@@ -1,39 +1,31 @@
 /**
- * De-duplication layer: when an interactive component has been used (indicated by
- * a context flag like "ui_facemap"), the corresponding checklist symptoms that
- * overlap with the interactive capture are soft-scaled to prevent double-counting.
+ * De-duplication layer v4.1
  *
- * Strategy: scale the checklist-entered severity by 0.5 (rounded) for symptoms
- * that are also covered by the interactive component.
+ * When an interactive component has been used (indicated by a context flag),
+ * symptoms it already captures are soft-scaled (×0.5) to prevent double-counting.
+ * Symptoms the interactive captured directly (present in uiPatch) keep their MAX value.
  */
 
-// Map from context flag → symptom IDs that the interactive component already captures
+// Exact mapping: context flag → symptom IDs replaced by that interactive component
 const INTERACTIVE_COVERAGE: Record<string, string[]> = {
+  // Cat 1: FaceMap + Intensity + Recurrence + Hormonal toggle
   ui_facemap: ["C1_01", "C1_02", "C1_03", "C1_04", "C1_07", "C1_08", "C1_15"],
-  ui_timeline: ["C2_01", "C2_02", "C2_03", "C2_04", "C2_09", "C2_14"],
-  ui_hydration: ["C3_01", "C3_02", "C3_03", "C3_13", "C3_15"],
-  ui_thermal: ["C4_01", "C4_05", "C4_06", "C4_07", "C4_09", "C4_15"],
-  ui_pigment_map: ["C5_01", "C5_02", "C5_03", "C5_04", "C5_06", "C5_07", "C5_12"],
+  // Cat 2: Timeline + Makeup longevity + Distribution + Seasonal
+  ui_timeline: ["C2_01", "C2_02", "C2_03", "C2_04", "C2_11", "C2_13", "C2_14"],
+  // Cat 3: Retention + Tightness + Flaking + Environment
+  ui_hydration: ["C3_01", "C3_02", "C3_03", "C3_11", "C3_13", "C3_15"],
+  // Cat 4: Reactivity + Flush duration + Active reaction + Capillary
+  ui_thermal: ["C4_01", "C4_03", "C4_05", "C4_06", "C4_09", "C4_15"],
+  // Cat 5: Pigment zone mapping
+  ui_pigment_map: ["C5_02", "C5_06", "C5_07", "C5_11", "C5_12"],
+  // Cat 6: SkinZoom selector
   ui_skinzoom: ["C6_01", "C6_02", "C6_03", "C6_06", "C6_07", "C6_10"],
-  ui_elasticity: ["C7_01", "C7_02", "C7_03", "C7_04", "C7_05", "C7_06", "C7_07"],
-  ui_recovery: ["C8_01", "C8_05", "C8_06", "C8_12", "C8_13"],
+  // Cat 7: Elasticity simulation + area tap
+  ui_elasticity: ["C7_01", "C7_03", "C7_05", "C7_06", "C7_07"],
+  // Cat 8: Recovery animation
+  ui_recovery: ["C8_01", "C8_06", "C8_12", "C8_13"],
 };
 
-/**
- * Given merged severities (interactive MAX'd with checklist), and active contexts,
- * apply soft scaling to checklist-covered symptoms so they don't inflate scores.
- *
- * We know a symptom was set by an interactive component if `uiPatch` contains it.
- * If the same symptom also has a checklist value AND the interactive flag is present,
- * we take the interactive value (already MAX'd) but don't let checklist stack on top.
- *
- * In practice, since we already used MAX merge, the values are already correct.
- * The dedup layer only needs to ensure we don't double-weight when BOTH sources
- * contributed. We do this by keeping the MAX'd value as-is (no stacking).
- *
- * If only the checklist set it and the interactive component was used for that
- * category but didn't set that specific symptom, we scale checklist by 0.7.
- */
 export function applyDedup(
   mergedSeverities: Record<string, number>,
   uiPatch: Record<string, number>,
@@ -50,9 +42,9 @@ export function applyDedup(
       const mergedVal = result[sid];
       if (mergedVal == null || mergedVal === 0) continue;
 
-      // If UI didn't set this symptom but checklist did, soft-scale
+      // If UI didn't set this symptom but checklist did → soft-scale ×0.5
       if (uiVal == null || uiVal === 0) {
-        result[sid] = Math.round(mergedVal * 0.7);
+        result[sid] = Math.max(0, Math.round(mergedVal * 0.5));
       }
       // If both set it, MAX is already applied — no change needed
     }

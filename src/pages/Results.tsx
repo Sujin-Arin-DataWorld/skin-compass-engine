@@ -76,9 +76,12 @@ const AnimatedScore = ({ target, delay }: { target: number; delay: number }) => 
 
 const ResultsPage = () => {
   const { result, selectedTier, setTier, severities } = useDiagnosisStore();
+  const [searchParams] = useSearchParams();
   const [activeTier, setActiveTier] = useState<Tier>(selectedTier);
   const [radarReady, setRadarReady] = useState(false);
-  const [replayPhase, setReplayPhase] = useState(0); // 0=banner, 1=pattern, 2=radar, 3=rest
+  const [replayPhase, setReplayPhase] = useState(0);
+  const isDebug = searchParams.get("debug") === "true" && import.meta.env.DEV;
+  const { reducedMotion } = usePerformanceMode();
 
   // Explainability
   const patternReasons = useMemo(() => {

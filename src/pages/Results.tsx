@@ -548,6 +548,11 @@ const ResultsPage = () => {
         </AnimatePresence>
       </div>
 
+      {/* Debug panel */}
+      {isDebug && result?._debug && (
+        <DebugPanel debugData={result._debug} />
+      )}
+
       <Footer />
     </div>
   );

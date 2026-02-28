@@ -91,6 +91,40 @@ export function runDiagnosis(input: DiagnosisInput): DiagnosisResult {
   // Product bundle
   const bundle = buildProductBundle(boosted, allFlags, input.skinType, input.tier);
 
+  // Build debug data
+  const dedupScales: Record<string, number> = {};
+  for (const sid of Object.keys(merged)) {
+    if (deduped[sid] !== merged[sid]) {
+      dedupScales[sid] = merged[sid] > 0 ? deduped[sid] / merged[sid] : 1;
+    }
+  }
+
+  const topSymptoms = Object.entries(deduped)
+    .filter(([, v]) => v > 0)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([id, sev]) => ({
+      id,
+      severity: sev,
+      text: (SYMPTOMS[id]?.text_en ?? id),
+    }));
+
+  const _debug: DebugData = {
+    rawScores: raw,
+    normalizedScores: normalized,
+    finalScores: boosted,
+    axisSeverities: axisSeverity,
+    patterns: patterns.map((p) => ({
+      id: p.pattern.id,
+      name: p.pattern.name_en,
+      confidence: p.score,
+      flag: p.pattern.flag,
+      severity: p.severity,
+    })),
+    dedupScales,
+    topSymptoms,
+  };
+
   return {
     engineVersion: "4.0.0",
     axis_scores: boosted,
@@ -103,6 +137,7 @@ export function runDiagnosis(input: DiagnosisInput): DiagnosisResult {
     primary_concerns: primary,
     secondary_concerns: secondary,
     product_bundle: bundle,
+    _debug,
   };
 }
 

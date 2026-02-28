@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
-import { SYMPTOMS, CATEGORY_INFO, META_QUESTIONS } from "@/engine/weights";
+import { CATEGORY_INFO, META_QUESTIONS } from "@/engine/weights";
 import { runDiagnosis } from "@/engine/runDiagnosisV4";
 import type { SkinType, ContextKey } from "@/engine/types";
 import Navbar from "@/components/Navbar";
+import CategoryInteractive from "@/components/diagnosis/CategoryInteractive";
+import SeveritySelector from "@/components/diagnosis/SeveritySelector";
+import LabCard from "@/components/diagnosis/LabCard";
 
 const CONTEXT_OPTIONS: { key: ContextKey; label: string }[] = [
   { key: "shaving", label: "I shave regularly" },
@@ -26,44 +29,24 @@ const SKIN_TYPES: { key: SkinType; label: string; desc: string }[] = [
   { key: "normal", label: "Normal", desc: "Generally balanced" },
 ];
 
-const SEVERITY_LABELS = ["None", "Occasionally", "Often", "Almost Always"];
-
-const SeveritySelector = ({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (v: number) => void;
-}) => (
-  <div className="flex gap-1">
-    {[0, 1, 2, 3].map((v) => (
-      <button
-        key={v}
-        onClick={() => onChange(v)}
-        className={`flex-1 rounded-md px-3 py-2 text-xs font-medium transition-all ${
-          value === v
-            ? v === 0
-              ? "bg-muted text-foreground"
-              : v === 1
-              ? "bg-severity-mild/20 text-severity-mild"
-              : v === 2
-              ? "bg-severity-moderate/20 text-severity-moderate"
-              : "bg-severity-severe/20 text-severity-severe"
-            : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
-        }`}
-      >
-        {SEVERITY_LABELS[v]}
-      </button>
-    ))}
-  </div>
-);
-
 const LOADING_MESSAGES = [
   "Mapping your symptom profile...",
   "Scoring 10 clinical axes...",
   "Detecting high-risk patterns...",
   "Building your protocol...",
 ];
+
+const StepWrapper = ({ children, ...props }: { children: React.ReactNode; key: string }) => (
+  <motion.div
+    initial={{ opacity: 0, x: 30 }}
+    animate={{ opacity: 1, x: 0 }}
+    exit={{ opacity: 0, x: -30 }}
+    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+    {...props}
+  >
+    {children}
+  </motion.div>
+);
 
 const DiagnosisPage = () => {
   const navigate = useNavigate();
@@ -72,15 +55,8 @@ const DiagnosisPage = () => {
   const [showMeta, setShowMeta] = useState(false);
   const [metaCategoryJustCompleted, setMetaCategoryJustCompleted] = useState<number | null>(null);
 
-  // Total steps: 0=context, 1=skinType, 2-9=categories 1-8, 10=loading
   const totalSteps = 10;
   const progress = ((store.currentStep + 1) / (totalSteps + 1)) * 100;
-
-  const categorySymptoms = useMemo(() => {
-    if (store.currentStep < 2 || store.currentStep > 9) return [];
-    const cat = store.currentStep - 1; // step 2 = cat 1, step 9 = cat 8
-    return Object.values(SYMPTOMS).filter((s) => s.category === cat);
-  }, [store.currentStep]);
 
   const currentCategoryNum = store.currentStep >= 2 && store.currentStep <= 9 ? store.currentStep - 1 : 0;
 
@@ -94,7 +70,6 @@ const DiagnosisPage = () => {
   }, [metaCategoryJustCompleted, store.severities]);
 
   const goNext = useCallback(() => {
-    // Check for meta questions after category completion
     if (store.currentStep >= 2 && store.currentStep <= 9) {
       const completedCat = store.currentStep - 1;
       const metaQs = META_QUESTIONS.filter(
@@ -113,7 +88,6 @@ const DiagnosisPage = () => {
     if (store.currentStep < 9) {
       store.setStep(store.currentStep + 1);
     } else {
-      // Start loading + run diagnosis
       store.setStep(10);
     }
   }, [store, showMeta]);
@@ -134,7 +108,6 @@ const DiagnosisPage = () => {
       setLoadingMsg((prev) => {
         if (prev >= LOADING_MESSAGES.length - 1) {
           clearInterval(interval);
-          // Run diagnosis
           const result = runDiagnosis({
             severities: store.severities,
             contexts: store.contexts,
@@ -165,7 +138,7 @@ const DiagnosisPage = () => {
         />
       </div>
 
-      <div className="flex min-h-screen flex-col items-center justify-center px-6 pt-20">
+      <div className="flex min-h-screen flex-col items-center justify-start px-4 sm:px-6 pt-24 pb-12">
         <div className="mx-auto w-full max-w-[640px]">
           <AnimatePresence mode="wait">
             {/* Step 0: Context */}
@@ -179,7 +152,7 @@ const DiagnosisPage = () => {
                 </p>
                 <div className="mt-8 flex flex-col gap-3">
                   {CONTEXT_OPTIONS.map((opt) => (
-                    <button
+                    <motion.button
                       key={opt.key}
                       onClick={() => store.toggleContext(opt.key)}
                       className={`rounded-lg border px-5 py-4 text-left text-sm transition-all ${
@@ -187,9 +160,10 @@ const DiagnosisPage = () => {
                           ? "border-primary bg-primary/10 text-foreground"
                           : "border-border text-muted-foreground hover:border-primary/50"
                       }`}
+                      whileTap={{ scale: 0.98 }}
                     >
                       {opt.label}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </StepWrapper>
@@ -206,7 +180,7 @@ const DiagnosisPage = () => {
                 </p>
                 <div className="mt-8 flex flex-col gap-3">
                   {SKIN_TYPES.map((st) => (
-                    <button
+                    <motion.button
                       key={st.key}
                       onClick={() => store.setSkinType(st.key)}
                       className={`rounded-lg border px-5 py-4 text-left transition-all ${
@@ -214,42 +188,24 @@ const DiagnosisPage = () => {
                           ? "border-primary bg-primary/10"
                           : "border-border hover:border-primary/50"
                       }`}
+                      whileTap={{ scale: 0.98 }}
                     >
                       <span className="font-medium text-foreground">{st.label}</span>
                       <span className="ml-3 text-sm text-muted-foreground">— {st.desc}</span>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </StepWrapper>
             )}
 
-            {/* Steps 2-9: Categories */}
+            {/* Steps 2-9: Interactive Categories */}
             {store.currentStep >= 2 && store.currentStep <= 9 && !showMeta && (
               <StepWrapper key={`cat-${currentCategoryNum}`}>
-                <div className="mb-6">
-                  <span className="text-xs font-medium uppercase tracking-widest text-primary">
-                    Category {currentCategoryNum} of 8
-                  </span>
-                  <h2 className="mt-2 font-display text-3xl text-foreground">
-                    {CATEGORY_INFO[currentCategoryNum]?.emoji}{" "}
-                    {CATEGORY_INFO[currentCategoryNum]?.name}
-                  </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {CATEGORY_INFO[currentCategoryNum]?.clinical}
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-5">
-                  {categorySymptoms.map((symptom) => (
-                    <div key={symptom.id} className="space-y-2">
-                      <p className="text-sm text-foreground">{symptom.text_en}</p>
-                      <SeveritySelector
-                        value={store.severities[symptom.id] ?? 0}
-                        onChange={(v) => store.setSeverity(symptom.id, v)}
-                      />
-                    </div>
-                  ))}
-                </div>
+                <CategoryInteractive
+                  category={currentCategoryNum}
+                  severities={store.severities}
+                  onSeverityChange={(id, v) => store.setSeverity(id, v)}
+                />
               </StepWrapper>
             )}
 
@@ -264,12 +220,12 @@ const DiagnosisPage = () => {
                 </p>
                 <div className="mt-8 flex flex-col gap-6">
                   {metaQuestionsForCategory.map((q) => (
-                    <div key={q.id} className="space-y-2">
-                      <p className="text-sm text-foreground">{q.text_en}</p>
+                    <LabCard key={q.id}>
+                      <p className="text-sm text-foreground mb-3">{q.text_en}</p>
                       {q.type === "boolean" ? (
                         <div className="flex gap-2">
                           {[true, false].map((v) => (
-                            <button
+                            <motion.button
                               key={String(v)}
                               onClick={() => store.setMetaAnswer(q.id, v)}
                               className={`flex-1 rounded-md px-4 py-2 text-sm transition-all ${
@@ -277,9 +233,10 @@ const DiagnosisPage = () => {
                                   ? "bg-primary/20 text-primary border border-primary"
                                   : "bg-secondary/50 text-muted-foreground border border-transparent hover:bg-secondary"
                               }`}
+                              whileTap={{ scale: 0.96 }}
                             >
                               {v ? "Yes" : "No"}
-                            </button>
+                            </motion.button>
                           ))}
                         </div>
                       ) : (
@@ -288,7 +245,7 @@ const DiagnosisPage = () => {
                           onChange={(v) => store.setMetaAnswer(q.id, v)}
                         />
                       )}
-                    </div>
+                    </LabCard>
                   ))}
                 </div>
               </StepWrapper>
@@ -298,7 +255,11 @@ const DiagnosisPage = () => {
             {store.currentStep === 10 && (
               <StepWrapper key="loading">
                 <div className="flex flex-col items-center justify-center py-20">
-                  <div className="h-20 w-20 animate-pulse-glow rounded-full border-2 border-primary opacity-40" />
+                  <motion.div
+                    className="h-20 w-20 rounded-full border-2 border-primary"
+                    animate={{ opacity: [0.3, 1, 0.3], scale: [0.95, 1.05, 0.95] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  />
                   <AnimatePresence mode="wait">
                     <motion.p
                       key={loadingMsg}
@@ -318,7 +279,12 @@ const DiagnosisPage = () => {
 
           {/* Navigation */}
           {store.currentStep < 10 && (
-            <div className="mt-8 flex items-center justify-between pb-12">
+            <motion.div
+              className="mt-8 flex items-center justify-between pb-12"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <button
                 onClick={goBack}
                 disabled={store.currentStep === 0 && !showMeta}
@@ -326,32 +292,21 @@ const DiagnosisPage = () => {
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
-              <button
+              <motion.button
                 onClick={goNext}
                 disabled={store.currentStep === 1 && !store.skinType}
                 className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 disabled:opacity-30"
+                whileTap={{ scale: 0.96 }}
               >
                 {store.currentStep === 9 && !showMeta ? "Analyse My Skin" : "Continue"}
                 <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           )}
         </div>
       </div>
     </div>
   );
 };
-
-const StepWrapper = ({ children, ...props }: { children: React.ReactNode; key: string }) => (
-  <motion.div
-    initial={{ opacity: 0, x: 30 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -30 }}
-    transition={{ duration: 0.3 }}
-    {...props}
-  >
-    {children}
-  </motion.div>
-);
 
 export default DiagnosisPage;

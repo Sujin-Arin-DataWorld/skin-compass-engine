@@ -8,18 +8,33 @@ import {
 } from "./scoreEngineV4";
 import { detectPatterns, applyPatternBoosts, getUrgencyLevel } from "./patternEngineV4";
 import { PRODUCT_CATALOG } from "./weights";
+import { mapUiSignalsToSeverityPatch, mergeSeveritiesMax } from "./uiMappingV4";
+import { applyDedup } from "./dedupV4";
+import type { UiSignalsV4 } from "./uiMappingV4";
 
 export interface DiagnosisInput {
-  severities: Record<string, number>; // symptom_id → 0-3
+  severities: Record<string, number>;
   contexts: ContextKey[];
   skinType: SkinType;
   tier: Tier;
   metaAnswers: Record<string, number | boolean>;
+  uiSignals?: UiSignalsV4;
 }
 
 export function runDiagnosis(input: DiagnosisInput): DiagnosisResult {
+  // Step A: UI signals → symptom severity patch
+  const uiPatch = input.uiSignals
+    ? mapUiSignalsToSeverityPatch(input.uiSignals)
+    : {};
+
+  // Step B: Merge UI patch into checklist severities (MAX wins)
+  const merged = mergeSeveritiesMax(input.severities, uiPatch);
+
+  // Step C: Dedup to prevent double counting
+  const deduped = applyDedup(merged, uiPatch, input.contexts as string[]);
+
   // Step 1: Raw accumulation with severity multipliers
-  const raw = computeRawScores(input.severities);
+  const raw = computeRawScores(deduped);
 
   // Step 2: Skin type baseline
   const withBaseline = applySkinTypeBaseline(raw, input.skinType);
@@ -34,7 +49,7 @@ export function runDiagnosis(input: DiagnosisInput): DiagnosisResult {
   const { normalized, flags: clinicalFlags } = clinicalNormalize(saturated);
 
   // Step 6: Pattern detection
-  const patterns = detectPatterns(input.severities, normalized, input.metaAnswers);
+  const patterns = detectPatterns(deduped, normalized, input.metaAnswers);
 
   // Step 7: Pattern boosts (additive, top 2 only)
   const boosted = applyPatternBoosts(normalized, patterns);
@@ -91,14 +106,12 @@ function buildProductBundle(
     Phase1: [], Phase2: [], Phase3: [], Phase4: [], Phase5: [], Device: [],
   };
 
-  // Phase 1
   if (scores.seb >= 40 || scores.acne >= 30) {
     bundle.Phase1.push(PRODUCT_CATALOG.drg_cleanser_oily);
   } else {
     bundle.Phase1.push(PRODUCT_CATALOG.biplain_cleanser);
   }
 
-  // Phase 2
   if (scores.hyd >= 25) {
     bundle.Phase2.push(tier === "Entry" ? PRODUCT_CATALOG.snature_toner : PRODUCT_CATALOG.torriden_serum);
   }
@@ -110,7 +123,6 @@ function buildProductBundle(
     else if (tier === "Full") bundle.Phase2.push(PRODUCT_CATALOG.manyo_bifida);
   }
 
-  // Phase 3
   if (tier !== "Entry") {
     if (scores.acne >= 35 || scores.seb >= 45) {
       bundle.Phase3.push(PRODUCT_CATALOG.cosrx_bha);
@@ -125,17 +137,14 @@ function buildProductBundle(
     }
   }
 
-  // Phase 4
   if (scores.seb >= 40) {
     bundle.Phase4.push(PRODUCT_CATALOG.drg_soothing_cream);
   } else {
     bundle.Phase4.push(PRODUCT_CATALOG.snature_moistcream);
   }
 
-  // Phase 5 — Always
   bundle.Phase5.push(tier === "Entry" ? PRODUCT_CATALOG.drg_sunscreen : PRODUCT_CATALOG.cellfusionc_sunscreen);
 
-  // Device
   if (scores.aging >= 46 || flags.includes("DEVICE_RECOMMENDED")) {
     if (tier === "Premium") bundle.Device.push(PRODUCT_CATALOG.medicube_booster);
     else if (tier === "Full") bundle.Device.push(PRODUCT_CATALOG.mamicare_device);

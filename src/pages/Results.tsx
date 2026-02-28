@@ -6,7 +6,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
-import { AXIS_LABELS, Tier, Product } from "@/engine/types";
+import { AXIS_LABELS, Tier, Product, AXIS_KEYS } from "@/engine/types";
+import { SYMPTOMS } from "@/engine/weights";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -53,8 +54,21 @@ const TIER_INFO: Record<Tier, { label: string; price: string; features: string[]
 };
 
 const ResultsPage = () => {
-  const { result, selectedTier, setTier } = useDiagnosisStore();
+  const { result, selectedTier, setTier, severities } = useDiagnosisStore();
   const [activeTier, setActiveTier] = useState<Tier>(selectedTier);
+
+  // Explainability: top contributing symptoms for the primary pattern
+  const patternReasons = useMemo(() => {
+    if (!result) return [];
+    const pp = result.detected_patterns[0];
+    if (!pp) return [];
+    const allIds = [...pp.pattern.required, ...pp.pattern.optional];
+    return allIds
+      .filter((id) => (severities[id] ?? 0) >= 2)
+      .map((id) => ({ id, text: SYMPTOMS[id]?.text_en ?? id, severity: severities[id] ?? 0 }))
+      .sort((a, b) => b.severity - a.severity)
+      .slice(0, 3);
+  }, [result, severities]);
 
   if (!result) return <Navigate to="/diagnosis" replace />;
 
@@ -130,6 +144,22 @@ const ResultsPage = () => {
                 <span key={p.pattern.id} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
                   {p.pattern.name_en}
                 </span>
+              ))}
+            </div>
+          )}
+          {/* Explainability: top contributing reasons */}
+          {patternReasons.length > 0 && (
+            <div className="mt-6 space-y-2">
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                Key Contributors
+              </p>
+              {patternReasons.map((r) => (
+                <div key={r.id} className="flex items-start gap-2">
+                  <span className={`mt-0.5 h-2 w-2 rounded-full shrink-0 ${
+                    r.severity >= 3 ? "bg-severity-severe" : "bg-severity-moderate"
+                  }`} />
+                  <p className="text-sm text-muted-foreground leading-snug">{r.text}</p>
+                </div>
               ))}
             </div>
           )}

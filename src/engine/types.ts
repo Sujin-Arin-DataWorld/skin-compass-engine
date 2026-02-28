@@ -94,6 +94,15 @@ export interface DiagnosisResult {
   primary_concerns: AxisKey[];
   secondary_concerns: AxisKey[];
   product_bundle: Record<string, Product[]>;
+  _debug?: {
+    rawScores: AxisScores;
+    normalizedScores: AxisScores;
+    finalScores: AxisScores;
+    axisSeverities: AxisSeverity;
+    patterns: { id: string; name: string; confidence: number; flag: string; severity: number }[];
+    dedupScales: Record<string, number>;
+    topSymptoms: { id: string; severity: number; text: string }[];
+  };
 }
 
 export type Tier = "Entry" | "Full" | "Premium";

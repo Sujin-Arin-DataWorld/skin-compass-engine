@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -10,6 +10,8 @@ import { AXIS_LABELS, Tier, Product, AXIS_KEYS } from "@/engine/types";
 import { SYMPTOMS } from "@/engine/weights";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DebugPanel from "@/components/diagnosis/DebugPanel";
+import { usePerformanceMode } from "@/hooks/usePerformanceMode";
 
 const URGENCY_COLORS: Record<string, string> = {
   LOW: "hsl(var(--severity-clear))",
@@ -74,9 +76,12 @@ const AnimatedScore = ({ target, delay }: { target: number; delay: number }) => 
 
 const ResultsPage = () => {
   const { result, selectedTier, setTier, severities } = useDiagnosisStore();
+  const [searchParams] = useSearchParams();
   const [activeTier, setActiveTier] = useState<Tier>(selectedTier);
   const [radarReady, setRadarReady] = useState(false);
-  const [replayPhase, setReplayPhase] = useState(0); // 0=banner, 1=pattern, 2=radar, 3=rest
+  const [replayPhase, setReplayPhase] = useState(0);
+  const isDebug = searchParams.get("debug") === "true" && import.meta.env.DEV;
+  const { reducedMotion } = usePerformanceMode();
 
   // Explainability
   const patternReasons = useMemo(() => {
@@ -96,16 +101,20 @@ const ResultsPage = () => {
 
   useEffect(() => {
     if (!result) return;
-    // Start with zeros
-    setAnimatedRadar(result.radar_chart_data.map(d => ({ ...d, score: 0 })));
 
-    // Phase 0 → 1 (banner visible immediately, pattern at 0.6s)
+    // Skip replay animation in reduced motion mode
+    if (reducedMotion) {
+      setAnimatedRadar(result.radar_chart_data);
+      setRadarReady(true);
+      setReplayPhase(3);
+      return;
+    }
+
+    setAnimatedRadar(result.radar_chart_data.map(d => ({ ...d, score: 0 })));
     const t1 = setTimeout(() => setReplayPhase(1), 600);
-    // Phase 2 (radar starts building at 1.2s)
     const t2 = setTimeout(() => {
       setReplayPhase(2);
       setRadarReady(true);
-      // Animate each axis sequentially
       result.radar_chart_data.forEach((d, i) => {
         setTimeout(() => {
           setAnimatedRadar(prev => prev.map((p, j) =>
@@ -114,11 +123,10 @@ const ResultsPage = () => {
         }, i * 200);
       });
     }, 1200);
-    // Phase 3 (rest of content at 3s)
     const t3 = setTimeout(() => setReplayPhase(3), 3000);
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [result]);
+  }, [result, reducedMotion]);
 
   if (!result) return <Navigate to="/diagnosis" replace />;
 
@@ -267,6 +275,40 @@ const ResultsPage = () => {
                   ))}
                 </motion.div>
               )}
+
+              {/* Why this result? — Transparency section */}
+              <motion.div
+                className="mt-8 rounded-lg border border-border/50 bg-secondary/20 p-5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.1 }}
+              >
+                <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                  Why this result?
+                </p>
+                {/* Dominant signals */}
+                {result.primary_concerns.length > 0 && (
+                  <div className="space-y-1.5 mb-3">
+                    {result.primary_concerns.slice(0, 3).map((axis) => (
+                      <div key={axis} className="flex items-center justify-between text-sm">
+                        <span className="text-foreground">{AXIS_LABELS[axis]}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          result.axis_severity[axis] >= 3
+                            ? "bg-severity-severe/10 text-severity-severe"
+                            : result.axis_severity[axis] >= 2
+                            ? "bg-severity-moderate/10 text-severity-moderate"
+                            : "bg-severity-mild/10 text-severity-mild"
+                        }`}>
+                          {result.axis_severity[axis] >= 3 ? "High" : result.axis_severity[axis] >= 2 ? "Moderate" : "Low"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  AI-assisted assessment based on your self-reported symptoms. This is not a medical diagnosis.
+                </p>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -505,6 +547,11 @@ const ResultsPage = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Debug panel */}
+      {isDebug && result?._debug && (
+        <DebugPanel debugData={result._debug} />
+      )}
 
       <Footer />
     </div>

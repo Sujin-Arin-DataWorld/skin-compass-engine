@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link, Navigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, AnimatePresence, animate } from "framer-motion";
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
+import { ChevronDown } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { AXIS_LABELS, Tier, Product, AXIS_KEYS } from "@/engine/types";
 import { SYMPTOMS } from "@/engine/weights";
@@ -12,6 +13,17 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { usePerformanceMode } from "@/hooks/usePerformanceMode";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 const URGENCY_COLORS: Record<string, string> = {
   LOW: "hsl(var(--severity-clear))",
@@ -55,10 +67,8 @@ const TIER_INFO: Record<Tier, { label: string; price: string; features: string[]
   Premium: { label: "PREMIUM Strategy", price: "€149+", features: ["+ Device", "+ Premium serums", "+ Priority ship"] },
 };
 
-// ── Animated counter component ──
 const AnimatedScore = ({ target, delay }: { target: number; delay: number }) => {
   const [display, setDisplay] = useState(0);
-
   useEffect(() => {
     const timeout = setTimeout(() => {
       const controls = animate(0, target, {
@@ -70,20 +80,32 @@ const AnimatedScore = ({ target, delay }: { target: number; delay: number }) => 
     }, delay * 1000);
     return () => clearTimeout(timeout);
   }, [target, delay]);
-
   return <span>{display}</span>;
+};
+
+const severityColor = (score: number) => {
+  if (score <= 20) return "hsl(var(--severity-clear))";
+  if (score <= 45) return "hsl(var(--severity-mild))";
+  if (score <= 70) return "hsl(var(--severity-moderate))";
+  return "hsl(var(--severity-severe))";
+};
+
+const severityLabel = (score: number) => {
+  if (score <= 20) return "Low";
+  if (score <= 45) return "Mild";
+  if (score <= 70) return "Moderate";
+  return "High";
 };
 
 const ResultsPage = () => {
   const { result, selectedTier, setTier, severities } = useDiagnosisStore();
   const [searchParams] = useSearchParams();
   const [activeTier, setActiveTier] = useState<Tier>(selectedTier);
+  const [metricsOpen, setMetricsOpen] = useState(false);
   const [radarReady, setRadarReady] = useState(false);
-  const [replayPhase, setReplayPhase] = useState(0);
   const isDebug = searchParams.get("debug") === "true" && import.meta.env.DEV;
   const { reducedMotion } = usePerformanceMode();
 
-  // Explainability
   const patternReasons = useMemo(() => {
     if (!result) return [];
     const pp = result.detected_patterns[0];
@@ -96,24 +118,17 @@ const ResultsPage = () => {
       .slice(0, 3);
   }, [result, severities]);
 
-  // Animated radar data — starts at 0, builds up
   const [animatedRadar, setAnimatedRadar] = useState<{ axis: string; score: number; label: string }[]>([]);
 
   useEffect(() => {
     if (!result) return;
-
-    // Skip replay animation in reduced motion mode
     if (reducedMotion) {
       setAnimatedRadar(result.radar_chart_data);
       setRadarReady(true);
-      setReplayPhase(3);
       return;
     }
-
     setAnimatedRadar(result.radar_chart_data.map(d => ({ ...d, score: 0 })));
-    const t1 = setTimeout(() => setReplayPhase(1), 600);
-    const t2 = setTimeout(() => {
-      setReplayPhase(2);
+    const t1 = setTimeout(() => {
       setRadarReady(true);
       result.radar_chart_data.forEach((d, i) => {
         setTimeout(() => {
@@ -122,437 +137,324 @@ const ResultsPage = () => {
           ));
         }, i * 200);
       });
-    }, 1200);
-    const t3 = setTimeout(() => setReplayPhase(3), 3000);
-
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    }, 600);
+    return () => clearTimeout(t1);
   }, [result, reducedMotion]);
 
   if (!result) return <Navigate to="/diagnosis" replace />;
 
   const primaryPattern = result.detected_patterns[0];
   const additionalPatterns = result.detected_patterns.slice(1);
-
-  const handleTierChange = (t: Tier) => {
-    setActiveTier(t);
-    setTier(t);
-  };
-
+  const handleTierChange = (t: Tier) => { setActiveTier(t); setTier(t); };
   const bundle = result.product_bundle;
-
-  const severityColor = (score: number) => {
-    if (score <= 20) return "hsl(var(--severity-clear))";
-    if (score <= 45) return "hsl(var(--severity-mild))";
-    if (score <= 70) return "hsl(var(--severity-moderate))";
-    return "hsl(var(--severity-severe))";
-  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
       <div className="mx-auto max-w-[960px] px-4 sm:px-6 pt-24 pb-16">
-        {/* Section A: Pattern Banner — reveals immediately */}
-        <AnimatePresence>
-          {replayPhase >= 0 && (
-            primaryPattern ? (
-              <motion.div
-                initial={{ opacity: 0, y: 30, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-                className={`rounded-lg border p-6 ${URGENCY_BG[result.urgency_level]}`}
-              >
-                <motion.p
-                  className="text-sm font-medium"
-                  style={{ color: URGENCY_COLORS[result.urgency_level] }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  {result.urgency_level === "CRITICAL" ? "⚠️ Critical Pattern Detected" : result.urgency_level === "HIGH" ? "⚠️ High-Risk Pattern Detected" : "Pattern Detected"}
-                </motion.p>
-                <motion.p
-                  className="mt-1 font-display text-xl text-foreground"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4, duration: 0.4 }}
-                >
-                  {primaryPattern.pattern.name_en}
-                </motion.p>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-lg border border-severity-clear/20 bg-severity-clear/5 p-6"
-              >
-                <p className="text-sm text-severity-clear">
-                  No critical risk patterns detected. Proceed with your protocol.
-                </p>
-              </motion.div>
-            )
+
+        {/* ═══════════════════════════════════════════════════════════
+            SECTION 1: PRIMARY DIAGNOSIS (always visible)
+        ═══════════════════════════════════════════════════════════ */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Urgency banner */}
+          {primaryPattern ? (
+            <div className={`rounded-lg border p-6 ${URGENCY_BG[result.urgency_level]}`}>
+              <p className="text-sm font-medium" style={{ color: URGENCY_COLORS[result.urgency_level] }}>
+                {result.urgency_level === "CRITICAL" ? "⚠️ Critical Pattern Detected" : result.urgency_level === "HIGH" ? "⚠️ High-Risk Pattern Detected" : "Pattern Detected"}
+              </p>
+              <p className="mt-1 font-display text-xl text-foreground">{primaryPattern.pattern.name_en}</p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-severity-clear/20 bg-severity-clear/5 p-6">
+              <p className="text-sm text-severity-clear">No critical patterns detected.</p>
+            </div>
           )}
-        </AnimatePresence>
 
-        {/* Section B: Pattern Name & Summary — staggered reveal */}
-        <AnimatePresence>
-          {replayPhase >= 1 && (
-            <motion.div
-              className="mt-16"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-            >
-              <motion.p
-                className="text-xs font-medium uppercase tracking-[0.2em] text-primary"
-                initial={{ opacity: 0, letterSpacing: "0.1em" }}
-                animate={{ opacity: 1, letterSpacing: "0.2em" }}
-                transition={{ delay: 0.1, duration: 0.6 }}
-              >
-                YOUR SKIN PATTERN
-              </motion.p>
-              <motion.h1
-                className="mt-3 font-display text-3xl sm:text-4xl text-foreground"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
-                {primaryPattern?.pattern.name_en || "Balanced Skin Profile"}
-              </motion.h1>
-              <motion.p
-                className="mt-4 max-w-2xl text-muted-foreground leading-relaxed"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-              >
-                {primaryPattern?.pattern.clinical_en || "Your skin shows a balanced profile without any dominant pattern. Follow the recommended protocol to maintain optimal skin health."}
-              </motion.p>
-              {additionalPatterns.length > 0 && (
-                <motion.div
-                  className="mt-4 flex flex-wrap gap-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <span className="text-xs text-muted-foreground">Additional patterns:</span>
-                  {additionalPatterns.map((p, i) => (
-                    <motion.span
-                      key={p.pattern.id}
-                      className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground"
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.7 + i * 0.1 }}
-                    >
-                      {p.pattern.name_en}
-                    </motion.span>
-                  ))}
-                </motion.div>
-              )}
-              {/* Explainability bullets */}
-              {patternReasons.length > 0 && (
-                <motion.div
-                  className="mt-6 space-y-2"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-                    Key Contributors
-                  </p>
-                  {patternReasons.map((r, i) => (
-                    <motion.div
-                      key={r.id}
-                      className="flex items-start gap-2"
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.9 + i * 0.12 }}
-                    >
-                      <span className={`mt-0.5 h-2 w-2 rounded-full shrink-0 ${
-                        r.severity >= 3 ? "bg-severity-severe" : "bg-severity-moderate"
-                      }`} />
-                      <p className="text-sm text-muted-foreground leading-snug">{r.text}</p>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
+          {/* Pattern name + explanation */}
+          <div className="mt-8">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">YOUR SKIN PATTERN</p>
+            <h1 className="mt-3 font-display text-3xl sm:text-4xl text-foreground">
+              {primaryPattern?.pattern.name_en || "Balanced Skin Profile"}
+            </h1>
+            <p className="mt-3 max-w-2xl text-muted-foreground leading-relaxed">
+              {primaryPattern?.pattern.clinical_en || "Your skin shows a balanced profile without any dominant pattern."}
+            </p>
 
-              {/* Why this result? — Transparency section */}
-              <motion.div
-                className="mt-8 rounded-lg border border-border/50 bg-secondary/20 p-5"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.1 }}
-              >
-                <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
-                  Why this result?
-                </p>
-                {/* Dominant signals */}
-                {result.primary_concerns.length > 0 && (
-                  <div className="space-y-1.5 mb-3">
-                    {result.primary_concerns.slice(0, 3).map((axis) => (
-                      <div key={axis} className="flex items-center justify-between text-sm">
-                        <span className="text-foreground">{AXIS_LABELS[axis]}</span>
-                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                          result.axis_severity[axis] >= 3
-                            ? "bg-severity-severe/10 text-severity-severe"
-                            : result.axis_severity[axis] >= 2
-                            ? "bg-severity-moderate/10 text-severity-moderate"
-                            : "bg-severity-mild/10 text-severity-mild"
-                        }`}>
-                          {result.axis_severity[axis] >= 3 ? "High" : result.axis_severity[axis] >= 2 ? "Moderate" : "Low"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  AI-assisted assessment based on your self-reported symptoms. This is not a medical diagnosis.
-                </p>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {/* Severity badge */}
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border px-4 py-1.5">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: URGENCY_COLORS[result.urgency_level] }} />
+              <span className="text-xs font-medium text-foreground">{result.urgency_level} Severity</span>
+            </div>
 
-        {/* Section C: Radar Chart — axes build up sequentially */}
-        <AnimatePresence>
-          {replayPhase >= 2 && (
-            <motion.div
-              className="mt-16"
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-            >
-              {/* Axis score counters */}
-              <div className="mb-6 grid grid-cols-3 sm:grid-cols-6 gap-3">
-                {result.radar_chart_data.map((d, i) => (
-                  <motion.div
-                    key={d.axis}
-                    className="flex flex-col items-center gap-1 rounded-lg border border-border p-3"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 + i * 0.15, duration: 0.4 }}
-                  >
-                    <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{d.axis}</span>
-                    <span
-                      className="text-xl font-display"
-                      style={{ color: severityColor(d.score) }}
-                    >
-                      <AnimatedScore target={d.score} delay={0.2 + i * 0.15} />
-                    </span>
-                  </motion.div>
+            {additionalPatterns.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="text-xs text-muted-foreground">Additional:</span>
+                {additionalPatterns.map((p) => (
+                  <span key={p.pattern.id} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground">
+                    {p.pattern.name_en}
+                  </span>
                 ))}
               </div>
+            )}
+          </div>
 
-              <div className="mx-auto max-w-[500px]">
-                <ResponsiveContainer width="100%" height={360}>
-                  <RadarChart data={radarReady ? animatedRadar : animatedRadar}>
-                    <PolarGrid stroke="hsl(var(--border))" />
-                    <PolarAngleAxis
-                      dataKey="axis"
-                      tick={({ payload, x, y, cx, ...rest }) => {
-                        const score = result.radar_chart_data.find(d => d.axis === payload.value)?.score ?? 0;
-                        return (
-                          <text
-                            {...rest}
-                            x={x}
-                            y={y}
-                            textAnchor={x > cx ? "start" : x < cx ? "end" : "middle"}
-                            fill={severityColor(score)}
-                            fontSize={11}
-                          >
-                            {payload.value}
-                          </text>
-                        );
-                      }}
-                    />
-                    <PolarRadiusAxis
-                      domain={[0, 100]}
-                      tick={{ fill: "hsl(var(--text-muted))", fontSize: 8 }}
-                      tickCount={4}
-                    />
-                    <Radar
-                      dataKey="score"
-                      stroke="hsl(var(--accent-cyan))"
-                      fill="hsl(var(--accent-cyan))"
-                      fillOpacity={0.15}
-                      strokeWidth={2}
-                      animationBegin={0}
-                      animationDuration={600}
-                      animationEasing="ease-out"
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
+          {/* Why this result? */}
+          <div className="mt-6 rounded-lg border border-border/50 bg-secondary/20 p-5">
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">Why this result?</p>
+            {patternReasons.length > 0 && (
+              <div className="space-y-1.5 mb-3">
+                {patternReasons.map((r) => (
+                  <div key={r.id} className="flex items-start gap-2">
+                    <span className={`mt-0.5 h-2 w-2 rounded-full shrink-0 ${r.severity >= 3 ? "bg-severity-severe" : "bg-severity-moderate"}`} />
+                    <p className="text-sm text-muted-foreground leading-snug">{r.text}</p>
+                  </div>
+                ))}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Sections D-H — reveal after radar completes */}
-        <AnimatePresence>
-          {replayPhase >= 3 && (
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-            >
-              {/* Section D: Phase Protocol */}
-              <div className="mt-16">
-                <h2 className="font-display text-2xl text-foreground">Your 5-Phase Protocol</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Applied in this exact order, morning and evening.</p>
-                <div className="mt-8 space-y-6">
-                  {Object.entries(PHASE_LABELS).map(([key, phase], i) => {
-                    const products = bundle[key] || [];
-                    if (key === "Device" && products.length === 0) return null;
-                    return (
-                      <motion.div
-                        key={key}
-                        className="border-l-2 border-border pl-6"
-                        initial={{ opacity: 0, x: -15 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.1, duration: 0.4 }}
-                      >
-                        <h3 className="font-display text-lg text-foreground">{phase.name}</h3>
-                        <p className="mt-1 text-sm text-muted-foreground">{phase.desc}</p>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+            )}
+            {result.primary_concerns.length > 0 && (
+              <div className="space-y-1.5 mb-3">
+                {result.primary_concerns.slice(0, 3).map((axis) => (
+                  <div key={axis} className="flex items-center justify-between text-sm">
+                    <span className="text-foreground">{AXIS_LABELS[axis]}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      result.axis_severity[axis] >= 3
+                        ? "bg-severity-severe/10 text-severity-severe"
+                        : result.axis_severity[axis] >= 2
+                        ? "bg-severity-moderate/10 text-severity-moderate"
+                        : "bg-severity-mild/10 text-severity-mild"
+                    }`}>
+                      {result.axis_severity[axis] >= 3 ? "High" : result.axis_severity[axis] >= 2 ? "Moderate" : "Low"}
+                    </span>
+                  </div>
+                ))}
               </div>
+            )}
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              AI-assisted assessment based on your self-reported symptoms. Not a medical diagnosis.
+            </p>
+          </div>
+        </motion.section>
 
-              {/* Section E: Strategy Box (Tiers) */}
-              <motion.div
-                className="mt-16"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
-                  {(["Entry", "Full", "Premium"] as Tier[]).map((t, i) => (
-                    <motion.button
-                      key={t}
-                      onClick={() => handleTierChange(t)}
-                      className={`rounded-lg border p-5 sm:p-6 text-left transition-all min-h-[44px] touch-manipulation ${
-                        activeTier === t
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/50 active:border-primary/60"
-                      }`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 + i * 0.1 }}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      <p className="text-xs font-medium uppercase tracking-widest text-primary">
-                        {TIER_INFO[t].label}
-                      </p>
-                      {t === "Full" && (
-                        <span className="mt-1 inline-block rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-medium text-primary">
-                          Recommended
-                        </span>
-                      )}
-                      <p className="mt-3 font-display text-2xl text-foreground">{TIER_INFO[t].price}</p>
-                      <ul className="mt-3 space-y-1">
-                        {TIER_INFO[t].features.map((f) => (
-                          <li key={f} className="text-xs text-muted-foreground">{f}</li>
-                        ))}
-                      </ul>
-                    </motion.button>
+        {/* ═══════════════════════════════════════════════════════════
+            SECTION 2: SKIN METRICS (collapsed by default)
+        ═══════════════════════════════════════════════════════════ */}
+        <motion.section
+          className="mt-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Collapsible open={metricsOpen} onOpenChange={setMetricsOpen}>
+            <CollapsibleTrigger asChild>
+              <button className="flex w-full items-center justify-between rounded-lg border border-border px-5 py-4 text-sm font-medium text-foreground transition-colors hover:border-primary/40 min-h-[44px] touch-manipulation">
+                <span>View detailed skin metrics</span>
+                <motion.div animate={{ rotate: metricsOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </motion.div>
+              </button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="mt-4 rounded-lg border border-border p-4">
+                {/* Axis score counters */}
+                <div className="mb-6 grid grid-cols-3 sm:grid-cols-5 gap-3">
+                  {result.radar_chart_data.map((d, i) => (
+                    <div key={d.axis} className="flex flex-col items-center gap-1 rounded-lg border border-border p-3">
+                      <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">{d.axis}</span>
+                      <span className="text-xl font-display" style={{ color: severityColor(d.score) }}>
+                        <AnimatedScore target={d.score} delay={0.1 + i * 0.1} />
+                      </span>
+                    </div>
                   ))}
                 </div>
-              </motion.div>
 
-              {/* Section F: Product List */}
-              <motion.div
-                className="mt-12"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7 }}
-              >
-                {Object.entries(bundle).map(([phase, products]) => {
-                  if (products.length === 0) return null;
-                  const phaseLabel = PHASE_LABELS[phase];
-                  return (
-                    <div key={phase} className="mb-8">
-                      <p className="mb-3 text-xs font-medium uppercase tracking-widest text-primary">
-                        {phaseLabel?.name || phase}
-                      </p>
-                      {products.map((product: Product) => (
-                        <div key={product.id} className="mb-3 flex flex-col sm:flex-row sm:items-center justify-between border-b border-border pb-3 gap-2">
-                          <div>
-                            <p className="text-xs text-muted-foreground">{product.brand}</p>
-                            <p className="text-sm font-medium text-foreground">{product.name}</p>
-                            <p className="mt-0.5 text-xs text-muted-foreground">
-                              {product.key_ingredients.join(" · ")}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-foreground">€{product.price_eur}</span>
-                            <button className="rounded-md border border-primary px-4 py-2 text-xs font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground active:bg-primary active:text-primary-foreground min-h-[44px] touch-manipulation">
-                              Notify Me
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })}
-                <p className="text-xs text-muted-foreground">
-                  Estimated total calculated at checkout. Shopify integration coming soon.
-                </p>
-              </motion.div>
-
-              {/* Section G: Clinical Flags */}
-              {result.active_flags.length > 0 && (
-                <motion.div
-                  className="mt-16"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.9 }}
-                >
-                  <h3 className="font-display text-xl text-foreground">Clinical Notes for Your Skin</h3>
-                  <div className="mt-6 space-y-4">
-                    {result.active_flags.map((flag, i) => {
-                      const msg = FLAG_MESSAGES[flag];
-                      if (!msg) return null;
-                      return (
-                        <motion.div
-                          key={flag}
-                          className="border-l-2 border-border pl-4"
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 1.0 + i * 0.1 }}
-                        >
-                          <p className="text-sm font-medium text-foreground">
-                            {msg.icon} {msg.title}
-                          </p>
-                          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{msg.body}</p>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Section H: Restart */}
-              <div className="mt-20 border-t border-border pt-8 text-center">
-                <p className="text-sm text-muted-foreground">Skin changes. Reassess in 6–8 weeks.</p>
-                <Link
-                  to="/diagnosis"
-                  className="mt-3 inline-block text-sm font-medium text-primary hover:underline min-h-[44px] flex items-center justify-center"
-                  onClick={() => useDiagnosisStore.getState().reset()}
-                >
-                  Restart Assessment
-                </Link>
+                {/* Radar chart */}
+                <div className="mx-auto max-w-[500px]">
+                  <ResponsiveContainer width="100%" height={320}>
+                    <RadarChart data={radarReady ? animatedRadar : animatedRadar}>
+                      <PolarGrid stroke="hsl(var(--border))" />
+                      <PolarAngleAxis
+                        dataKey="axis"
+                        tick={({ payload, x, y, cx, ...rest }) => {
+                          const score = result.radar_chart_data.find(d => d.axis === payload.value)?.score ?? 0;
+                          return (
+                            <text {...rest} x={x} y={y} textAnchor={x > cx ? "start" : x < cx ? "end" : "middle"} fill={severityColor(score)} fontSize={11}>
+                              {payload.value}
+                            </text>
+                          );
+                        }}
+                      />
+                      <PolarRadiusAxis domain={[0, 100]} tick={{ fill: "hsl(var(--text-muted))", fontSize: 8 }} tickCount={4} />
+                      <Radar dataKey="score" stroke="hsl(var(--accent-cyan))" fill="hsl(var(--accent-cyan))" fillOpacity={0.15} strokeWidth={2} animationBegin={0} animationDuration={600} animationEasing="ease-out" />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
-            </motion.div>
+            </CollapsibleContent>
+          </Collapsible>
+        </motion.section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            SECTION 3: AXIS BREAKDOWN (accordion, one open at a time)
+        ═══════════════════════════════════════════════════════════ */}
+        <motion.section
+          className="mt-12"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <h2 className="font-display text-xl text-foreground mb-4">Axis Breakdown</h2>
+          <Accordion type="single" collapsible className="space-y-2">
+            {result.radar_chart_data.map((d) => (
+              <AccordionItem key={d.axis} value={d.axis} className="rounded-lg border border-border px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: severityColor(d.score) }} />
+                    <span className="text-sm font-medium text-foreground">{AXIS_LABELS[d.axis] || d.axis}</span>
+                    <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${
+                      d.score > 70 ? "bg-severity-severe/10 text-severity-severe"
+                        : d.score > 45 ? "bg-severity-moderate/10 text-severity-moderate"
+                        : d.score > 20 ? "bg-severity-mild/10 text-severity-mild"
+                        : "bg-severity-clear/10 text-severity-clear"
+                    }`}>
+                      {severityLabel(d.score)} · {d.score}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="pb-2 space-y-2">
+                    {/* Show contributing symptoms for this axis */}
+                    {Object.entries(severities)
+                      .filter(([id]) => {
+                        const sym = SYMPTOMS[id];
+                        return sym && AXIS_LABELS[d.axis]?.toLowerCase().includes(sym.category.toString());
+                      })
+                      .filter(([, val]) => val >= 2)
+                      .slice(0, 5)
+                      .map(([id, val]) => (
+                        <div key={id} className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">{SYMPTOMS[id]?.text_en ?? id}</span>
+                          <span className="text-foreground">{val}/3</span>
+                        </div>
+                      ))
+                    }
+                    {result.axis_severity[d.axis] != null && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Severity level: {result.axis_severity[d.axis] >= 3 ? "High" : result.axis_severity[d.axis] >= 2 ? "Moderate" : "Low"}
+                      </p>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </motion.section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            SECTION 4: 5-PHASE PROTOCOL
+        ═══════════════════════════════════════════════════════════ */}
+        <motion.section
+          className="mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <h2 className="font-display text-2xl text-foreground">Your 5-Phase Protocol</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Applied in this exact order, morning and evening.</p>
+
+          {/* Clinical Flags */}
+          {result.active_flags.length > 0 && (
+            <div className="mt-6 space-y-3">
+              {result.active_flags.map((flag) => {
+                const msg = FLAG_MESSAGES[flag];
+                if (!msg) return null;
+                return (
+                  <div key={flag} className="border-l-2 border-border pl-4">
+                    <p className="text-sm font-medium text-foreground">{msg.icon} {msg.title}</p>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{msg.body}</p>
+                  </div>
+                );
+              })}
+            </div>
           )}
-        </AnimatePresence>
+
+          {/* Phase steps */}
+          <div className="mt-8 space-y-6">
+            {Object.entries(PHASE_LABELS).map(([key, phase]) => {
+              const products = bundle[key] || [];
+              if (key === "Device" && products.length === 0) return null;
+              return (
+                <div key={key} className="border-l-2 border-border pl-6">
+                  <h3 className="font-display text-lg text-foreground">{phase.name}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{phase.desc}</p>
+                  {products.map((product: Product) => (
+                    <div key={product.id} className="mt-3 flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 pb-3 gap-2">
+                      <div>
+                        <p className="text-xs text-muted-foreground">{product.brand}</p>
+                        <p className="text-sm font-medium text-foreground">{product.name}</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">{product.key_ingredients.join(" · ")}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-foreground">€{product.price_eur}</span>
+                        <button className="rounded-md border border-primary px-4 py-2 text-xs font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground min-h-[44px] touch-manipulation">
+                          Notify Me
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Tier selector */}
+          <div className="mt-12 grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+            {(["Entry", "Full", "Premium"] as Tier[]).map((t) => (
+              <button
+                key={t}
+                onClick={() => handleTierChange(t)}
+                className={`rounded-lg border p-5 text-left transition-all min-h-[44px] touch-manipulation ${
+                  activeTier === t ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                }`}
+              >
+                <p className="text-xs font-medium uppercase tracking-widest text-primary">{TIER_INFO[t].label}</p>
+                {t === "Full" && (
+                  <span className="mt-1 inline-block rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-medium text-primary">Recommended</span>
+                )}
+                <p className="mt-3 font-display text-2xl text-foreground">{TIER_INFO[t].price}</p>
+                <ul className="mt-3 space-y-1">
+                  {TIER_INFO[t].features.map((f) => (
+                    <li key={f} className="text-xs text-muted-foreground">{f}</li>
+                  ))}
+                </ul>
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-6 text-xs text-muted-foreground">
+            Estimated total calculated at checkout. Shopify integration coming soon.
+          </p>
+        </motion.section>
+
+        {/* Restart */}
+        <div className="mt-20 border-t border-border pt-8 text-center">
+          <p className="text-sm text-muted-foreground">Skin changes. Reassess in 6–8 weeks.</p>
+          <Link
+            to="/diagnosis"
+            className="mt-3 inline-flex items-center justify-center text-sm font-medium text-primary hover:underline min-h-[44px]"
+            onClick={() => useDiagnosisStore.getState().reset()}
+          >
+            Restart Assessment
+          </Link>
+        </div>
       </div>
 
-      {/* Debug panel */}
-      {isDebug && result?._debug && (
-        <DebugPanel debugData={result._debug} />
-      )}
-
+      {isDebug && result?._debug && <DebugPanel debugData={result._debug} />}
       <Footer />
     </div>
   );

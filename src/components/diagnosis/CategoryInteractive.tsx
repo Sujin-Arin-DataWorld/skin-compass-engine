@@ -58,6 +58,7 @@ const AGING_ZONES = [
 ];
 
 const PORE_ZONES = [
+  { id: "forehead", label: "Forehead", cx: 100, cy: 55, rx: 22, ry: 12 },
   { id: "nose", label: "Nose", cx: 100, cy: 95, rx: 10, ry: 14 },
   { id: "left_cheek", label: "L. Cheek", cx: 72, cy: 92, rx: 14, ry: 12 },
   { id: "right_cheek", label: "R. Cheek", cx: 128, cy: 92, rx: 14, ry: 12 },
@@ -65,9 +66,11 @@ const PORE_ZONES = [
 ];
 
 const OILINESS_ZONES = [
-  { id: "t_zone", label: "T-Zone", cx: 100, cy: 70, rx: 14, ry: 30 },
-  { id: "cheeks", label: "Cheeks", cx: 100, cy: 95, rx: 35, ry: 18 },
-  { id: "full_face", label: "Full Face", cx: 100, cy: 90, rx: 42, ry: 50 },
+  { id: "forehead", label: "Forehead", cx: 100, cy: 55, rx: 22, ry: 12 },
+  { id: "nose", label: "Nose", cx: 100, cy: 95, rx: 10, ry: 14 },
+  { id: "left_cheek", label: "L. Cheek", cx: 72, cy: 92, rx: 14, ry: 12 },
+  { id: "right_cheek", label: "R. Cheek", cx: 128, cy: 92, rx: 14, ry: 12 },
+  { id: "chin", label: "Chin", cx: 100, cy: 128, rx: 12, ry: 8 },
 ];
 
 // Context flags for interactive components
@@ -111,6 +114,8 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
   const [pigmentPhoto, setPigmentPhoto] = useState<string | null>(null);
   const [timelineHour, setTimelineHour] = useState(12);
   const [oilZones, setOilZones] = useState<string[]>([]);
+  const [oilFullFace, setOilFullFace] = useState(false);
+  const [poreFullFace, setPoreFullFace] = useState(false);
   const [pigmentZones, setPigmentZones] = useState<string[]>([]);
   const [textureSelected, setTextureSelected] = useState<string | null>(null);
   const [poreZones, setPoreZones] = useState<string[]>([]);
@@ -229,23 +234,48 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             title="Where does oil appear most?"
             subtitle="Tap affected areas"
             zones={OILINESS_ZONES}
-            selected={oilZones}
+            selected={oilFullFace ? OILINESS_ZONES.map(z => z.id) : oilZones}
             onToggle={(id) => {
+              if (oilFullFace) return;
               markInteractive();
-              setOilZones(prev =>
-                prev.includes(id) ? prev.filter(z => z !== id) : [...prev, id]
-              );
-              if (id === "t_zone") {
+              const next = oilZones.includes(id) ? oilZones.filter(z => z !== id) : [...oilZones, id];
+              setOilZones(next);
+              const hasTZone = next.includes("forehead") && next.includes("nose");
+              if (hasTZone) {
                 onSeverityChange("C2_02", 2);
                 setUiSignals("oil", { distribution: "tzone" });
-              }
-              if (id === "full_face") {
-                onSeverityChange("C2_01", 3);
-                onSeverityChange("C2_09", 2);
-                setUiSignals("oil", { distribution: "full" });
+              } else if (next.length > 0) {
+                onSeverityChange("C2_14", next.length >= 3 ? 2 : 1);
+                setUiSignals("oil", { distribution: "patchy" });
               }
             }}
           />
+          {/* Full Face toggle */}
+          <motion.button
+            onClick={() => {
+              markInteractive();
+              const next = !oilFullFace;
+              setOilFullFace(next);
+              if (next) {
+                setOilZones([]);
+                onSeverityChange("C2_01", 3);
+                onSeverityChange("C2_14", 2);
+                onSeverityChange("C2_09", 2);
+                setUiSignals("oil", { distribution: "full" });
+              } else {
+                onSeverityChange("C2_14", 0);
+                setUiSignals("oil", { distribution: undefined });
+              }
+            }}
+            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
+              oilFullFace
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:border-primary/40"
+            }`}
+            whileTap={{ scale: 0.97 }}
+          >
+            Full Face — Oil everywhere
+          </motion.button>
         </>
       )}
 
@@ -386,16 +416,42 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             title="Where are pores most visible?"
             subtitle="Tap to mark"
             zones={PORE_ZONES}
-            selected={poreZones}
+            selected={poreFullFace ? PORE_ZONES.map(z => z.id) : poreZones}
             onToggle={(id) => {
+              if (poreFullFace) return;
               markInteractive();
-              setPoreZones(prev =>
-                prev.includes(id) ? prev.filter(z => z !== id) : [...prev, id]
-              );
-              if (id === "nose") { onSeverityChange("C6_02", 2); setUiSignals("texture", { pore_location: "nose" }); }
+              const next = poreZones.includes(id) ? poreZones.filter(z => z !== id) : [...poreZones, id];
+              setPoreZones(next);
+              if (id === "forehead" || id === "nose") { onSeverityChange("C6_02", 2); setUiSignals("texture", { pore_location: "nose" }); }
               if (id === "left_cheek" || id === "right_cheek") { onSeverityChange("C6_03", 2); setUiSignals("texture", { pore_location: "cheeks" }); }
+              if (next.length >= 4) { onSeverityChange("C6_01", 2); setUiSignals("texture", { pore_location: "full" }); }
             }}
           />
+          {/* Full Face toggle for pores */}
+          <motion.button
+            onClick={() => {
+              markInteractive();
+              const next = !poreFullFace;
+              setPoreFullFace(next);
+              if (next) {
+                setPoreZones([]);
+                onSeverityChange("C6_01", 2);
+                onSeverityChange("C6_02", 2);
+                onSeverityChange("C6_03", 2);
+                setUiSignals("texture", { pore_location: "full" });
+              } else {
+                setUiSignals("texture", { pore_location: undefined });
+              }
+            }}
+            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
+              poreFullFace
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:border-primary/40"
+            }`}
+            whileTap={{ scale: 0.97 }}
+          >
+            Full Face — Pores everywhere
+          </motion.button>
         </>
       )}
 

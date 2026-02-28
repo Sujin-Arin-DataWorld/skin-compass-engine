@@ -36,17 +36,23 @@ const LOADING_MESSAGES = [
   "Building your protocol...",
 ];
 
-const StepWrapper = ({ children, ...props }: { children: React.ReactNode; key: string }) => (
-  <motion.div
-    initial={{ opacity: 0, x: 30 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -30 }}
-    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-    {...props}
-  >
-    {children}
-  </motion.div>
+import React from "react";
+
+const StepWrapper = React.forwardRef<HTMLDivElement, { children: React.ReactNode }>(
+  ({ children, ...props }, ref) => (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -30 }}
+      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  )
 );
+StepWrapper.displayName = "StepWrapper";
 
 const DiagnosisPage = () => {
   const navigate = useNavigate();

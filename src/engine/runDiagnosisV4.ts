@@ -21,6 +21,16 @@ export interface DiagnosisInput {
   uiSignals?: UiSignalsV4;
 }
 
+export interface DebugData {
+  rawScores: AxisScores;
+  normalizedScores: AxisScores;
+  finalScores: AxisScores;
+  axisSeverities: Record<AxisKey, 0 | 1 | 2 | 3>;
+  patterns: { id: string; name: string; confidence: number; flag: string; severity: number }[];
+  dedupScales: Record<string, number>;
+  topSymptoms: { id: string; severity: number; text: string }[];
+}
+
 export function runDiagnosis(input: DiagnosisInput): DiagnosisResult {
   // Step A: UI signals → symptom severity patch
   const uiPatch = input.uiSignals

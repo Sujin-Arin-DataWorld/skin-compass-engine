@@ -275,6 +275,40 @@ const ResultsPage = () => {
                   ))}
                 </motion.div>
               )}
+
+              {/* Why this result? — Transparency section */}
+              <motion.div
+                className="mt-8 rounded-lg border border-border/50 bg-secondary/20 p-5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.1 }}
+              >
+                <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground mb-3">
+                  Why this result?
+                </p>
+                {/* Dominant signals */}
+                {result.primary_concerns.length > 0 && (
+                  <div className="space-y-1.5 mb-3">
+                    {result.primary_concerns.slice(0, 3).map((axis) => (
+                      <div key={axis} className="flex items-center justify-between text-sm">
+                        <span className="text-foreground">{AXIS_LABELS[axis]}</span>
+                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                          result.axis_severity[axis] >= 3
+                            ? "bg-severity-severe/10 text-severity-severe"
+                            : result.axis_severity[axis] >= 2
+                            ? "bg-severity-moderate/10 text-severity-moderate"
+                            : "bg-severity-mild/10 text-severity-mild"
+                        }`}>
+                          {result.axis_severity[axis] >= 3 ? "High" : result.axis_severity[axis] >= 2 ? "Moderate" : "Low"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  AI-assisted assessment based on your self-reported symptoms. This is not a medical diagnosis.
+                </p>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

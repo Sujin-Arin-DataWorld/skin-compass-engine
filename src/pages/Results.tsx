@@ -147,6 +147,22 @@ const ResultsPage = () => {
               ))}
             </div>
           )}
+          {/* Explainability: top contributing reasons */}
+          {patternReasons.length > 0 && (
+            <div className="mt-6 space-y-2">
+              <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                Key Contributors
+              </p>
+              {patternReasons.map((r) => (
+                <div key={r.id} className="flex items-start gap-2">
+                  <span className={`mt-0.5 h-2 w-2 rounded-full shrink-0 ${
+                    r.severity >= 3 ? "bg-severity-severe" : "bg-severity-moderate"
+                  }`} />
+                  <p className="text-sm text-muted-foreground leading-snug">{r.text}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {/* Section C: Radar Chart */}

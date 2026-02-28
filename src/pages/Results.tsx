@@ -6,7 +6,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
-import { AXIS_LABELS, Tier, Product } from "@/engine/types";
+import { AXIS_LABELS, Tier, Product, AXIS_KEYS } from "@/engine/types";
+import { SYMPTOMS } from "@/engine/weights";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 

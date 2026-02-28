@@ -120,6 +120,7 @@ const DiagnosisPage = () => {
             skinType: store.skinType || "normal",
             tier: store.selectedTier,
             metaAnswers: store.metaAnswers,
+            uiSignals: store.uiSignals,
           });
           store.setResult(result);
           setTimeout(() => navigate("/results"), 500);

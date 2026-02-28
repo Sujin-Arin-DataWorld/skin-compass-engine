@@ -83,15 +83,16 @@ const CATEGORY_CONTEXT_FLAGS: Record<number, string> = {
 };
 
 // Core symptom IDs (shown by default) — 3 per category
+// These are symptoms NOT captured by interactive components
 const CORE_SYMPTOMS: Record<number, string[]> = {
-  1: ["C1_01", "C1_07", "C1_03"],
-  2: ["C2_01", "C2_04", "C2_07"],
-  3: ["C3_01", "C3_02", "C3_03"],
-  4: ["C4_01", "C4_03", "C4_09"],
-  5: ["C5_01", "C5_04", "C5_06"],
-  6: ["C6_01", "C6_06", "C6_04"],
-  7: ["C7_01", "C7_06", "C7_03"],
-  8: ["C8_01", "C8_06", "C8_08"],
+  1: ["C1_10", "C1_11", "C1_13"],
+  2: ["C2_07", "C2_10", "C2_09"],
+  3: ["C3_14", "C3_12", "C3_10"],
+  4: ["C4_11", "C4_14", "C4_07"],
+  5: ["C5_03", "C5_13", "C5_05"],
+  6: ["C6_12", "C6_15", "C6_09"],
+  7: ["C7_08", "C7_11", "C7_13"],
+  8: ["C8_03", "C8_04", "C8_09"],
 };
 
 // ---------- Per-category interactive renderer ----------

@@ -101,16 +101,20 @@ const ResultsPage = () => {
 
   useEffect(() => {
     if (!result) return;
-    // Start with zeros
-    setAnimatedRadar(result.radar_chart_data.map(d => ({ ...d, score: 0 })));
 
-    // Phase 0 → 1 (banner visible immediately, pattern at 0.6s)
+    // Skip replay animation in reduced motion mode
+    if (reducedMotion) {
+      setAnimatedRadar(result.radar_chart_data);
+      setRadarReady(true);
+      setReplayPhase(3);
+      return;
+    }
+
+    setAnimatedRadar(result.radar_chart_data.map(d => ({ ...d, score: 0 })));
     const t1 = setTimeout(() => setReplayPhase(1), 600);
-    // Phase 2 (radar starts building at 1.2s)
     const t2 = setTimeout(() => {
       setReplayPhase(2);
       setRadarReady(true);
-      // Animate each axis sequentially
       result.radar_chart_data.forEach((d, i) => {
         setTimeout(() => {
           setAnimatedRadar(prev => prev.map((p, j) =>
@@ -119,11 +123,10 @@ const ResultsPage = () => {
         }, i * 200);
       });
     }, 1200);
-    // Phase 3 (rest of content at 3s)
     const t3 = setTimeout(() => setReplayPhase(3), 3000);
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [result]);
+  }, [result, reducedMotion]);
 
   if (!result) return <Navigate to="/diagnosis" replace />;
 

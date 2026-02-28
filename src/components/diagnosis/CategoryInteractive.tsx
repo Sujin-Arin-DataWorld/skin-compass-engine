@@ -66,9 +66,11 @@ const PORE_ZONES = [
 ];
 
 const OILINESS_ZONES = [
-  { id: "t_zone", label: "T-Zone", cx: 100, cy: 70, rx: 14, ry: 30 },
-  { id: "cheeks", label: "Cheeks", cx: 100, cy: 95, rx: 35, ry: 18 },
-  { id: "full_face", label: "Full Face", cx: 100, cy: 90, rx: 42, ry: 50 },
+  { id: "forehead", label: "Forehead", cx: 100, cy: 55, rx: 22, ry: 12 },
+  { id: "nose", label: "Nose", cx: 100, cy: 95, rx: 10, ry: 14 },
+  { id: "left_cheek", label: "L. Cheek", cx: 72, cy: 92, rx: 14, ry: 12 },
+  { id: "right_cheek", label: "R. Cheek", cx: 128, cy: 92, rx: 14, ry: 12 },
+  { id: "chin", label: "Chin", cx: 100, cy: 128, rx: 12, ry: 8 },
 ];
 
 // Context flags for interactive components

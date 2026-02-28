@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Bug } from "lucide-react";
-import type { DebugData } from "@/engine/runDiagnosisV4";
+import type { DiagnosisResult } from "@/engine/types";
 import { AXIS_KEYS, AXIS_LABELS } from "@/engine/types";
 import { SYMPTOMS } from "@/engine/weights";
+
+type DebugData = NonNullable<DiagnosisResult["_debug"]>;
 
 interface DebugPanelProps {
   debugData: DebugData;

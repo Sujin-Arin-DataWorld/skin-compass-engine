@@ -2,6 +2,7 @@ import {
   AxisKey, AXIS_KEYS, AXIS_LABELS, RADAR_AXES,
   AxisScores, DiagnosisResult, SkinType, ContextKey, Tier, Product,
 } from "./types";
+import { SYMPTOMS } from "./weights";
 import {
   computeRawScores, applySkinTypeBaseline, applyContextModifiers,
   saturateScores, getAxisSeverities, clinicalNormalize,

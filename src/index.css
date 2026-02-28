@@ -113,4 +113,10 @@
   .glass-dark {
     @apply bg-card/80 backdrop-blur-md border border-border;
   }
+
+  /* Touch optimization */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 }

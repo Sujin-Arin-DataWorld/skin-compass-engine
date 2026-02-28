@@ -5,7 +5,7 @@ interface SkinPatch {
   id: string;
   label: string;
   description: string;
-  pattern: string; // SVG pattern description
+  pattern: string;
   severity: number;
 }
 
@@ -23,62 +23,31 @@ interface SkinZoomSelectorProps {
 
 const renderPatchSVG = (pattern: string, isSelected: boolean) => {
   const baseColor = isSelected ? "hsl(var(--primary) / 0.15)" : "hsl(var(--secondary))";
-  
+
   return (
     <svg viewBox="0 0 80 80" className="w-full h-full rounded-lg">
       <rect width="80" height="80" fill={baseColor} />
-      
       {pattern === "smooth" && (
-        <g>
-          {/* Clean surface with minimal detail */}
-          <circle cx="40" cy="40" r="1" fill="hsl(var(--muted-foreground) / 0.1)" />
-        </g>
+        <g><circle cx="40" cy="40" r="1" fill="hsl(var(--muted-foreground) / 0.1)" /></g>
       )}
-      
       {pattern === "pores" && (
         <g>
-          {/* Visible pore dots */}
           {Array.from({ length: 20 }, (_, i) => (
-            <circle
-              key={i}
-              cx={15 + (i % 5) * 14 + Math.sin(i) * 3}
-              cy={15 + Math.floor(i / 5) * 14 + Math.cos(i) * 3}
-              r={1.5 + Math.random()}
-              fill="hsl(var(--muted-foreground) / 0.25)"
-            />
+            <circle key={i} cx={15 + (i % 5) * 14 + Math.sin(i) * 3} cy={15 + Math.floor(i / 5) * 14 + Math.cos(i) * 3} r={1.5 + Math.random()} fill="hsl(var(--muted-foreground) / 0.25)" />
           ))}
         </g>
       )}
-      
       {pattern === "oxidised" && (
         <g>
-          {/* Darker pore dots */}
           {Array.from({ length: 25 }, (_, i) => (
-            <circle
-              key={i}
-              cx={10 + (i % 5) * 15 + Math.sin(i) * 2}
-              cy={10 + Math.floor(i / 5) * 14 + Math.cos(i) * 2}
-              r={1.8 + Math.random() * 0.5}
-              fill="hsl(var(--muted-foreground) / 0.45)"
-            />
+            <circle key={i} cx={10 + (i % 5) * 15 + Math.sin(i) * 2} cy={10 + Math.floor(i / 5) * 14 + Math.cos(i) * 2} r={1.8 + Math.random() * 0.5} fill="hsl(var(--muted-foreground) / 0.45)" />
           ))}
         </g>
       )}
-      
       {pattern === "rough" && (
         <g>
-          {/* Bumpy irregular surface */}
           {Array.from({ length: 30 }, (_, i) => (
-            <g key={i}>
-              <circle
-                cx={8 + (i % 6) * 12 + Math.sin(i * 2) * 4}
-                cy={8 + Math.floor(i / 6) * 14 + Math.cos(i * 2) * 4}
-                r={2 + Math.random() * 1.5}
-                fill="hsl(var(--muted-foreground) / 0.3)"
-                stroke="hsl(var(--muted-foreground) / 0.15)"
-                strokeWidth="0.5"
-              />
-            </g>
+            <circle key={i} cx={8 + (i % 6) * 12 + Math.sin(i * 2) * 4} cy={8 + Math.floor(i / 6) * 14 + Math.cos(i * 2) * 4} r={2 + Math.random() * 1.5} fill="hsl(var(--muted-foreground) / 0.3)" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="0.5" />
           ))}
         </g>
       )}
@@ -100,15 +69,15 @@ const SkinZoomSelector = ({ selected, onSelect }: SkinZoomSelectorProps) => (
         <motion.button
           key={patch.id}
           onClick={() => onSelect(patch.id, patch.severity)}
-          className={`flex flex-col gap-2 rounded-xl border overflow-hidden transition-all ${
+          className={`flex flex-col gap-2 rounded-xl border overflow-hidden transition-all min-h-[100px] select-none touch-manipulation ${
             selected === patch.id
               ? "border-primary shadow-[0_0_20px_-8px_hsl(var(--primary)/0.3)]"
-              : "border-border hover:border-primary/40"
+              : "border-border hover:border-primary/40 active:border-primary/60"
           }`}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: i * 0.08, duration: 0.3 }}
-          whileTap={{ scale: 0.96 }}
+          whileTap={{ scale: 0.95 }}
           whileHover={{
             boxShadow: selected === patch.id
               ? "0 0 24px -6px hsla(192, 100%, 50%, 0.2)"

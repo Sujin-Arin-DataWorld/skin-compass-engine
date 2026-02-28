@@ -14,7 +14,6 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
   const [dragging, setDragging] = useState(false);
   const pct = (value / 24) * 100;
 
-  // Shine intensity based on value (for oiliness category)
   const shineOpacity = Math.min(0.6, value / 24);
 
   return (
@@ -25,7 +24,7 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
 
       <div className="mt-4 relative">
         {/* Track */}
-        <div className="relative h-2 w-full rounded-full bg-secondary overflow-hidden">
+        <div className="relative h-3 w-full rounded-full bg-secondary overflow-hidden">
           <motion.div
             className="absolute h-full rounded-full"
             style={{
@@ -36,7 +35,7 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
           />
         </div>
 
-        {/* Slider input */}
+        {/* Slider input — taller touch target */}
         <input
           type="range"
           min={0}
@@ -48,21 +47,22 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
           onMouseUp={() => setDragging(false)}
           onTouchStart={() => setDragging(true)}
           onTouchEnd={() => setDragging(false)}
-          className="absolute inset-0 w-full h-2 opacity-0 cursor-pointer"
+          className="absolute inset-x-0 w-full opacity-0 cursor-pointer touch-manipulation"
+          style={{ top: "-14px", height: "44px" }}
         />
 
         {/* Thumb */}
         <motion.div
-          className="absolute top-1/2 -translate-y-1/2 h-5 w-5 rounded-full border-2 border-primary bg-background pointer-events-none"
-          style={{ left: `calc(${pct}% - 10px)`, top: "4px" }}
-          animate={{ scale: dragging ? 1.2 : 1 }}
+          className="absolute -translate-y-1/2 h-6 w-6 rounded-full border-2 border-primary bg-background pointer-events-none shadow-lg"
+          style={{ left: `calc(${pct}% - 12px)`, top: "6px" }}
+          animate={{ scale: dragging ? 1.3 : 1 }}
           transition={{ duration: 0.15 }}
         />
       </div>
 
       {/* Markers */}
       {markers && (
-        <div className="mt-2 flex justify-between">
+        <div className="mt-3 flex justify-between">
           {markers.map((m) => (
             <span key={m.value} className="text-[10px] text-muted-foreground">{m.label}</span>
           ))}

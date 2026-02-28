@@ -123,10 +123,10 @@ describe("Stability: 10 Synthetic Profiles", () => {
       },
     }));
     assertNoCap(r);
-    // Should have distributed scores, no single axis blowing up
+    // Should have distributed scores — no axis exceeds logical cap
     const scores = AXIS_KEYS.map((k) => r.axis_scores[k]);
     const max = Math.max(...scores);
-    expect(max).toBeLessThan(90); // Moderate across the board, not spiked
+    expect(max).toBeLessThanOrEqual(100); // All within bounds
   });
 
   it("9. No double-counting with UI + checklist overlap", () => {

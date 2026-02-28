@@ -58,6 +58,7 @@ const AGING_ZONES = [
 ];
 
 const PORE_ZONES = [
+  { id: "forehead", label: "Forehead", cx: 100, cy: 55, rx: 22, ry: 12 },
   { id: "nose", label: "Nose", cx: 100, cy: 95, rx: 10, ry: 14 },
   { id: "left_cheek", label: "L. Cheek", cx: 72, cy: 92, rx: 14, ry: 12 },
   { id: "right_cheek", label: "R. Cheek", cx: 128, cy: 92, rx: 14, ry: 12 },

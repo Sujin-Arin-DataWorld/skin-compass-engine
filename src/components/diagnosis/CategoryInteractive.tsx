@@ -234,23 +234,48 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             title="Where does oil appear most?"
             subtitle="Tap affected areas"
             zones={OILINESS_ZONES}
-            selected={oilZones}
+            selected={oilFullFace ? OILINESS_ZONES.map(z => z.id) : oilZones}
             onToggle={(id) => {
+              if (oilFullFace) return;
               markInteractive();
-              setOilZones(prev =>
-                prev.includes(id) ? prev.filter(z => z !== id) : [...prev, id]
-              );
-              if (id === "t_zone") {
+              const next = oilZones.includes(id) ? oilZones.filter(z => z !== id) : [...oilZones, id];
+              setOilZones(next);
+              const hasTZone = next.includes("forehead") && next.includes("nose");
+              if (hasTZone) {
                 onSeverityChange("C2_02", 2);
                 setUiSignals("oil", { distribution: "tzone" });
-              }
-              if (id === "full_face") {
-                onSeverityChange("C2_01", 3);
-                onSeverityChange("C2_09", 2);
-                setUiSignals("oil", { distribution: "full" });
+              } else if (next.length > 0) {
+                onSeverityChange("C2_14", next.length >= 3 ? 2 : 1);
+                setUiSignals("oil", { distribution: "patchy" });
               }
             }}
           />
+          {/* Full Face toggle */}
+          <motion.button
+            onClick={() => {
+              markInteractive();
+              const next = !oilFullFace;
+              setOilFullFace(next);
+              if (next) {
+                setOilZones([]);
+                onSeverityChange("C2_01", 3);
+                onSeverityChange("C2_14", 2);
+                onSeverityChange("C2_09", 2);
+                setUiSignals("oil", { distribution: "full" });
+              } else {
+                onSeverityChange("C2_14", 0);
+                setUiSignals("oil", { distribution: undefined });
+              }
+            }}
+            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
+              oilFullFace
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:border-primary/40"
+            }`}
+            whileTap={{ scale: 0.97 }}
+          >
+            Full Face — Oil everywhere
+          </motion.button>
         </>
       )}
 

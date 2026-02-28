@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
+import heroImage from "@/assets/hero-skin-texture.webp";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -32,52 +33,76 @@ const Index = () => {
       <Navbar />
 
       {/* Hero */}
-      <section className="flex min-h-screen flex-col items-center justify-center px-6 pt-20">
-        <div className="mx-auto max-w-[960px] text-center">
-          <motion.h1
-            className="font-display text-5xl leading-tight tracking-tight text-foreground sm:text-6xl md:text-7xl"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            Your Skin.<br />
-            <span className="text-gradient-cyan">Clinically Decoded.</span>
-          </motion.h1>
-
-          <motion.p
-            className="mx-auto mt-6 max-w-lg text-lg text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.6 }}
-          >
-            A dermatology-grade skin assessment.<br />
-            Personalized K-beauty protocols.<br />
-            Delivered to your door.
-          </motion.p>
-
-          <motion.div
-            className="mt-10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, duration: 0.5 }}
-          >
-            <Link
-              to="/diagnosis"
-              className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all glow-cyan hover:opacity-90"
+      <section className="relative flex min-h-screen items-center px-6 pt-20 overflow-hidden">
+        <div className="mx-auto grid max-w-[1100px] w-full gap-12 md:grid-cols-2 md:items-center">
+          {/* Text — left */}
+          <div className="relative z-10 order-2 md:order-1">
+            <motion.h1
+              className="font-display text-4xl leading-tight tracking-tight text-foreground sm:text-5xl md:text-6xl"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
             >
-              Begin Your Skin Assessment
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </motion.div>
+              Your Skin.<br />
+              <span className="text-gradient-cyan">Clinically Decoded.</span>
+            </motion.h1>
 
-          <motion.p
-            className="mt-4 text-sm text-muted-foreground"
+            <motion.p
+              className="mt-6 max-w-md text-lg text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              A dermatology-grade skin assessment.<br />
+              Personalized K-beauty protocols.<br />
+              Delivered to your door.
+            </motion.p>
+
+            <motion.div
+              className="mt-10"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+            >
+              <Link
+                to="/diagnosis"
+                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all glow-cyan hover:opacity-90"
+              >
+                Begin Your Skin Assessment
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </motion.div>
+
+            <motion.p
+              className="mt-4 text-sm text-muted-foreground"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 0.5 }}
+            >
+              120 clinical markers · 8 patterns · 5-phase protocol
+            </motion.p>
+          </div>
+
+          {/* Hero image — right on desktop, top on mobile */}
+          <motion.div
+            className="relative order-1 md:order-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 0.5 }}
+            transition={{ delay: 0.2, duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
           >
-            120 clinical markers · 8 patterns · 5-phase protocol
-          </motion.p>
+            <div className="relative overflow-hidden rounded-2xl">
+              <img
+                src={heroImage}
+                alt="Abstract skin surface analysis — clinical macro texture with data overlay"
+                className="w-full h-auto object-cover opacity-[0.88]"
+                loading="eager"
+                width={1920}
+                height={1080}
+              />
+              {/* Dark gradient overlay for text readability on mobile */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent md:bg-gradient-to-l md:from-background/60 md:via-transparent md:to-transparent" />
+            </div>
+          </motion.div>
         </div>
       </section>
 

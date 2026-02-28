@@ -129,11 +129,11 @@ const DebugPanel = ({ debugData }: DebugPanelProps) => {
                       <div
                         key={sid}
                         className={`rounded border p-1.5 font-mono text-[9px] ${
-                          scale < 1 ? "border-severity-moderate/40 bg-severity-moderate/5" : "border-border"
+                          (scale as number) < 1 ? "border-severity-moderate/40 bg-severity-moderate/5" : "border-border"
                         }`}
                       >
                         <span className="text-foreground">{sid}</span>
-                        <span className="text-muted-foreground ml-1">×{scale}</span>
+                        <span className="text-muted-foreground ml-1">×{String(scale)}</span>
                       </div>
                     ))}
                   </div>

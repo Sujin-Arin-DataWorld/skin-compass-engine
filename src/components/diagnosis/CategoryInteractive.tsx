@@ -416,16 +416,42 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             title="Where are pores most visible?"
             subtitle="Tap to mark"
             zones={PORE_ZONES}
-            selected={poreZones}
+            selected={poreFullFace ? PORE_ZONES.map(z => z.id) : poreZones}
             onToggle={(id) => {
+              if (poreFullFace) return;
               markInteractive();
-              setPoreZones(prev =>
-                prev.includes(id) ? prev.filter(z => z !== id) : [...prev, id]
-              );
-              if (id === "nose") { onSeverityChange("C6_02", 2); setUiSignals("texture", { pore_location: "nose" }); }
+              const next = poreZones.includes(id) ? poreZones.filter(z => z !== id) : [...poreZones, id];
+              setPoreZones(next);
+              if (id === "forehead" || id === "nose") { onSeverityChange("C6_02", 2); setUiSignals("texture", { pore_location: "nose" }); }
               if (id === "left_cheek" || id === "right_cheek") { onSeverityChange("C6_03", 2); setUiSignals("texture", { pore_location: "cheeks" }); }
+              if (next.length >= 4) { onSeverityChange("C6_01", 2); setUiSignals("texture", { pore_location: "full" }); }
             }}
           />
+          {/* Full Face toggle for pores */}
+          <motion.button
+            onClick={() => {
+              markInteractive();
+              const next = !poreFullFace;
+              setPoreFullFace(next);
+              if (next) {
+                setPoreZones([]);
+                onSeverityChange("C6_01", 2);
+                onSeverityChange("C6_02", 2);
+                onSeverityChange("C6_03", 2);
+                setUiSignals("texture", { pore_location: "full" });
+              } else {
+                setUiSignals("texture", { pore_location: undefined });
+              }
+            }}
+            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
+              poreFullFace
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border text-muted-foreground hover:border-primary/40"
+            }`}
+            whileTap={{ scale: 0.97 }}
+          >
+            Full Face — Pores everywhere
+          </motion.button>
         </>
       )}
 

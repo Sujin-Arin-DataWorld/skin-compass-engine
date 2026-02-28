@@ -57,21 +57,23 @@ const ResultsPage = () => {
   const { result, selectedTier, setTier, severities } = useDiagnosisStore();
   const [activeTier, setActiveTier] = useState<Tier>(selectedTier);
 
-  if (!result) return <Navigate to="/diagnosis" replace />;
-
-  const primaryPattern = result.detected_patterns[0];
-  const additionalPatterns = result.detected_patterns.slice(1);
-
   // Explainability: top contributing symptoms for the primary pattern
   const patternReasons = useMemo(() => {
-    if (!primaryPattern) return [];
-    const allIds = [...primaryPattern.pattern.required, ...primaryPattern.pattern.optional];
+    if (!result) return [];
+    const pp = result.detected_patterns[0];
+    if (!pp) return [];
+    const allIds = [...pp.pattern.required, ...pp.pattern.optional];
     return allIds
       .filter((id) => (severities[id] ?? 0) >= 2)
       .map((id) => ({ id, text: SYMPTOMS[id]?.text_en ?? id, severity: severities[id] ?? 0 }))
       .sort((a, b) => b.severity - a.severity)
       .slice(0, 3);
-  }, [primaryPattern, severities]);
+  }, [result, severities]);
+
+  if (!result) return <Navigate to="/diagnosis" replace />;
+
+  const primaryPattern = result.detected_patterns[0];
+  const additionalPatterns = result.detected_patterns.slice(1);
 
   const handleTierChange = (t: Tier) => {
     setActiveTier(t);

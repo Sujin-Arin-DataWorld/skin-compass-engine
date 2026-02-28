@@ -46,8 +46,6 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
       current[zoneId] = intensity;
     }
     onChange(current);
-
-    // Tap feedback
     setTappedZone(zoneId);
     setTimeout(() => setTappedZone(null), 300);
   }, [selectedZones, onChange, intensity, maxSelections]);
@@ -55,9 +53,9 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
   const getZoneColor = (zoneId: string) => {
     const val = selectedZones[zoneId];
     if (!val) return "transparent";
-    if (val === 1) return "hsla(4, 74%, 56%, 0.25)";
-    if (val === 2) return "hsla(4, 74%, 56%, 0.45)";
-    return "hsla(4, 74%, 56%, 0.65)";
+    if (val === 1) return "hsla(30, 55%, 48%, 0.18)";
+    if (val === 2) return "hsla(30, 55%, 48%, 0.32)";
+    return "hsla(30, 55%, 48%, 0.48)";
   };
 
   const getGlowRadius = (zoneId: string) => {
@@ -75,8 +73,9 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
 
         <div className="relative">
           <svg viewBox="30 10 140 170" className="w-full max-w-[280px] h-auto touch-manipulation">
-            <ellipse cx="100" cy="95" rx="48" ry="60" fill="none" stroke="hsl(var(--border))" strokeWidth="1.5" />
-            <path d="M 55 55 Q 60 25 100 20 Q 140 25 145 55" fill="none" stroke="hsl(var(--border))" strokeWidth="1" />
+            {/* Face outline — increased contrast */}
+            <ellipse cx="100" cy="95" rx="48" ry="60" fill="none" stroke="hsl(var(--foreground) / 0.25)" strokeWidth="1.8" />
+            <path d="M 55 55 Q 60 25 100 20 Q 140 25 145 55" fill="none" stroke="hsl(var(--foreground) / 0.2)" strokeWidth="1" />
             <ellipse cx="82" cy="80" rx="8" ry="4" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
             <ellipse cx="118" cy="80" rx="8" ry="4" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
             <path d="M 90 125 Q 100 132 110 125" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
@@ -88,7 +87,7 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
                     cx={zone.cx}
                     cy={zone.cy}
                     r={getGlowRadius(zone.id)}
-                    fill="hsla(4, 74%, 56%, 0.15)"
+                    fill="hsla(30, 55%, 48%, 0.1)"
                     initial={{ r: 0 }}
                     animate={{
                       r: getGlowRadius(zone.id) + 8,
@@ -101,13 +100,13 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
                   />
                 )}
 
-                {/* Tap ripple effect */}
+                {/* Tap ripple */}
                 {tappedZone === zone.id && (
                   <motion.circle
                     cx={zone.cx}
                     cy={zone.cy}
                     r={5}
-                    fill="hsl(var(--primary) / 0.3)"
+                    fill="hsl(var(--accent) / 0.3)"
                     initial={{ r: 5, opacity: 0.6 }}
                     animate={{ r: 20, opacity: 0 }}
                     transition={{ duration: 0.4 }}
@@ -117,7 +116,7 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
                 <motion.path
                   d={zone.path}
                   fill={getZoneColor(zone.id)}
-                  stroke={hoveredZone === zone.id ? "hsl(var(--primary))" : "transparent"}
+                  stroke={hoveredZone === zone.id ? "hsl(var(--accent))" : "transparent"}
                   strokeWidth="1"
                   className="cursor-pointer"
                   onClick={() => toggleZone(zone.id)}
@@ -127,28 +126,36 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
                   transition={{ duration: 0.15 }}
                 />
 
-                {selectedZones[zone.id] && (
-                  <motion.circle
-                    cx={zone.cx}
-                    cy={zone.cy}
-                    r={3 + selectedZones[zone.id]}
-                    fill="hsl(var(--severity-severe))"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                  />
-                )}
+                {/* Interactive dot — bronze when selected */}
+                <motion.circle
+                  cx={zone.cx}
+                  cy={zone.cy}
+                  r={selectedZones[zone.id] ? 3 + selectedZones[zone.id] : 3}
+                  fill={selectedZones[zone.id] ? "hsl(var(--accent))" : "hsl(var(--muted-foreground) / 0.4)"}
+                  className="pointer-events-none"
+                  initial={{ scale: 0 }}
+                  animate={{
+                    scale: 1,
+                    ...(selectedZones[zone.id] ? { r: [3 + selectedZones[zone.id], 4 + selectedZones[zone.id], 3 + selectedZones[zone.id]] } : {}),
+                  }}
+                  transition={{
+                    scale: { type: "spring", stiffness: 400, damping: 15 },
+                    r: { duration: 0.8, repeat: selectedZones[zone.id] ? Infinity : 0, repeatDelay: 1.5 },
+                  }}
+                />
               </g>
             ))}
           </svg>
 
+          {/* Tooltip on hover */}
           <AnimatePresence>
             {hoveredZone && (
               <motion.div
-                className="absolute top-0 right-0 rounded-md bg-secondary px-2 py-1 text-xs text-foreground"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                className="absolute top-0 right-0 rounded-md bg-secondary border border-border px-2.5 py-1 text-xs text-foreground shadow-md"
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 4 }}
+                transition={{ duration: 0.15 }}
               >
                 {FACE_ZONES.find(z => z.id === hoveredZone)?.label}
                 {selectedZones[hoveredZone] && ` · Intensity ${selectedZones[hoveredZone]}/3`}
@@ -157,14 +164,14 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
           </AnimatePresence>
         </div>
 
-        {/* Selected summary */}
+        {/* Selected chips */}
         <div className="flex flex-wrap gap-2 justify-center">
           {Object.entries(selectedZones).map(([id, val]) => {
             const zone = FACE_ZONES.find(z => z.id === id);
             return (
               <motion.span
                 key={id}
-                className="rounded-full bg-severity-severe/20 px-3 py-1.5 text-xs text-severity-severe min-h-[32px] flex items-center"
+                className="rounded-full bg-accent/15 px-3 py-1.5 text-xs text-accent-foreground border border-accent/30 min-h-[32px] flex items-center"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
               >

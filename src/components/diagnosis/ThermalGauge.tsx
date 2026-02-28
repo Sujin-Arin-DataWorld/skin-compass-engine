@@ -27,15 +27,11 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
         {/* Face with thermal overlay */}
         <div className="relative">
           <svg viewBox="30 20 140 140" className="w-48 h-auto">
-            {/* Face outline */}
             <ellipse cx="100" cy="90" rx="45" ry="55" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="1.5" />
-            {/* Eyes */}
             <ellipse cx="82" cy="78" rx="7" ry="3.5" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
             <ellipse cx="118" cy="78" rx="7" ry="3.5" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
-            {/* Nose */}
             <path d="M 97 85 L 100 100 L 103 100" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.6" />
 
-            {/* Thermal flush on cheeks */}
             <motion.ellipse
               cx="72" cy="92" rx="18" ry="14"
               fill={`hsl(${level.color})`}
@@ -48,7 +44,6 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
               animate={{ opacity: level.spread, scale: 0.8 + level.spread * 0.4 }}
               transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             />
-            {/* Central nose flush at high levels */}
             <motion.ellipse
               cx="100" cy="95" rx="10" ry="12"
               fill={`hsl(${level.color})`}
@@ -56,7 +51,6 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
               transition={{ duration: 0.5 }}
             />
 
-            {/* Heat ripple */}
             {value >= 2 && (
               <motion.ellipse
                 cx="100" cy="90" rx="40" ry="48"
@@ -71,13 +65,13 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
           </svg>
         </div>
 
-        {/* Thermometer selector */}
-        <div className="flex w-full gap-1">
+        {/* Thermometer selector — touch-optimized */}
+        <div className="flex w-full gap-1.5">
           {THERMAL_LEVELS.map((lvl, i) => (
-            <button
+            <motion.button
               key={i}
               onClick={() => onChange(i)}
-              className={`flex-1 rounded-md px-2 py-2.5 text-xs font-medium transition-all ${
+              className={`flex-1 min-h-[44px] rounded-lg px-2 py-3 text-xs font-medium transition-all select-none touch-manipulation ${
                 value === i
                   ? i === 0
                     ? "bg-muted text-foreground"
@@ -86,11 +80,12 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
                     : i === 2
                     ? "bg-severity-moderate/20 text-severity-moderate"
                     : "bg-severity-severe/20 text-severity-severe"
-                  : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+                  : "bg-secondary/50 text-muted-foreground hover:bg-secondary active:bg-secondary"
               }`}
+              whileTap={{ scale: 0.93 }}
             >
               {lvl.label}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>

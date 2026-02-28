@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
@@ -10,6 +10,8 @@ import { AXIS_LABELS, Tier, Product, AXIS_KEYS } from "@/engine/types";
 import { SYMPTOMS } from "@/engine/weights";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import DebugPanel from "@/components/diagnosis/DebugPanel";
+import { usePerformanceMode } from "@/hooks/usePerformanceMode";
 
 const URGENCY_COLORS: Record<string, string> = {
   LOW: "hsl(var(--severity-clear))",

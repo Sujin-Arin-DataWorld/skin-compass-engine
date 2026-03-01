@@ -71,10 +71,10 @@
     --sidebar-border: 28 20% 82%;
     --sidebar-ring: 38 60% 50%;
 
-    /* Diagnosis text tokens */
-    --diagnosis-text-primary:   20 35% 12%;
-    --diagnosis-text-secondary: 20 20% 32%;
-    --diagnosis-text-hint:      20 15% 48%;
+    /* Diagnosis text tokens — WCAG AA compliant */
+    --diagnosis-text-primary:   20 40% 14%;
+    --diagnosis-text-secondary: 20 25% 25%;
+    --diagnosis-text-hint:      20 18% 40%;
 
     /* Typography scale */
     --text-hero:     clamp(2.8rem, 7vw, 5.5rem);

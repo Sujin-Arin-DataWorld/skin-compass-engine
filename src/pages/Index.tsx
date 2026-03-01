@@ -442,6 +442,73 @@ const Index = () => {
         </AnimatePresence>
       </section>
 
+      {/* ── Brand Message Overlay ──────────── */}
+      <motion.div
+        className="mx-auto max-w-[1100px] px-6 py-12 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-40px" }}
+        transition={{ duration: 0.6 }}
+      >
+        <p className="font-display text-display-md text-foreground">
+          Diagnose yourself.<br />
+          <span className="text-primary italic">Get exactly what your skin needs.</span>
+        </p>
+        <p className="mt-4 font-body text-body-lg text-muted-foreground max-w-xl mx-auto">
+          No guessing. No generic routines. A 10-axis clinical assessment matches
+          you to K-beauty formulas proven to work for your specific skin pattern —
+          then delivers them to your door.
+        </p>
+      </motion.div>
+
+      {/* ── Image Banner ───────────────────── */}
+      <section className="px-6 pb-16">
+        <div className="mx-auto grid max-w-[1100px] gap-4 md:grid-cols-3">
+          <motion.div
+            className="overflow-hidden rounded-xl aspect-[4/3]"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=900&q=85"
+              alt="At-home skincare routine"
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </motion.div>
+          <motion.div
+            className="overflow-hidden rounded-xl aspect-[4/3]"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?w=600&q=85"
+              alt="K-beauty serum collection"
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </motion.div>
+          <motion.div
+            className="overflow-hidden rounded-xl aspect-[4/3]"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <img
+              src="https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=500&q=85"
+              alt="Skin self-assessment"
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── Why It Works ────────────────────── */}
       <section className="px-6 py-24">
         <div className="mx-auto max-w-[960px]">

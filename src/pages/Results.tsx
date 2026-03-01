@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import Navbar from "@/components/Navbar";
+import SilkBackground from "@/components/SilkBackground";
 import SlidePatternReveal from "@/components/results/SlidePatternReveal";
 import SlideAxisBreakdown from "@/components/results/SlideAxisBreakdown";
 import SlideWhyItWorks from "@/components/results/SlideWhyItWorks";

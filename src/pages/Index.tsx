@@ -5,7 +5,105 @@ import { ArrowRight, ChevronDown, Scan, Brain, FlaskConical, PackageCheck } from
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
-import heroImage from "@/assets/hero-skin-texture.webp";
+// Radar chart data — 8 diagnosis categories
+const RADAR_CATEGORIES = [
+  { label: "Acne",        value: 0.72 },
+  { label: "Oiliness",    value: 0.58 },
+  { label: "Dryness",     value: 0.35 },
+  { label: "Sensitivity", value: 0.81 },
+  { label: "Pigment",     value: 0.45 },
+  { label: "Texture",     value: 0.62 },
+  { label: "Aging",       value: 0.28 },
+  { label: "Barrier",     value: 0.55 },
+];
+
+function polarToXY(angle: number, radius: number, cx: number, cy: number) {
+  const rad = (angle - 90) * (Math.PI / 180);
+  return { x: cx + radius * Math.cos(rad), y: cy + radius * Math.sin(rad) };
+}
+
+function SkinRadar() {
+  const radarRef = useRef<SVGSVGElement>(null);
+  const radarInView = useInView(radarRef, { once: true, margin: "-40px" });
+
+  const cx = 160, cy = 160, maxR = 120;
+  const n = RADAR_CATEGORIES.length;
+  const angleStep = 360 / n;
+
+  const rings = [0.25, 0.5, 0.75, 1.0];
+
+  const dataPoints = RADAR_CATEGORIES.map((cat, i) =>
+    polarToXY(i * angleStep, maxR * cat.value, cx, cy)
+  );
+  const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
+
+  const labels = RADAR_CATEGORIES.map((cat, i) => ({
+    ...polarToXY(i * angleStep, maxR + 28, cx, cy),
+    label: cat.label,
+  }));
+
+  return (
+    <motion.svg
+      ref={radarRef}
+      viewBox="0 0 320 320"
+      className="w-full max-w-[340px] h-auto mx-auto"
+      initial={{ opacity: 0 }}
+      animate={radarInView ? { opacity: 1 } : {}}
+      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+    >
+      {rings.map((r) => (
+        <polygon
+          key={r}
+          points={Array.from({ length: n }, (_, i) => {
+            const p = polarToXY(i * angleStep, maxR * r, cx, cy);
+            return `${p.x},${p.y}`;
+          }).join(" ")}
+          fill="none"
+          stroke="hsl(var(--border))"
+          strokeWidth={r === 1 ? 1 : 0.5}
+          opacity={r === 1 ? 0.5 : 0.2}
+        />
+      ))}
+      {Array.from({ length: n }, (_, i) => {
+        const p = polarToXY(i * angleStep, maxR, cx, cy);
+        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="hsl(var(--border))" strokeWidth={0.5} opacity={0.25} />;
+      })}
+      <motion.path
+        d={dataPath}
+        fill="hsl(var(--primary) / 0.08)"
+        stroke="hsl(var(--primary))"
+        strokeWidth={1.5}
+        strokeLinejoin="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={radarInView ? { pathLength: 1, opacity: 1 } : {}}
+        transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      />
+      {dataPoints.map((p, i) => (
+        <motion.circle
+          key={i} cx={p.x} cy={p.y} r={3}
+          fill="hsl(var(--primary))"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={radarInView ? { scale: 1, opacity: 1 } : {}}
+          transition={{ delay: 0.6 + i * 0.06, duration: 0.3 }}
+        />
+      ))}
+      {labels.map((l, i) => (
+        <motion.text
+          key={i} x={l.x} y={l.y}
+          textAnchor="middle" dominantBaseline="central"
+          className="fill-muted-foreground"
+          fontSize={9} fontFamily="var(--font-body)" fontWeight={400} letterSpacing="0.04em"
+          initial={{ opacity: 0 }}
+          animate={radarInView ? { opacity: 0.7 } : {}}
+          transition={{ delay: 0.8 + i * 0.05, duration: 0.4 }}
+        >
+          {l.label}
+        </motion.text>
+      ))}
+      <circle cx={cx} cy={cy} r={2} fill="hsl(var(--primary) / 0.3)" />
+    </motion.svg>
+  );
+}
 
 // ─────────────────────────────────────────────
 // Animation variants
@@ -262,7 +360,7 @@ const Index = () => {
               transition={{ duration: 0.8 }}
             >
               Your Skin.<br />
-              <span className="text-gradient-cyan">Clinically Decoded.</span>
+              <span className="text-gradient-sand">Clinically Decoded.</span>
             </motion.h1>
 
             <motion.p
@@ -284,7 +382,7 @@ const Index = () => {
             >
               <Link
                 to="/diagnosis"
-                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all glow-cyan hover:opacity-90"
+                 className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all hover:opacity-90"
               >
                 Begin Your Skin Assessment
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -312,26 +410,17 @@ const Index = () => {
             </motion.div>
           </div>
 
-          {/* Right: hero image + score card */}
+          {/* Right: radar visualization */}
           <motion.div
-            className="relative order-1 md:order-2"
+            className="relative order-1 md:order-2 flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ delay: 0.3, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
           >
-            <div className="relative overflow-hidden rounded-2xl">
-              <img
-                src={heroImage}
-                alt="Abstract skin surface analysis — clinical macro texture with data overlay"
-                className="w-full h-auto object-cover opacity-[0.88]"
-                loading="eager"
-                width={1920}
-                height={1080}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent md:bg-gradient-to-l md:from-background/60 md:via-transparent md:to-transparent" />
-            </div>
-
-            <SkinScoreCard />
+            <SkinRadar />
+            <p className="absolute -bottom-2 text-[9px] text-muted-foreground tracking-wide text-center w-full">
+              Illustrative 8-category profile
+            </p>
           </motion.div>
         </div>
 
@@ -449,7 +538,7 @@ const Index = () => {
           <motion.div className="mt-16 text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn}>
             <Link
               to="/diagnosis"
-              className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all glow-cyan hover:opacity-90"
+              className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all hover:opacity-90"
             >
               Start Free Assessment
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />

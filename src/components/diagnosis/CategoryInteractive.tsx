@@ -473,6 +473,14 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               applyPhotoMatch(id, PIGMENT_PHOTOS);
               const idx = PIGMENT_PHOTOS.findIndex(p => p.id === id);
               setUiSignals("pigment", { photo_match: idx as 0 | 1 | 2 | 3 });
+              // Pre-highlight pigment zones based on pattern
+              const suggested = PIGMENT_PHOTO_TO_ZONES[id];
+              if (suggested && suggested.length > 0) {
+                const merged = [...new Set([...pigmentZones, ...suggested])];
+                setInteractive("pigmentZones", merged);
+                setUiSignals("pigment", { zones: merged });
+                onSeverityChange("C5_04", Math.min(3, merged.length));
+              }
             }}
           />
         </>

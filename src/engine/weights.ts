@@ -119,6 +119,7 @@ export const SYMPTOMS: Record<string, SymptomDef> = {
   C7_13: { id: "C7_13", text_en: "Skin feels loose or lacks resistance when pinched gently", category: 7, weights: { aging: 0.8, bar: 0.2 } },
   C7_14: { id: "C7_14", text_en: "A second chin appears when looking downward", category: 7, weights: { aging: 0.7 } },
   C7_15: { id: "C7_15", text_en: "Forehead lines have become deeper", category: 7, weights: { aging: 0.7 } },
+  C7_16: { id: "C7_16", text_en: "Facial contours appear less defined than 1–2 years ago", category: 7, weights: { aging: 0.8, texture: 0.2 } },
 
   // Category 8 — Barrier & Recovery
   C8_01: { id: "C8_01", text_en: "All products suddenly feel irritating", category: 8, weights: { bar: 0.9, sen: 0.7 } },

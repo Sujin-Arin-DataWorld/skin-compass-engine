@@ -53,8 +53,8 @@ export function runDiagnosis(input: DiagnosisInput): DiagnosisResult {
   // Step 3: Context modifiers
   const withContext = applyContextModifiers(withBaseline, input.contexts);
 
-  // Step 4: Saturating logistic
-  const saturated = saturateScores(withContext);
+  // Step 4: Normalized S-curve scoring
+  const saturated = saturateScores(withContext, deduped);
 
   // Step 5: Clinical normalization
   const { normalized, flags: clinicalFlags } = clinicalNormalize(saturated);

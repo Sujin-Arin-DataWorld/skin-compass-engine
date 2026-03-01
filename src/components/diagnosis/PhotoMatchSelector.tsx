@@ -31,7 +31,7 @@ const PhotoMatchSelector = ({ title, options, selected, onSelect }: PhotoMatchSe
           className={`flex flex-col items-center gap-2 rounded-xl border p-4 min-h-[100px] transition-all select-none touch-manipulation ${
             selected === opt.id
               ? "border-primary bg-primary/10 shadow-[0_0_20px_-8px_hsl(var(--primary)/0.3)]"
-              : "border-border bg-secondary/30 hover:border-primary/40 active:border-primary/60"
+              : "border-border bg-card hover:border-primary/40 active:border-primary/60"
           }`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -39,8 +39,8 @@ const PhotoMatchSelector = ({ title, options, selected, onSelect }: PhotoMatchSe
           whileTap={{ scale: 0.94 }}
         >
           <span className="text-3xl">{opt.icon}</span>
-          <span className="text-xs font-medium text-foreground">{opt.label}</span>
-          <span className="text-[10px] text-muted-foreground text-center leading-tight">
+          <span className="text-xs font-semibold text-foreground">{opt.label}</span>
+          <span className="text-[10px] text-foreground/60 text-center leading-tight">
             {opt.description}
           </span>
         </motion.button>

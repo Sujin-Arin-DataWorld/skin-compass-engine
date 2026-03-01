@@ -173,7 +173,7 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 7 }: Face
             return (
               <motion.span
                 key={id}
-                className="rounded-full bg-accent/15 px-3 py-1.5 text-xs text-accent-foreground border border-accent/30 min-h-[32px] flex items-center"
+                className="rounded-full bg-accent/20 px-3 py-1.5 text-xs text-foreground font-medium border border-accent/40 min-h-[32px] flex items-center"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
               >

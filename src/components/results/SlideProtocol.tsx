@@ -28,17 +28,17 @@ const SlideProtocol = ({ result }: Props) => {
   const products = result.product_bundle[phase.key] || [];
 
   return (
-    <div className="flex flex-1 flex-col px-6 py-12 overflow-y-auto">
+    <div className="results-slide flex flex-1 flex-col px-6 py-12 overflow-y-auto">
       <div className="mx-auto w-full max-w-[800px]">
         <motion.p
-          className="text-xs font-medium uppercase tracking-[0.2em] text-primary"
+          className="slide-eyebrow text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           Your 5-Phase Protocol
         </motion.p>
         <motion.p
-          className="mt-1 text-sm text-muted-foreground"
+          className="slide-body mt-1 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
@@ -61,8 +61,8 @@ const SlideProtocol = ({ result }: Props) => {
                 <div key={flag} className="flex items-start gap-2 rounded-lg border border-border/50 bg-card/50 px-4 py-3">
                   <span>{msg.icon}</span>
                   <div>
-                    <p className="text-xs font-medium text-foreground">{msg.title}</p>
-                    <p className="text-[11px] text-muted-foreground">{msg.body}</p>
+                    <p style={{ fontSize: '0.9375rem', fontWeight: 500, color: 'hsl(var(--foreground))' }}>{msg.title}</p>
+                    <p className="slide-body" style={{ fontSize: '0.875rem' }}>{msg.body}</p>
                   </div>
                 </div>
               );
@@ -70,20 +70,46 @@ const SlideProtocol = ({ result }: Props) => {
           </motion.div>
         )}
 
-        {/* Phase tabs */}
-        <div className="mt-6 flex gap-1 overflow-x-auto pb-1">
+        {/* Instruction hint */}
+        <motion.p
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-6 mb-4 text-center"
+          style={{
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: '0.875rem',
+            color: 'hsl(var(--foreground-hint))',
+            fontStyle: 'italic',
+          }}
+        >
+          ← Tap each phase to see your personalised step →
+        </motion.p>
+
+        {/* Phase tabs — bigger */}
+        <div className="flex gap-2 rounded-xl p-1.5" style={{ background: 'hsl(var(--muted))' }}>
           {PHASES.map((p, i) => (
             <button
               key={p.key}
               onClick={() => setActivePhase(i)}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all whitespace-nowrap min-h-[40px] touch-manipulation ${
-                activePhase === i
-                  ? "bg-primary/10 text-primary border border-primary/30"
-                  : "text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/50"
-              }`}
+              className="flex-1 rounded-lg py-3 transition-all duration-200 min-h-[56px] touch-manipulation"
+              style={{
+                background: activePhase === i ? 'hsl(var(--card))' : 'transparent',
+                boxShadow: activePhase === i ? '0 1px 4px hsl(0 0% 0% / 0.12)' : 'none',
+              }}
             >
-              <span>{p.icon}</span>
-              <span>{p.num}. {p.name}</span>
+              <div style={{ fontSize: '1.25rem', textAlign: 'center', marginBottom: '4px' }}>
+                {p.icon}
+              </div>
+              <p style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: '0.8125rem',
+                fontWeight: activePhase === i ? 600 : 400,
+                color: activePhase === i ? 'hsl(var(--foreground))' : 'hsl(var(--foreground-hint))',
+                textAlign: 'center',
+                lineHeight: 1.3,
+              }}>
+                {p.num}<br/>{p.name}
+              </p>
             </button>
           ))}
         </div>
@@ -92,48 +118,68 @@ const SlideProtocol = ({ result }: Props) => {
         <AnimatePresence mode="wait">
           <motion.div
             key={activePhase}
-            className="mt-4 rounded-xl border border-border p-6"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.25 }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-6 rounded-2xl p-6 md:p-8"
+            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
           >
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-xl text-foreground">
-                Phase {phase.num} · {phase.name}
-              </h3>
-              <div className="flex gap-2">
-                {phase.am && <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">AM</span>}
-                {phase.pm && <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-medium text-primary">PM</span>}
-              </div>
+            {/* Phase label */}
+            <p style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase' as const,
+              color: 'hsl(var(--primary))',
+              marginBottom: '0.5rem',
+            }}>
+              Phase {phase.num} · {phase.name}
+            </p>
+
+            {/* Phase description */}
+            <p className="slide-body" style={{ marginBottom: '1rem' }}>{phase.desc}</p>
+
+            {/* AM/PM badges */}
+            <div className="flex gap-2 mb-5">
+              {phase.am && (
+                <span className="rounded-full px-3 py-1 text-sm font-medium"
+                      style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--primary))' }}>
+                  ☀️ AM
+                </span>
+              )}
+              {phase.pm && (
+                <span className="rounded-full px-3 py-1 text-sm font-medium"
+                      style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--primary))' }}>
+                  🌙 PM
+                </span>
+              )}
             </div>
 
-            <p className="mt-2 text-sm text-muted-foreground">{phase.desc}</p>
-
             {/* Products in this phase */}
-            <div className="mt-5 space-y-4">
+            <div className="space-y-4">
               {products.length === 0 ? (
-                <p className="text-xs text-muted-foreground italic">No products assigned for this phase at your current tier.</p>
+                <p className="slide-body" style={{ fontStyle: 'italic' }}>No products assigned for this phase at your current tier.</p>
               ) : (
                 products.map((product: Product) => (
                   <div key={product.id} className="border-t border-border/50 pt-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{product.brand}</p>
-                        <p className="text-sm font-medium text-foreground">{product.name}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="slide-eyebrow" style={{ fontSize: '0.6875rem', letterSpacing: '0.12em' }}>{product.brand}</p>
+                        <p style={{ fontSize: '1rem', fontWeight: 500, color: 'hsl(var(--foreground))' }}>{product.name}</p>
+                        <p className="slide-body" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
                           {product.key_ingredients.join(" · ")}
                         </p>
-                        {/* Target axes */}
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {product.target_axes.map((axis) => (
-                            <span key={axis} className="rounded-full bg-secondary px-2 py-0.5 text-[10px] text-muted-foreground">
+                            <span key={axis} className="rounded-full bg-secondary px-2 py-0.5 text-[0.75rem]" style={{ color: 'hsl(var(--foreground-hint))' }}>
                               {AXIS_LABELS[axis]}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <span className="text-sm font-medium text-foreground whitespace-nowrap">€{product.price_eur}</span>
+                      <span style={{ fontSize: '1rem', fontWeight: 600, color: 'hsl(var(--foreground))' }}>€{product.price_eur}</span>
                     </div>
                   </div>
                 ))

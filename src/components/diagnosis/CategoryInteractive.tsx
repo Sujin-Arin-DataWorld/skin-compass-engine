@@ -633,7 +633,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               <div className="flex flex-col gap-5">
                 {extraSymptoms.map((symptom) => (
                   <div key={symptom.id} className="space-y-2">
-                    <p className="text-sm text-foreground">{symptom.text_en}</p>
+                    <p className="question-label">{symptom.text_en}</p>
                     <SeveritySelector
                       value={severities[symptom.id] ?? 0}
                       onChange={(v) => onSeverityChange(symptom.id, v)}

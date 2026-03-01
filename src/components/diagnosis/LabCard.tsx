@@ -9,7 +9,7 @@ interface LabCardProps {
 
 const LabCard = ({ children, className = "", active = true }: LabCardProps) => (
   <motion.div
-    className={`rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6 shadow-lg transition-shadow ${
+    className={`rounded-2xl border border-border/50 bg-card p-6 shadow-sm transition-shadow ${
       active ? "shadow-[0_0_30px_-10px_hsl(var(--accent-sand)/0.10)]" : ""
     } ${className}`}
     initial={{ opacity: 0, y: 16 }}

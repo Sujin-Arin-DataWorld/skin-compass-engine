@@ -129,13 +129,16 @@ export function mapUiSignalsToSeverityPatch(signals: UiSignalsV4): Record<string
     const zones = new Set(acne.zones ?? []);
     const zc = zones.size;
     if (zc >= 1) p["C1_02"] = clampSev(zc >= 4 ? 3 : zc >= 2 ? 2 : 1);
-    if (zones.has("jawline") || zones.has("chin"))
+    if (zones.has("jawline") || zones.has("jawline_l") || zones.has("jawline_r") || zones.has("chin"))
       p["C1_02"] = clampSev(Math.max(p["C1_02"] ?? 0, 2));
+    // Hairline zones = strong hormonal signal
+    if (zones.has("forehead_left") || zones.has("forehead_right"))
+      p["C1_03"] = clampSev(Math.max(p["C1_03"] ?? 0, 2));
 
     const intenSev = sliderToSev(acne.intensity);
     if (intenSev >= 2) { p["C1_07"] = intenSev; p["C1_08"] = intenSev; }
     p["C1_01"] = sliderToSev(acne.recurrence);
-    if (acne.hormonal) p["C1_03"] = 2;
+    if (acne.hormonal) p["C1_03"] = clampSev(Math.max(p["C1_03"] ?? 0, 2));
     if (acne.body) p["C1_15"] = 2;
     if (acne.mask_area) p["C1_04"] = 2;
     if (acne.photo_match === 1) p["C1_03"] = clampSev(Math.max(p["C1_03"] ?? 0, 2));

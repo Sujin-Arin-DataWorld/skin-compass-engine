@@ -74,6 +74,21 @@ const OILINESS_ZONES = [
   { id: "chin", label: "Chin", cx: 100, cy: 128, rx: 12, ry: 8 },
 ];
 
+// Photo → zone pre-highlight mappings
+const ACNE_PHOTO_TO_ZONES: Record<string, Record<string, number>> = {
+  mild_scattered: { left_cheek: 1, right_cheek: 1 },
+  hormonal_jaw: { jawline_l: 1, jawline_r: 1, chin: 1 },
+  cystic: { left_cheek: 1, right_cheek: 1, chin: 1, jawline_l: 1, jawline_r: 1 },
+  comedonal: { nose: 1, forehead: 1 },
+};
+
+const PIGMENT_PHOTO_TO_ZONES: Record<string, string[]> = {
+  pih: ["left_cheek", "right_cheek"],
+  melasma: ["left_cheek", "right_cheek", "forehead"],
+  uneven_dull: [],
+  minimal_pigment: [],
+};
+
 // Context flags for interactive components
 const CATEGORY_CONTEXT_FLAGS: Record<number, string> = {
   1: "ui_facemap",
@@ -94,7 +109,7 @@ const CORE_SYMPTOMS: Record<number, string[]> = {
   4: ["C4_11", "C4_14", "C4_07"],
   5: ["C5_03", "C5_13", "C5_05"],
   6: ["C6_12", "C6_15", "C6_09"],
-  7: ["C7_08", "C7_11", "C7_13"],
+  7: ["C7_08", "C7_11", "C7_13", "C7_16"],
   8: ["C8_03", "C8_04", "C8_09"],
 };
 
@@ -224,6 +239,15 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               applyPhotoMatch(id, ACNE_PHOTOS);
               const idx = ACNE_PHOTOS.findIndex(p => p.id === id);
               setUiSignals("acne", { photo_match: idx as 0 | 1 | 2 | 3 });
+              // Pre-highlight face map zones based on pattern
+              const suggestedZones = ACNE_PHOTO_TO_ZONES[id];
+              if (suggestedZones) {
+                const merged = { ...faceZones };
+                for (const [zone, intensity] of Object.entries(suggestedZones)) {
+                  if (!(zone in merged)) merged[zone] = intensity;
+                }
+                handleFaceMapChange(merged);
+              }
             }}
           />
         </>
@@ -449,6 +473,14 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               applyPhotoMatch(id, PIGMENT_PHOTOS);
               const idx = PIGMENT_PHOTOS.findIndex(p => p.id === id);
               setUiSignals("pigment", { photo_match: idx as 0 | 1 | 2 | 3 });
+              // Pre-highlight pigment zones based on pattern
+              const suggested = PIGMENT_PHOTO_TO_ZONES[id];
+              if (suggested && suggested.length > 0) {
+                const merged = [...new Set([...pigmentZones, ...suggested])];
+                setInteractive("pigmentZones", merged);
+                setUiSignals("pigment", { zones: merged });
+                onSeverityChange("C5_04", Math.min(3, merged.length));
+              }
             }}
           />
         </>

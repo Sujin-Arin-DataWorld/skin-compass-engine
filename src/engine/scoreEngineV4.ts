@@ -55,12 +55,45 @@ export function applyContextModifiers(
   return result;
 }
 
-/** Saturating logistic: score = 100 * (1 - exp(-0.9 * raw)) */
-export function saturateScores(raw: AxisScores): AxisScores {
+/**
+ * Normalized S-curve scoring: prevents clustering at 87–100.
+ * Computes earned/possible ratio per axis, then applies soft S-curve.
+ */
+export function saturateScores(
+  raw: AxisScores,
+  severities: Record<string, number>
+): AxisScores {
+  // Determine which categories the user actually answered
+  const answeredCategories = new Set<number>();
+  for (const [sid, sev] of Object.entries(severities)) {
+    if (sev > 0 && SYMPTOMS[sid]) {
+      answeredCategories.add(SYMPTOMS[sid].category);
+    }
+  }
+
+  // Max possible per axis = sum of all weights for symptoms in answered categories
+  const maxPossible = emptyScores();
+  for (const def of Object.values(SYMPTOMS)) {
+    if (answeredCategories.has(def.category)) {
+      for (const [axis, weight] of Object.entries(def.weights)) {
+        maxPossible[axis as AxisKey] += weight;
+      }
+    }
+  }
+
   const result = emptyScores();
   for (const axis of AXIS_KEYS) {
-    const r = raw[axis];
-    result[axis] = Math.min(100, 100 * (1 - Math.exp(-0.9 * r)));
+    if (maxPossible[axis] <= 0) {
+      result[axis] = 0;
+      continue;
+    }
+    const ratio = Math.min(raw[axis] / maxPossible[axis], 1.0);
+    // Soft S-curve: mild responses don't spike, severe responses stay high
+    const curved =
+      ratio < 0.5
+        ? 2 * ratio * ratio
+        : 1 - Math.pow(-2 * ratio + 2, 2) / 2;
+    result[axis] = Math.round(curved * 100);
   }
   return result;
 }

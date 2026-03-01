@@ -226,10 +226,6 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       {/* ===== CATEGORY 1: ACNE ===== */}
       {category === 1 && (
         <>
-          <FaceMapInteractive
-            selectedZones={faceZones}
-            onChange={handleFaceMapChange}
-          />
           <PhotoMatchSelector
             title="Which image looks closest to your skin?"
             options={ACNE_PHOTOS}
@@ -250,6 +246,10 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                 handleFaceMapChange(merged);
               }
             }}
+          />
+          <FaceMapInteractive
+            selectedZones={faceZones}
+            onChange={handleFaceMapChange}
           />
         </>
       )}

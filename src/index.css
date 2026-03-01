@@ -284,8 +284,10 @@
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 1.0625rem;
   font-weight: 500;
-  color: hsl(var(--foreground));
+  color: hsl(var(--diagnosis-text-primary));
   line-height: 1.55;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .section-header {

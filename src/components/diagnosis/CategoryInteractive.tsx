@@ -121,6 +121,8 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
   const [poreZones, setPoreZones] = useState<string[]>([]);
   const [agingZones, setAgingZones] = useState<string[]>([]);
   const [expandedQuestions, setExpandedQuestions] = useState(false);
+  // Independent toggle state for sensitivity actives (fixes shared C4_05 bug)
+  const [activeToggles, setActiveToggles] = useState<Record<string, boolean>>({});
 
   const categorySymptoms = useMemo(() => {
     return Object.values(SYMPTOMS).filter((s) => s.category === category);

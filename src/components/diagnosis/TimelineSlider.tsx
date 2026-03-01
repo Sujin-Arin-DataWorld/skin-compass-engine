@@ -83,20 +83,28 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
         <span className="text-sm text-muted-foreground">{unit}</span>
       </div>
 
-      {/* Shine preview */}
-      <motion.div
-        className="mt-3 mx-auto h-16 w-32 rounded-full overflow-hidden relative border border-border"
-        style={{ background: "hsl(var(--secondary))" }}
-      >
-        <motion.div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background: "radial-gradient(ellipse at 40% 30%, rgba(255,255,255,0.3), transparent 60%)",
-          }}
-          animate={{ opacity: shineOpacity }}
-          transition={{ duration: 0.3 }}
-        />
-      </motion.div>
+      {/* Oil intensity indicator */}
+      {value > 0 && value < 24 && (
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <div className="flex gap-1">
+            {[1, 2, 3].map((level) => (
+              <motion.div
+                key={level}
+                className={`h-2 w-6 rounded-full ${
+                  (value <= 8 && level <= 3) || (value <= 14 && level <= 2) || level <= 1
+                    ? "bg-primary"
+                    : "bg-border"
+                }`}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              />
+            ))}
+          </div>
+          <span className="text-[10px] text-muted-foreground">
+            {value <= 6 ? "High oil production" : value <= 12 ? "Moderate" : "Low"}
+          </span>
+        </div>
+      )}
     </LabCard>
   );
 };

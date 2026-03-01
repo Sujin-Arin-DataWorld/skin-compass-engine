@@ -226,10 +226,6 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       {/* ===== CATEGORY 1: ACNE ===== */}
       {category === 1 && (
         <>
-          <FaceMapInteractive
-            selectedZones={faceZones}
-            onChange={handleFaceMapChange}
-          />
           <PhotoMatchSelector
             title="Which image looks closest to your skin?"
             options={ACNE_PHOTOS}
@@ -250,6 +246,10 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                 handleFaceMapChange(merged);
               }
             }}
+          />
+          <FaceMapInteractive
+            selectedZones={faceZones}
+            onChange={handleFaceMapChange}
           />
         </>
       )}
@@ -307,7 +307,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
               oilFullFace
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground hover:border-primary/40"
+                : "border-border text-foreground/70 hover:border-primary/40"
             }`}
             whileTap={{ scale: 0.97 }}
           >
@@ -449,21 +449,6 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       {/* ===== CATEGORY 5: PIGMENTATION ===== */}
       {category === 5 && (
         <>
-          <AreaTapOverlay
-            title="Where is pigmentation visible?"
-            subtitle="Tap to highlight affected zones"
-            zones={PIGMENT_ZONES}
-            selected={pigmentZones}
-            onToggle={(id) => {
-              markInteractive();
-              const next = pigmentZones.includes(id) ? pigmentZones.filter(z => z !== id) : [...pigmentZones, id];
-              setInteractive("pigmentZones", next);
-              const count = next.length;
-              onSeverityChange("C5_04", Math.min(3, count));
-              setUiSignals("pigment", { zones: next });
-            }}
-            darken
-          />
           <PhotoMatchSelector
             title="Which pigmentation pattern matches yours?"
             options={PIGMENT_PHOTOS}
@@ -483,6 +468,21 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                 onSeverityChange("C5_04", Math.min(3, merged.length));
               }
             }}
+          />
+          <AreaTapOverlay
+            title="Where is pigmentation visible?"
+            subtitle="Tap to highlight affected zones"
+            zones={PIGMENT_ZONES}
+            selected={pigmentZones}
+            onToggle={(id) => {
+              markInteractive();
+              const next = pigmentZones.includes(id) ? pigmentZones.filter(z => z !== id) : [...pigmentZones, id];
+              setInteractive("pigmentZones", next);
+              const count = next.length;
+              onSeverityChange("C5_04", Math.min(3, count));
+              setUiSignals("pigment", { zones: next });
+            }}
+            darken
           />
         </>
       )}
@@ -533,7 +533,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
               poreFullFace
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground hover:border-primary/40"
+                : "border-border text-foreground/70 hover:border-primary/40"
             }`}
             whileTap={{ scale: 0.97 }}
           >

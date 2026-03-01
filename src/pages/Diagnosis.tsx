@@ -315,17 +315,17 @@ const DiagnosisPage = () => {
                 <div className="mt-8 flex flex-col gap-6">
                   {metaQuestionsForCategory.map((q) => (
                     <LabCard key={q.id}>
-                      <p className="text-sm text-foreground mb-3">{q.text_en}</p>
+                      <p className="question-label mb-3">{q.text_en}</p>
                       {q.type === "boolean" ? (
                         <div className="flex gap-2">
                           {[true, false].map((v) => (
                             <motion.button
                               key={String(v)}
                               onClick={() => store.setMetaAnswer(q.id, v)}
-                              className={`flex-1 rounded-md px-4 py-2 text-sm transition-all min-h-[44px] touch-manipulation ${
+                              className={`flex-1 rounded-md px-4 py-2 text-sm transition-all min-h-[44px] touch-manipulation border ${
                                 store.metaAnswers[q.id] === v
-                                  ? "bg-primary/20 text-primary border border-primary"
-                                  : "bg-secondary/50 text-muted-foreground border border-transparent hover:bg-secondary"
+                                  ? "bg-primary/20 text-primary border-primary"
+                                  : "bg-secondary/50 text-foreground/70 border-transparent hover:bg-secondary"
                               }`}
                               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                             >
@@ -334,10 +334,26 @@ const DiagnosisPage = () => {
                           ))}
                         </div>
                       ) : (
-                        <SeveritySelector
-                          value={(store.metaAnswers[q.id] as number) ?? 0}
-                          onChange={(v) => store.setMetaAnswer(q.id, v)}
-                        />
+                        <div className="space-y-3">
+                          <SeveritySelector
+                            value={(store.metaAnswers[q.id] as number) ?? 0}
+                            onChange={(v) => store.setMetaAnswer(q.id, v)}
+                          />
+                          {/* "Not applicable" option for hormonal questions */}
+                          {(q.id === "premenstrual_7_10d") && (
+                            <motion.button
+                              onClick={() => store.setMetaAnswer(q.id, -1)}
+                              className={`w-full rounded-md px-4 py-2.5 text-sm transition-all min-h-[44px] touch-manipulation border ${
+                                store.metaAnswers[q.id] === -1
+                                  ? "bg-muted text-foreground border-border"
+                                  : "bg-secondary/30 text-foreground/60 border-transparent hover:bg-secondary/60"
+                              }`}
+                              whileTap={reducedMotion ? undefined : { scale: 0.96 }}
+                            >
+                              Not applicable
+                            </motion.button>
+                          )}
+                        </div>
                       )}
                     </LabCard>
                   ))}

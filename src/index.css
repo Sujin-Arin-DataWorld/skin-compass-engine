@@ -5,24 +5,26 @@
 @layer base {
   :root {
     /* ── Light mode — Warm Luxury ── */
-    --background: 28 20% 97%;
-    --background-2: 28 18% 93%;
-    --foreground: 20 25% 18%;
+    --background:           28 20% 97%;
+    --background-2:         28 15% 93%;
+    --card:                 0 0% 100%;
+    --card-foreground:      20 40% 11%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 20 35% 12%;
+    --foreground:           20 40% 11%;
+    --foreground-body:      20 30% 24%;
+    --foreground-hint:      20 20% 47%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 20 25% 18%;
+    --popover-foreground: 20 40% 11%;
 
-    --primary: 38 65% 52%;
-    --primary-foreground: 28 20% 97%;
+    --primary:              38 60% 50%;
+    --primary-foreground:   28 20% 97%;
 
     --secondary: 28 15% 90%;
-    --secondary-foreground: 20 25% 18%;
+    --secondary-foreground: 20 40% 11%;
 
-    --muted: 28 15% 88%;
-    --muted-foreground: 20 15% 48%;
+    --muted: 28 15% 90%;
+    --muted-foreground: 20 20% 47%;
 
     --accent: 20 35% 28%;
     --accent-foreground: 28 20% 97%;
@@ -31,13 +33,13 @@
     --destructive-foreground: 28 20% 97%;
 
     --border: 28 20% 82%;
-    --input: 28 20% 82%;
-    --ring: 38 65% 52%;
+    --input: 28 20% 88%;
+    --ring: 38 60% 50%;
 
     --radius: 0.5rem;
 
     /* Custom tokens — light */
-    --accent-sand: 38 65% 52%;
+    --accent-sand: 38 60% 50%;
     --accent-champagne: 38 55% 85%;
     --accent-rose: 8 40% 52%;
 
@@ -61,53 +63,71 @@
     --font-body: 'DM Sans', system-ui, sans-serif;
 
     --sidebar-background: 28 18% 93%;
-    --sidebar-foreground: 20 25% 18%;
-    --sidebar-primary: 38 65% 52%;
+    --sidebar-foreground: 20 40% 11%;
+    --sidebar-primary: 38 60% 50%;
     --sidebar-primary-foreground: 28 20% 97%;
     --sidebar-accent: 28 15% 90%;
-    --sidebar-accent-foreground: 20 25% 18%;
+    --sidebar-accent-foreground: 20 40% 11%;
     --sidebar-border: 28 20% 82%;
-    --sidebar-ring: 38 65% 52%;
+    --sidebar-ring: 38 60% 50%;
+
+    /* Diagnosis text tokens */
+    --diagnosis-text-primary:   20 35% 12%;
+    --diagnosis-text-secondary: 20 20% 32%;
+    --diagnosis-text-hint:      20 15% 48%;
+
+    /* Typography scale */
+    --text-hero:     clamp(2.8rem, 7vw, 5.5rem);
+    --text-display:  clamp(2rem, 4vw, 3.2rem);
+    --text-title:    clamp(1.5rem, 2.5vw, 2rem);
+    --text-section:  1.375rem;
+    --text-card:     1.125rem;
+    --text-body:     1rem;
+    --text-small:    0.9375rem;
+    --text-label:    0.8125rem;
+    --text-micro:    0.75rem;
   }
 
   .dark {
     /* ── Dark mode — Espresso Luxury ── */
-    --background: 20 18% 8%;
-    --background-2: 20 16% 11%;
-    --foreground: 38 30% 90%;
+    --background:           20 22% 7%;
+    --background-2:         20 18% 10%;
+    --card:                 20 18% 12%;
+    --card-foreground:      38 28% 91%;
 
-    --card: 20 16% 13%;
-    --card-foreground: 38 25% 90%;
+    --foreground:           38 28% 91%;
+    --foreground-body:      38 22% 78%;
+    --foreground-hint:      38 16% 54%;
 
     --popover: 20 16% 12%;
-    --popover-foreground: 38 30% 90%;
+    --popover-foreground: 38 28% 91%;
 
-    --primary: 38 55% 62%;
-    --primary-foreground: 20 18% 8%;
+    --primary:              38 58% 56%;
+    --primary-foreground:   20 22% 7%;
 
     --secondary: 20 14% 16%;
-    --secondary-foreground: 38 30% 90%;
+    --secondary-foreground: 38 28% 91%;
 
-    --muted: 20 14% 16%;
-    --muted-foreground: 38 15% 58%;
+    --muted: 20 16% 16%;
+    --muted-foreground: 38 16% 54%;
 
     --accent: 38 40% 45%;
-    --accent-foreground: 20 18% 8%;
+    --accent-foreground: 20 22% 7%;
 
     --destructive: 0 60% 48%;
-    --destructive-foreground: 38 30% 90%;
+    --destructive-foreground: 38 28% 91%;
 
-    --border: 20 15% 20%;
-    --input: 20 15% 20%;
-    --ring: 38 55% 62%;
+    --border: 20 16% 22%;
+    --input: 20 18% 15%;
+    --ring: 38 58% 56%;
 
     /* Custom tokens — dark */
-    --accent-sand: 38 55% 62%;
+    --accent-sand: 38 58% 56%;
     --accent-champagne: 38 40% 45%;
     --accent-rose: 8 40% 58%;
 
     --gradient-start: 38 40% 20%;
-    --gradient-end: 20 18% 8%;
+    --gradient-end: 20 22% 7%;
 
     --severity-clear: 145 40% 38%;
     --severity-mild: 40 50% 50%;
@@ -123,13 +143,18 @@
     --glow-champagne: 0 0 20px hsla(38, 40%, 45%, 0.08);
 
     --sidebar-background: 20 16% 10%;
-    --sidebar-foreground: 38 30% 90%;
-    --sidebar-primary: 38 55% 62%;
-    --sidebar-primary-foreground: 20 18% 8%;
+    --sidebar-foreground: 38 28% 91%;
+    --sidebar-primary: 38 58% 56%;
+    --sidebar-primary-foreground: 20 22% 7%;
     --sidebar-accent: 20 14% 16%;
-    --sidebar-accent-foreground: 38 30% 90%;
-    --sidebar-border: 20 15% 20%;
-    --sidebar-ring: 38 55% 62%;
+    --sidebar-accent-foreground: 38 28% 91%;
+    --sidebar-border: 20 16% 22%;
+    --sidebar-ring: 38 58% 56%;
+
+    /* Diagnosis text tokens — dark */
+    --diagnosis-text-primary:   38 30% 92%;
+    --diagnosis-text-secondary: 38 20% 72%;
+    --diagnosis-text-hint:      38 15% 55%;
   }
 }
 
@@ -226,81 +251,62 @@
 
 /* ── Diagnosis page contrast classes ── */
 
-:root {
-  --diagnosis-text-primary:   20 35% 12%;
-  --diagnosis-text-secondary: 20 20% 32%;
-  --diagnosis-text-hint:      20 15% 48%;
-}
-
-.dark {
-  --diagnosis-text-primary:   38 30% 92%;
-  --diagnosis-text-secondary: 38 20% 72%;
-  --diagnosis-text-hint:      38 15% 55%;
-}
-
 .category-title {
   font-family: 'Cormorant Garamond', Georgia, serif;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 400;
   line-height: 1.15;
   letter-spacing: -0.01em;
-  color: hsl(20 25% 15%);
-}
-
-.dark .category-title {
-  color: hsl(38 25% 92%);
+  color: hsl(var(--foreground));
 }
 
 .category-description {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   line-height: 1.65;
-  color: hsl(20 15% 40%);
-}
-
-.dark .category-description {
-  color: hsl(38 20% 68%);
+  color: hsl(var(--foreground-body));
 }
 
 .category-badge {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: hsl(var(--primary));
 }
 
 .question-label {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 1rem;
+  font-size: 1.0625rem;
   font-weight: 500;
-  color: hsl(var(--diagnosis-text-primary));
-  line-height: 1.5;
+  color: hsl(var(--foreground));
+  line-height: 1.55;
 }
 
 .section-header {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: hsl(var(--diagnosis-text-secondary));
+  color: hsl(var(--foreground-hint));
+  margin-bottom: 0.75rem;
 }
 
 .option-button {
-  background: hsl(0 0% 97%);
-  border: 1px solid hsl(20 15% 80%);
-  color: hsl(20 25% 22%);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-size: 0.9rem;
-  font-weight: 400;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  min-height: 48px;
 }
 
-.dark .option-button {
-  background: hsl(20 14% 18%);
-  border: 1px solid hsl(20 14% 28%);
-  color: hsl(38 20% 78%);
+.option-button:hover {
+  border-color: hsl(var(--primary) / 0.5);
+  background: hsl(var(--primary) / 0.05);
 }
 
 .option-button.selected {
@@ -308,4 +314,43 @@
   border-color: hsl(var(--primary));
   color: hsl(var(--primary-foreground));
   font-weight: 500;
+}
+
+/* ── Result slide base typography ─────────── */
+.results-slide {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: hsl(var(--foreground));
+}
+
+.results-slide h1,
+.results-slide h2,
+.results-slide h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.slide-eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: hsl(var(--primary));
+}
+
+.slide-title {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: hsl(var(--foreground));
+}
+
+.slide-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: hsl(var(--foreground-body));
+}
+
+.score-number {
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }

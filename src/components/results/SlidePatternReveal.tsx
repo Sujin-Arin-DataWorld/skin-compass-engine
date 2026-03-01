@@ -32,13 +32,13 @@ const SlidePatternReveal = ({ result }: Props) => {
   const words = (patternName || pattern.name).split(" ");
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center overflow-y-auto">
+    <div className="results-slide flex flex-1 flex-col items-center justify-center px-6 py-12 text-center overflow-y-auto">
       {/* Completion tag */}
       <motion.p
-        className="text-[10px] font-medium uppercase tracking-[0.25em] text-muted-foreground"
+        className="slide-eyebrow"
+        style={{ fontSize: '0.75rem' }}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0 }}
       >
         Category 8 of 8 complete
       </motion.p>
@@ -55,7 +55,7 @@ const SlidePatternReveal = ({ result }: Props) => {
 
       {/* Pattern label */}
       <motion.p
-        className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-primary"
+        className="slide-eyebrow mt-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
@@ -64,7 +64,7 @@ const SlidePatternReveal = ({ result }: Props) => {
       </motion.p>
 
       {/* Pattern name — word by word */}
-      <h1 className="mt-3 font-display text-4xl sm:text-5xl text-foreground leading-tight">
+      <h1 className="slide-title mt-3" style={{ fontSize: 'clamp(2rem, 5vw, 3.2rem)' }}>
         {words.map((word, i) => (
           <motion.span
             key={i}
@@ -80,7 +80,7 @@ const SlidePatternReveal = ({ result }: Props) => {
 
       {/* Tagline */}
       <motion.p
-        className="mt-4 max-w-md text-base text-muted-foreground leading-relaxed"
+        className="slide-body mt-4 max-w-md"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.0 }}
@@ -106,15 +106,16 @@ const SlidePatternReveal = ({ result }: Props) => {
         {topSignals.map((s) => (
           <div key={s.axis} className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-primary" />
-            <span className="text-sm text-foreground font-medium">{s.label}</span>
-            <span className="text-sm text-muted-foreground">{s.score}/100</span>
+            <span style={{ fontSize: '1rem', fontWeight: 500, color: 'hsl(var(--foreground))' }}>{s.label}</span>
+            <span className="score-number" style={{ fontSize: '1rem', color: 'hsl(var(--foreground-hint))' }}>{s.score}/100</span>
           </div>
         ))}
       </motion.div>
 
       {/* CTA hint */}
       <motion.p
-        className="mt-10 text-xs text-muted-foreground"
+        className="mt-10"
+        style={{ fontSize: '0.875rem', color: 'hsl(var(--foreground-hint))' }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.6 }}
         transition={{ delay: 1.6 }}

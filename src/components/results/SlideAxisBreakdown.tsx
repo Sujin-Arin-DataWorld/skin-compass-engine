@@ -2,11 +2,17 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { DiagnosisResult, AXIS_LABELS, AXIS_KEYS, AxisKey } from "@/engine/types";
 
-const severityColor = (score: number) => {
-  if (score <= 20) return "hsl(var(--severity-clear))";
-  if (score <= 45) return "hsl(var(--severity-mild))";
-  if (score <= 70) return "hsl(var(--severity-moderate))";
-  return "hsl(var(--severity-severe))";
+function getBarColor(score: number): string {
+  if (score >= 70) return "hsl(var(--severity-severe))";
+  if (score >= 45) return "hsl(var(--severity-moderate))";
+  if (score >= 20) return "hsl(var(--severity-mild))";
+  return "hsl(var(--severity-clear))";
+}
+
+const AXIS_ICONS: Record<string, string> = {
+  bar: "🛡", sen: "⚡", acne: "🔴", hormonal: "🌙",
+  redness: "🌡", hyd: "💧", seb: "✨", pigment: "🌑",
+  aging: "⏳", ox: "🌪", texture: "⚪", makeup_stability: "💄",
 };
 
 const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, (s: number) => string>> = {
@@ -21,11 +27,11 @@ const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, (s: number) => string>> = {
   ox: (s) => s > 60 ? "High oxidative stress — antioxidant protocol essential." : s > 30 ? "Moderate environmental damage." : "Low oxidative burden.",
 };
 
-// SVG radar chart
+// SVG radar chart — enlarged per v6
 function RadarChart({ result }: { result: DiagnosisResult }) {
   const axes = result.radar_chart_data;
   const n = axes.length;
-  const SIZE = 220, CENTER = SIZE / 2, RADIUS = 85;
+  const SIZE = 280, CENTER = SIZE / 2, RADIUS = 110;
 
   const points = axes.map((a, i) => {
     const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
@@ -62,12 +68,19 @@ function RadarChart({ result }: { result: DiagnosisResult }) {
       />
       {axes.map((a, i) => {
         const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        const r = RADIUS + 18;
+        const r = RADIUS + 42;
         return (
           <text
             key={a.axis} x={CENTER + r * Math.cos(angle)} y={CENTER + r * Math.sin(angle)}
             textAnchor="middle" dominantBaseline="central"
-            className="fill-muted-foreground" fontSize={8} fontFamily="var(--font-body)"
+            style={{
+              fontSize: '12px',
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontWeight: 500,
+              fill: 'hsl(var(--foreground))',
+              opacity: 0.85,
+              textTransform: 'capitalize' as const,
+            }}
           >
             {a.axis}
           </text>
@@ -89,70 +102,119 @@ const SlideAxisBreakdown = ({ result }: Props) => {
 
   const topInterpretations = sorted.slice(0, 3).map((axis) => ({
     axis,
+    score: Math.round(result.axis_scores[axis]),
     text: AXIS_INTERPRETATIONS[axis]?.(result.axis_scores[axis]) ?? "",
   })).filter((i) => i.text);
 
   return (
-    <div className="flex flex-1 flex-col px-6 py-12 overflow-y-auto">
+    <div className="results-slide flex flex-1 flex-col px-6 py-12 overflow-y-auto">
       <div className="mx-auto w-full max-w-[800px]">
-        <motion.p
-          className="text-xs font-medium uppercase tracking-[0.2em] text-primary"
+        <motion.h2
+          className="slide-title"
+          style={{ color: 'hsl(var(--primary))' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
           Your Skin Profile
-        </motion.p>
+        </motion.h2>
 
         <div className="mt-6 grid gap-8 md:grid-cols-2 items-start">
-          {/* Radar */}
           <RadarChart result={result} />
 
-          {/* Score bars */}
+          {/* Score bars — bigger */}
           <div className="space-y-3">
             {sorted.map((axis, i) => {
               const score = Math.round(result.axis_scores[axis]);
               return (
                 <motion.div
                   key={axis}
-                  className="space-y-1"
+                  className="flex items-center gap-3"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 + i * 0.06 }}
                 >
-                  <div className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">{AXIS_LABELS[axis]}</span>
-                    <span className="font-medium" style={{ color: severityColor(score) }}>{score}</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                  <span style={{
+                    fontFamily: "'DM Sans', system-ui, sans-serif",
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    color: 'hsl(var(--foreground))',
+                    width: '130px',
+                    flexShrink: 0,
+                  }}>
+                    {AXIS_LABELS[axis]}
+                  </span>
+                  <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: 'hsl(var(--border))' }}>
                     <motion.div
                       className="h-full rounded-full"
-                      style={{ backgroundColor: severityColor(score) }}
+                      style={{ backgroundColor: getBarColor(score) }}
                       initial={{ width: 0 }}
                       animate={{ width: `${score}%` }}
                       transition={{ duration: 0.6, delay: 0.4 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
                     />
                   </div>
+                  <span className="score-number" style={{
+                    color: getBarColor(score),
+                    width: '36px',
+                    textAlign: 'right' as const,
+                    flexShrink: 0,
+                  }}>
+                    {score}
+                  </span>
                 </motion.div>
               );
             })}
           </div>
         </div>
 
-        {/* Interpretations */}
+        {/* Interpretations with icons */}
         {topInterpretations.length > 0 && (
           <motion.div
-            className="mt-8 space-y-3 border-t border-border pt-6"
+            className="mt-8 border-t border-border pt-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">What this means</p>
-            {topInterpretations.map((i) => (
-              <p key={i.axis} className="text-sm text-muted-foreground leading-relaxed">
-                <span className="font-medium text-foreground">{AXIS_LABELS[i.axis]}:</span>{" "}
-                {i.text}
-              </p>
-            ))}
+            <h3 style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: '0.8125rem',
+              fontWeight: 700,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase' as const,
+              color: 'hsl(var(--foreground-hint))',
+              marginBottom: '1.25rem',
+            }}>
+              What This Means
+            </h3>
+            <div className="space-y-0">
+              {topInterpretations.map((i) => (
+                <div key={i.axis} className="flex items-start gap-4 py-4 border-b border-border/40 last:border-0">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
+                       style={{ background: `${getBarColor(i.score)}22` }}>
+                    <span style={{ fontSize: '1.25rem' }}>{AXIS_ICONS[i.axis] ?? "📊"}</span>
+                  </div>
+                  <div>
+                    <p style={{
+                      fontFamily: "'DM Sans', system-ui, sans-serif",
+                      fontSize: '1.0625rem',
+                      fontWeight: 600,
+                      color: 'hsl(var(--foreground))',
+                      marginBottom: '0.25rem',
+                    }}>
+                      {AXIS_LABELS[i.axis]}
+                      <span style={{
+                        marginLeft: '0.5rem',
+                        fontSize: '0.875rem',
+                        fontWeight: 400,
+                        color: getBarColor(i.score),
+                      }}>
+                        {i.score}/100
+                      </span>
+                    </p>
+                    <p className="slide-body">{i.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </motion.div>
         )}
       </div>

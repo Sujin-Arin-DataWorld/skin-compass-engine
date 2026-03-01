@@ -116,7 +116,7 @@ export const SYMPTOMS: Record<string, SymptomDef> = {
   C7_10: { id: "C7_10", text_en: "Makeup settles into wrinkles throughout the day", category: 7, weights: { aging: 0.6, hyd: 0.4, makeup_stability: 0.4 } },
   C7_11: { id: "C7_11", text_en: "Skin is measurably less plump than before", category: 7, weights: { aging: 0.9, ox: 0.3 } },
   C7_12: { id: "C7_12", text_en: "Facial contours look lower when viewed from the side", category: 7, weights: { aging: 0.8 } },
-  C7_13: { id: "C7_13", text_en: "Face puffs in the morning and sags by evening", category: 7, weights: { aging: 0.5, bar: 0.3, hyd: 0.3 } },
+  C7_13: { id: "C7_13", text_en: "Skin feels loose or lacks resistance when pinched gently", category: 7, weights: { aging: 0.8, bar: 0.2 } },
   C7_14: { id: "C7_14", text_en: "A second chin appears when looking downward", category: 7, weights: { aging: 0.7 } },
   C7_15: { id: "C7_15", text_en: "Forehead lines have become deeper", category: 7, weights: { aging: 0.7 } },
 

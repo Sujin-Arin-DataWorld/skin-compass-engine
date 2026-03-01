@@ -262,7 +262,7 @@ const Index = () => {
               transition={{ duration: 0.8 }}
             >
               Your Skin.<br />
-              <span className="text-gradient-cyan">Clinically Decoded.</span>
+              <span className="text-gradient-sand">Clinically Decoded.</span>
             </motion.h1>
 
             <motion.p

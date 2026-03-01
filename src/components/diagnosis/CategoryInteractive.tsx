@@ -533,7 +533,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
               poreFullFace
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground hover:border-primary/40"
+                : "border-border text-foreground/70 hover:border-primary/40"
             }`}
             whileTap={{ scale: 0.97 }}
           >

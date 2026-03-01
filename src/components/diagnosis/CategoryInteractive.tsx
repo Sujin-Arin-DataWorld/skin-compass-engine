@@ -212,14 +212,15 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
 
   return (
     <div className="space-y-6">
-      <div className="mb-2">
-        <span className="text-xs font-medium uppercase tracking-widest text-primary">
+      <div className="mb-6">
+        <span className="category-badge">
           Category {category} of 8
         </span>
-        <h2 className="mt-2 font-display text-3xl text-foreground">
-          {info?.emoji} {info?.name}
+        <h2 className="category-title mt-1 flex items-center gap-3">
+          <span>{info?.emoji}</span>
+          {info?.name}
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">{info?.clinical}</p>
+        <p className="category-description mt-2 max-w-lg">{info?.clinical}</p>
       </div>
 
       {/* ===== CATEGORY 1: ACNE ===== */}

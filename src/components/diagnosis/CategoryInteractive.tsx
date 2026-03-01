@@ -74,6 +74,21 @@ const OILINESS_ZONES = [
   { id: "chin", label: "Chin", cx: 100, cy: 128, rx: 12, ry: 8 },
 ];
 
+// Photo → zone pre-highlight mappings
+const ACNE_PHOTO_TO_ZONES: Record<string, Record<string, number>> = {
+  mild_scattered: { left_cheek: 1, right_cheek: 1 },
+  hormonal_jaw: { jawline_l: 1, jawline_r: 1, chin: 1 },
+  cystic: { left_cheek: 1, right_cheek: 1, chin: 1, jawline_l: 1, jawline_r: 1 },
+  comedonal: { nose: 1, forehead: 1 },
+};
+
+const PIGMENT_PHOTO_TO_ZONES: Record<string, string[]> = {
+  pih: ["left_cheek", "right_cheek"],
+  melasma: ["left_cheek", "right_cheek", "forehead"],
+  uneven_dull: [],
+  minimal_pigment: [],
+};
+
 // Context flags for interactive components
 const CATEGORY_CONTEXT_FLAGS: Record<number, string> = {
   1: "ui_facemap",

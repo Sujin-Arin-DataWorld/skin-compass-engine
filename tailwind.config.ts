@@ -61,11 +61,11 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        cyan: {
-          DEFAULT: "hsl(var(--accent-cyan))",
+        sand: {
+          DEFAULT: "hsl(var(--accent-sand))",
         },
-        gold: {
-          DEFAULT: "hsl(var(--accent-gold))",
+        champagne: {
+          DEFAULT: "hsl(var(--accent-champagne))",
         },
         rose: {
           DEFAULT: "hsl(var(--accent-rose))",

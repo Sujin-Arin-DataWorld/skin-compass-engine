@@ -121,6 +121,8 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
   const [poreZones, setPoreZones] = useState<string[]>([]);
   const [agingZones, setAgingZones] = useState<string[]>([]);
   const [expandedQuestions, setExpandedQuestions] = useState(false);
+  // Independent toggle state for sensitivity actives (fixes shared C4_05 bug)
+  const [activeToggles, setActiveToggles] = useState<Record<string, boolean>>({});
 
   const categorySymptoms = useMemo(() => {
     return Object.values(SYMPTOMS).filter((s) => s.category === category);
@@ -327,39 +329,35 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               {[
                 { id: "aha", label: "AHA", symptom: "C4_05", signalKey: "react_aha" },
                 { id: "retinol", label: "Retinol", symptom: "C4_06", signalKey: "react_retinol" },
-                { id: "vitc", label: "Vitamin C", symptom: "C4_05", signalKey: "react_vitc" },
-              ].map((active) => (
-                <motion.button
-                  key={active.id}
-                  onClick={() => {
-                    markInteractive();
-                    const cur = severities[active.symptom] ?? 0;
-                    const next = cur >= 3 ? 0 : cur + 1;
-                    onSeverityChange(active.symptom, next);
-                    setUiSignals("sensitivity", { [active.signalKey]: next > 0 });
-                  }}
-                  className={`rounded-xl border px-4 py-3 text-sm transition-all ${
-                    (severities[active.symptom] ?? 0) > 0
-                      ? "border-severity-severe/50 bg-severity-severe/10 text-severity-severe"
-                      : "border-border text-muted-foreground hover:border-primary/40"
-                  }`}
-                  whileTap={{ scale: 0.92 }}
-                >
-                  <motion.div
-                    animate={
-                      (severities[active.symptom] ?? 0) > 0
-                        ? { scale: [1, 1.05, 1] }
-                        : {}
-                    }
-                    transition={{ duration: 0.3 }}
+                { id: "vitc", label: "Vitamin C", symptom: "C4_13", signalKey: "react_vitc" },
+              ].map((active) => {
+                const isActive = activeToggles[active.id] ?? false;
+                return (
+                  <motion.button
+                    key={active.id}
+                    onClick={() => {
+                      markInteractive();
+                      const next = !isActive;
+                      setActiveToggles(prev => ({ ...prev, [active.id]: next }));
+                      onSeverityChange(active.symptom, next ? 2 : 0);
+                      setUiSignals("sensitivity", { [active.signalKey]: next });
+                    }}
+                    className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
+                      isActive
+                        ? "border-severity-severe/50 bg-severity-severe/10 text-severity-severe"
+                        : "border-border text-muted-foreground hover:border-primary/40"
+                    }`}
+                    whileTap={{ scale: 0.92 }}
                   >
-                    {active.label}
-                    {(severities[active.symptom] ?? 0) > 0 && (
-                      <span className="ml-1 text-xs">×{severities[active.symptom]}</span>
-                    )}
-                  </motion.div>
-                </motion.button>
-              ))}
+                    <motion.div
+                      animate={isActive ? { scale: [1, 1.05, 1] } : {}}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {active.label}
+                    </motion.div>
+                  </motion.button>
+                );
+              })}
             </div>
           </LabCard>
         </>

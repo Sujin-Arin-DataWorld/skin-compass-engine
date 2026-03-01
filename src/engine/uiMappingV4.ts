@@ -2,7 +2,10 @@ import type { AxisKey } from "./types";
 
 // ── Face zones ──
 export type FaceZone =
-  | "forehead" | "nose" | "left_cheek" | "right_cheek" | "chin" | "jawline" | "temple";
+  | "forehead" | "forehead_left" | "forehead_right"
+  | "nose" | "left_cheek" | "right_cheek" | "chin"
+  | "jawline" | "jawline_l" | "jawline_r" | "temple"
+  | "t_zone";
 
 // ── Per-category signal shapes ──
 export interface UiSignalsV4 {
@@ -126,13 +129,16 @@ export function mapUiSignalsToSeverityPatch(signals: UiSignalsV4): Record<string
     const zones = new Set(acne.zones ?? []);
     const zc = zones.size;
     if (zc >= 1) p["C1_02"] = clampSev(zc >= 4 ? 3 : zc >= 2 ? 2 : 1);
-    if (zones.has("jawline") || zones.has("chin"))
+    if (zones.has("jawline") || zones.has("jawline_l") || zones.has("jawline_r") || zones.has("chin"))
       p["C1_02"] = clampSev(Math.max(p["C1_02"] ?? 0, 2));
+    // Hairline zones = strong hormonal signal
+    if (zones.has("forehead_left") || zones.has("forehead_right"))
+      p["C1_03"] = clampSev(Math.max(p["C1_03"] ?? 0, 2));
 
     const intenSev = sliderToSev(acne.intensity);
     if (intenSev >= 2) { p["C1_07"] = intenSev; p["C1_08"] = intenSev; }
     p["C1_01"] = sliderToSev(acne.recurrence);
-    if (acne.hormonal) p["C1_03"] = 2;
+    if (acne.hormonal) p["C1_03"] = clampSev(Math.max(p["C1_03"] ?? 0, 2));
     if (acne.body) p["C1_15"] = 2;
     if (acne.mask_area) p["C1_04"] = 2;
     if (acne.photo_match === 1) p["C1_03"] = clampSev(Math.max(p["C1_03"] ?? 0, 2));
@@ -170,7 +176,7 @@ export function mapUiSignalsToSeverityPatch(signals: UiSignalsV4): Record<string
     p["C4_09"] = durationMinToSev(sen.flush_duration_min);
     if (sen.react_aha) p["C4_05"] = 2;
     if (sen.react_retinol) p["C4_06"] = 2;
-    if (sen.react_vitc) p["C4_05"] = clampSev(Math.max(p["C4_05"] ?? 0, 1));
+    if (sen.react_vitc) p["C4_13"] = clampSev(Math.max(p["C4_13"] ?? 0, 2));
     if (sen.visible_capillaries) p["C4_15"] = 2;
   }
 

@@ -176,7 +176,7 @@ export function mapUiSignalsToSeverityPatch(signals: UiSignalsV4): Record<string
     p["C4_09"] = durationMinToSev(sen.flush_duration_min);
     if (sen.react_aha) p["C4_05"] = 2;
     if (sen.react_retinol) p["C4_06"] = 2;
-    if (sen.react_vitc) p["C4_05"] = clampSev(Math.max(p["C4_05"] ?? 0, 1));
+    if (sen.react_vitc) p["C4_13"] = clampSev(Math.max(p["C4_13"] ?? 0, 2));
     if (sen.visible_capillaries) p["C4_15"] = 2;
   }
 

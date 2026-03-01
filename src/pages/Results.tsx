@@ -290,7 +290,7 @@ const ResultsPage = () => {
                         }}
                       />
                       <PolarRadiusAxis domain={[0, 100]} tick={{ fill: "hsl(var(--text-muted))", fontSize: 8 }} tickCount={4} />
-                      <Radar dataKey="score" stroke="hsl(var(--accent-cyan))" fill="hsl(var(--accent-cyan))" fillOpacity={0.15} strokeWidth={2} animationBegin={0} animationDuration={600} animationEasing="ease-out" />
+                      <Radar dataKey="score" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.15} strokeWidth={2} animationBegin={0} animationDuration={600} animationEasing="ease-out" />
                     </RadarChart>
                   </ResponsiveContainer>
                 </div>

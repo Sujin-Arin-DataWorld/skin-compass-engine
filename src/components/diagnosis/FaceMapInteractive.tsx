@@ -12,12 +12,14 @@ interface FaceZone {
 
 const FACE_ZONES: FaceZone[] = [
   { id: "forehead", label: "Forehead", path: "M 80 45 Q 100 25 120 45 L 125 70 Q 100 65 75 70 Z", cx: 100, cy: 50 },
+  { id: "forehead_left", label: "Left Hairline / Temple", path: "M 55 42 Q 62 30 75 38 L 75 62 Q 65 58 58 55 Z", cx: 65, cy: 48 },
+  { id: "forehead_right", label: "Right Hairline / Temple", path: "M 145 42 Q 138 30 125 38 L 125 62 Q 135 58 142 55 Z", cx: 135, cy: 48 },
   { id: "left_cheek", label: "Left Cheek", path: "M 65 85 Q 55 100 60 120 L 75 125 Q 80 105 75 85 Z", cx: 68, cy: 105 },
   { id: "right_cheek", label: "Right Cheek", path: "M 135 85 Q 145 100 140 120 L 125 125 Q 120 105 125 85 Z", cx: 132, cy: 105 },
   { id: "nose", label: "Nose", path: "M 95 75 L 105 75 L 108 105 Q 100 110 92 105 Z", cx: 100, cy: 90 },
   { id: "chin", label: "Chin", path: "M 85 135 Q 100 155 115 135 L 120 125 Q 100 130 80 125 Z", cx: 100, cy: 140 },
-  { id: "jawline_l", label: "Jawline L", path: "M 60 120 Q 65 135 80 140 L 85 135 Q 72 130 65 120 Z", cx: 72, cy: 130 },
-  { id: "jawline_r", label: "Jawline R", path: "M 140 120 Q 135 135 120 140 L 115 135 Q 128 130 135 120 Z", cx: 128, cy: 130 },
+  { id: "jawline_l", label: "Left Jawline", path: "M 60 120 Q 65 135 80 140 L 85 135 Q 72 130 65 120 Z", cx: 72, cy: 130 },
+  { id: "jawline_r", label: "Right Jawline", path: "M 140 120 Q 135 135 120 140 L 115 135 Q 128 130 135 120 Z", cx: 128, cy: 130 },
   { id: "t_zone", label: "T-Zone", path: "M 90 45 L 110 45 L 108 75 L 110 105 Q 100 110 90 105 L 92 75 Z", cx: 100, cy: 75 },
 ];
 
@@ -27,7 +29,7 @@ interface FaceMapInteractiveProps {
   maxSelections?: number;
 }
 
-const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: FaceMapInteractiveProps) => {
+const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 7 }: FaceMapInteractiveProps) => {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [intensity] = useState(1);
   const [tappedZone, setTappedZone] = useState<string | null>(null);
@@ -72,7 +74,7 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 5 }: Face
         </p>
 
         <div className="relative">
-          <svg viewBox="30 10 140 170" className="w-full max-w-[280px] h-auto touch-manipulation">
+          <svg viewBox="30 10 140 170" className="w-full max-w-[280px] min-h-[220px] h-auto touch-manipulation">
             {/* Face outline — increased contrast */}
             <ellipse cx="100" cy="95" rx="48" ry="60" fill="none" stroke="hsl(var(--foreground) / 0.25)" strokeWidth="1.8" />
             <path d="M 55 55 Q 60 25 100 20 Q 140 25 145 55" fill="none" stroke="hsl(var(--foreground) / 0.2)" strokeWidth="1" />

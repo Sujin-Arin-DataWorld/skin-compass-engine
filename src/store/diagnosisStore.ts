@@ -2,20 +2,57 @@ import { create } from "zustand";
 import { SkinType, ContextKey, Tier, DiagnosisResult } from "@/engine/types";
 import type { UiSignalsV4 } from "@/engine/uiMappingV4";
 
+export interface InteractiveState {
+  faceZones: Record<string, number>;
+  acnePhoto: string | null;
+  drynessPhoto: string | null;
+  pigmentPhoto: string | null;
+  timelineHour: number;
+  oilZones: string[];
+  oilFullFace: boolean;
+  poreFullFace: boolean;
+  pigmentZones: string[];
+  textureSelected: string | null;
+  poreZones: string[];
+  agingZones: string[];
+  activeToggles: Record<string, boolean>;
+  expandedQuestions: Record<number, boolean>;
+}
+
+const defaultInteractiveState: InteractiveState = {
+  faceZones: {},
+  acnePhoto: null,
+  drynessPhoto: null,
+  pigmentPhoto: null,
+  timelineHour: 12,
+  oilZones: [],
+  oilFullFace: false,
+  poreFullFace: false,
+  pigmentZones: [],
+  textureSelected: null,
+  poreZones: [],
+  agingZones: [],
+  activeToggles: {},
+  expandedQuestions: {},
+};
+
 interface DiagnosisState {
   // Step tracking
-  currentStep: number; // 0=context, 1=skinType, 2-9=categories, 10=loading
-  currentCategory: number; // 1-8
+  currentStep: number;
+  currentCategory: number;
 
   // Inputs
   contexts: ContextKey[];
   skinType: SkinType | null;
-  severities: Record<string, number>; // symptom_id → 0-3
+  severities: Record<string, number>;
   metaAnswers: Record<string, number | boolean>;
   selectedTier: Tier;
 
   // Interactive UI signals
   uiSignals: UiSignalsV4;
+
+  // Interactive component state (persisted across category navigation)
+  interactiveState: InteractiveState;
 
   // Result
   result: DiagnosisResult | null;
@@ -31,6 +68,7 @@ interface DiagnosisState {
   setTier: (tier: Tier) => void;
   setResult: (result: DiagnosisResult) => void;
   setUiSignals: (category: string, data: Record<string, unknown>) => void;
+  setInteractive: <K extends keyof InteractiveState>(key: K, value: InteractiveState[K]) => void;
   reset: () => void;
 }
 
@@ -43,6 +81,7 @@ const initialState = {
   metaAnswers: {} as Record<string, number | boolean>,
   selectedTier: "Full" as Tier,
   uiSignals: {} as UiSignalsV4,
+  interactiveState: { ...defaultInteractiveState },
   result: null as DiagnosisResult | null,
 };
 
@@ -92,5 +131,10 @@ export const useDiagnosisStore = create<DiagnosisState>((set) => ({
       },
     })),
 
-  reset: () => set(initialState),
+  setInteractive: (key, value) =>
+    set((state) => ({
+      interactiveState: { ...state.interactiveState, [key]: value },
+    })),
+
+  reset: () => set({ ...initialState, interactiveState: { ...defaultInteractiveState } }),
 }));

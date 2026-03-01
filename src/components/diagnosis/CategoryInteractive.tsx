@@ -1,6 +1,6 @@
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Info } from "lucide-react";
 import FaceMapInteractive from "./FaceMapInteractive";
 import PhotoMatchSelector, { PhotoOption } from "./PhotoMatchSelector";
 import TimelineSlider from "./TimelineSlider";
@@ -15,6 +15,7 @@ import LabCard from "./LabCard";
 import { SYMPTOMS, CATEGORY_INFO } from "@/engine/weights";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // ---------- Photo match presets per category ----------
 
@@ -86,7 +87,6 @@ const CATEGORY_CONTEXT_FLAGS: Record<number, string> = {
 };
 
 // Core symptom IDs (shown by default) — 3 per category
-// These are symptoms NOT captured by interactive components
 const CORE_SYMPTOMS: Record<number, string[]> = {
   1: ["C1_10", "C1_11", "C1_13"],
   2: ["C2_07", "C2_10", "C2_09"],
@@ -98,6 +98,13 @@ const CORE_SYMPTOMS: Record<number, string[]> = {
   8: ["C8_03", "C8_04", "C8_09"],
 };
 
+// Active ingredient tooltips
+const ACTIVE_TOOLTIPS: Record<string, string> = {
+  aha: "Alpha Hydroxy Acids — e.g. glycolic acid, lactic acid. Found in exfoliating toners.",
+  retinol: "Vitamin A derivative. Found in anti-aging serums. Can cause purging.",
+  vitc: "Brightening antioxidant. Found in serums targeting dark spots.",
+};
+
 // ---------- Per-category interactive renderer ----------
 
 interface CategoryInteractiveProps {
@@ -107,22 +114,23 @@ interface CategoryInteractiveProps {
 }
 
 const CategoryInteractive = ({ category, severities, onSeverityChange }: CategoryInteractiveProps) => {
-  const { addContext, setUiSignals } = useDiagnosisStore();
-  const [faceZones, setFaceZones] = useState<Record<string, number>>({});
-  const [acnePhoto, setAcnePhoto] = useState<string | null>(null);
-  const [drynessPhoto, setDrynessPhoto] = useState<string | null>(null);
-  const [pigmentPhoto, setPigmentPhoto] = useState<string | null>(null);
-  const [timelineHour, setTimelineHour] = useState(12);
-  const [oilZones, setOilZones] = useState<string[]>([]);
-  const [oilFullFace, setOilFullFace] = useState(false);
-  const [poreFullFace, setPoreFullFace] = useState(false);
-  const [pigmentZones, setPigmentZones] = useState<string[]>([]);
-  const [textureSelected, setTextureSelected] = useState<string | null>(null);
-  const [poreZones, setPoreZones] = useState<string[]>([]);
-  const [agingZones, setAgingZones] = useState<string[]>([]);
-  const [expandedQuestions, setExpandedQuestions] = useState(false);
-  // Independent toggle state for sensitivity actives (fixes shared C4_05 bug)
-  const [activeToggles, setActiveToggles] = useState<Record<string, boolean>>({});
+  const { addContext, setUiSignals, interactiveState, setInteractive } = useDiagnosisStore();
+
+  // Read interactive state from store (persists across navigation)
+  const faceZones = interactiveState.faceZones;
+  const acnePhoto = interactiveState.acnePhoto;
+  const drynessPhoto = interactiveState.drynessPhoto;
+  const pigmentPhoto = interactiveState.pigmentPhoto;
+  const timelineHour = interactiveState.timelineHour;
+  const oilZones = interactiveState.oilZones;
+  const oilFullFace = interactiveState.oilFullFace;
+  const poreFullFace = interactiveState.poreFullFace;
+  const pigmentZones = interactiveState.pigmentZones;
+  const textureSelected = interactiveState.textureSelected;
+  const poreZones = interactiveState.poreZones;
+  const agingZones = interactiveState.agingZones;
+  const activeToggles = interactiveState.activeToggles;
+  const expandedQuestions = interactiveState.expandedQuestions[category] ?? false;
 
   const categorySymptoms = useMemo(() => {
     return Object.values(SYMPTOMS).filter((s) => s.category === category);
@@ -132,13 +140,11 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
   const coreSymptoms = categorySymptoms.filter((s) => coreIds.includes(s.id));
   const extraSymptoms = categorySymptoms.filter((s) => !coreIds.includes(s.id));
 
-  // Register interactive context flag on first interaction
   const markInteractive = useCallback(() => {
     const flag = CATEGORY_CONTEXT_FLAGS[category];
     if (flag) addContext(flag);
   }, [category, addContext]);
 
-  // Apply photo match severity boosts
   const applyPhotoMatch = useCallback((photoId: string, photos: PhotoOption[]) => {
     const photo = photos.find(p => p.id === photoId);
     if (!photo) return;
@@ -148,9 +154,8 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
     });
   }, [severities, onSeverityChange]);
 
-  // Convert face map to severity + uiSignals
   const handleFaceMapChange = useCallback((zones: Record<string, number>) => {
-    setFaceZones(zones);
+    setInteractive("faceZones", zones);
     markInteractive();
     const zoneCount = Object.keys(zones).length;
     const totalIntensity = Object.values(zones).reduce((a, b) => a + b, 0);
@@ -161,17 +166,20 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
     if (zones["jawline_l"] || zones["jawline_r"] || zones["chin"]) {
       onSeverityChange("C1_03", Math.max(severities["C1_03"] ?? 0, 2));
     }
-    // Write to uiSignals
+    // Hairline zones = hormonal signal
+    if (zones["forehead_left"] || zones["forehead_right"]) {
+      onSeverityChange("C1_03", Math.max(severities["C1_03"] ?? 0, 2));
+    }
     const zoneNames = Object.keys(zones);
     setUiSignals("acne", {
       zones: zoneNames,
       intensity: zoneCount > 0 ? Math.round((totalIntensity / zoneCount) * 33) : 0,
+      hormonal: !!(zones["jawline_l"] || zones["jawline_r"] || zones["chin"] || zones["forehead_left"] || zones["forehead_right"]),
     });
-  }, [onSeverityChange, severities, markInteractive, setUiSignals]);
+  }, [onSeverityChange, severities, markInteractive, setUiSignals, setInteractive]);
 
-  // Convert timeline to severity + uiSignals
   const handleTimelineChange = useCallback((hour: number) => {
-    setTimelineHour(hour);
+    setInteractive("timelineHour", hour);
     markInteractive();
     let sev = 0;
     if (hour <= 6) sev = 3;
@@ -180,9 +188,12 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
     onSeverityChange("C2_01", sev);
     onSeverityChange("C2_03", hour <= 8 ? 3 : hour <= 14 ? 2 : hour <= 20 ? 1 : 0);
     setUiSignals("oil", { shine_start_hour: hour });
-  }, [onSeverityChange, markInteractive, setUiSignals]);
+  }, [onSeverityChange, markInteractive, setUiSignals, setInteractive]);
 
   const info = CATEGORY_INFO[category];
+
+  // "Not sure" helper
+  const isNotSure = activeToggles["not_sure"] ?? false;
 
   return (
     <div className="space-y-6">
@@ -208,7 +219,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             options={ACNE_PHOTOS}
             selected={acnePhoto}
             onSelect={(id) => {
-              setAcnePhoto(id);
+              setInteractive("acnePhoto", id);
               markInteractive();
               applyPhotoMatch(id, ACNE_PHOTOS);
               const idx = ACNE_PHOTOS.findIndex(p => p.id === id);
@@ -241,7 +252,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               if (oilFullFace) return;
               markInteractive();
               const next = oilZones.includes(id) ? oilZones.filter(z => z !== id) : [...oilZones, id];
-              setOilZones(next);
+              setInteractive("oilZones", next);
               const hasTZone = next.includes("forehead") && next.includes("nose");
               if (hasTZone) {
                 onSeverityChange("C2_02", 2);
@@ -252,14 +263,13 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               }
             }}
           />
-          {/* Full Face toggle */}
           <motion.button
             onClick={() => {
               markInteractive();
               const next = !oilFullFace;
-              setOilFullFace(next);
+              setInteractive("oilFullFace", next);
               if (next) {
-                setOilZones([]);
+                setInteractive("oilZones", []);
                 onSeverityChange("C2_01", 3);
                 onSeverityChange("C2_14", 2);
                 onSeverityChange("C2_09", 2);
@@ -298,7 +308,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             options={DRYNESS_PHOTOS}
             selected={drynessPhoto}
             onSelect={(id) => {
-              setDrynessPhoto(id);
+              setInteractive("drynessPhoto", id);
               markInteractive();
               applyPhotoMatch(id, DRYNESS_PHOTOS);
               const idx = DRYNESS_PHOTOS.findIndex(p => p.id === id);
@@ -325,40 +335,88 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
               Which actives cause stinging?
             </p>
-            <div className="flex gap-3 justify-center">
-              {[
-                { id: "aha", label: "AHA", symptom: "C4_05", signalKey: "react_aha" },
-                { id: "retinol", label: "Retinol", symptom: "C4_06", signalKey: "react_retinol" },
-                { id: "vitc", label: "Vitamin C", symptom: "C4_13", signalKey: "react_vitc" },
-              ].map((active) => {
-                const isActive = activeToggles[active.id] ?? false;
-                return (
+            <TooltipProvider delayDuration={200}>
+              <div className="flex flex-wrap gap-3 justify-center">
+                {[
+                  { id: "aha", label: "AHA", symptom: "C4_05", signalKey: "react_aha" },
+                  { id: "retinol", label: "Retinol", symptom: "C4_06", signalKey: "react_retinol" },
+                  { id: "vitc", label: "Vitamin C", symptom: "C4_13", signalKey: "react_vitc" },
+                ].map((active) => {
+                  const isActive = !isNotSure && (activeToggles[active.id] ?? false);
+                  return (
+                    <div key={active.id} className="flex flex-col items-center gap-1">
+                      <motion.button
+                        onClick={() => {
+                          markInteractive();
+                          const next = !isActive;
+                          const newToggles = { ...activeToggles, [active.id]: next, not_sure: false };
+                          setInteractive("activeToggles", newToggles);
+                          onSeverityChange(active.symptom, next ? 2 : 0);
+                          setUiSignals("sensitivity", { [active.signalKey]: next });
+                        }}
+                        className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
+                          isActive
+                            ? "border-severity-severe/50 bg-severity-severe/10 text-severity-severe"
+                            : "border-border text-muted-foreground hover:border-primary/40"
+                        }`}
+                        whileTap={{ scale: 0.92 }}
+                      >
+                        <motion.div
+                          animate={isActive ? { scale: [1, 1.05, 1] } : {}}
+                          transition={{ duration: 0.3 }}
+                        >
+                          {active.label}
+                        </motion.div>
+                      </motion.button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="text-muted-foreground/50 hover:text-muted-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-[220px] text-xs">
+                          {ACTIVE_TOOLTIPS[active.id]}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  );
+                })}
+
+                {/* "Not sure / haven't tried" option */}
+                <div className="flex flex-col items-center gap-1">
                   <motion.button
-                    key={active.id}
                     onClick={() => {
                       markInteractive();
-                      const next = !isActive;
-                      setActiveToggles(prev => ({ ...prev, [active.id]: next }));
-                      onSeverityChange(active.symptom, next ? 2 : 0);
-                      setUiSignals("sensitivity", { [active.signalKey]: next });
+                      const next = !isNotSure;
+                      const newToggles: Record<string, boolean> = next
+                        ? { not_sure: true, aha: false, retinol: false, vitc: false }
+                        : { ...activeToggles, not_sure: false };
+                      setInteractive("activeToggles", newToggles);
+                      // Clear all active severities when "not sure"
+                      if (next) {
+                        onSeverityChange("C4_05", 0);
+                        onSeverityChange("C4_06", 0);
+                        onSeverityChange("C4_13", 0);
+                        setUiSignals("sensitivity", { react_aha: false, react_retinol: false, react_vitc: false });
+                      }
                     }}
-                    className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
-                      isActive
-                        ? "border-severity-severe/50 bg-severity-severe/10 text-severity-severe"
+                    className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation italic ${
+                      isNotSure
+                        ? "border-primary/50 bg-primary/10 text-primary"
                         : "border-border text-muted-foreground hover:border-primary/40"
                     }`}
                     whileTap={{ scale: 0.92 }}
                   >
                     <motion.div
-                      animate={isActive ? { scale: [1, 1.05, 1] } : {}}
+                      animate={isNotSure ? { scale: [1, 1.05, 1] } : {}}
                       transition={{ duration: 0.3 }}
                     >
-                      {active.label}
+                      ❓ Not sure
                     </motion.div>
                   </motion.button>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            </TooltipProvider>
           </LabCard>
         </>
       )}
@@ -373,12 +431,11 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             selected={pigmentZones}
             onToggle={(id) => {
               markInteractive();
-              setPigmentZones(prev =>
-                prev.includes(id) ? prev.filter(z => z !== id) : [...prev, id]
-              );
-              const count = pigmentZones.length + (pigmentZones.includes(id) ? -1 : 1);
+              const next = pigmentZones.includes(id) ? pigmentZones.filter(z => z !== id) : [...pigmentZones, id];
+              setInteractive("pigmentZones", next);
+              const count = next.length;
               onSeverityChange("C5_04", Math.min(3, count));
-              setUiSignals("pigment", { zones: pigmentZones.includes(id) ? pigmentZones.filter(z => z !== id) : [...pigmentZones, id] });
+              setUiSignals("pigment", { zones: next });
             }}
             darken
           />
@@ -387,7 +444,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             options={PIGMENT_PHOTOS}
             selected={pigmentPhoto}
             onSelect={(id) => {
-              setPigmentPhoto(id);
+              setInteractive("pigmentPhoto", id);
               markInteractive();
               applyPhotoMatch(id, PIGMENT_PHOTOS);
               const idx = PIGMENT_PHOTOS.findIndex(p => p.id === id);
@@ -404,7 +461,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             selected={textureSelected}
             onSelect={(id, sev) => {
               markInteractive();
-              setTextureSelected(id);
+              setInteractive("textureSelected", id);
               onSeverityChange("C6_06", sev);
               onSeverityChange("C6_07", Math.max(0, sev - 1));
               setUiSignals("texture", { zoom_choice: sev as 0 | 1 | 2 | 3 });
@@ -419,20 +476,19 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               if (poreFullFace) return;
               markInteractive();
               const next = poreZones.includes(id) ? poreZones.filter(z => z !== id) : [...poreZones, id];
-              setPoreZones(next);
+              setInteractive("poreZones", next);
               if (id === "forehead" || id === "nose") { onSeverityChange("C6_02", 2); setUiSignals("texture", { pore_location: "nose" }); }
               if (id === "left_cheek" || id === "right_cheek") { onSeverityChange("C6_03", 2); setUiSignals("texture", { pore_location: "cheeks" }); }
               if (next.length >= 4) { onSeverityChange("C6_01", 2); setUiSignals("texture", { pore_location: "full" }); }
             }}
           />
-          {/* Full Face toggle for pores */}
           <motion.button
             onClick={() => {
               markInteractive();
               const next = !poreFullFace;
-              setPoreFullFace(next);
+              setInteractive("poreFullFace", next);
               if (next) {
-                setPoreZones([]);
+                setInteractive("poreZones", []);
                 onSeverityChange("C6_01", 2);
                 onSeverityChange("C6_02", 2);
                 onSeverityChange("C6_03", 2);
@@ -472,10 +528,9 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             selected={agingZones}
             onToggle={(id) => {
               markInteractive();
-              setAgingZones(prev =>
-                prev.includes(id) ? prev.filter(z => z !== id) : [...prev, id]
-              );
-              if (id === "eye_area") { onSeverityChange("C7_01", 2); setUiSignals("aging", { areas: [...agingZones, "eyes"] }); }
+              const next = agingZones.includes(id) ? agingZones.filter(z => z !== id) : [...agingZones, id];
+              setInteractive("agingZones", next);
+              if (id === "eye_area") { onSeverityChange("C7_01", 2); setUiSignals("aging", { areas: [...next.filter(z => z !== id ? true : false), "eyes"] }); }
               if (id === "nasolabial") { onSeverityChange("C7_03", 2); setUiSignals("aging", { areas: [...agingZones, "nasolabial"] }); }
               if (id === "jawline") { onSeverityChange("C7_05", 2); setUiSignals("aging", { areas: [...agingZones, "jawline"] }); }
               if (id === "neck") { onSeverityChange("C7_04", 2); setUiSignals("aging", { areas: [...agingZones, "neck"] }); }
@@ -520,7 +575,12 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
 
       {/* Extra symptom questions (collapsible) */}
       {extraSymptoms.length > 0 && (
-        <Collapsible open={expandedQuestions} onOpenChange={setExpandedQuestions}>
+        <Collapsible
+          open={expandedQuestions}
+          onOpenChange={(open) => {
+            setInteractive("expandedQuestions", { ...interactiveState.expandedQuestions, [category]: open });
+          }}
+        >
           <CollapsibleTrigger asChild>
             <motion.button
               className="flex w-full items-center justify-between rounded-lg border border-border px-5 py-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"

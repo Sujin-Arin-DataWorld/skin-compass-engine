@@ -266,7 +266,9 @@
   font-family: 'DM Sans', system-ui, sans-serif;
   font-size: 1.0625rem;
   line-height: 1.65;
-  color: hsl(var(--foreground-body));
+  color: hsl(var(--diagnosis-text-secondary));
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .category-badge {

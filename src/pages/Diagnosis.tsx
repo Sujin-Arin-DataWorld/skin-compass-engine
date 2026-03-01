@@ -7,6 +7,7 @@ import { CATEGORY_INFO, META_QUESTIONS } from "@/engine/weights";
 import { runDiagnosis } from "@/engine/runDiagnosisV4";
 import type { SkinType, ContextKey } from "@/engine/types";
 import Navbar from "@/components/Navbar";
+import SilkBackground from "@/components/SilkBackground";
 import CategoryInteractive from "@/components/diagnosis/CategoryInteractive";
 import SeveritySelector from "@/components/diagnosis/SeveritySelector";
 import LabCard from "@/components/diagnosis/LabCard";
@@ -171,7 +172,8 @@ const DiagnosisPage = () => {
   }, [store.currentStep]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <SilkBackground />
       <Navbar />
 
       {/* Progress bar + time estimate */}

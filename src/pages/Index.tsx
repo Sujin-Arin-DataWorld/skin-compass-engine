@@ -94,7 +94,7 @@ function SkinRadar() {
         fill="hsl(var(--foreground))"
         fontSize={11} fontFamily="var(--font-body)" fontWeight={500} letterSpacing="0.04em"
         initial={{ opacity: 0 }}
-        animate={radarInView ? { opacity: 0.7 } : {}}
+        animate={radarInView ? { opacity: 0.75 } : {}}
         transition={{ delay: 0.8 + i * 0.05, duration: 0.4 }}>
 
           {l.label}

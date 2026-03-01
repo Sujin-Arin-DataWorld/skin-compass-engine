@@ -2,8 +2,25 @@ import { Link } from "react-router-dom";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
-import logoLight from "@/assets/logo-light.png";
-import logoDark from "@/assets/logo-dark.png";
+
+function Logo() {
+  return (
+    <Link to="/" className="flex flex-col items-start leading-none group" aria-label="Skin Strategy Lab">
+      <span
+        className="font-display text-[1.35rem] font-light tracking-[0.12em] text-foreground transition-colors group-hover:text-primary"
+        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.14em" }}
+      >
+        SKIN STRATEGY
+      </span>
+      <span
+        className="font-body text-[0.6rem] font-medium uppercase tracking-[0.35em] text-primary mt-[-2px]"
+        style={{ letterSpacing: "0.4em" }}
+      >
+        — LAB —
+      </span>
+    </Link>
+  );
+}
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -11,20 +28,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-4">
-        <Link to="/" className="flex items-center">
-          <img
-            src={logoLight}
-            alt="Skin Strategy Lab"
-            className="h-10 w-auto dark:hidden"
-            loading="eager"
-          />
-          <img
-            src={logoDark}
-            alt="Skin Strategy Lab"
-            className="h-10 w-auto hidden dark:block"
-            loading="eager"
-          />
-        </Link>
+        <Logo />
 
         <div className="flex items-center gap-3">
           {/* Theme toggle */}

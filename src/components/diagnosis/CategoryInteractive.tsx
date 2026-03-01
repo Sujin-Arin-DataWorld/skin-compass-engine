@@ -449,21 +449,6 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       {/* ===== CATEGORY 5: PIGMENTATION ===== */}
       {category === 5 && (
         <>
-          <AreaTapOverlay
-            title="Where is pigmentation visible?"
-            subtitle="Tap to highlight affected zones"
-            zones={PIGMENT_ZONES}
-            selected={pigmentZones}
-            onToggle={(id) => {
-              markInteractive();
-              const next = pigmentZones.includes(id) ? pigmentZones.filter(z => z !== id) : [...pigmentZones, id];
-              setInteractive("pigmentZones", next);
-              const count = next.length;
-              onSeverityChange("C5_04", Math.min(3, count));
-              setUiSignals("pigment", { zones: next });
-            }}
-            darken
-          />
           <PhotoMatchSelector
             title="Which pigmentation pattern matches yours?"
             options={PIGMENT_PHOTOS}
@@ -483,6 +468,21 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                 onSeverityChange("C5_04", Math.min(3, merged.length));
               }
             }}
+          />
+          <AreaTapOverlay
+            title="Where is pigmentation visible?"
+            subtitle="Tap to highlight affected zones"
+            zones={PIGMENT_ZONES}
+            selected={pigmentZones}
+            onToggle={(id) => {
+              markInteractive();
+              const next = pigmentZones.includes(id) ? pigmentZones.filter(z => z !== id) : [...pigmentZones, id];
+              setInteractive("pigmentZones", next);
+              const count = next.length;
+              onSeverityChange("C5_04", Math.min(3, count));
+              setUiSignals("pigment", { zones: next });
+            }}
+            darken
           />
         </>
       )}

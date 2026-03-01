@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import LabCard from "./LabCard";
 
@@ -20,24 +20,25 @@ interface AreaTapOverlayProps {
   darken?: boolean;
 }
 
-const AreaTapOverlay = ({ title, subtitle, zones, selected, onToggle, darken = false }: AreaTapOverlayProps) => {
+const AreaTapOverlay = forwardRef<HTMLDivElement, AreaTapOverlayProps>(
+  ({ title, subtitle, zones, selected, onToggle, darken = false }, ref) => {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
 
   return (
-    <LabCard>
-      <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+    <LabCard ref={ref}>
+      <p className="section-header">
         {title}
       </p>
-      {subtitle && <p className="mb-4 text-xs text-muted-foreground">{subtitle}</p>}
+      {subtitle && <p className="mb-4 text-sm text-foreground/60">{subtitle}</p>}
 
       <div className="relative flex justify-center">
         <svg viewBox="30 15 140 160" className="w-full max-w-[260px] h-auto touch-manipulation">
-          {/* Face outline — increased contrast */}
+          {/* Face outline */}
           <ellipse cx="100" cy="90" rx="45" ry="58" fill="hsl(var(--secondary))" stroke="hsl(var(--foreground) / 0.25)" strokeWidth="1.8" />
-          <ellipse cx="82" cy="76" rx="7" ry="3.5" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
-          <ellipse cx="118" cy="76" rx="7" ry="3.5" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
-          <path d="M 97 82 L 100 98 L 103 98" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.6" />
-          <path d="M 90 118 Q 100 124 110 118" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.6" />
+          <ellipse cx="82" cy="76" rx="7" ry="3.5" fill="none" stroke="hsl(var(--foreground) / 0.2)" strokeWidth="0.8" />
+          <ellipse cx="118" cy="76" rx="7" ry="3.5" fill="none" stroke="hsl(var(--foreground) / 0.2)" strokeWidth="0.8" />
+          <path d="M 97 82 L 100 98 L 103 98" fill="none" stroke="hsl(var(--foreground) / 0.15)" strokeWidth="0.6" />
+          <path d="M 90 118 Q 100 124 110 118" fill="none" stroke="hsl(var(--foreground) / 0.2)" strokeWidth="0.6" />
 
           {/* Tappable zones */}
           {zones.map((zone) => {
@@ -75,7 +76,7 @@ const AreaTapOverlay = ({ title, subtitle, zones, selected, onToggle, darken = f
                   onMouseLeave={() => setHoveredZone(null)}
                 />
 
-                {/* Visible zone — bronze highlight when selected */}
+                {/* Visible zone */}
                 <motion.ellipse
                   cx={zone.cx}
                   cy={zone.cy}
@@ -96,12 +97,12 @@ const AreaTapOverlay = ({ title, subtitle, zones, selected, onToggle, darken = f
                   transition={{ duration: 0.3 }}
                 />
 
-                {/* Interactive dot instead of text label */}
+                {/* Interactive dot */}
                 <motion.circle
                   cx={zone.cx}
                   cy={zone.cy}
                   r={isSelected ? 4 : 3}
-                  fill={isSelected ? "hsl(var(--accent))" : "hsl(var(--muted-foreground) / 0.5)"}
+                  fill={isSelected ? "hsl(var(--accent))" : "hsl(var(--foreground) / 0.3)"}
                   className="pointer-events-none"
                   animate={isSelected ? { scale: [1, 1.2, 1] } : {}}
                   transition={{ duration: 0.6, repeat: isSelected ? Infinity : 0, repeatDelay: 1 }}
@@ -115,7 +116,7 @@ const AreaTapOverlay = ({ title, subtitle, zones, selected, onToggle, darken = f
         <AnimatePresence>
           {hoveredZone && (
             <motion.div
-              className="absolute top-0 right-0 rounded-md bg-secondary border border-border px-2.5 py-1 text-xs text-foreground shadow-md"
+              className="absolute top-0 right-0 rounded-md bg-card border border-border px-2.5 py-1 text-xs text-foreground shadow-md"
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 4 }}
@@ -146,6 +147,8 @@ const AreaTapOverlay = ({ title, subtitle, zones, selected, onToggle, darken = f
       </div>
     </LabCard>
   );
-};
+});
+
+AreaTapOverlay.displayName = "AreaTapOverlay";
 
 export default AreaTapOverlay;

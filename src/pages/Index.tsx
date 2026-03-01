@@ -38,7 +38,7 @@ function SkinRadar() {
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
 
   const labels = RADAR_CATEGORIES.map((cat, i) => ({
-    ...polarToXY(i * angleStep, maxR + 28, cx, cy),
+    ...polarToXY(i * angleStep, maxR + 36, cx, cy),
     label: cat.label
   }));
 

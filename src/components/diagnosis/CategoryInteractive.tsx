@@ -357,7 +357,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             label="Flush Reactivity"
           />
           <LabCard>
-            <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+             <p className="section-header mb-3">
               Which actives cause stinging?
             </p>
             <TooltipProvider delayDuration={200}>

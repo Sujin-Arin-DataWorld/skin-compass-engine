@@ -5,7 +5,9 @@ import { ArrowRight, ChevronDown, Scan, Brain, FlaskConical, PackageCheck } from
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
-// Radar chart data — 8 diagnosis categories
+import SilkBackground from "@/components/SilkBackground";
+
+// ── Radar data ────────────────────────────────
 const RADAR_CATEGORIES = [
   { label: "Acne",        value: 0.72 },
   { label: "Oiliness",    value: 0.58 },
@@ -105,30 +107,16 @@ function SkinRadar() {
   );
 }
 
-// ─────────────────────────────────────────────
-// Animation variants
-// ─────────────────────────────────────────────
+// ── Animation variants ────────────────────────
 const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
+  hidden: { opacity: 0, y: 40 },
   visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.13, duration: 0.65, ease: [0.22, 1, 0.36, 1] as const },
   }),
 };
 
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.92 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
-  },
-};
-
-// ─────────────────────────────────────────────
-// Static data
-// ─────────────────────────────────────────────
+// ── Static data ───────────────────────────────
 const proofItems = [
   {
     num: "01",
@@ -172,16 +160,20 @@ const CLINICAL_AXES = [
   { axis: "Sebum Rate", desc: "Relative sebum excretion normalized per T/U zone" },
 ];
 
-// ─────────────────────────────────────────────
-// ScoreBar
-// ─────────────────────────────────────────────
+const EDITORIAL_IMAGES = [
+  "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80",
+  "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=600&q=80",
+  "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80",
+];
+
+// ── ScoreBar ──────────────────────────────────
 function ScoreBar({ label, value, delay = 0 }: { label: string; value: number; delay?: number }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
 
   return (
     <div ref={ref} className="space-y-1">
-      <div className="flex justify-between text-xs">
+      <div className="flex justify-between font-body text-xs">
         <span className="text-muted-foreground">{label}</span>
         <span className="text-foreground font-medium">{value}/100</span>
       </div>
@@ -197,132 +189,7 @@ function ScoreBar({ label, value, delay = 0 }: { label: string; value: number; d
   );
 }
 
-// ─────────────────────────────────────────────
-// SkinScoreCard
-// ─────────────────────────────────────────────
-function SkinScoreCard() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 900);
-    return () => clearTimeout(t);
-  }, []);
-
-  return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          className="absolute bottom-6 left-6 right-6 md:left-auto md:right-6 md:bottom-8 md:w-56 rounded-xl border border-border/60 bg-card/90 backdrop-blur-md p-4 shadow-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <p className="text-[10px] font-medium uppercase tracking-widest text-primary mb-3">
-            Sample Score Profile
-          </p>
-          <div className="space-y-2.5">
-            {SCORE_AXES.map((axis, i) => (
-              <ScoreBar key={axis.key} label={axis.label} value={axis.value} delay={i * 0.1} />
-            ))}
-          </div>
-          <p className="mt-3 text-[9px] text-muted-foreground text-center">
-            Illustrative only — your results will differ
-          </p>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
-
-// ─────────────────────────────────────────────
-// ProofCard
-// ─────────────────────────────────────────────
-function ProofCard({ item, i }: { item: (typeof proofItems)[0]; i: number }) {
-  const [active, setActive] = useState(false);
-
-  return (
-    <motion.div
-      custom={i}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-80px" }}
-      variants={fadeUp}
-      onMouseEnter={() => setActive(true)}
-      onMouseLeave={() => setActive(false)}
-      onFocus={() => setActive(true)}
-      onBlur={() => setActive(false)}
-      tabIndex={0}
-      role="article"
-      className="group relative overflow-hidden rounded-xl border border-border/40 p-6 transition-colors duration-200 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-    >
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent"
-        animate={{ opacity: active ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-      />
-      <div className="relative">
-        <span className="text-sm font-medium text-primary">{item.num}</span>
-        <h3 className="mt-2 font-display text-2xl text-foreground">{item.title}</h3>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
-        <motion.p
-          className="mt-2 text-xs text-primary/80"
-          animate={{ opacity: active ? 1 : 0, y: active ? 0 : 8 }}
-          transition={{ duration: 0.2 }}
-        >
-          {item.detail}
-        </motion.p>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// StepCard
-// ─────────────────────────────────────────────
-function StepCard({ s, i }: { s: (typeof steps)[0]; i: number }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <motion.div
-      custom={i}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true }}
-      variants={fadeUp}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setHovered(true)}
-      onBlur={() => setHovered(false)}
-      tabIndex={0}
-      role="article"
-      aria-label={`Step ${s.step}: ${s.title}`}
-      className="group relative rounded-xl border border-border/50 p-5 transition-colors duration-200 hover:border-primary/40 hover:bg-primary/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-    >
-      <span className="text-[10px] font-medium uppercase tracking-widest text-primary">
-        Step {s.step}
-      </span>
-
-      <div className="mt-3 mb-3">
-        <s.Icon className={`h-6 w-6 transition-colors duration-200 ${hovered ? "text-primary" : "text-muted-foreground"}`} />
-      </div>
-
-      <h4 className="font-display text-lg text-foreground">{s.title}</h4>
-
-      <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-        {s.desc}
-      </p>
-
-      <div className="mt-3 text-xs font-medium text-primary/80">
-        {s.time}
-      </div>
-    </motion.div>
-  );
-}
-
-// ─────────────────────────────────────────────
-// Page
-// ─────────────────────────────────────────────
+// ── Main Page ─────────────────────────────────
 const Index = () => {
   const [scrolled, setScrolled] = useState(false);
 
@@ -333,108 +200,138 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background font-body">
+      <SilkBackground />
       <Navbar />
 
-      {/* ── Hero ────────────────────────────── */}
-      <section className="relative flex min-h-screen items-center px-6 pt-20 overflow-hidden">
-        <div className="mx-auto grid max-w-[1100px] w-full gap-12 md:grid-cols-2 md:items-center">
+      {/* ── HERO ─────────────────────────────── */}
+      <section className="relative z-10 flex min-h-screen items-center px-6 pt-24 pb-16">
+        <div className="mx-auto grid max-w-[1200px] w-full gap-16 lg:grid-cols-2 lg:items-center">
 
-          {/* Left: copy */}
-          <div className="relative z-10 order-2 md:order-1">
-            {/* Eyebrow badge */}
+          {/* LEFT: Editorial copy */}
+          <div className="order-2 lg:order-1">
             <motion.div
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 font-body text-xs font-medium uppercase tracking-widest text-primary"
             >
-              <FlaskConical className="h-3 w-3" />
-              Dermatology-Grade AI Assessment
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+              Dermatology-Grade K-Beauty
             </motion.div>
 
             <motion.h1
-              className="font-display text-4xl leading-tight tracking-tight text-foreground sm:text-5xl md:text-6xl"
-              initial={{ opacity: 0, y: 40 }}
+              className="font-display text-display-xl text-foreground leading-[1.02]"
+              initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.85, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              Your Skin.<br />
-              <span className="text-gradient-sand">Clinically Decoded.</span>
+              Your Skin,<br />
+              <em className="not-italic text-primary">Clinically</em><br />
+              Decoded.
             </motion.h1>
 
             <motion.p
-              className="mt-6 max-w-md text-lg text-muted-foreground"
+              className="mt-8 max-w-lg font-body text-body-lg text-muted-foreground leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.6 }}
+              transition={{ delay: 0.45, duration: 0.7 }}
             >
-              A dermatology-grade skin assessment.<br />
-              Personalized K-beauty protocols.<br />
-              Delivered to your door.
+              A 10-axis dermatology assessment maps your skin with clinical precision.
+              We match you to dermatologist-validated Korean formulas — and deliver them to your door.
             </motion.p>
 
             <motion.div
-              className="mt-10 flex flex-col gap-2"
+              className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.5 }}
+              transition={{ delay: 0.65, duration: 0.5 }}
             >
               <Link
                 to="/diagnosis"
-                 className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all hover:opacity-90"
+                className="group inline-flex items-center justify-center gap-3 rounded-full bg-primary px-10 py-4 font-body text-base font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2"
               >
-                Begin Your Skin Assessment
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                Begin Your Assessment
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
-              <span className="text-xs text-muted-foreground">Free · No account needed</span>
+              <span className="font-body text-sm text-muted-foreground">Free · 6 minutes · No account</span>
             </motion.div>
 
-            {/* Stats row */}
             <motion.div
-              className="mt-10 flex gap-8"
+              className="mt-12 flex items-center gap-10 border-t border-border/50 pt-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 0.5 }}
+              transition={{ delay: 0.9, duration: 0.6 }}
             >
               {[
-                { val: "120", lbl: "clinical markers" },
-                { val: "8",   lbl: "skin patterns" },
-                { val: "5",   lbl: "phase protocol" },
+                { val: "120", lbl: "Clinical markers" },
+                { val: "8",   lbl: "Skin patterns" },
+                { val: "5",   lbl: "Protocol phases" },
               ].map((stat) => (
-                <div key={stat.lbl} className="text-center">
-                  <p className="font-display text-2xl text-foreground">{stat.val}</p>
-                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{stat.lbl}</p>
+                <div key={stat.lbl}>
+                  <p className="font-display text-display-md text-foreground">{stat.val}</p>
+                  <p className="font-body text-label uppercase tracking-widest text-muted-foreground">{stat.lbl}</p>
                 </div>
               ))}
             </motion.div>
           </div>
 
-          {/* Right: radar visualization */}
+          {/* RIGHT: Radar + editorial images */}
           <motion.div
-            className="relative order-1 md:order-2 flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            className="relative order-1 lg:order-2 flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           >
-            <SkinRadar />
-            <p className="absolute -bottom-2 text-[9px] text-muted-foreground tracking-wide text-center w-full">
-              Illustrative 8-category profile
+            <div
+              className="absolute inset-0 rounded-full opacity-20"
+              style={{ background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)", filter: "blur(40px)" }}
+            />
+
+            <div className="relative z-10">
+              <SkinRadar />
+            </div>
+
+            <motion.div
+              className="absolute -top-8 -right-4 z-20 hidden lg:block"
+              initial={{ opacity: 0, y: 20, rotate: 3 }}
+              animate={{ opacity: 1, y: 0, rotate: 3 }}
+              transition={{ delay: 1.0, duration: 0.7 }}
+            >
+              <div className="h-32 w-24 overflow-hidden rounded-2xl border border-border/40 shadow-xl">
+                <img src={EDITORIAL_IMAGES[1]} alt="Serum texture" className="h-full w-full object-cover" loading="lazy" />
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="absolute -bottom-6 -left-8 z-20 hidden lg:block"
+              initial={{ opacity: 0, y: -20, rotate: -2 }}
+              animate={{ opacity: 1, y: 0, rotate: -2 }}
+              transition={{ delay: 1.2, duration: 0.7 }}
+            >
+              <div className="h-28 w-36 overflow-hidden rounded-2xl border border-border/40 shadow-xl">
+                <img src={EDITORIAL_IMAGES[2]} alt="Cream texture" className="h-full w-full object-cover" loading="lazy" />
+              </div>
+            </motion.div>
+
+            <p className="absolute -bottom-10 font-body text-[10px] text-muted-foreground tracking-wider text-center w-full">
+              Illustrative 8-category skin profile
             </p>
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
         <AnimatePresence>
           {!scrolled && (
             <motion.div
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-muted-foreground"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.6 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ delay: 1.8 }}
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 text-muted-foreground/50"
+              aria-hidden="true"
             >
-              <span className="text-[10px] uppercase tracking-widest">Scroll</span>
-              <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
+              <span className="font-body text-label uppercase tracking-widest">Scroll</span>
+              <motion.div animate={{ y: [0, 6, 0] }} transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}>
                 <ChevronDown className="h-4 w-4" />
               </motion.div>
             </motion.div>
@@ -442,108 +339,181 @@ const Index = () => {
         </AnimatePresence>
       </section>
 
-      {/* ── Why It Works ────────────────────── */}
-      <section className="px-6 py-24">
-        <div className="mx-auto max-w-[960px]">
-          <motion.h2
-            className="font-display text-3xl text-foreground mb-12"
+      {/* ── EDITORIAL IMAGE BANNER ─────────── */}
+      <section className="relative z-10 py-8 overflow-hidden">
+        <motion.div
+          className="flex gap-4 px-6"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="h-64 flex-1 overflow-hidden rounded-2xl">
+            <img src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=900&q=80" alt="K-beauty skincare ritual" className="h-full w-full object-cover" loading="lazy" />
+          </div>
+          <div className="hidden h-64 w-1/3 overflow-hidden rounded-2xl sm:block">
+            <img src="https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=600&q=80" alt="Skincare texture close-up" className="h-full w-full object-cover" loading="lazy" />
+          </div>
+          <div className="hidden h-64 w-1/4 overflow-hidden rounded-2xl md:block">
+            <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500&q=80" alt="Botanical ingredients" className="h-full w-full object-cover" loading="lazy" />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ── WHY IT WORKS ──────────────────── */}
+      <section className="relative z-10 px-6 py-28">
+        <div className="mx-auto max-w-[1100px]">
+          <motion.div
+            className="mb-16 max-w-2xl"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
-            variants={scaleIn}
+            viewport={{ once: true, margin: "-30px" }}
+            variants={fadeUp}
+            custom={0}
           >
-            Why It Works
-          </motion.h2>
+            <span className="font-body text-label uppercase tracking-widest text-primary">The Method</span>
+            <h2 className="mt-3 font-display text-display-lg text-foreground">Why It Works</h2>
+          </motion.div>
+
           <div className="grid gap-6 md:grid-cols-3">
             {proofItems.map((item, i) => (
-              <ProofCard key={item.num} item={item} i={i} />
+              <motion.div
+                key={item.num}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-30px" }}
+                variants={fadeUp}
+                className="group relative overflow-hidden rounded-2xl border border-border/40 bg-card/60 p-8 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+              >
+                <span className="font-body text-label font-medium text-primary">{item.num}</span>
+                <h3 className="mt-3 font-display text-display-md text-foreground">{item.title}</h3>
+                <p className="mt-3 font-body text-body-md leading-relaxed text-muted-foreground">{item.desc}</p>
+                <div className="mt-5 inline-flex items-center rounded-full bg-primary/5 px-3 py-1 font-body text-xs font-medium text-primary">
+                  {item.detail}
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Scoring System Explainer ─────────── */}
-      <section className="border-t border-border px-6 py-24">
-        <div className="mx-auto max-w-[960px]">
-          <motion.div
-            className="mb-12"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={scaleIn}
-          >
-            <span className="text-xs font-medium uppercase tracking-widest text-primary">
-              Scoring System
-            </span>
-            <h2 className="mt-2 font-display text-3xl text-foreground">
-              10-Axis Skin Vector
-            </h2>
-            <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-              Every assessment generates a unique 10-dimensional vector across clinically validated
-              axes. Your protocol is computed from the full vector — not a single bucket or type.
-            </p>
-          </motion.div>
+      {/* ── SCORING SYSTEM ────────────────── */}
+      <section className="relative z-10 border-t border-border/30 px-6 py-28">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-30px" }}
+              variants={fadeUp}
+              custom={0}
+            >
+              <span className="font-body text-label uppercase tracking-widest text-primary">Scoring System</span>
+              <h2 className="mt-3 font-display text-display-lg text-foreground">10-Axis Skin Vector</h2>
+              <p className="mt-5 font-body text-body-lg leading-relaxed text-muted-foreground">
+                Every assessment generates a unique 10-dimensional vector across clinically validated axes.
+                Your protocol is computed from the full vector — not a single bucket or type.
+              </p>
 
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Animated score bars */}
-            <div className="rounded-xl border border-border/40 p-6">
-              <p className="mb-4 text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+              <div className="mt-10 space-y-4">
+                {CLINICAL_AXES.map((item, i) => (
+                  <motion.div
+                    key={item.axis}
+                    custom={i + 1}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-20px" }}
+                    variants={fadeUp}
+                    className="border-l-2 border-primary/40 pl-5"
+                  >
+                    <p className="font-body text-base font-medium text-foreground">{item.axis}</p>
+                    <p className="mt-0.5 font-body text-sm text-muted-foreground">{item.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-30px" }}
+              variants={fadeUp}
+              custom={1}
+              className="rounded-2xl border border-border/40 bg-card/60 p-8 backdrop-blur-sm"
+            >
+              <p className="mb-6 font-body text-label uppercase tracking-widest text-muted-foreground">
                 Sample output — illustrative
               </p>
-              <div className="space-y-3">
+              <div className="space-y-5">
                 {SCORE_AXES.map((axis, i) => (
                   <ScoreBar key={axis.key} label={axis.label} value={axis.value} delay={i * 0.1} />
                 ))}
               </div>
-            </div>
-
-            {/* Clinical axis descriptions */}
-            <div className="space-y-4">
-              {CLINICAL_AXES.map((item, i) => (
-                <motion.div key={item.axis} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                  <h4 className="text-sm font-medium text-foreground">{item.axis}</h4>
-                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
-                </motion.div>
-              ))}
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ── How It Works ────────────────────── */}
-      <section className="border-t border-border px-6 py-24">
-        <div className="mx-auto max-w-[960px]">
+      {/* ── HOW IT WORKS ──────────────────── */}
+      <section className="relative z-10 border-t border-border/30 px-6 py-28">
+        <div className="mx-auto max-w-[1100px]">
           <motion.div
-            className="mb-12"
+            className="mb-16"
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
-            variants={scaleIn}
+            viewport={{ once: true, margin: "-30px" }}
+            variants={fadeUp}
+            custom={0}
           >
-            <h2 className="font-display text-3xl text-foreground">
-              How It Works
-            </h2>
-            <p className="mt-3 text-sm text-muted-foreground">
+            <h2 className="font-display text-display-lg text-foreground">How It Works</h2>
+            <p className="mt-3 font-body text-body-lg text-muted-foreground">
               Four steps. Under 6 minutes. Clinically grounded results.
             </p>
           </motion.div>
 
-          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((s, i) => (
-              <StepCard key={s.step} s={s} i={i} />
+              <motion.div
+                key={s.step}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                variants={fadeUp}
+                tabIndex={0}
+                className="group rounded-2xl border border-border/40 bg-card/60 p-6 backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
+                <span className="font-body text-label uppercase tracking-widest text-primary">Step {s.step}</span>
+                <div className="mt-3 flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                  <s.Icon className="h-5 w-5" />
+                </div>
+                <h4 className="mt-4 font-display text-xl text-foreground">{s.title}</h4>
+                <p className="mt-2 font-body text-sm text-muted-foreground">{s.desc}</p>
+                <div className="mt-4 inline-flex items-center rounded-full border border-border/60 px-3 py-1 font-body text-xs text-muted-foreground">
+                  {s.time}
+                </div>
+              </motion.div>
             ))}
           </div>
 
           {/* Bottom CTA */}
-          <motion.div className="mt-16 text-center" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn}>
+          <motion.div
+            className="mt-20 flex flex-col items-center gap-4 text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-30px" }}
+            variants={fadeUp}
+            custom={4}
+          >
             <Link
               to="/diagnosis"
-              className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all hover:opacity-90"
+              className="group inline-flex items-center gap-3 rounded-full bg-primary px-12 py-5 font-body text-lg font-medium text-primary-foreground shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2"
             >
               Start Free Assessment
-              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
-            <p className="mt-3 text-xs text-muted-foreground">
+            <p className="font-body text-sm text-muted-foreground">
               No registration · Results in under 6 min · Backed by clinical scales
             </p>
           </motion.div>

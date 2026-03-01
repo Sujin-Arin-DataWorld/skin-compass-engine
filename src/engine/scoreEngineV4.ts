@@ -82,6 +82,7 @@ export function saturateScores(
   }
 
   const result = emptyScores();
+  console.group("[ScoreEngine] S-curve normalization per axis");
   for (const axis of AXIS_KEYS) {
     if (maxPossible[axis] <= 0) {
       result[axis] = 0;
@@ -94,7 +95,16 @@ export function saturateScores(
         ? 2 * ratio * ratio
         : 1 - Math.pow(-2 * ratio + 2, 2) / 2;
     result[axis] = Math.round(curved * 100);
+
+    console.log(
+      `%c${axis}%c  raw=${raw[axis].toFixed(2)}  max=${maxPossible[axis].toFixed(2)}  ratio=${ratio.toFixed(3)}  curved=${curved.toFixed(3)}  final=${result[axis]}`,
+      "color: #B8A98A; font-weight: bold",
+      "color: inherit"
+    );
   }
+  console.log("Answered categories:", [...answeredCategories].sort().join(", "));
+  console.groupEnd();
+
   return result;
 }
 

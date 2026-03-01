@@ -6,6 +6,78 @@
 
 @layer base {
   :root {
+    /* ── Light mode ── */
+    --background: 40 20% 97%;
+    --foreground: 30 10% 12%;
+
+    --card: 40 15% 95%;
+    --card-foreground: 30 10% 12%;
+
+    --popover: 40 15% 95%;
+    --popover-foreground: 30 10% 12%;
+
+    --primary: 35 32% 48%;
+    --primary-foreground: 40 20% 97%;
+
+    --secondary: 35 12% 90%;
+    --secondary-foreground: 30 10% 12%;
+
+    --muted: 35 10% 88%;
+    --muted-foreground: 30 8% 42%;
+
+    --accent: 35 32% 48%;
+    --accent-foreground: 40 20% 97%;
+
+    --destructive: 0 60% 48%;
+    --destructive-foreground: 40 20% 97%;
+
+    --border: 35 10% 84%;
+    --input: 35 10% 84%;
+    --ring: 35 32% 48%;
+
+    --radius: 0.5rem;
+
+    /* Custom tokens — light */
+    --bg-primary: 40 20% 97%;
+    --bg-secondary: 40 15% 95%;
+    --bg-elevated: 35 12% 90%;
+    --border-subtle: 35 10% 84%;
+    --text-primary: 30 10% 12%;
+    --text-secondary: 30 8% 38%;
+    --text-muted: 30 6% 55%;
+
+    --accent-sand: 35 32% 48%;
+    --accent-champagne: 38 22% 60%;
+    --accent-rose: 8 40% 52%;
+
+    --severity-clear: 145 40% 34%;
+    --severity-mild: 40 50% 44%;
+    --severity-moderate: 24 55% 44%;
+    --severity-severe: 4 50% 44%;
+
+    --urgency-low: 145 40% 34%;
+    --urgency-medium: 40 50% 44%;
+    --urgency-high: 24 55% 44%;
+    --urgency-critical: 4 50% 44%;
+
+    --glow-sand: 0 0 24px hsla(35, 28%, 48%, 0.06);
+    --glow-champagne: 0 0 20px hsla(38, 22%, 60%, 0.04);
+
+    --font-display: 'DM Serif Display', serif;
+    --font-body: 'Inter', sans-serif;
+
+    --sidebar-background: 40 15% 95%;
+    --sidebar-foreground: 30 10% 12%;
+    --sidebar-primary: 35 32% 48%;
+    --sidebar-primary-foreground: 40 20% 97%;
+    --sidebar-accent: 35 12% 90%;
+    --sidebar-accent-foreground: 30 10% 12%;
+    --sidebar-border: 35 10% 84%;
+    --sidebar-ring: 35 32% 48%;
+  }
+
+  .dark {
+    /* ── Dark mode ── */
     --background: 30 8% 5%;
     --foreground: 40 14% 90%;
 
@@ -34,9 +106,7 @@
     --input: 30 6% 18%;
     --ring: 35 28% 63%;
 
-    --radius: 0.5rem;
-
-    /* Custom tokens */
+    /* Custom tokens — dark */
     --bg-primary: 30 8% 5%;
     --bg-secondary: 30 6% 8%;
     --bg-elevated: 30 5% 12%;
@@ -61,9 +131,6 @@
 
     --glow-sand: 0 0 24px hsla(35, 28%, 63%, 0.08);
     --glow-champagne: 0 0 20px hsla(38, 22%, 72%, 0.06);
-
-    --font-display: 'DM Serif Display', serif;
-    --font-body: 'Inter', sans-serif;
 
     --sidebar-background: 30 6% 6%;
     --sidebar-foreground: 40 14% 90%;

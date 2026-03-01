@@ -172,7 +172,8 @@ const DiagnosisPage = () => {
   }, [store.currentStep]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      <SilkBackground />
       <Navbar />
 
       {/* Progress bar + time estimate */}

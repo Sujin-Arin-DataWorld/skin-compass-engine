@@ -239,6 +239,15 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               applyPhotoMatch(id, ACNE_PHOTOS);
               const idx = ACNE_PHOTOS.findIndex(p => p.id === id);
               setUiSignals("acne", { photo_match: idx as 0 | 1 | 2 | 3 });
+              // Pre-highlight face map zones based on pattern
+              const suggestedZones = ACNE_PHOTO_TO_ZONES[id];
+              if (suggestedZones) {
+                const merged = { ...faceZones };
+                for (const [zone, intensity] of Object.entries(suggestedZones)) {
+                  if (!(zone in merged)) merged[zone] = intensity;
+                }
+                handleFaceMapChange(merged);
+              }
             }}
           />
         </>

@@ -212,14 +212,15 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
 
   return (
     <div className="space-y-6">
-      <div className="mb-2">
-        <span className="text-xs font-medium uppercase tracking-widest text-primary">
+      <div className="mb-6">
+        <span className="category-badge">
           Category {category} of 8
         </span>
-        <h2 className="mt-2 font-display text-3xl text-foreground">
-          {info?.emoji} {info?.name}
+        <h2 className="category-title mt-1 flex items-center gap-3">
+          <span>{info?.emoji}</span>
+          {info?.name}
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">{info?.clinical}</p>
+        <p className="category-description mt-2 max-w-lg">{info?.clinical}</p>
       </div>
 
       {/* ===== CATEGORY 1: ACNE ===== */}
@@ -356,7 +357,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             label="Flush Reactivity"
           />
           <LabCard>
-            <p className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+             <p className="section-header mb-3">
               Which actives cause stinging?
             </p>
             <TooltipProvider delayDuration={200}>
@@ -589,13 +590,13 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
 
       {/* Core symptom questions (3 per category, always visible) */}
       <LabCard>
-        <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        <p className="section-header mb-4">
           Core Assessment
         </p>
         <div className="flex flex-col gap-5">
           {coreSymptoms.map((symptom) => (
             <div key={symptom.id} className="space-y-2">
-              <p className="text-sm text-foreground">{symptom.text_en}</p>
+              <p className="question-label">{symptom.text_en}</p>
               <SeveritySelector
                 value={severities[symptom.id] ?? 0}
                 onChange={(v) => onSeverityChange(symptom.id, v)}
@@ -632,7 +633,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               <div className="flex flex-col gap-5">
                 {extraSymptoms.map((symptom) => (
                   <div key={symptom.id} className="space-y-2">
-                    <p className="text-sm text-foreground">{symptom.text_en}</p>
+                    <p className="question-label">{symptom.text_en}</p>
                     <SeveritySelector
                       value={severities[symptom.id] ?? 0}
                       onChange={(v) => onSeverityChange(symptom.id, v)}

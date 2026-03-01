@@ -2,7 +2,10 @@ import type { AxisKey } from "./types";
 
 // ── Face zones ──
 export type FaceZone =
-  | "forehead" | "nose" | "left_cheek" | "right_cheek" | "chin" | "jawline" | "temple";
+  | "forehead" | "forehead_left" | "forehead_right"
+  | "nose" | "left_cheek" | "right_cheek" | "chin"
+  | "jawline" | "jawline_l" | "jawline_r" | "temple"
+  | "t_zone";
 
 // ── Per-category signal shapes ──
 export interface UiSignalsV4 {

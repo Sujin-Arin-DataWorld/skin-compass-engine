@@ -14,8 +14,16 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['DM Serif Display', 'serif'],
-        body: ['Inter', 'sans-serif'],
+        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+        body: ['DM Sans', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        'display-xl': ['clamp(3rem, 7vw, 6rem)', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
+        'display-lg': ['clamp(2.2rem, 5vw, 4rem)', { lineHeight: '1.1', letterSpacing: '-0.015em' }],
+        'display-md': ['clamp(1.6rem, 3vw, 2.5rem)', { lineHeight: '1.2' }],
+        'body-lg': ['1.125rem', { lineHeight: '1.7' }],
+        'body-md': ['1rem', { lineHeight: '1.65' }],
+        'label': ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.1em' }],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -590,13 +590,13 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
 
       {/* Core symptom questions (3 per category, always visible) */}
       <LabCard>
-        <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        <p className="section-header mb-4">
           Core Assessment
         </p>
         <div className="flex flex-col gap-5">
           {coreSymptoms.map((symptom) => (
             <div key={symptom.id} className="space-y-2">
-              <p className="text-sm text-foreground">{symptom.text_en}</p>
+              <p className="question-label">{symptom.text_en}</p>
               <SeveritySelector
                 value={severities[symptom.id] ?? 0}
                 onChange={(v) => onSeverityChange(symptom.id, v)}

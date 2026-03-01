@@ -312,26 +312,17 @@ const Index = () => {
             </motion.div>
           </div>
 
-          {/* Right: hero image + score card */}
+          {/* Right: radar visualization */}
           <motion.div
-            className="relative order-1 md:order-2"
+            className="relative order-1 md:order-2 flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ delay: 0.3, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
           >
-            <div className="relative overflow-hidden rounded-2xl">
-              <img
-                src={heroImage}
-                alt="Abstract skin surface analysis — clinical macro texture with data overlay"
-                className="w-full h-auto object-cover opacity-[0.88]"
-                loading="eager"
-                width={1920}
-                height={1080}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent md:bg-gradient-to-l md:from-background/60 md:via-transparent md:to-transparent" />
-            </div>
-
-            <SkinScoreCard />
+            <SkinRadar />
+            <p className="absolute -bottom-2 text-[9px] text-muted-foreground tracking-wide text-center w-full">
+              Illustrative 8-category profile
+            </p>
           </motion.div>
         </div>
 

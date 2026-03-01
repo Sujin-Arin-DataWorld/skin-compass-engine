@@ -284,7 +284,7 @@ const Index = () => {
             >
               <Link
                 to="/diagnosis"
-                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all glow-cyan hover:opacity-90"
+                 className="group inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-4 text-lg font-semibold text-primary-foreground transition-all hover:opacity-90"
               >
                 Begin Your Skin Assessment
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />

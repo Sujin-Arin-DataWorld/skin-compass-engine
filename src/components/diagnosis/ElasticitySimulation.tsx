@@ -161,8 +161,8 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
           <motion.span
             className="absolute pointer-events-none text-[32px] leading-none"
             style={{
-              left: 30,
-              top: 68,
+              left: FINGER_LEFT,
+              top: FINGER_TOP,
               filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
             }}
             initial={{ y: -4 }}

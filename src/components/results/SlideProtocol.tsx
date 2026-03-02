@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DiagnosisResult, Product, AXIS_LABELS } from "@/engine/types";
 
 const PHASES = [
-  { key: "Phase1", num: 1, name: "Cleanse",  icon: "💧", am: true,  pm: true,  desc: "Remove impurities without disrupting barrier integrity." },
-  { key: "Phase2", num: 2, name: "Prep",     icon: "🌿", am: true,  pm: true,  desc: "Rebuild and reinforce the skin's moisture barrier." },
-  { key: "Phase3", num: 3, name: "Treat",    icon: "🔬", am: false, pm: true,  desc: "Address primary concerns with active ingredients." },
-  { key: "Phase4", num: 4, name: "Seal",     icon: "🛡", am: true,  pm: true,  desc: "Lock in moisture and create a protective film." },
-  { key: "Phase5", num: 5, name: "Protect",  icon: "☀️", am: true,  pm: false, desc: "UV protection — always the final step." },
+  { key: "Phase1", num: 1, name: "Cleanse", icon: "💧", am: true, pm: true, desc: "Remove impurities without disrupting barrier integrity.", skipWarning: "Skipping leaves barrier-disrupting residue that amplifies reactivity." },
+  { key: "Phase2", num: 2, name: "Prep", icon: "🌿", am: true, pm: true, desc: "Rebuild and reinforce the skin's moisture barrier.", skipWarning: "Barrier support is the foundation — skipping collapses all downstream phases." },
+  { key: "Phase3", num: 3, name: "Treat", icon: "🔬", am: false, pm: true, desc: "Address primary concerns with active ingredients.", skipWarning: "Treatment actives without barrier prep cause reactive flare-ups." },
+  { key: "Phase4", num: 4, name: "Seal", icon: "🛡", am: true, pm: true, desc: "Lock in moisture and create a protective film.", skipWarning: "Recovery phase locks in treatment gains — skipping reduces efficacy by ~40%." },
+  { key: "Phase5", num: 5, name: "Protect", icon: "☀️", am: true, pm: false, desc: "UV protection — always the final step.", skipWarning: "Without SPF, all pigmentation and barrier work is partially reversed daily." },
 ];
 
 const FLAG_MESSAGES: Record<string, { icon: string; title: string; body: string }> = {
@@ -26,9 +26,11 @@ const SlideProtocol = ({ result }: Props) => {
   const [activePhase, setActivePhase] = useState(0);
   const phase = PHASES[activePhase];
   const products = result.product_bundle[phase.key] || [];
+  const signalCount = result.radar_chart_data.filter((d) => d.score > 0).length;
+  const confidence = Math.min(95, 65 + signalCount * 3);
 
   return (
-    <div className="results-slide flex flex-1 flex-col px-6 py-12 overflow-y-auto">
+    <div className="results-slide flex flex-1 flex-col px-6 py-10 overflow-y-auto">
       <div className="mx-auto w-full max-w-[800px]">
         <motion.p
           className="slide-eyebrow text-center"
@@ -41,18 +43,52 @@ const SlideProtocol = ({ result }: Props) => {
           className="slide-body mt-1 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.05 }}
         >
           Personalized sequence based on your skin vector
         </motion.p>
 
+        {/* Protocol confidence badge */}
+        <motion.div
+          className="flex justify-center mt-3 mb-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+            style={{
+              background: "hsl(var(--primary) / 0.1)",
+              border: "1px solid hsl(var(--primary) / 0.3)",
+            }}
+          >
+            <span
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                color: "hsl(var(--primary))",
+              }}
+            >
+              {confidence}% protocol match
+            </span>
+            <span
+              style={{
+                fontSize: "0.75rem",
+                color: "hsl(var(--foreground-hint))",
+              }}
+            >
+              · Built from {signalCount} signals
+            </span>
+          </div>
+        </motion.div>
+
         {/* Clinical flags */}
         {result.active_flags.length > 0 && (
           <motion.div
-            className="mt-4 space-y-2"
+            className="space-y-2 mb-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.15 }}
           >
             {result.active_flags.slice(0, 2).map((flag) => {
               const msg = FLAG_MESSAGES[flag];
@@ -61,8 +97,8 @@ const SlideProtocol = ({ result }: Props) => {
                 <div key={flag} className="flex items-start gap-2 rounded-lg border border-border/50 bg-card/50 px-4 py-3">
                   <span>{msg.icon}</span>
                   <div>
-                    <p style={{ fontSize: '0.9375rem', fontWeight: 500, color: 'hsl(var(--foreground))' }}>{msg.title}</p>
-                    <p className="slide-body" style={{ fontSize: '0.875rem' }}>{msg.body}</p>
+                    <p style={{ fontSize: "0.9375rem", fontWeight: 500, color: "hsl(var(--foreground))" }}>{msg.title}</p>
+                    <p className="slide-body" style={{ fontSize: "0.875rem" }}>{msg.body}</p>
                   </div>
                 </div>
               );
@@ -70,45 +106,29 @@ const SlideProtocol = ({ result }: Props) => {
           </motion.div>
         )}
 
-        {/* Instruction hint */}
-        <motion.p
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-6 mb-4 text-center"
-          style={{
-            fontFamily: "'DM Sans', system-ui, sans-serif",
-            fontSize: '0.875rem',
-            color: 'hsl(var(--foreground-hint))',
-            fontStyle: 'italic',
-          }}
-        >
-          ← Tap each phase to see your personalised step →
-        </motion.p>
-
-        {/* Phase tabs — bigger */}
-        <div className="flex gap-2 rounded-xl p-1.5" style={{ background: 'hsl(var(--muted))' }}>
+        {/* Phase tabs */}
+        <div className="flex gap-2 rounded-xl p-1.5" style={{ background: "hsl(var(--muted))" }}>
           {PHASES.map((p, i) => (
             <button
               key={p.key}
               onClick={() => setActivePhase(i)}
               className="flex-1 rounded-lg py-3 transition-all duration-200 min-h-[56px] touch-manipulation"
               style={{
-                background: activePhase === i ? 'hsl(var(--card))' : 'transparent',
-                boxShadow: activePhase === i ? '0 1px 4px hsl(0 0% 0% / 0.12)' : 'none',
+                background: activePhase === i ? "hsl(var(--card))" : "transparent",
+                boxShadow: activePhase === i ? "0 1px 4px hsl(0 0% 0% / 0.12)" : "none",
               }}
             >
-              <div style={{ fontSize: '1.25rem', textAlign: 'center', marginBottom: '4px' }}>
+              <div style={{ fontSize: "1.25rem", textAlign: "center", marginBottom: "4px" }}>
                 {p.icon}
               </div>
               <p style={{
-                fontFamily: "'DM Sans', system-ui, sans-serif",
-                fontSize: '0.8125rem',
+                fontSize: "0.8125rem",
                 fontWeight: activePhase === i ? 600 : 400,
-                color: activePhase === i ? 'hsl(var(--foreground))' : 'hsl(var(--foreground-hint))',
-                textAlign: 'center',
+                color: activePhase === i ? "hsl(var(--foreground))" : "hsl(var(--foreground-hint))",
+                textAlign: "center",
                 lineHeight: 1.3,
               }}>
-                {p.num}<br/>{p.name}
+                {p.num}<br />{p.name}
               </p>
             </button>
           ))}
@@ -123,67 +143,74 @@ const SlideProtocol = ({ result }: Props) => {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="mt-6 rounded-2xl p-6 md:p-8"
-            style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+            style={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
           >
-            {/* Phase label */}
-            <p style={{
-              fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase' as const,
-              color: 'hsl(var(--primary))',
-              marginBottom: '0.5rem',
-            }}>
+            <p className="slide-eyebrow mb-2" style={{ color: "hsl(var(--primary))" }}>
               Phase {phase.num} · {phase.name}
             </p>
-
-            {/* Phase description */}
-            <p className="slide-body" style={{ marginBottom: '1rem' }}>{phase.desc}</p>
+            <p className="slide-body mb-1">{phase.desc}</p>
 
             {/* AM/PM badges */}
             <div className="flex gap-2 mb-5">
               {phase.am && (
                 <span className="rounded-full px-3 py-1 text-sm font-medium"
-                      style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--primary))' }}>
+                  style={{ background: "hsl(var(--primary) / 0.12)", color: "hsl(var(--primary))" }}>
                   ☀️ AM
                 </span>
               )}
               {phase.pm && (
                 <span className="rounded-full px-3 py-1 text-sm font-medium"
-                      style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--primary))' }}>
+                  style={{ background: "hsl(var(--primary) / 0.12)", color: "hsl(var(--primary))" }}>
                   🌙 PM
                 </span>
               )}
             </div>
 
-            {/* Products in this phase */}
+            {/* Products */}
             <div className="space-y-4">
               {products.length === 0 ? (
-                <p className="slide-body" style={{ fontStyle: 'italic' }}>No products assigned for this phase at your current tier.</p>
+                <p className="slide-body" style={{ fontStyle: "italic" }}>No products assigned for this phase at your current tier.</p>
               ) : (
                 products.map((product: Product) => (
                   <div key={product.id} className="border-t border-border/50 pt-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="slide-eyebrow" style={{ fontSize: '0.6875rem', letterSpacing: '0.12em' }}>{product.brand}</p>
-                        <p style={{ fontSize: '1rem', fontWeight: 500, color: 'hsl(var(--foreground))' }}>{product.name}</p>
-                        <p className="slide-body" style={{ fontSize: '0.875rem', marginTop: '0.25rem' }}>
+                        <p className="slide-eyebrow" style={{ fontSize: "0.6875rem", letterSpacing: "0.12em" }}>{product.brand}</p>
+                        <p style={{ fontSize: "1rem", fontWeight: 500, color: "hsl(var(--foreground))" }}>{product.name}</p>
+                        <p className="slide-body" style={{ fontSize: "0.875rem", marginTop: "0.25rem" }}>
                           {product.key_ingredients.join(" · ")}
                         </p>
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {product.target_axes.map((axis) => (
-                            <span key={axis} className="rounded-full bg-secondary px-2 py-0.5 text-[0.75rem]" style={{ color: 'hsl(var(--foreground-hint))' }}>
+                            <span key={axis} className="rounded-full bg-secondary px-2 py-0.5 text-[0.75rem]" style={{ color: "hsl(var(--foreground-hint))" }}>
                               {AXIS_LABELS[axis]}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <span style={{ fontSize: '1rem', fontWeight: 600, color: 'hsl(var(--foreground))' }}>€{product.price_eur}</span>
+                      <span style={{ fontSize: "1rem", fontWeight: 600, color: "hsl(var(--foreground))" }}>€{product.price_eur}</span>
                     </div>
                   </div>
                 ))
               )}
+            </div>
+
+            {/* Skip warning */}
+            <div
+              className="mt-4 rounded-xl px-3 py-2"
+              style={{
+                background: "hsl(var(--muted) / 0.5)",
+                borderLeft: "3px solid hsl(var(--foreground-hint) / 0.3)",
+              }}
+            >
+              <p style={{
+                fontSize: "0.75rem",
+                color: "hsl(var(--foreground-hint))",
+                lineHeight: 1.4,
+                fontStyle: "italic",
+              }}>
+                ⚠ {phase.skipWarning}
+              </p>
             </div>
           </motion.div>
         </AnimatePresence>

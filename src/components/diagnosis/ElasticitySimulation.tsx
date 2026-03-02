@@ -68,7 +68,7 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
   useEffect(() => {
     if (prevValue.current !== value) {
       prevValue.current = value;
-      animatePress(LEVELS[value].recoverySec);
+      animatePress(LEVELS[value].recoverySec, LEVELS[value].pressDist);
     }
   }, [value, animatePress]);
 

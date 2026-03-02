@@ -7,11 +7,16 @@ interface ElasticitySimulationProps {
   onChange: (v: number) => void;
 }
 
+const CHEEK_LEFT = 22;
+const CHEEK_TOP = 105;
+const FINGER_LEFT = CHEEK_LEFT + 8;
+const FINGER_TOP = CHEEK_TOP - 44;
+
 const LEVELS = [
-  { label: "Firm", description: "Skin snaps back immediately — no visible deformation", recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: "Fast", pct: 100 },
-  { label: "Mild", description: "Skin returns within 1–2 seconds after release", recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: "Medium", pct: 72 },
-  { label: "Moderate", description: "Skin takes 3–5 seconds to recover its shape", recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: "Slow", pct: 42 },
-  { label: "Significant", description: "Skin stays deformed or recovers very slowly", recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: "Very slow", pct: 15 },
+  { label: "Firm", description: "Skin snaps back immediately — no visible deformation", recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: "Fast", pct: 100, pressDist: 14 },
+  { label: "Mild", description: "Skin returns within 1–2 seconds after release", recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: "Medium", pct: 72, pressDist: 18 },
+  { label: "Moderate", description: "Skin takes 3–5 seconds to recover its shape", recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: "Slow", pct: 42, pressDist: 24 },
+  { label: "Significant", description: "Skin stays deformed or recovers very slowly", recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: "Very slow", pct: 15, pressDist: 30 },
 ];
 
 const PRESS_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];

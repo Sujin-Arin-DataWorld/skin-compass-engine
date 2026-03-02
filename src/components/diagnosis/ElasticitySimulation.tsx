@@ -143,8 +143,8 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
             style={{
               width: 44,
               height: 36,
-              left: 22,
-              top: 105,
+              left: CHEEK_LEFT,
+              top: CHEEK_TOP,
               background: phase === "pressed"
                 ? "radial-gradient(ellipse, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.06) 70%)"
                 : "hsl(var(--primary) / 0.05)",

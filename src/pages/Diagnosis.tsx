@@ -350,7 +350,7 @@ const DiagnosisPage = () => {
                               }`}
                               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                             >
-                              Not applicable
+                              Not applicable (I do not menstruate / prefer not to answer)
                             </motion.button>
                           )}
                         </div>

@@ -7,11 +7,16 @@ interface ElasticitySimulationProps {
   onChange: (v: number) => void;
 }
 
+const CHEEK_LEFT = 22;
+const CHEEK_TOP = 105;
+const FINGER_LEFT = CHEEK_LEFT + 8;
+const FINGER_TOP = CHEEK_TOP - 44;
+
 const LEVELS = [
-  { label: "Firm", description: "Skin snaps back immediately — no visible deformation", recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: "Fast", pct: 100 },
-  { label: "Mild", description: "Skin returns within 1–2 seconds after release", recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: "Medium", pct: 72 },
-  { label: "Moderate", description: "Skin takes 3–5 seconds to recover its shape", recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: "Slow", pct: 42 },
-  { label: "Significant", description: "Skin stays deformed or recovers very slowly", recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: "Very slow", pct: 15 },
+  { label: "Firm", description: "Skin snaps back immediately — no visible deformation", recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: "Fast", pct: 100, pressDist: 14 },
+  { label: "Mild", description: "Skin returns within 1–2 seconds after release", recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: "Medium", pct: 72, pressDist: 18 },
+  { label: "Moderate", description: "Skin takes 3–5 seconds to recover its shape", recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: "Slow", pct: 42, pressDist: 24 },
+  { label: "Significant", description: "Skin stays deformed or recovers very slowly", recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: "Very slow", pct: 15, pressDist: 30 },
 ];
 
 const PRESS_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -26,14 +31,14 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
   const [phase, setPhase] = useState<"idle" | "pressed" | "recovering">("idle");
   const prevValue = useRef(value);
 
-  const animatePress = useCallback(async (recoverySec: number) => {
+  const animatePress = useCallback(async (recoverySec: number, pressDist: number) => {
     if (animating.current) return;
     animating.current = true;
     setIsAnimating(true);
 
     setPhase("pressed");
     await Promise.all([
-      fingerControls.start({ y: 10, transition: { duration: 0.22, ease: PRESS_EASE } }),
+      fingerControls.start({ y: pressDist, transition: { duration: 0.22, ease: PRESS_EASE } }),
       skinControls.start({
         scaleX: 0.92, scaleY: 1.04, y: 1,
         transition: { duration: 0.22, ease: PRESS_EASE },
@@ -63,12 +68,12 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
   useEffect(() => {
     if (prevValue.current !== value) {
       prevValue.current = value;
-      animatePress(LEVELS[value].recoverySec);
+      animatePress(LEVELS[value].recoverySec, LEVELS[value].pressDist);
     }
   }, [value, animatePress]);
 
   const handleTap = useCallback(() => {
-    animatePress(config.recoverySec);
+    animatePress(config.recoverySec, config.pressDist);
   }, [animatePress, config]);
 
   return (
@@ -138,8 +143,8 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
             style={{
               width: 44,
               height: 36,
-              left: 22,
-              top: 105,
+              left: CHEEK_LEFT,
+              top: CHEEK_TOP,
               background: phase === "pressed"
                 ? "radial-gradient(ellipse, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.06) 70%)"
                 : "hsl(var(--primary) / 0.05)",
@@ -156,8 +161,8 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
           <motion.span
             className="absolute pointer-events-none text-[32px] leading-none"
             style={{
-              left: 30,
-              top: 68,
+              left: FINGER_LEFT,
+              top: FINGER_TOP,
               filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
             }}
             initial={{ y: -4 }}
@@ -169,7 +174,7 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
           {/* Hover hint */}
           <div
             className="absolute text-[8px] text-foreground/25 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-            style={{ left: 10, top: 148, width: 68 }}
+            style={{ left: CHEEK_LEFT - 12, top: CHEEK_TOP + 43, width: 68 }}
           >
             tap to test
           </div>

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import LabCard from "./LabCard";
-import fingerImg from "@/assets/finger-press.png";
 
 interface ElasticitySimulationProps {
   value: number;
@@ -32,27 +31,23 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
     animating.current = true;
     setIsAnimating(true);
 
-    // Press
     setPhase("pressed");
     await Promise.all([
-      fingerControls.start({ y: 14, transition: { duration: 0.22, ease: PRESS_EASE } }),
+      fingerControls.start({ y: 10, transition: { duration: 0.22, ease: PRESS_EASE } }),
       skinControls.start({
-        scaleX: 0.91, scaleY: 1.06, y: 2,
+        scaleX: 0.92, scaleY: 1.04, y: 1,
         transition: { duration: 0.22, ease: PRESS_EASE },
       }),
     ]);
 
-    // Hold
     await new Promise((r) => setTimeout(r, 160));
 
-    // Lift finger
     setPhase("recovering");
-    await fingerControls.start({ y: 0, transition: { duration: 0.12, ease: "easeOut" } });
+    await fingerControls.start({ y: -4, transition: { duration: 0.12, ease: "easeOut" } });
 
-    // Recovery — overshoot then settle
     const t = Math.max(recoverySec, 0.3);
     await skinControls.start({
-      scaleX: 1.012, scaleY: 0.994, y: 0,
+      scaleX: 1.01, scaleY: 0.995, y: 0,
       transition: { duration: t * 0.28, ease: "easeOut" },
     });
     await skinControls.start({
@@ -65,7 +60,6 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
     setIsAnimating(false);
   }, [fingerControls, skinControls]);
 
-  // Auto-play on selection change
   useEffect(() => {
     if (prevValue.current !== value) {
       prevValue.current = value;
@@ -108,7 +102,7 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
           ))}
         </div>
 
-        {/* Info block */}
+        {/* Info */}
         <div className="text-center space-y-0.5 px-2">
           <p className="text-[13px] text-foreground/75 leading-relaxed">{config.description}</p>
           <p className="text-xs text-primary font-semibold tracking-wide">{config.recoveryRange} recovery</p>
@@ -121,10 +115,10 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
           role="button"
           tabIndex={0}
           aria-label="Tap to test skin elasticity"
-          style={{ width: 180, height: 200 }}
+          style={{ width: 180, height: 195 }}
         >
           {/* Face */}
-          <svg width="180" height="180" viewBox="0 0 180 180" className="absolute top-[20px] left-0">
+          <svg width="180" height="180" viewBox="0 0 180 180" className="absolute top-[15px] left-0">
             <defs>
               <radialGradient id="faceGrad" cx="50%" cy="45%" r="55%">
                 <stop offset="0%" stopColor="hsl(var(--secondary))" stopOpacity="1" />
@@ -132,27 +126,24 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
               </radialGradient>
             </defs>
             <ellipse cx="90" cy="95" rx="52" ry="65" fill="url(#faceGrad)" stroke="hsl(var(--foreground) / 0.08)" strokeWidth="0.8" />
-            {/* Eyes */}
             <ellipse cx="74" cy="82" rx="5.5" ry="2.5" fill="none" stroke="hsl(var(--foreground) / 0.12)" strokeWidth="0.6" />
             <ellipse cx="106" cy="82" rx="5.5" ry="2.5" fill="none" stroke="hsl(var(--foreground) / 0.12)" strokeWidth="0.6" />
-            {/* Nose */}
             <path d="M 88 86 L 90 96 L 93 96" fill="none" stroke="hsl(var(--foreground) / 0.07)" strokeWidth="0.4" />
-            {/* Mouth */}
             <path d="M 82 116 Q 90 121 98 116" fill="none" stroke="hsl(var(--foreground) / 0.1)" strokeWidth="0.6" />
           </svg>
 
-          {/* Cheek target — deformable */}
+          {/* Cheek target */}
           <motion.div
-            className="absolute rounded-[50%] transition-shadow duration-200"
+            className="absolute rounded-[50%]"
             style={{
               width: 44,
               height: 36,
               left: 22,
-              top: 104,
+              top: 105,
               background: phase === "pressed"
-                ? "radial-gradient(ellipse, hsl(var(--primary) / 0.18) 0%, hsl(var(--primary) / 0.06) 70%)"
+                ? "radial-gradient(ellipse, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.06) 70%)"
                 : "hsl(var(--primary) / 0.05)",
-              border: `1px solid hsl(var(--primary) / ${phase === "idle" ? 0.12 : 0.3})`,
+              border: `1px solid hsl(var(--primary) / ${phase === "idle" ? 0.1 : 0.28})`,
               boxShadow: phase === "pressed"
                 ? "inset 0 8px 16px rgba(0,0,0,0.18), inset 0 2px 5px rgba(0,0,0,0.1)"
                 : "none",
@@ -161,36 +152,30 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
             animate={skinControls}
           />
 
-          {/* Finger */}
-          <motion.img
-            src={fingerImg}
-            alt=""
-            className="absolute pointer-events-none"
-            draggable={false}
+          {/* Emoji finger */}
+          <motion.span
+            className="absolute pointer-events-none text-[32px] leading-none"
             style={{
-              width: 48,
-              height: 48,
-              left: 20,
-              top: 52,
-              transform: "rotate(180deg)",
-              filter: "drop-shadow(0 3px 6px rgba(0,0,0,0.12))",
-              objectFit: "contain",
+              left: 30,
+              top: 68,
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
             }}
-            initial={{ y: 0 }}
+            initial={{ y: -4 }}
             animate={fingerControls}
-          />
+          >
+            👆
+          </motion.span>
 
-          {/* Hover hint on cheek */}
+          {/* Hover hint */}
           <div
             className="absolute text-[8px] text-foreground/25 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-            style={{ left: 12, top: 146, width: 64 }}
+            style={{ left: 10, top: 148, width: 68 }}
           >
             tap to test
           </div>
         </div>
 
-        {/* Microcopy */}
-        <p className="text-[10px] text-foreground/35 -mt-1 tracking-wide">
+        <p className="text-[10px] text-foreground/35 -mt-2 tracking-wide">
           Tap cheek to replay · Auto-plays on selection
         </p>
 

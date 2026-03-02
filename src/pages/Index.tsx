@@ -26,7 +26,7 @@ function SkinRadar() {
   const radarRef = useRef<SVGSVGElement>(null);
   const radarInView = useInView(radarRef, { once: true, margin: "-40px" });
 
-  const cx = 160,cy = 160,maxR = 120;
+  const cx = 200,cy = 200,maxR = 120;
   const n = RADAR_CATEGORIES.length;
   const angleStep = 360 / n;
 
@@ -38,15 +38,15 @@ function SkinRadar() {
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
 
   const labels = RADAR_CATEGORIES.map((cat, i) => ({
-    ...polarToXY(i * angleStep, maxR + 42, cx, cy),
+    ...polarToXY(i * angleStep, maxR + 44, cx, cy),
     label: cat.label
   }));
 
   return (
     <motion.svg
       ref={radarRef}
-      viewBox="0 0 320 320"
-      className="w-full max-w-[340px] h-auto mx-auto"
+      viewBox="0 0 400 400"
+      className="w-full max-w-[380px] h-auto mx-auto"
       initial={{ opacity: 0 }}
       animate={radarInView ? { opacity: 1 } : {}}
       transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}>

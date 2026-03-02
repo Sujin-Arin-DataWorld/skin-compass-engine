@@ -37,7 +37,7 @@ const CRITICAL_MESSAGES: Partial<Record<AxisKey, string>> = {
 function RadarChart({ result, highlightAxis }: { result: DiagnosisResult; highlightAxis: AxisKey }) {
   const axes = result.radar_chart_data;
   const n = axes.length;
-  const SIZE = 280, CENTER = SIZE / 2, RADIUS = 110;
+  const VIEWBOX = 340, CENTER = VIEWBOX / 2, RADIUS = 100;
 
   const points = axes.map((a, i) => {
     const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
@@ -47,7 +47,7 @@ function RadarChart({ result, highlightAxis }: { result: DiagnosisResult; highli
   const poly = points.map((p) => `${p.x},${p.y}`).join(" ");
 
   return (
-    <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} className="mx-auto">
+    <svg width="100%" viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`} className="mx-auto max-w-[320px]">
       {[0.25, 0.5, 0.75, 1].map((r) => (
         <polygon
           key={r}

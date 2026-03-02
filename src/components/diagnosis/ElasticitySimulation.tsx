@@ -73,7 +73,7 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
   }, [value, animatePress]);
 
   const handleTap = useCallback(() => {
-    animatePress(config.recoverySec);
+    animatePress(config.recoverySec, config.pressDist);
   }, [animatePress, config]);
 
   return (

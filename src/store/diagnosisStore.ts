@@ -12,11 +12,13 @@ export interface InteractiveState {
   oilFullFace: boolean;
   poreFullFace: boolean;
   pigmentZones: string[];
+  pigmentMarkers: Array<{ zone: string; type: string }>;
   textureSelected: string | null;
   poreZones: string[];
   agingZones: string[];
   activeToggles: Record<string, boolean>;
   expandedQuestions: Record<number, boolean>;
+  userTags: Record<string, number>;
 }
 
 const defaultInteractiveState: InteractiveState = {
@@ -29,11 +31,13 @@ const defaultInteractiveState: InteractiveState = {
   oilFullFace: false,
   poreFullFace: false,
   pigmentZones: [],
+  pigmentMarkers: [],
   textureSelected: null,
   poreZones: [],
   agingZones: [],
   activeToggles: {},
   expandedQuestions: {},
+  userTags: {},
 };
 
 interface DiagnosisState {
@@ -69,6 +73,7 @@ interface DiagnosisState {
   setResult: (result: DiagnosisResult) => void;
   setUiSignals: (category: string, data: Record<string, unknown>) => void;
   setInteractive: <K extends keyof InteractiveState>(key: K, value: InteractiveState[K]) => void;
+  addUserTags: (delta: Record<string, number>) => void;
   reset: () => void;
 }
 
@@ -135,6 +140,16 @@ export const useDiagnosisStore = create<DiagnosisState>((set) => ({
     set((state) => ({
       interactiveState: { ...state.interactiveState, [key]: value },
     })),
+
+  addUserTags: (delta) =>
+    set((state) => {
+      const current = state.interactiveState.userTags;
+      const merged = { ...current };
+      for (const [tag, value] of Object.entries(delta)) {
+        merged[tag] = (merged[tag] ?? 0) + value;
+      }
+      return { interactiveState: { ...state.interactiveState, userTags: merged } };
+    }),
 
   reset: () => set({ ...initialState, interactiveState: { ...defaultInteractiveState } }),
 }));

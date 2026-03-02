@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import LabCard from "./LabCard";
+import FaceBase from "./FaceBase";
 
 interface ThermalGaugeProps {
   value: number; // 0-3
@@ -26,12 +27,8 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
       <div className="mt-4 flex flex-col items-center gap-6">
         {/* Face with thermal overlay */}
         <div className="relative">
-          <svg viewBox="30 20 140 140" className="w-48 h-auto">
-            <ellipse cx="100" cy="90" rx="45" ry="55" fill="hsl(var(--secondary))" stroke="hsl(var(--border))" strokeWidth="1.5" />
-            <ellipse cx="82" cy="78" rx="7" ry="3.5" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
-            <ellipse cx="118" cy="78" rx="7" ry="3.5" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
-            <path d="M 97 85 L 100 100 L 103 100" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.6" />
-
+          <FaceBase viewBox="30 20 140 140" className="w-48 h-auto">
+            {/* Thermal redness overlays */}
             <motion.ellipse
               cx="72" cy="92" rx="18" ry="14"
               fill={`hsl(${level.color})`}
@@ -62,7 +59,7 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               />
             )}
-          </svg>
+          </FaceBase>
         </div>
 
         {/* Thermometer selector — touch-optimized */}
@@ -71,17 +68,16 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
             <motion.button
               key={i}
               onClick={() => onChange(i)}
-              className={`flex-1 min-h-[44px] rounded-lg px-2 py-3 text-xs font-medium transition-all select-none touch-manipulation ${
-                value === i
+              className={`flex-1 min-h-[44px] rounded-lg px-2 py-3 text-xs font-medium transition-all select-none touch-manipulation ${value === i
                   ? i === 0
                     ? "bg-muted text-foreground"
                     : i === 1
-                    ? "bg-severity-mild/20 text-severity-mild"
-                    : i === 2
-                    ? "bg-severity-moderate/20 text-severity-moderate"
-                    : "bg-severity-severe/20 text-severity-severe"
+                      ? "bg-severity-mild/20 text-severity-mild"
+                      : i === 2
+                        ? "bg-severity-moderate/20 text-severity-moderate"
+                        : "bg-severity-severe/20 text-severity-severe"
                   : "bg-secondary/50 text-muted-foreground hover:bg-secondary active:bg-secondary"
-              }`}
+                }`}
               whileTap={{ scale: 0.93 }}
             >
               {lvl.label}

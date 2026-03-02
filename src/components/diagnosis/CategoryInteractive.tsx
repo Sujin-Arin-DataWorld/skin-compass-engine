@@ -13,6 +13,7 @@ import RecoveryAnimation from "./RecoveryAnimation";
 import SeveritySelector from "./SeveritySelector";
 import LabCard from "./LabCard";
 import { SYMPTOMS, CATEGORY_INFO } from "@/engine/weights";
+import { TAGGED_QUESTIONS, selectTopQuestions, computeTagDelta } from "@/engine/questionEngine";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -101,18 +102,6 @@ const CATEGORY_CONTEXT_FLAGS: Record<number, string> = {
   8: "ui_recovery",
 };
 
-// Core symptom IDs (shown by default) — 3 per category
-const CORE_SYMPTOMS: Record<number, string[]> = {
-  1: ["C1_10", "C1_11", "C1_13"],
-  2: ["C2_07", "C2_10", "C2_09"],
-  3: ["C3_14", "C3_12", "C3_10"],
-  4: ["C4_11", "C4_14", "C4_07"],
-  5: ["C5_03", "C5_13", "C5_05"],
-  6: ["C6_12", "C6_15", "C6_09"],
-  7: ["C7_08", "C7_11", "C7_13", "C7_16"],
-  8: ["C8_03", "C8_04", "C8_09"],
-};
-
 // Active ingredient tooltips
 const ACTIVE_TOOLTIPS: Record<string, string> = {
   aha: "Alpha Hydroxy Acids — e.g. glycolic acid, lactic acid. Found in exfoliating toners.",
@@ -129,7 +118,7 @@ interface CategoryInteractiveProps {
 }
 
 const CategoryInteractive = ({ category, severities, onSeverityChange }: CategoryInteractiveProps) => {
-  const { addContext, setUiSignals, interactiveState, setInteractive } = useDiagnosisStore();
+  const { addContext, setUiSignals, interactiveState, setInteractive, addUserTags } = useDiagnosisStore();
 
   // Read interactive state from store (persists across navigation)
   const faceZones = interactiveState.faceZones;
@@ -151,9 +140,22 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
     return Object.values(SYMPTOMS).filter((s) => s.category === category);
   }, [category]);
 
-  const coreIds = CORE_SYMPTOMS[category] ?? [];
-  const coreSymptoms = categorySymptoms.filter((s) => coreIds.includes(s.id));
-  const extraSymptoms = categorySymptoms.filter((s) => !coreIds.includes(s.id));
+  // Dynamic question selection via QuestionEngine
+  const userTags = interactiveState.userTags;
+  const candidates = useMemo(
+    () => TAGGED_QUESTIONS.filter((q) => q.category === category),
+    [category]
+  );
+  const selectedQuestions = useMemo(
+    () => selectTopQuestions(candidates, userTags, 3),
+    [candidates, userTags]
+  );
+  const selectedIds = useMemo(
+    () => new Set(selectedQuestions.map((q) => q.id)),
+    [selectedQuestions]
+  );
+  const coreSymptoms = categorySymptoms.filter((s) => selectedIds.has(s.id));
+  const extraSymptoms = categorySymptoms.filter((s) => !selectedIds.has(s.id));
 
   const markInteractive = useCallback(() => {
     const flag = CATEGORY_CONTEXT_FLAGS[category];
@@ -236,15 +238,8 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               applyPhotoMatch(id, ACNE_PHOTOS);
               const idx = ACNE_PHOTOS.findIndex(p => p.id === id);
               setUiSignals("acne", { photo_match: idx as 0 | 1 | 2 | 3 });
-              // Pre-highlight face map zones based on pattern
-              const suggestedZones = ACNE_PHOTO_TO_ZONES[id];
-              if (suggestedZones) {
-                const merged = { ...faceZones };
-                for (const [zone, intensity] of Object.entries(suggestedZones)) {
-                  if (!(zone in merged)) merged[zone] = intensity;
-                }
-                handleFaceMapChange(merged);
-              }
+              // Selection mode: photo only sets severity context.
+              // User must manually tap face zones below.
             }}
           />
           <FaceMapInteractive
@@ -304,11 +299,10 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                 setUiSignals("oil", { distribution: undefined });
               }
             }}
-            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
-              oilFullFace
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-foreground/70 hover:border-primary/40"
-            }`}
+            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${oilFullFace
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border text-foreground/70 hover:border-primary/40"
+              }`}
             whileTap={{ scale: 0.97 }}
           >
             Full Face — Oil everywhere
@@ -357,7 +351,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             label="Flush Reactivity"
           />
           <LabCard>
-             <p className="section-header mb-3">
+            <p className="section-header mb-3">
               Which actives cause stinging?
             </p>
             <TooltipProvider delayDuration={200}>
@@ -379,11 +373,10 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                           onSeverityChange(active.symptom, next ? 2 : 0);
                           setUiSignals("sensitivity", { [active.signalKey]: next });
                         }}
-                        className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
-                          isActive
-                            ? "border-severity-severe/50 bg-severity-severe/10 text-severity-severe"
-                            : "border-border text-muted-foreground hover:border-primary/40"
-                        }`}
+                        className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${isActive
+                          ? "border-severity-severe/50 bg-severity-severe/10 text-severity-severe"
+                          : "border-border text-muted-foreground hover:border-primary/40"
+                          }`}
                         whileTap={{ scale: 0.92 }}
                       >
                         <motion.div
@@ -425,11 +418,10 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                         setUiSignals("sensitivity", { react_aha: false, react_retinol: false, react_vitc: false });
                       }
                     }}
-                    className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation italic ${
-                      isNotSure
-                        ? "border-primary/50 bg-primary/10 text-primary"
-                        : "border-border text-muted-foreground hover:border-primary/40"
-                    }`}
+                    className={`rounded-xl border px-4 py-3 text-sm transition-all min-h-[44px] touch-manipulation italic ${isNotSure
+                      ? "border-primary/50 bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/40"
+                      }`}
                     whileTap={{ scale: 0.92 }}
                   >
                     <motion.div
@@ -447,45 +439,74 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       )}
 
       {/* ===== CATEGORY 5: PIGMENTATION ===== */}
-      {category === 5 && (
-        <>
-          <PhotoMatchSelector
-            title="Which pigmentation pattern matches yours?"
-            options={PIGMENT_PHOTOS}
-            selected={pigmentPhoto}
-            onSelect={(id) => {
-              setInteractive("pigmentPhoto", id);
-              markInteractive();
-              applyPhotoMatch(id, PIGMENT_PHOTOS);
-              const idx = PIGMENT_PHOTOS.findIndex(p => p.id === id);
-              setUiSignals("pigment", { photo_match: idx as 0 | 1 | 2 | 3 });
-              // Pre-highlight pigment zones based on pattern
-              const suggested = PIGMENT_PHOTO_TO_ZONES[id];
-              if (suggested && suggested.length > 0) {
-                const merged = [...new Set([...pigmentZones, ...suggested])];
-                setInteractive("pigmentZones", merged);
-                setUiSignals("pigment", { zones: merged });
-                onSeverityChange("C5_04", Math.min(3, merged.length));
-              }
-            }}
-          />
-          <AreaTapOverlay
-            title="Where is pigmentation visible?"
-            subtitle="Tap to highlight affected zones"
-            zones={PIGMENT_ZONES}
-            selected={pigmentZones}
-            onToggle={(id) => {
-              markInteractive();
-              const next = pigmentZones.includes(id) ? pigmentZones.filter(z => z !== id) : [...pigmentZones, id];
-              setInteractive("pigmentZones", next);
-              const count = next.length;
-              onSeverityChange("C5_04", Math.min(3, count));
-              setUiSignals("pigment", { zones: next });
-            }}
-            darken
-          />
-        </>
-      )}
+      {category === 5 && (() => {
+        const currentPattern = pigmentPhoto ?? "pih"; // default
+        const pigmentMarkers = interactiveState.pigmentMarkers;
+
+        // Derive selected zone IDs from all markers (unique)
+        const markedZoneIds = [...new Set(pigmentMarkers.map(m => m.zone))];
+
+        // Pattern type → visual style
+        const PIGMENT_MARKER_STYLES: Record<string, { fill: string; fillGlow: string; stroke: string; label: string }> = {
+          pih: { fill: "hsla(20, 50%, 35%, 0.30)", fillGlow: "hsla(20, 50%, 35%, 0.15)", stroke: "hsl(20, 50%, 45%)", label: "PIH" },
+          melasma: { fill: "hsla(220, 40%, 40%, 0.25)", fillGlow: "hsla(220, 40%, 40%, 0.12)", stroke: "hsl(220, 45%, 55%)", label: "Melasma" },
+          uneven_dull: { fill: "hsla(38, 50%, 50%, 0.20)", fillGlow: "hsla(38, 50%, 50%, 0.10)", stroke: "hsl(38, 55%, 55%)", label: "Dull" },
+          minimal_pigment: { fill: "hsla(120, 30%, 50%, 0.15)", fillGlow: "hsla(120, 30%, 50%, 0.08)", stroke: "hsl(120, 35%, 55%)", label: "Minimal" },
+        };
+
+        return (
+          <>
+            <PhotoMatchSelector
+              title="Which pigmentation pattern matches yours?"
+              options={PIGMENT_PHOTOS}
+              selected={pigmentPhoto}
+              onSelect={(id) => {
+                setInteractive("pigmentPhoto", id);
+                markInteractive();
+                applyPhotoMatch(id, PIGMENT_PHOTOS);
+                const idx = PIGMENT_PHOTOS.findIndex(p => p.id === id);
+                setUiSignals("pigment", { photo_match: idx as 0 | 1 | 2 | 3 });
+                // Selection mode: user must manually tap zones below.
+                // Switching patterns does NOT clear existing markers.
+              }}
+            />
+            <AreaTapOverlay
+              title="Where is pigmentation visible?"
+              subtitle={`Tap to mark ${PIGMENT_MARKER_STYLES[currentPattern]?.label ?? "affected"} zones`}
+              zones={PIGMENT_ZONES}
+              selected={markedZoneIds}
+              markers={pigmentMarkers}
+              markerStyles={PIGMENT_MARKER_STYLES}
+              onToggle={(zoneId) => {
+                markInteractive();
+                // Check if this zone already has a marker of the current type
+                const existingIdx = pigmentMarkers.findIndex(
+                  m => m.zone === zoneId && m.type === currentPattern
+                );
+
+                let next: Array<{ zone: string; type: string }>;
+                if (existingIdx >= 0) {
+                  // Remove this specific marker (toggle off)
+                  next = pigmentMarkers.filter((_, i) => i !== existingIdx);
+                } else {
+                  // Add marker (additive — doesn't remove other types)
+                  next = [...pigmentMarkers, { zone: zoneId, type: currentPattern }];
+                }
+
+                setInteractive("pigmentMarkers", next);
+                // Also keep pigmentZones in sync (unique zone IDs)
+                const uniqueZones = [...new Set(next.map(m => m.zone))];
+                setInteractive("pigmentZones", uniqueZones);
+
+                const count = uniqueZones.length;
+                onSeverityChange("C5_04", Math.min(3, count));
+                setUiSignals("pigment", { zones: uniqueZones, markers: next });
+              }}
+              darken
+            />
+          </>
+        );
+      })()}
 
       {/* ===== CATEGORY 6: TEXTURE ===== */}
       {category === 6 && (
@@ -530,11 +551,10 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                 setUiSignals("texture", { pore_location: undefined });
               }
             }}
-            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${
-              poreFullFace
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-foreground/70 hover:border-primary/40"
-            }`}
+            className={`w-full rounded-lg border px-5 py-3 text-sm transition-all min-h-[44px] touch-manipulation ${poreFullFace
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border text-foreground/70 hover:border-primary/40"
+              }`}
             whileTap={{ scale: 0.97 }}
           >
             Full Face — Pores everywhere
@@ -588,18 +608,30 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
         </>
       )}
 
-      {/* Core symptom questions (3 per category, always visible) */}
+      {/* Dynamically selected questions (top 3 by QuestionEngine) */}
       <LabCard>
         <p className="section-header mb-4">
           Core Assessment
         </p>
         <div className="flex flex-col gap-5">
           {coreSymptoms.map((symptom) => (
-            <div key={symptom.id} className="space-y-2">
-              <p className="question-label">{symptom.text_en}</p>
+            <div
+              key={symptom.id}
+              className="space-y-2 rounded-lg px-3 py-2.5 -mx-1"
+              style={{
+                background: "hsl(var(--primary) / 0.05)",
+                border: "1px solid hsl(var(--primary) / 0.15)",
+              }}
+            >
+              <p className="question-label" style={{ color: "hsl(var(--foreground))" }}>{symptom.text_en}</p>
               <SeveritySelector
                 value={severities[symptom.id] ?? 0}
-                onChange={(v) => onSeverityChange(symptom.id, v)}
+                onChange={(v) => {
+                  onSeverityChange(symptom.id, v);
+                  // Accumulate tags from this answer
+                  const delta = computeTagDelta(symptom.id, v);
+                  addUserTags(delta);
+                }}
               />
             </div>
           ))}
@@ -636,7 +668,11 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                     <p className="question-label">{symptom.text_en}</p>
                     <SeveritySelector
                       value={severities[symptom.id] ?? 0}
-                      onChange={(v) => onSeverityChange(symptom.id, v)}
+                      onChange={(v) => {
+                        onSeverityChange(symptom.id, v);
+                        const delta = computeTagDelta(symptom.id, v);
+                        addUserTags(delta);
+                      }}
                     />
                   </div>
                 ))}

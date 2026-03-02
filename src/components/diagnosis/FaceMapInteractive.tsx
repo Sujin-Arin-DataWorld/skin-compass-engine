@@ -75,12 +75,12 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 7 }: Face
 
         <div className="relative">
           <svg viewBox="30 10 140 170" className="w-full max-w-[280px] min-h-[220px] h-auto touch-manipulation">
-            {/* Face outline — increased contrast */}
-            <ellipse cx="100" cy="95" rx="48" ry="60" fill="none" stroke="hsl(var(--foreground) / 0.25)" strokeWidth="1.8" />
-            <path d="M 55 55 Q 60 25 100 20 Q 140 25 145 55" fill="none" stroke="hsl(var(--foreground) / 0.2)" strokeWidth="1" />
-            <ellipse cx="82" cy="80" rx="8" ry="4" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
-            <ellipse cx="118" cy="80" rx="8" ry="4" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
-            <path d="M 90 125 Q 100 132 110 125" fill="none" stroke="hsl(var(--muted-foreground))" strokeWidth="0.8" />
+            {/* Face outline — uses shared tokens */}
+            <ellipse cx="100" cy="95" rx="48" ry="60" fill="none" stroke="hsl(var(--face-stroke))" strokeWidth="1.8" />
+            <path d="M 55 55 Q 60 25 100 20 Q 140 25 145 55" fill="none" stroke="hsl(var(--face-detail) / 0.5)" strokeWidth="1" />
+            <ellipse cx="82" cy="80" rx="8" ry="4" fill="none" stroke="hsl(var(--face-detail))" strokeWidth="0.8" />
+            <ellipse cx="118" cy="80" rx="8" ry="4" fill="none" stroke="hsl(var(--face-detail))" strokeWidth="0.8" />
+            <path d="M 90 125 Q 100 132 110 125" fill="none" stroke="hsl(var(--face-detail))" strokeWidth="0.8" />
 
             {FACE_ZONES.map((zone) => (
               <g key={zone.id}>

@@ -28,11 +28,14 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
       </p>
 
       <div className="flex flex-col items-center gap-5">
-        {/* Animated skin surface */}
-        <div className="relative w-full max-w-[260px] h-28 rounded-xl border border-border overflow-hidden">
-          {/* Base skin */}
-          <div className="absolute inset-0 bg-secondary" />
-
+        {/* Animated skin surface — warm beige/peach */}
+        <div
+          className="relative w-full max-w-[260px] h-28 rounded-xl overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, hsl(28, 40%, 82%), hsl(20, 30%, 75%))",
+            border: "1px solid hsl(28, 30%, 72%)",
+          }}
+        >
           {/* Irritation overlay (red → calm) */}
           <motion.div
             className="absolute inset-0"
@@ -77,7 +80,8 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
           {/* Status text */}
           <div className="absolute bottom-2 left-0 right-0 text-center">
             <motion.span
-              className="text-[10px] text-muted-foreground"
+              className="text-[10px]"
+              style={{ color: "hsl(20, 30%, 35%)" }}
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: animDuration, repeat: Infinity, repeatDelay: 1 }}
             >
@@ -86,23 +90,27 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
           </div>
         </div>
 
-        {/* Selector */}
+        {/* Selector — warm peach tones for unselected */}
         <div className="flex w-full gap-1">
           {RECOVERY_LABELS.map((lvl, i) => (
             <button
               key={i}
               onClick={() => onChange(i)}
-              className={`flex-1 flex flex-col items-center gap-0.5 rounded-md px-1 py-2.5 text-center transition-all ${
-                recoverySpeed === i
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-2.5 text-center transition-all min-h-[44px] ${recoverySpeed === i
                   ? i === 0
                     ? "bg-severity-clear/20 text-severity-clear"
                     : i === 1
-                    ? "bg-severity-mild/20 text-severity-mild"
-                    : i === 2
-                    ? "bg-severity-moderate/20 text-severity-moderate"
-                    : "bg-severity-severe/20 text-severity-severe"
-                  : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
-              }`}
+                      ? "bg-severity-mild/20 text-severity-mild"
+                      : i === 2
+                        ? "bg-severity-moderate/20 text-severity-moderate"
+                        : "bg-severity-severe/20 text-severity-severe"
+                  : "text-muted-foreground hover:opacity-80"
+                }`}
+              style={
+                recoverySpeed !== i
+                  ? { background: "hsla(25, 35%, 78%, 0.35)" }
+                  : undefined
+              }
             >
               <span className="text-xs font-medium">{lvl.label}</span>
             </button>

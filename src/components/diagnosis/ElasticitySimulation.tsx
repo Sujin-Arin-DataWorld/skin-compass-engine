@@ -7,73 +7,77 @@ interface ElasticitySimulationProps {
   onChange: (v: number) => void;
 }
 
-const CHEEK_LEFT = 22;
-const CHEEK_TOP = 105;
-const FINGER_LEFT = CHEEK_LEFT + 8;
-const FINGER_TOP = CHEEK_TOP - 44;
-
 const LEVELS = [
-  { label: "Firm", description: "Skin snaps back immediately — no visible deformation", recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: "Fast", pct: 100, pressDist: 14 },
-  { label: "Mild", description: "Skin returns within 1–2 seconds after release", recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: "Medium", pct: 72, pressDist: 18 },
-  { label: "Moderate", description: "Skin takes 3–5 seconds to recover its shape", recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: "Slow", pct: 42, pressDist: 24 },
-  { label: "Significant", description: "Skin stays deformed or recovers very slowly", recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: "Very slow", pct: 15, pressDist: 30 },
+  { label: "Firm", description: "Skin snaps back immediately — no visible deformation", recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: "Fast", pct: 100, dipDepth: 6 },
+  { label: "Mild", description: "Skin returns within 1–2 seconds after release", recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: "Medium", pct: 72, dipDepth: 12 },
+  { label: "Moderate", description: "Skin takes 3–5 seconds to recover its shape", recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: "Slow", pct: 42, dipDepth: 20 },
+  { label: "Significant", description: "Skin stays deformed or recovers very slowly", recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: "Very slow", pct: 15, dipDepth: 28 },
 ];
 
 const PRESS_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
+/** Generate a smooth SVG path for the skin surface with an optional dip at center. */
+function skinSurfacePath(dip: number): string {
+  // Surface goes from left to right with a smooth dip in the center
+  const y0 = 50; // baseline y
+  return `M 10 ${y0} Q 50 ${y0} 80 ${y0 + dip * 0.3} Q 110 ${y0 + dip} 140 ${y0 + dip} Q 170 ${y0 + dip} 200 ${y0 + dip * 0.3} Q 230 ${y0} 270 ${y0}`;
+}
+
 const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) => {
-  const fingerControls = useAnimation();
-  const skinControls = useAnimation();
+  const surfaceControls = useAnimation();
+  const arrowControls = useAnimation();
 
   const config = LEVELS[value];
   const animating = useRef(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [phase, setPhase] = useState<"idle" | "pressed" | "recovering">("idle");
+  const [phase, setPhase] = useState<"idle" | "pressing" | "recovering">("idle");
   const prevValue = useRef(value);
 
-  const animatePress = useCallback(async (recoverySec: number, pressDist: number) => {
+  const animatePress = useCallback(async (recoverySec: number, dipDepth: number) => {
     if (animating.current) return;
     animating.current = true;
-    setIsAnimating(true);
 
-    setPhase("pressed");
+    setPhase("pressing");
+    // Arrow descends, surface dips
     await Promise.all([
-      fingerControls.start({ y: pressDist, transition: { duration: 0.22, ease: PRESS_EASE } }),
-      skinControls.start({
-        scaleX: 0.92, scaleY: 1.04, y: 1,
-        transition: { duration: 0.22, ease: PRESS_EASE },
+      arrowControls.start({ y: 18, opacity: 0.9, transition: { duration: 0.25, ease: PRESS_EASE } }),
+      surfaceControls.start({
+        d: skinSurfacePath(dipDepth),
+        transition: { duration: 0.25, ease: PRESS_EASE },
       }),
     ]);
 
-    await new Promise((r) => setTimeout(r, 160));
+    await new Promise((r) => setTimeout(r, 200));
 
     setPhase("recovering");
-    await fingerControls.start({ y: -4, transition: { duration: 0.12, ease: "easeOut" } });
+    // Arrow lifts
+    await arrowControls.start({ y: -8, opacity: 0.4, transition: { duration: 0.15, ease: "easeOut" } });
 
+    // Surface recovers — speed depends on level
     const t = Math.max(recoverySec, 0.3);
-    await skinControls.start({
-      scaleX: 1.01, scaleY: 0.995, y: 0,
-      transition: { duration: t * 0.28, ease: "easeOut" },
+    // Overshoot slightly
+    await surfaceControls.start({
+      d: skinSurfacePath(-2),
+      transition: { duration: t * 0.35, ease: "easeOut" },
     });
-    await skinControls.start({
-      scaleX: 1, scaleY: 1, y: 0,
-      transition: { duration: t * 0.72, ease: [0.25, 0.1, 0.25, 1] },
+    // Settle back to flat
+    await surfaceControls.start({
+      d: skinSurfacePath(0),
+      transition: { duration: t * 0.65, ease: [0.25, 0.1, 0.25, 1] },
     });
 
     setPhase("idle");
     animating.current = false;
-    setIsAnimating(false);
-  }, [fingerControls, skinControls]);
+  }, [arrowControls, surfaceControls]);
 
   useEffect(() => {
     if (prevValue.current !== value) {
       prevValue.current = value;
-      animatePress(LEVELS[value].recoverySec, LEVELS[value].pressDist);
+      animatePress(LEVELS[value].recoverySec, LEVELS[value].dipDepth);
     }
   }, [value, animatePress]);
 
   const handleTap = useCallback(() => {
-    animatePress(config.recoverySec, config.pressDist);
+    animatePress(config.recoverySec, config.dipDepth);
   }, [animatePress, config]);
 
   return (
@@ -90,17 +94,16 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
             <button
               key={i}
               onClick={() => onChange(i)}
-              className={`flex flex-col items-center justify-center rounded-lg py-2.5 px-1 text-center transition-all min-h-[44px] touch-manipulation border ${
-                value === i
-                  ? i === 0
-                    ? "bg-muted text-foreground border-border ring-1 ring-primary/30"
-                    : i === 1
+              className={`flex flex-col items-center justify-center rounded-lg py-2.5 px-1 text-center transition-all min-h-[44px] touch-manipulation border ${value === i
+                ? i === 0
+                  ? "bg-muted text-foreground border-border ring-1 ring-primary/30"
+                  : i === 1
                     ? "bg-severity-mild/15 text-severity-mild border-severity-mild/30 ring-1 ring-severity-mild/20"
                     : i === 2
-                    ? "bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30 ring-1 ring-severity-moderate/20"
-                    : "bg-severity-severe/15 text-severity-severe border-severity-severe/30 ring-1 ring-severity-severe/20"
-                  : "bg-secondary/40 text-foreground/60 border-transparent hover:bg-secondary/70"
-              }`}
+                      ? "bg-severity-moderate/15 text-severity-moderate border-severity-moderate/30 ring-1 ring-severity-moderate/20"
+                      : "bg-severity-severe/15 text-severity-severe border-severity-severe/30 ring-1 ring-severity-severe/20"
+                : "bg-secondary/40 text-foreground/60 border-transparent hover:bg-secondary/70"
+                }`}
             >
               <span className="text-[11px] font-medium leading-tight">{lvl.label}</span>
             </button>
@@ -113,76 +116,71 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
           <p className="text-xs text-primary font-semibold tracking-wide">{config.recoveryRange} recovery</p>
         </div>
 
-        {/* Interaction area */}
+        {/* SVG Press & Release interaction area */}
         <div
-          className="relative select-none cursor-pointer group"
+          className="relative w-full max-w-[300px] cursor-pointer select-none group"
           onClick={handleTap}
           role="button"
           tabIndex={0}
           aria-label="Tap to test skin elasticity"
-          style={{ width: 180, height: 195 }}
         >
-          {/* Face */}
-          <svg width="180" height="180" viewBox="0 0 180 180" className="absolute top-[15px] left-0">
+          <svg viewBox="0 0 280 120" className="w-full h-auto">
+            {/* Skin cross-section layers */}
             <defs>
-              <radialGradient id="faceGrad" cx="50%" cy="45%" r="55%">
-                <stop offset="0%" stopColor="hsl(var(--secondary))" stopOpacity="1" />
-                <stop offset="100%" stopColor="hsl(var(--secondary))" stopOpacity="0.7" />
-              </radialGradient>
+              <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(28, 40%, 78%)" />
+                <stop offset="50%" stopColor="hsl(25, 35%, 68%)" />
+                <stop offset="100%" stopColor="hsl(20, 30%, 58%)" />
+              </linearGradient>
+              <linearGradient id="skinGradDark" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(28, 25%, 40%)" />
+                <stop offset="50%" stopColor="hsl(25, 20%, 32%)" />
+                <stop offset="100%" stopColor="hsl(20, 18%, 24%)" />
+              </linearGradient>
             </defs>
-            <ellipse cx="90" cy="95" rx="52" ry="65" fill="url(#faceGrad)" stroke="hsl(var(--foreground) / 0.08)" strokeWidth="0.8" />
-            <ellipse cx="74" cy="82" rx="5.5" ry="2.5" fill="none" stroke="hsl(var(--foreground) / 0.12)" strokeWidth="0.6" />
-            <ellipse cx="106" cy="82" rx="5.5" ry="2.5" fill="none" stroke="hsl(var(--foreground) / 0.12)" strokeWidth="0.6" />
-            <path d="M 88 86 L 90 96 L 93 96" fill="none" stroke="hsl(var(--foreground) / 0.07)" strokeWidth="0.4" />
-            <path d="M 82 116 Q 90 121 98 116" fill="none" stroke="hsl(var(--foreground) / 0.1)" strokeWidth="0.6" />
+
+            {/* Dermis layer (static, always behind) */}
+            <rect x="10" y="65" width="260" height="50" rx="6" fill="url(#skinGrad)" opacity="0.4" className="dark:fill-[url(#skinGradDark)]" />
+
+            {/* Skin surface — animated path */}
+            <motion.path
+              d={skinSurfacePath(0)}
+              fill="none"
+              stroke="hsl(var(--foreground) / 0.6)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              animate={surfaceControls}
+            />
+
+            {/* Epidermis fill below surface */}
+            <motion.path
+              d={skinSurfacePath(0) + " L 270 110 L 10 110 Z"}
+              fill="url(#skinGrad)"
+              opacity="0.7"
+              className="dark:fill-[url(#skinGradDark)]"
+              animate={surfaceControls}
+            />
+
+            {/* Press indicator arrow */}
+            <motion.g
+              initial={{ y: -8, opacity: 0.4 }}
+              animate={arrowControls}
+            >
+              <line x1="140" y1="8" x2="140" y2="34" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinecap="round" />
+              <polygon points="132,30 140,42 148,30" fill="hsl(var(--primary))" />
+            </motion.g>
+
+            {/* Phase label */}
+            <text x="140" y="108" textAnchor="middle" className="text-[9px] fill-current text-muted-foreground" style={{ fontSize: 9 }}>
+              {phase === "idle" ? "Tap to press" : phase === "pressing" ? "Pressing..." : "Recovering..."}
+            </text>
           </svg>
 
-          {/* Cheek target */}
-          <motion.div
-            className="absolute rounded-[50%]"
-            style={{
-              width: 44,
-              height: 36,
-              left: CHEEK_LEFT,
-              top: CHEEK_TOP,
-              background: phase === "pressed"
-                ? "radial-gradient(ellipse, hsl(var(--primary) / 0.2) 0%, hsl(var(--primary) / 0.06) 70%)"
-                : "hsl(var(--primary) / 0.05)",
-              border: `1px solid hsl(var(--primary) / ${phase === "idle" ? 0.1 : 0.28})`,
-              boxShadow: phase === "pressed"
-                ? "inset 0 8px 16px rgba(0,0,0,0.18), inset 0 2px 5px rgba(0,0,0,0.1)"
-                : "none",
-              transformOrigin: "center center",
-            }}
-            animate={skinControls}
-          />
-
-          {/* Emoji finger */}
-          <motion.span
-            className="absolute pointer-events-none text-[32px] leading-none"
-            style={{
-              left: FINGER_LEFT,
-              top: FINGER_TOP,
-              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
-            }}
-            initial={{ y: -4 }}
-            animate={fingerControls}
-          >
-            👆
-          </motion.span>
-
           {/* Hover hint */}
-          <div
-            className="absolute text-[8px] text-foreground/25 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-            style={{ left: CHEEK_LEFT - 12, top: CHEEK_TOP + 43, width: 68 }}
-          >
-            tap to test
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span className="text-[10px] text-foreground/20 tracking-wide">tap to test</span>
           </div>
         </div>
-
-        <p className="text-[10px] text-foreground/35 -mt-2 tracking-wide">
-          Tap cheek to replay · Auto-plays on selection
-        </p>
 
         {/* Recovery bar */}
         <div className="w-full max-w-[260px]">

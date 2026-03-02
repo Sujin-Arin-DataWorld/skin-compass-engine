@@ -21,33 +21,38 @@ interface SkinZoomSelectorProps {
   onSelect: (patchId: string, severity: number) => void;
 }
 
-const renderPatchSVG = (pattern: string, isSelected: boolean) => {
-  const baseColor = isSelected ? "hsl(var(--primary) / 0.15)" : "hsl(var(--secondary))";
+/** Skin-brown base for all patches; pore dots use darker brown tones. */
+const SKIN_BG = "hsla(25, 40%, 68%, 0.40)";
+const SKIN_BG_DARK = "hsla(25, 30%, 50%, 0.25)";
+
+const renderPatchSVG = (pattern: string) => {
+  const poreColor = "hsla(20, 35%, 38%, 0.45)";
+  const poreColorDark = "hsla(20, 30%, 32%, 0.60)";
 
   return (
     <svg viewBox="0 0 80 80" className="w-full h-full rounded-lg">
-      <rect width="80" height="80" fill={baseColor} />
+      <rect width="80" height="80" fill={SKIN_BG} className="dark:fill-[hsla(25,30%,50%,0.25)]" />
       {pattern === "smooth" && (
-        <g><circle cx="40" cy="40" r="1" fill="hsl(var(--muted-foreground) / 0.1)" /></g>
+        <g><circle cx="40" cy="40" r="1" fill={poreColor} opacity="0.3" /></g>
       )}
       {pattern === "pores" && (
         <g>
           {Array.from({ length: 20 }, (_, i) => (
-            <circle key={i} cx={15 + (i % 5) * 14 + Math.sin(i) * 3} cy={15 + Math.floor(i / 5) * 14 + Math.cos(i) * 3} r={1.5 + Math.random()} fill="hsl(var(--muted-foreground) / 0.25)" />
+            <circle key={i} cx={15 + (i % 5) * 14 + Math.sin(i) * 3} cy={15 + Math.floor(i / 5) * 14 + Math.cos(i) * 3} r={1.5 + Math.random()} fill={poreColor} />
           ))}
         </g>
       )}
       {pattern === "oxidised" && (
         <g>
           {Array.from({ length: 25 }, (_, i) => (
-            <circle key={i} cx={10 + (i % 5) * 15 + Math.sin(i) * 2} cy={10 + Math.floor(i / 5) * 14 + Math.cos(i) * 2} r={1.8 + Math.random() * 0.5} fill="hsl(var(--muted-foreground) / 0.45)" />
+            <circle key={i} cx={10 + (i % 5) * 15 + Math.sin(i) * 2} cy={10 + Math.floor(i / 5) * 14 + Math.cos(i) * 2} r={1.8 + Math.random() * 0.5} fill={poreColorDark} />
           ))}
         </g>
       )}
       {pattern === "rough" && (
         <g>
           {Array.from({ length: 30 }, (_, i) => (
-            <circle key={i} cx={8 + (i % 6) * 12 + Math.sin(i * 2) * 4} cy={8 + Math.floor(i / 6) * 14 + Math.cos(i * 2) * 4} r={2 + Math.random() * 1.5} fill="hsl(var(--muted-foreground) / 0.3)" stroke="hsl(var(--muted-foreground) / 0.15)" strokeWidth="0.5" />
+            <circle key={i} cx={8 + (i % 6) * 12 + Math.sin(i * 2) * 4} cy={8 + Math.floor(i / 6) * 14 + Math.cos(i * 2) * 4} r={2 + Math.random() * 1.5} fill={poreColorDark} stroke="hsla(20, 30%, 28%, 0.2)" strokeWidth="0.5" />
           ))}
         </g>
       )}
@@ -69,23 +74,22 @@ const SkinZoomSelector = ({ selected, onSelect }: SkinZoomSelectorProps) => (
         <motion.button
           key={patch.id}
           onClick={() => onSelect(patch.id, patch.severity)}
-          className={`flex flex-col gap-2 rounded-xl border overflow-hidden transition-all min-h-[100px] select-none touch-manipulation ${
-            selected === patch.id
-              ? "border-primary shadow-[0_0_20px_-8px_hsl(var(--primary)/0.3)]"
-              : "border-border hover:border-primary/40 active:border-primary/60"
-          }`}
+          className={`flex flex-col gap-2 rounded-xl overflow-hidden transition-all min-h-[100px] select-none touch-manipulation ${selected === patch.id
+              ? "ring-0 shadow-[0_0_16px_-4px_hsla(45,95%,55%,0.4)]"
+              : "hover:shadow-md active:shadow-lg"
+            }`}
+          style={{
+            border: selected === patch.id
+              ? "3px solid hsl(45, 95%, 55%)"
+              : "1px solid hsl(var(--border))",
+          }}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: i * 0.08, duration: 0.3 }}
           whileTap={{ scale: 0.95 }}
-          whileHover={{
-            boxShadow: selected === patch.id
-              ? "0 0 24px -6px hsla(192, 100%, 50%, 0.2)"
-              : "0 4px 16px -6px hsla(0, 0%, 0%, 0.3)",
-          }}
         >
           <div className="h-20 w-full">
-            {renderPatchSVG(patch.pattern, selected === patch.id)}
+            {renderPatchSVG(patch.pattern)}
           </div>
           <div className="px-3 pb-3">
             <span className="text-xs font-medium text-foreground">{patch.label}</span>

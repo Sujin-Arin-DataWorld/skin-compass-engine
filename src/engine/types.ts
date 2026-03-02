@@ -26,7 +26,8 @@ export type SkinType = "dry" | "oily" | "combination" | "sensitive" | "normal";
 
 export type ContextKey =
   | "shaving" | "makeup" | "hormonal" | "outdoor_work"
-  | "skincare_beginner" | "recent_procedure" | "low_water_intake";
+  | "skincare_beginner" | "recent_procedure" | "low_water_intake"
+  | "reactive_skin" | "high_stress";
 
 export type Urgency = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
@@ -80,6 +81,7 @@ export interface Product {
   key_ingredients: string[];
   target_axes: AxisKey[];
   for_skin: string[];
+  image?: string;
 }
 
 export interface DiagnosisResult {

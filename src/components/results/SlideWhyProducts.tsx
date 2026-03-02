@@ -60,14 +60,9 @@ const SlideWhyProducts = ({ result }: Props) => {
         >
           {displayed.length} formulas matched to your vector
         </motion.h2>
-        <motion.p
-          className="slide-body mb-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
-          Each product was selected because of specific signals in your diagnosis —
-          not because of your skin type alone.
+
+        <motion.p className="slide-body mb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+          Each product was selected because of specific signals in your diagnosis — not because of your skin type alone.
         </motion.p>
 
         {/* Product cards */}
@@ -119,14 +114,24 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
         <p className="slide-eyebrow" style={{ fontSize: "0.625rem", letterSpacing: "0.18em", marginBottom: "0.2rem" }}>
           {product.brand}
         </p>
-        <div className="flex items-start justify-between">
-          <div>
-            <p style={{ fontSize: "1rem", fontWeight: 600, color: "hsl(var(--foreground))", lineHeight: 1.2 }}>
-              {product.name}
-            </p>
-            <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", marginTop: "0.15rem" }}>
-              {product.type}
-            </p>
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-20 aspect-square bg-gray-50 rounded-md flex items-center justify-center overflow-hidden p-2">
+              {product.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain" />
+              ) : (
+                <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">No Image</div>
+              )}
+            </div>
+            <div>
+              <p style={{ fontSize: "1rem", fontWeight: 600, color: "hsl(var(--foreground))", lineHeight: 1.2 }}>
+                {product.name}
+              </p>
+              <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", marginTop: "0.15rem" }}>
+                {product.type}
+              </p>
+            </div>
           </div>
           <div className="text-right">
             <p className="font-display" style={{ fontSize: "1.25rem", fontWeight: 600, color: "hsl(var(--foreground))" }}>

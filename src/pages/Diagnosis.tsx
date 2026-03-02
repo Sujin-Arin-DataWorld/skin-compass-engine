@@ -24,13 +24,14 @@ const CONTEXT_OPTIONS: { key: ContextKey; label: string }[] = [
   { key: "skincare_beginner", label: "I'm new to skincare" },
   { key: "recent_procedure", label: "I've recently had a cosmetic procedure" },
   { key: "low_water_intake", label: "I don't drink much water" },
+  { key: "reactive_skin", label: "My skin is easily irritated/reactive (Sensitive)" },
+  { key: "high_stress", label: "I experience high stress or lack of sleep" },
 ];
 
 const SKIN_TYPES: { key: SkinType; label: string; desc: string }[] = [
   { key: "dry", label: "Dry", desc: "Tight, flaky, craves moisture" },
   { key: "oily", label: "Oily", desc: "Shiny, enlarged pores, breakout-prone" },
   { key: "combination", label: "Combination", desc: "Oily T-zone, drier cheeks" },
-  { key: "sensitive", label: "Sensitive", desc: "Easily irritated, reactive" },
   { key: "normal", label: "Normal", desc: "Generally balanced" },
 ];
 
@@ -106,19 +107,26 @@ const DiagnosisPage = () => {
 
   const metaQuestionsForCategory = useMemo(() => {
     if (metaCategoryJustCompleted === null) return [];
-    return META_QUESTIONS.filter(
-      (q) =>
-        q.trigger_after_category === metaCategoryJustCompleted &&
-        q.trigger_condition(store.severities)
-    );
-  }, [metaCategoryJustCompleted, store.severities]);
+    return META_QUESTIONS.filter((q) => {
+      if (q.trigger_after_category !== metaCategoryJustCompleted) return false;
+      if (q.id === "premenstrual_7_10d" || q.id === "jaw_focus") {
+        // only ask hormonal precision questions when context flag is set
+        if (!store.contexts.includes("hormonal")) return false;
+      }
+      return q.trigger_condition(store.severities);
+    });
+  }, [metaCategoryJustCompleted, store.severities, store.contexts]);
 
   const goNext = useCallback(() => {
     if (store.currentStep >= 2 && store.currentStep <= 9) {
       const completedCat = store.currentStep - 1;
-      const metaQs = META_QUESTIONS.filter(
-        (q) => q.trigger_after_category === completedCat && q.trigger_condition(store.severities)
-      );
+      const metaQs = META_QUESTIONS.filter((q) => {
+        if (q.trigger_after_category !== completedCat) return false;
+        if ((q.id === "premenstrual_7_10d" || q.id === "jaw_focus") && !store.contexts.includes("hormonal")) {
+          return false;
+        }
+        return q.trigger_condition(store.severities);
+      });
       if (metaQs.length > 0 && !showMeta) {
         setMetaCategoryJustCompleted(completedCat);
         setShowMeta(true);

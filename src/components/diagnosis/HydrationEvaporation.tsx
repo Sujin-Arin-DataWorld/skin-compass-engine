@@ -36,17 +36,14 @@ const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporation
       </p>
 
       <div className="mt-4 flex flex-col items-center gap-5">
-        {/* Skin surface with droplets */}
-        <div className="relative w-full max-w-[260px] h-32 rounded-xl bg-secondary/60 border border-border overflow-hidden">
-          {/* Skin texture lines */}
-          {[0, 1, 2, 3].map(i => (
-            <div
-              key={i}
-              className="absolute w-full border-t border-border/30"
-              style={{ top: `${25 + i * 22}%` }}
-            />
-          ))}
-
+        {/* Skin surface with droplets — blue hydration theme */}
+        <div
+          className="relative w-full max-w-[260px] h-32 rounded-xl overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, hsl(var(--hydration-soft)), hsl(var(--card)))`,
+            border: `1px solid hsl(var(--hydration) / 0.2)`,
+          }}
+        >
           {/* Micro-crack overlay for severe dryness */}
           {retentionLevel >= 2 && (
             <motion.div
@@ -56,41 +53,52 @@ const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporation
                   ${45 + retentionLevel * 10}deg,
                   transparent,
                   transparent 8px,
-                  hsl(var(--border)) 8px,
-                  hsl(var(--border)) 8.5px
+                  hsl(var(--hydration) / 0.12) 8px,
+                  hsl(var(--hydration) / 0.12) 8.5px
                 )`,
               }}
-              animate={{ opacity: retentionLevel === 2 ? 0.2 : 0.4 }}
+              animate={{ opacity: retentionLevel === 2 ? 0.4 : 0.7 }}
               transition={{ duration: 0.6 }}
             />
           )}
 
-          {/* Water droplets */}
+          {/* Water droplets — blue hydration tokens */}
           <svg viewBox="0 0 130 80" className="absolute inset-0 w-full h-full">
             {droplets.map((d, i) => (
-              <motion.ellipse
+              <motion.path
                 key={d.id}
-                cx={d.x}
-                cy={d.y}
-                rx={d.size * 0.7}
-                ry={d.size}
-                fill="hsl(var(--primary) / 0.4)"
-                stroke="hsl(var(--primary) / 0.2)"
-                strokeWidth="0.5"
+                d={`M ${d.x} ${d.y - d.size * 0.6}
+                    Q ${d.x - d.size * 0.5} ${d.y + d.size * 0.3} ${d.x} ${d.y + d.size * 0.6}
+                    Q ${d.x + d.size * 0.5} ${d.y + d.size * 0.3} ${d.x} ${d.y - d.size * 0.6} Z`}
+                fill="hsl(var(--hydration) / 0.5)"
+                stroke="hsl(var(--hydration) / 0.3)"
+                strokeWidth="0.4"
                 initial={{ opacity: 0.8, scale: 1 }}
                 animate={{
-                  opacity: i < remainingDroplets ? [0.5, 0.8, 0.5] : 0,
+                  opacity: i < remainingDroplets ? [0.4, 0.8, 0.4] : 0,
                   scale: i < remainingDroplets ? [0.9, 1, 0.9] : 0,
-                  cy: i >= remainingDroplets ? d.y - 15 : d.y,
+                  y: i >= remainingDroplets ? -15 : 0,
                 }}
                 transition={{
                   opacity: { duration: evapDuration, repeat: i < remainingDroplets ? Infinity : 0 },
                   scale: { duration: evapDuration, repeat: i < remainingDroplets ? Infinity : 0 },
-                  cy: { duration: 0.6, delay: d.delay },
+                  y: { duration: 0.6, delay: d.delay },
                 }}
               />
             ))}
           </svg>
+
+          {/* Level indicator bar */}
+          <div className="absolute bottom-2 left-3 right-3">
+            <div className="h-1 w-full rounded-full overflow-hidden" style={{ background: "hsl(var(--hydration) / 0.15)" }}>
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: "hsl(var(--hydration) / 0.6)" }}
+                animate={{ width: `${((3 - retentionLevel) / 3) * 100}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Selector */}
@@ -99,17 +107,16 @@ const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporation
             <button
               key={i}
               onClick={() => onChange(i)}
-              className={`flex-1 flex flex-col items-center gap-0.5 rounded-md px-1 py-2.5 text-center transition-all ${
-                retentionLevel === i
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-2.5 text-center transition-all min-h-[44px] ${retentionLevel === i
                   ? i === 0
                     ? "bg-severity-clear/20 text-severity-clear"
                     : i === 1
-                    ? "bg-severity-mild/20 text-severity-mild"
-                    : i === 2
-                    ? "bg-severity-moderate/20 text-severity-moderate"
-                    : "bg-severity-severe/20 text-severity-severe"
+                      ? "bg-severity-mild/20 text-severity-mild"
+                      : i === 2
+                        ? "bg-severity-moderate/20 text-severity-moderate"
+                        : "bg-severity-severe/20 text-severity-severe"
                   : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
-              }`}
+                }`}
             >
               <span className="text-xs font-medium">{lvl.label}</span>
             </button>

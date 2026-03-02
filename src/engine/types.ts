@@ -82,6 +82,7 @@ export interface Product {
   target_axes: AxisKey[];
   for_skin: string[];
   image?: string;
+  texture_feel?: string;
 }
 
 export interface DiagnosisResult {

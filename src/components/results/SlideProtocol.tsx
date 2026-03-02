@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { DiagnosisResult, Product, AXIS_LABELS, Tier } from "@/engine/types";
-import { IMAGE_SERVER_URL } from "@/engine/weights";
+import { DiagnosisResult, Product, AXIS_LABELS } from "@/engine/types";
 import { Lock } from "lucide-react";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
 
 const PHASES = [
   { key: "Phase1", num: 1, name: "Cleanse", icon: "💧", am: true, pm: true, desc: "Remove impurities without disrupting barrier integrity.", skipWarning: "Skipping leaves barrier-disrupting residue that amplifies reactivity." },
@@ -33,17 +30,9 @@ const SlideProtocol = ({ result }: Props) => {
   const signalCount = result.radar_chart_data.filter((d) => d.score > 0).length;
   const confidence = Math.min(95, 65 + signalCount * 3);
 
-  const navigate = useNavigate();
-  const setTier = useDiagnosisStore((s) => s.setTier);
-
   const barrierScore = Math.round(result?.axis_scores.bar ?? 0);
   const sensitivityScore = Math.round(result?.axis_scores.sen ?? 0);
   const isLocked = barrierScore < 50 || sensitivityScore > 70;
-
-  const startProtocol = (tier: Tier) => {
-    setTier(tier);
-    navigate("/checkout", { state: { tier, deviceLocked: isLocked } });
-  };
 
   return (
     <div className="results-slide flex flex-1 flex-col px-6 py-10 overflow-y-auto">
@@ -183,163 +172,81 @@ const SlideProtocol = ({ result }: Props) => {
             </div>
 
             {/* Products */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               {products.length === 0 ? (
                 <p className="slide-body" style={{ fontStyle: "italic" }}>No products assigned for this phase at your current tier.</p>
               ) : (
                 products.map((product: Product) => (
-                  <div key={product.id} className="border-t border-border/50 pt-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="slide-eyebrow" style={{ fontSize: "0.6875rem", letterSpacing: "0.12em" }}>{product.brand}</p>
-                        <p style={{ fontSize: "1rem", fontWeight: 500, color: "hsl(var(--foreground))" }}>{product.name}</p>
-                        <p className="slide-body" style={{ fontSize: "0.875rem", marginTop: "0.25rem" }}>
-                          {product.key_ingredients.join(" · ")}
-                        </p>
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {product.target_axes.map((axis) => (
-                            <span
-                              key={axis}
-                              className="rounded-full px-2.5 py-0.5 text-[0.75rem] font-medium"
-                              style={{
-                                background: "hsl(var(--primary) / 0.3)",
-                                color: "white",
-                                border: "1px solid hsl(var(--primary) / 0.4)",
-                              }}
-                            >
-                              {AXIS_LABELS[axis]}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <span style={{ fontSize: "1rem", fontWeight: 600, color: "hsl(var(--foreground))" }}>€{product.price_eur}</span>
+                  <div
+                    key={product.id}
+                    className="flex items-center gap-4 rounded-xl p-3"
+                    style={{ background: "hsl(var(--muted) / 0.4)", border: "1px solid hsl(var(--border) / 0.5)" }}
+                  >
+                    {/* Product colour swatch placeholder */}
+                    <div
+                      className="w-14 h-14 rounded-lg flex-shrink-0 flex items-center justify-center text-xl"
+                      style={{ background: "hsl(var(--primary) / 0.12)" }}
+                    >
+                      🧴
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p style={{ fontSize: "0.6875rem", letterSpacing: "0.1em", fontWeight: 600, color: "hsl(var(--foreground-hint))", textTransform: "uppercase" }}>{product.brand}</p>
+                      <p style={{ fontSize: "0.9375rem", fontWeight: 500, color: "hsl(var(--foreground))", lineHeight: 1.3 }}>{product.name}</p>
+                      <p className="slide-body truncate" style={{ fontSize: "0.8125rem", marginTop: "0.15rem" }}>
+                        {product.key_ingredients.slice(0, 3).join(" · ")}
+                      </p>
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {product.target_axes.map((axis) => (
+                          <span
+                            key={axis}
+                            className="rounded-full px-2 py-0.5 text-[0.7rem] font-medium"
+                            style={{ background: "hsl(var(--primary) / 0.25)", color: "hsl(var(--primary))" }}
+                          >
+                            {AXIS_LABELS[axis]}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "0.9375rem", fontWeight: 600, color: "hsl(var(--foreground))", flexShrink: 0 }}>€{product.price_eur}</span>
                   </div>
                 ))
               )}
             </div>
 
-            {/* Clinical device (Premium gated reward) */}
-            <div className="mt-6">
-              <p className="slide-eyebrow mb-2">Clinical Device (Premium Reward)</p>
-              <div className="flex items-center gap-4">
-                <div className="relative w-36 h-36 rounded-lg overflow-hidden">
-                  <img
-                    src={`${IMAGE_SERVER_URL}&sig=clinical_device`}
-                    alt="Clinical device"
-                    className={`w-full h-full object-cover transition-all duration-300 ${isLocked ? "filter blur-sm brightness-75" : "brightness-100"}`}
-                  />
-
-                  {/* Lock overlay */}
-                  {isLocked && (
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                      <div className="rounded-full bg-black/30 p-2">
-                        <Lock className="w-6 h-6 text-white" />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Month 2 badge */}
-                  <span className="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full shadow">
-                    {isLocked ? "Month 2: Device Unlock" : "Device Unlocked"}
-                  </span>
-
-                  <div className="absolute bottom-2 left-2 right-2 text-center text-[12px] text-white/90">
-                    Unlocks after barrier readiness in month 2
-                  </div>
-                </div>
-
-                <div className="flex-1">
-                  <p className="slide-title">Clinical EMS / LED Device</p>
-                  <p className="slide-body mt-2">Professional-grade device to amplify Phase 3 results. Available as a Premium reward after the protocol reaches barrier readiness in Month 2.</p>
-
-                  <div className="mt-3 space-y-2">
-                    <div className="rounded-lg border p-3" style={{ background: 'hsl(var(--muted) / 0.04)' }}>
-                      <p className="font-medium">Premium Strategy — €149</p>
-                      <p className="slide-body" style={{ fontSize: '0.9rem', marginTop: 6 }}>
-                        Safety: Lease-to-own after 3 months. Device ships when barrier stability is confirmed (or at Month 2 when eligible). Device is a premium reward for demonstrated barrier readiness, not a first-month freebie.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Subscription comparison table */}
-                <div className="mt-8">
-                  <div className="mx-auto max-w-4xl">
-                    <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-                      {/* Entry */}
-                      <div className="rounded-2xl border p-5 flex flex-col items-stretch" style={{ background: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-semibold">Entry</p>
-                            <p className="text-2xl font-bold mt-1">€49</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-xs text-muted-foreground">Per month</span>
-                          </div>
-                        </div>
-
-                        <ul className="mt-4 space-y-3 slide-body">
-                          <li>5-Phase Products: <span className="float-right">✓</span></li>
-                          <li>Monthly Recalibration: <span className="float-right">✓</span></li>
-                          <li>Active Ingredient Gating: <span className="float-right">✓</span></li>
-                          <li>Clinical Device: <span className="float-right">✕</span></li>
-                        </ul>
-
-                        <button onClick={() => startProtocol("Entry")} className="mt-6 w-full rounded-lg bg-transparent border border-border text-foreground py-3 slide-body">Start My Protocol</button>
-                      </div>
-
-                      {/* Full - Most Recommended */}
-                      <div className="rounded-2xl p-5 flex flex-col items-stretch transform md:-translate-y-2" style={{ background: 'linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.03) 100%)', boxShadow: '0 8px 30px rgba(200,150,60,0.08)', border: '1px solid hsl(var(--primary) / 0.12)' }}>
-                        <div className="relative">
-                          <div className="absolute -top-3 left-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full shadow">Most Recommended</div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-semibold">Full Protocol</p>
-                            <p className="text-2xl font-bold mt-1">€89</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-xs text-muted-foreground">Per month</span>
-                          </div>
-                        </div>
-
-                        <ul className="mt-4 space-y-3 slide-body">
-                          <li>5-Phase Products: <span className="float-right">✓</span></li>
-                          <li>Monthly Recalibration: <span className="float-right">✓</span></li>
-                          <li>Active Ingredient Gating: <span className="float-right">✓</span></li>
-                          <li>Clinical Device: <span className="float-right">✕</span></li>
-                        </ul>
-
-                        <button onClick={() => startProtocol("Full")} className="mt-6 w-full rounded-lg bg-primary text-primary-foreground py-3 slide-body">Start My Protocol</button>
-                      </div>
-
-                      {/* Premium */}
-                      <div className="rounded-2xl border p-5 flex flex-col items-stretch" style={{ background: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-semibold">Premium Strategy</p>
-                            <p className="text-2xl font-bold mt-1">€149</p>
-                            <p className="text-xs text-muted-foreground">Includes €120 Clinical Device</p>
-                          </div>
-                          <div className="text-right">
-                            <span className="text-xs text-muted-foreground">Per month</span>
-                          </div>
-                        </div>
-
-                        <ul className="mt-4 space-y-3 slide-body">
-                          <li>5-Phase Products: <span className="float-right">✓</span></li>
-                          <li>Monthly Recalibration: <span className="float-right">✓</span></li>
-                          <li>Active Ingredient Gating: <span className="float-right">✓</span></li>
-                          <li>Clinical Device: <span className="float-right font-semibold">FREE Month 2 Reward</span></li>
-                        </ul>
-
-                        <button onClick={() => startProtocol("Premium")} className="mt-6 w-full rounded-lg bg-primary text-primary-foreground py-3 slide-body">Start My Protocol</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            {/* Clinical device reward — compact strip */}
+            <div
+              className="mt-5 flex items-center gap-3 rounded-xl px-4 py-3"
+              style={{
+                background: isLocked ? "hsl(var(--muted) / 0.3)" : "hsl(var(--primary) / 0.08)",
+                border: `1px solid ${isLocked ? "hsl(var(--border) / 0.4)" : "hsl(var(--primary) / 0.3)"}`,
+                opacity: isLocked ? 0.75 : 1,
+              }}
+            >
+              <div
+                className="w-9 h-9 rounded-lg flex-shrink-0 flex items-center justify-center"
+                style={{ background: isLocked ? "hsl(var(--muted))" : "hsl(var(--primary) / 0.15)" }}
+              >
+                {isLocked
+                  ? <Lock className="w-4 h-4" style={{ color: "hsl(var(--foreground-hint))" }} />
+                  : <span className="text-base">✨</span>
+                }
               </div>
+              <div className="flex-1 min-w-0">
+                <p style={{ fontSize: "0.8125rem", fontWeight: 600, color: "hsl(var(--foreground))" }}>
+                  Premium Reward · Clinical EMS / LED Device
+                </p>
+                <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.4 }}>
+                  {isLocked
+                    ? "Locked for Month 1 — Ships once barrier stability is confirmed"
+                    : "Device ready for dispatch · amplifies Phase 3 results 3× weekly"}
+                </p>
+              </div>
+              <span
+                className="text-xs font-semibold flex-shrink-0"
+                style={{ color: isLocked ? "hsl(var(--foreground-hint))" : "hsl(var(--primary))" }}
+              >
+                {isLocked ? "Month 2" : "Unlocked"}
+              </span>
             </div>
 
             {/* Skip warning */}

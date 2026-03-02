@@ -42,7 +42,7 @@ const SlideWhyProducts = ({ result }: Props) => {
   return (
     <div className="results-slide flex flex-1 flex-col px-6 py-10 overflow-y-auto">
       <div className="mx-auto w-full max-w-xl">
-        <motion.p className="slide-eyebrow mb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.p className="slide-eyebrow mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           Personalized Selection
         </motion.p>
         <motion.h2
@@ -52,7 +52,7 @@ const SlideWhyProducts = ({ result }: Props) => {
             fontWeight: 400,
             lineHeight: 1.2,
             color: "hsl(var(--foreground))",
-            marginBottom: "0.5rem",
+            marginBottom: "0.75rem",
           }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -61,12 +61,12 @@ const SlideWhyProducts = ({ result }: Props) => {
           {displayed.length} formulas matched to your vector
         </motion.h2>
 
-        <motion.p className="slide-body mb-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+        <motion.p className="slide-body mb-10" style={{ color: "#D1D1D1" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
           Each product was selected because of specific signals in your diagnosis — not because of your skin type alone.
         </motion.p>
 
         {/* Product cards */}
-        <div className="space-y-4">
+        <div className="space-y-8">
           {displayed.map((product, i) => (
             <EnhancedProductCard key={product.id} product={product} result={result} index={i} />
           ))}
@@ -77,7 +77,7 @@ const SlideWhyProducts = ({ result }: Props) => {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
-          className="mt-6 rounded-2xl border p-4"
+          className="mt-12 rounded-2xl border p-6"
           style={{
             borderColor: "hsl(var(--primary) / 0.3)",
             background: "hsl(var(--primary) / 0.05)",
@@ -103,42 +103,63 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15 + index * 0.08 }}
+      initial={{ opacity: 0, y: 18 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.45, delay: index * 0.07, ease: [0.22, 1, 0.36, 1] }}
       className="rounded-2xl border overflow-hidden"
       style={{ borderColor: "hsl(var(--border))", background: "hsl(var(--card))" }}
     >
       {/* Header */}
-      <div className="px-4 pt-4 pb-3">
-        <p className="slide-eyebrow" style={{ fontSize: "0.625rem", letterSpacing: "0.18em", marginBottom: "0.2rem" }}>
+      <div className="px-5 pt-5 pb-4">
+        <p className="slide-eyebrow" style={{ fontSize: "0.625rem", letterSpacing: "0.18em", marginBottom: "0.35rem" }}>
           {product.brand}
         </p>
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-20 aspect-square bg-gray-50 rounded-md flex items-center justify-center overflow-hidden p-2">
-              {product.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain" />
-              ) : (
-                <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">No Image</div>
+          <div className="flex items-start gap-4">
+            <div className="relative flex-shrink-0">
+              <div className="w-20 aspect-square bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden p-2">
+                {product.image ? (
+                  <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain" />
+                ) : (
+                  <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300 text-xs">No Image</div>
+                )}
+              </div>
+              {/* Texture feel overlay */}
+              {product.texture_feel && (
+                <div
+                  className="absolute -bottom-2 left-0 right-0 mx-auto w-max max-w-[96px] rounded-full px-2 py-0.5 text-center"
+                  style={{
+                    background: "hsl(var(--primary) / 0.15)",
+                    border: "1px solid hsl(var(--primary) / 0.25)",
+                    fontSize: "0.6rem",
+                    fontWeight: 600,
+                    letterSpacing: "0.04em",
+                    color: "hsl(var(--primary))",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {product.texture_feel}
+                </div>
               )}
             </div>
-            <div>
+            <div className="mt-1">
               <p style={{ fontSize: "1rem", fontWeight: 600, color: "hsl(var(--foreground))", lineHeight: 1.2 }}>
                 {product.name}
               </p>
-              <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", marginTop: "0.15rem" }}>
+              <p style={{ fontSize: "0.75rem", color: "#D1D1D1", marginTop: "0.2rem" }}>
                 {product.type}
               </p>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right flex-shrink-0">
             <p className="font-display" style={{ fontSize: "1.25rem", fontWeight: 600, color: "hsl(var(--foreground))" }}>
               €{product.price_eur}
             </p>
             <span
-              className="rounded-full px-2 py-0.5 text-xs"
+              className="rounded-full px-2 py-0.5 text-xs mt-1 inline-block"
               style={{
                 background: "hsl(var(--primary) / 0.1)",
                 color: "hsl(var(--primary))",
@@ -152,16 +173,16 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
       </div>
 
       {/* Matched axes bars */}
-      <div className="px-4 pb-3 border-t" style={{ borderColor: "hsl(var(--border) / 0.5)" }}>
-        <p className="slide-eyebrow mt-2.5 mb-2" style={{ letterSpacing: "0.1em" }}>
+      <div className="px-5 pb-4 border-t" style={{ borderColor: "hsl(var(--border) / 0.5)" }}>
+        <p className="slide-eyebrow mt-3 mb-2.5" style={{ letterSpacing: "0.1em" }}>
           Matched to your profile
         </p>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {matchedAxes.map(({ axis, score, isHighest }) => (
             <div key={axis} className="flex items-center gap-2">
               <p style={{
                 fontSize: "0.75rem",
-                color: "hsl(var(--foreground-hint))",
+                color: "#D1D1D1",
                 width: "70px",
                 flexShrink: 0,
               }}>
@@ -170,16 +191,18 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
               <div className="flex-1 rounded-full" style={{ height: "4px", background: "hsl(var(--border))" }}>
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${score}%` }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
+                  whileInView={{ width: `${score}%` }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: 0.15 }}
                   className="h-full rounded-full"
                   style={{ background: isHighest ? "hsl(var(--primary))" : "hsl(var(--foreground-hint) / 0.5)" }}
                 />
               </div>
               <p style={{
                 fontSize: "0.75rem",
+                fontFamily: "'Courier New', Courier, monospace",
                 fontWeight: 700,
-                color: isHighest ? "hsl(var(--primary))" : "hsl(var(--foreground-hint))",
+                color: isHighest ? "hsl(var(--primary))" : "#D1D1D1",
                 width: "28px",
                 textAlign: "right" as const,
               }}>
@@ -191,9 +214,9 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
       </div>
 
       {/* Key ingredients */}
-      <div className="px-4 pb-3 flex flex-wrap gap-1.5">
+      <div className="px-5 pb-4 flex flex-wrap gap-2">
         {product.key_ingredients.slice(0, 3).map((ing) => (
-          <span key={ing} style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))" }}>
+          <span key={ing} style={{ fontSize: "0.75rem", color: "#D1D1D1" }}>
             ✓ {ing}
           </span>
         ))}
@@ -203,7 +226,7 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
       <div className="border-t" style={{ borderColor: "hsl(var(--border) / 0.5)" }}>
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between px-4 py-3"
+          className="w-full flex items-center justify-between px-5 py-3"
           style={{
             fontSize: "0.8125rem",
             fontWeight: 600,
@@ -226,18 +249,18 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.22 }}
-              className="px-4 pb-4 space-y-3 overflow-hidden"
+              className="px-5 pb-5 space-y-4 overflow-hidden"
             >
               <div>
-                <p className="slide-eyebrow mb-1" style={{ letterSpacing: "0.1em" }}>Because we observed</p>
+                <p className="slide-eyebrow mb-1.5" style={{ letterSpacing: "0.1em" }}>Because we observed</p>
                 {because.map((b, i) => (
-                  <p key={i} className="slide-body" style={{ lineHeight: 1.5 }}>· {b}</p>
+                  <p key={i} className="slide-body" style={{ lineHeight: 1.6, color: "#D1D1D1", fontFamily: b.includes("/100") ? "'Courier New', Courier, monospace" : "inherit" }}>· {b}</p>
                 ))}
               </div>
               <div>
-                <p className="slide-eyebrow mb-1" style={{ letterSpacing: "0.1em" }}>This product helps by</p>
+                <p className="slide-eyebrow mb-1.5" style={{ letterSpacing: "0.1em" }}>This product helps by</p>
                 {helps.map((h, i) => (
-                  <p key={i} className="slide-body" style={{ lineHeight: 1.5 }}>✓ {h}</p>
+                  <p key={i} className="slide-body" style={{ lineHeight: 1.6, color: "#D1D1D1" }}>✓ {h}</p>
                 ))}
               </div>
             </motion.div>

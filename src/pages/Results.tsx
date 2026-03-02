@@ -8,6 +8,7 @@ import SlideDiagnosisSummary from "@/components/results/SlideDiagnosisSummary";
 import SlideAxisBreakdown from "@/components/results/SlideAxisBreakdown";
 import SlideWhyProducts from "@/components/results/SlideWhyProducts";
 import SlideProtocol from "@/components/results/SlideProtocol";
+import SlideSubscriptionTable from "@/components/results/SlideSubscriptionTable";
 import SlideSubscribe from "@/components/results/SlideSubscribe";
 import SlideNav from "@/components/results/SlideNav";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
@@ -17,6 +18,7 @@ const SLIDE_LABELS = [
   { key: "diagnosis", short: "Pattern", full: "Your Skin Pattern" },
   { key: "axes", short: "Analysis", full: "Clinical Analysis" },
   { key: "protocol", short: "Protocol", full: "Your Routine" },
+  { key: "plans", short: "Plans", full: "Choose Your Plan" },
   { key: "products", short: "Products", full: "Matched Products" },
   { key: "subscribe", short: "Strategy", full: "Adaptive Strategy" },
 ];
@@ -76,7 +78,7 @@ const ResultsPage = () => {
 
   const goTo = useCallback(
     (idx: number) => {
-      if (idx < 0 || idx >= 5) return;
+      if (idx < 0 || idx >= 6) return;
       setDirection(idx > current ? 1 : -1);
       setCurrent(idx);
     },
@@ -99,6 +101,7 @@ const ResultsPage = () => {
     <SlideDiagnosisSummary result={result} />,
     <SlideAxisBreakdown result={result} />,
     <SlideProtocol result={result} />,
+    <SlideSubscriptionTable result={result} />,
     <SlideWhyProducts result={result} />,
     <SlideSubscribe result={result} />,
   ];
@@ -112,7 +115,7 @@ const ResultsPage = () => {
       <div className="absolute top-[57px] left-0 right-0 z-50 h-0.5 bg-border/40">
         <motion.div
           className="h-full bg-primary"
-          animate={{ width: `${((current + 1) / 5) * 100}%` }}
+          animate={{ width: `${((current + 1) / 6) * 100}%` }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         />
       </div>
@@ -143,7 +146,7 @@ const ResultsPage = () => {
       {/* Navigation overlay */}
       <SlideNav
         current={current}
-        total={5}
+        total={6}
         labels={SLIDE_LABELS.map((l) => l.short)}
         fullLabels={SLIDE_LABELS.map((l) => l.full)}
         onPrev={() => goTo(current - 1)}

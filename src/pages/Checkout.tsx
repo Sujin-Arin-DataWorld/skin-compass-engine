@@ -66,11 +66,32 @@ const Checkout = () => {
             {/* Back link */}
             <button
               onClick={() => navigate(-1)}
-              className="mb-8 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="mb-10 flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Protocol
             </button>
+
+            {/* Luxury brand tagline */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              style={{
+                fontFamily: "'Georgia', 'Times New Roman', serif",
+                fontStyle: "italic",
+                fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
+                fontWeight: 400,
+                color: "#D1D1D1",
+                lineHeight: 1.5,
+                letterSpacing: "0.01em",
+                marginBottom: "2rem",
+                borderLeft: "2px solid hsl(var(--primary) / 0.5)",
+                paddingLeft: "1rem",
+              }}
+            >
+              "K-Beauty innovation, recalibrated for your European lifestyle."
+            </motion.p>
 
             {/* Header */}
             <p
@@ -86,7 +107,7 @@ const Checkout = () => {
 
             {/* Device status banner */}
             <div
-              className="flex items-center gap-3 rounded-xl px-4 py-3 mb-6"
+              className="flex items-start gap-3 rounded-xl px-4 py-4 mb-8"
               style={{
                 background: deviceLocked
                   ? "hsl(var(--muted) / 0.5)"
@@ -94,22 +115,42 @@ const Checkout = () => {
                 border: `1px solid ${deviceLocked ? "hsl(var(--border))" : "hsl(var(--primary) / 0.4)"}`,
               }}
             >
-              {deviceLocked ? (
-                <Lock className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-              ) : (
-                <Unlock className="w-5 h-5 flex-shrink-0" style={{ color: "hsl(var(--primary))" }} />
-              )}
+              <div
+                className="flex-shrink-0 mt-0.5 rounded-full p-1.5"
+                style={{
+                  background: deviceLocked ? "hsl(var(--muted))" : "hsl(var(--primary) / 0.15)",
+                  opacity: deviceLocked ? 0.5 : 1,
+                }}
+              >
+                {deviceLocked ? (
+                  <Lock className="w-4 h-4 text-muted-foreground" />
+                ) : (
+                  <Unlock className="w-4 h-4" style={{ color: "hsl(var(--primary))" }} />
+                )}
+              </div>
               <div>
-                <p className="text-sm font-medium text-foreground">
+                <p className="text-sm font-semibold text-foreground mb-1">
                   {deviceLocked
-                    ? "Clinical device unlocks in Month 2"
-                    : "Clinical device eligible — barrier ready!"}
+                    ? "Dermatological Safety Logic · Locked for Month 1"
+                    : "Barrier Stable · Clinical Device Eligible"}
                 </p>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-xs" style={{ color: "#D1D1D1", lineHeight: 1.6 }}>
                   {deviceLocked
-                    ? "Your barrier score is building. Device ships once stability is confirmed."
-                    : "Your barrier score qualifies for immediate device access. Ships with Month 1 order."}
+                    ? "Your barrier score is still building. The EMS/LED device ships once barrier stability is confirmed — this protects against device-induced sensitisation during the repair phase."
+                    : "Your barrier score qualifies for immediate device access. The clinical device ships with your Month 1 order."}
                 </p>
+                {deviceLocked && (
+                  <p
+                    className="mt-2 text-xs"
+                    style={{
+                      fontFamily: "'Courier New', Courier, monospace",
+                      color: "hsl(var(--primary))",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    bar_score &lt; 50 → DEVICE_GATE: ACTIVE
+                  </p>
+                )}
               </div>
             </div>
 
@@ -138,11 +179,12 @@ const Checkout = () => {
             {/* Safety note for Premium */}
             {tier === "Premium" && (
               <div
-                className="rounded-xl px-4 py-3 mb-6 text-xs text-muted-foreground"
+                className="rounded-xl px-4 py-4 mb-8 text-xs"
                 style={{
                   background: "hsl(var(--muted) / 0.4)",
                   borderLeft: "3px solid hsl(var(--primary) / 0.4)",
-                  lineHeight: 1.6,
+                  lineHeight: 1.7,
+                  color: "#D1D1D1",
                 }}
               >
                 <strong className="text-foreground">Lease-to-own safety:</strong> Clinical device

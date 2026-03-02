@@ -5,32 +5,66 @@ interface SlideNavProps {
   current: number;
   total: number;
   labels: string[];
+  fullLabels?: string[];
   onPrev: () => void;
   onNext: () => void;
   onGoTo: (idx: number) => void;
 }
 
-const SlideNav = ({ current, total, labels, onPrev, onNext, onGoTo }: SlideNavProps) => (
+const SlideNav = ({ current, total, labels, fullLabels, onPrev, onNext, onGoTo }: SlideNavProps) => (
   <>
-    {/* Dot indicators + label */}
+    {/* Dot indicators + narrative label */}
     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-50">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {Array.from({ length: total }).map((_, i) => (
           <button
             key={i}
             onClick={() => onGoTo(i)}
-            className={`transition-all duration-300 rounded-full ${
+            className="transition-all duration-300 rounded-full"
+            style={
               i === current
-                ? "w-6 h-2 bg-primary"
-                : "w-2 h-2 bg-border hover:bg-muted-foreground"
-            }`}
+                ? {
+                    height: "8px",
+                    background: "hsl(var(--primary))",
+                    padding: "0 10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minWidth: "fit-content",
+                  }
+                : {
+                    width: "8px",
+                    height: "8px",
+                    background: i < current ? "hsl(var(--primary) / 0.4)" : "hsl(var(--border))",
+                  }
+            }
             aria-label={labels[i]}
-          />
+          >
+            {i === current && (
+              <span
+                style={{
+                  fontSize: "0.5625rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase" as const,
+                  color: "hsl(var(--primary-foreground))",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {labels[i]}
+              </span>
+            )}
+          </button>
         ))}
       </div>
-      <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-        {labels[current]}
-      </span>
+      {fullLabels && (
+        <span
+          className="text-[10px] uppercase tracking-widest"
+          style={{ color: "hsl(var(--muted-foreground))" }}
+        >
+          {fullLabels[current]}
+        </span>
+      )}
     </div>
 
     {/* Arrow buttons (desktop) */}

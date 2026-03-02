@@ -4,20 +4,20 @@ import { Navigate, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
-import SlidePatternReveal from "@/components/results/SlidePatternReveal";
+import SlideDiagnosisSummary from "@/components/results/SlideDiagnosisSummary";
 import SlideAxisBreakdown from "@/components/results/SlideAxisBreakdown";
-import SlideWhyItWorks from "@/components/results/SlideWhyItWorks";
+import SlideWhyProducts from "@/components/results/SlideWhyProducts";
 import SlideProtocol from "@/components/results/SlideProtocol";
 import SlideSubscribe from "@/components/results/SlideSubscribe";
 import SlideNav from "@/components/results/SlideNav";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 
 const SLIDE_LABELS = [
-  "Your Pattern",
-  "Skin Profile",
-  "Why It Works",
-  "Protocol",
-  "Get Started",
+  { key: "diagnosis", short: "Pattern", full: "Your Skin Pattern" },
+  { key: "axes", short: "Analysis", full: "Clinical Analysis" },
+  { key: "protocol", short: "Protocol", full: "Your Routine" },
+  { key: "products", short: "Products", full: "Matched Products" },
+  { key: "subscribe", short: "Strategy", full: "Adaptive Strategy" },
 ];
 
 const slideVariants = {
@@ -56,10 +56,10 @@ const ResultsPage = () => {
   if (!result) return <Navigate to="/diagnosis" replace />;
 
   const slides = [
-    <SlidePatternReveal result={result} />,
+    <SlideDiagnosisSummary result={result} />,
     <SlideAxisBreakdown result={result} />,
-    <SlideWhyItWorks result={result} />,
     <SlideProtocol result={result} />,
+    <SlideWhyProducts result={result} />,
     <SlideSubscribe result={result} />,
   ];
 
@@ -68,7 +68,7 @@ const ResultsPage = () => {
       <SilkBackground />
       <Navbar />
 
-      {/* Progress bar */}
+      {/* Narrative progress bar */}
       <div className="absolute top-[57px] left-0 right-0 z-50 h-0.5 bg-border/40">
         <motion.div
           className="h-full bg-primary"
@@ -104,7 +104,8 @@ const ResultsPage = () => {
       <SlideNav
         current={current}
         total={5}
-        labels={SLIDE_LABELS}
+        labels={SLIDE_LABELS.map((l) => l.short)}
+        fullLabels={SLIDE_LABELS.map((l) => l.full)}
         onPrev={() => goTo(current - 1)}
         onNext={() => goTo(current + 1)}
         onGoTo={goTo}

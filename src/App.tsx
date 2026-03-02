@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Diagnosis from "./pages/Diagnosis";
 import Results from "./pages/Results";
 import About from "./pages/About";
+import Checkout from "./pages/Checkout";
 import Impressum from "./pages/Impressum";
 import Datenschutz from "./pages/Datenschutz";
 import NotFound from "./pages/NotFound";
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/diagnosis" element={<Diagnosis />} />
             <Route path="/results" element={<Results />} />
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/about" element={<About />} />
             <Route path="/impressum" element={<Impressum />} />
             <Route path="/datenschutz" element={<Datenschutz />} />

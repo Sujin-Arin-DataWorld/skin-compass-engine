@@ -174,7 +174,7 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
           {/* Hover hint */}
           <div
             className="absolute text-[8px] text-foreground/25 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-            style={{ left: 10, top: 148, width: 68 }}
+            style={{ left: CHEEK_LEFT - 12, top: CHEEK_TOP + 43, width: 68 }}
           >
             tap to test
           </div>

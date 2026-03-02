@@ -31,14 +31,14 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
   const [phase, setPhase] = useState<"idle" | "pressed" | "recovering">("idle");
   const prevValue = useRef(value);
 
-  const animatePress = useCallback(async (recoverySec: number) => {
+  const animatePress = useCallback(async (recoverySec: number, pressDist: number) => {
     if (animating.current) return;
     animating.current = true;
     setIsAnimating(true);
 
     setPhase("pressed");
     await Promise.all([
-      fingerControls.start({ y: 10, transition: { duration: 0.22, ease: PRESS_EASE } }),
+      fingerControls.start({ y: pressDist, transition: { duration: 0.22, ease: PRESS_EASE } }),
       skinControls.start({
         scaleX: 0.92, scaleY: 1.04, y: 1,
         transition: { duration: 0.22, ease: PRESS_EASE },

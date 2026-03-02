@@ -9,26 +9,32 @@ function getBarColor(score: number): string {
   return "hsl(var(--severity-clear))";
 }
 
-const AXIS_ICONS: Record<string, string> = {
-  bar: "🛡", sen: "⚡", acne: "🔴", hormonal: "🌙",
-  redness: "🌡", hyd: "💧", seb: "✨", pigment: "🌑",
-  aging: "⏳", ox: "🌪", texture: "⚪", makeup_stability: "💄",
-};
-
 const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, (s: number) => string>> = {
-  bar: (s) => s > 60 ? "Your skin barrier is significantly compromised — products penetrate unevenly." : s > 30 ? "Mild barrier weakness — minor sensitivity likely." : "Your barrier is healthy and intact.",
-  acne: (s) => s > 60 ? "Active breakout pattern — needs targeted antibacterial care." : s > 30 ? "Occasional breakouts, likely triggered by sebum or stress." : "Minimal acne concern.",
-  sen: (s) => s > 60 ? "High reactivity — many actives will cause stinging." : s > 30 ? "Moderate sensitivity — patch test new products." : "Good tolerance for actives.",
-  hyd: (s) => s > 60 ? "Significant dehydration — skin may feel tight despite oiliness." : s > 30 ? "Mild dehydration." : "Well-hydrated skin.",
-  aging: (s) => s > 60 ? "Accelerated collagen decline — retinal + peptide protocol recommended." : s > 30 ? "Early signs of aging — preventive care advised." : "Minimal aging concern.",
-  seb: (s) => s > 60 ? "Sebum overproduction — contributing to pore congestion and shine." : s > 30 ? "Moderate sebum levels." : "Sebum balanced.",
-  pigment: (s) => s > 60 ? "Melanocyte hyperactivation — UV protection critical." : s > 30 ? "Some uneven tone present." : "Even skin tone.",
-  texture: (s) => s > 60 ? "Surface irregularity — exfoliation and pore refinement needed." : s > 30 ? "Mild texture concerns." : "Smooth surface texture.",
-  ox: (s) => s > 60 ? "High oxidative stress — antioxidant protocol essential." : s > 30 ? "Moderate environmental damage." : "Low oxidative burden.",
+  acne: (s) => s >= 75 ? "Cyclical, likely hormonally driven" : s >= 50 ? "Moderate, inflammatory pattern" : "Occasional, surface-level",
+  seb: (s) => s >= 75 ? "Rapid sebum return, T-zone dominant" : s >= 50 ? "Balanced but reactive to humidity" : "Controlled",
+  hyd: (s) => s >= 75 ? "Compromised moisture barrier (TEWL risk)" : s >= 50 ? "Suboptimal retention" : "Adequate",
+  sen: (s) => s >= 75 ? "High reactivity — multiple trigger exposure" : s >= 50 ? "Moderate — flush and thermal reactivity" : "Manageable",
+  pigment: (s) => s >= 75 ? "UV-responsive, melasma-type deepening" : s >= 50 ? "Post-inflammatory marks, localized" : "Mild",
+  texture: (s) => s >= 75 ? "Dual mechanism — pores + surface roughness" : s >= 50 ? "Congestion-dominant" : "Minor irregularity",
+  aging: (s) => s >= 75 ? "Recoil delay across multiple contour zones" : s >= 50 ? "Early-stage firmness reduction" : "Within normal range",
+  bar: (s) => s >= 75 ? "Barrier compromise triad present" : s >= 50 ? "Stress pattern, recovery delayed" : "Mild disruption",
+  ox: (s) => s >= 75 ? "High oxidative stress — antioxidant protocol essential" : s >= 50 ? "Moderate environmental damage" : "Low oxidative burden",
 };
 
-// SVG radar chart — enlarged per v6
-function RadarChart({ result }: { result: DiagnosisResult }) {
+const CRITICAL_MESSAGES: Partial<Record<AxisKey, string>> = {
+  acne: "Inflammation control must come before any actives.",
+  seb: "Sebum regulation is the gateway to texture and pore improvement.",
+  hyd: "Barrier hydration is Phase 1 before any targeted treatment.",
+  sen: "Barrier calming must precede all active ingredients.",
+  pigment: "SPF protocol activation is the highest leverage action.",
+  texture: "Gentle exfoliation cadence is the critical variable.",
+  aging: "Collagen-supporting actives unlock in Phase 4.",
+  bar: "Barrier repair must be established before adding any new actives.",
+  ox: "Antioxidant integration is the first line of defence.",
+};
+
+// SVG radar chart
+function RadarChart({ result, highlightAxis }: { result: DiagnosisResult; highlightAxis: AxisKey }) {
   const axes = result.radar_chart_data;
   const n = axes.length;
   const SIZE = 280, CENTER = SIZE / 2, RADIUS = 110;
@@ -74,12 +80,12 @@ function RadarChart({ result }: { result: DiagnosisResult }) {
             key={a.axis} x={CENTER + r * Math.cos(angle)} y={CENTER + r * Math.sin(angle)}
             textAnchor="middle" dominantBaseline="central"
             style={{
-              fontSize: '12px',
+              fontSize: "12px",
               fontFamily: "'DM Sans', system-ui, sans-serif",
               fontWeight: 500,
-              fill: 'hsl(var(--foreground))',
+              fill: "hsl(var(--foreground))",
               opacity: 0.85,
-              textTransform: 'capitalize' as const,
+              textTransform: "capitalize" as const,
             }}
           >
             {a.axis}
@@ -99,124 +105,135 @@ const SlideAxisBreakdown = ({ result }: Props) => {
     () => [...AXIS_KEYS].sort((a, b) => result.axis_scores[b] - result.axis_scores[a]),
     [result]
   );
-
-  const topInterpretations = sorted.slice(0, 3).map((axis) => ({
-    axis,
-    score: Math.round(result.axis_scores[axis]),
-    text: AXIS_INTERPRETATIONS[axis]?.(result.axis_scores[axis]) ?? "",
-  })).filter((i) => i.text);
+  const topAxis = sorted[0];
 
   return (
-    <div className="results-slide flex flex-1 flex-col px-6 py-12 overflow-y-auto">
+    <div className="results-slide flex flex-1 flex-col px-6 py-10 overflow-y-auto">
       <div className="mx-auto w-full max-w-[800px]">
+        {/* Eyebrow */}
+        <motion.p className="slide-eyebrow mb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          Clinical Analysis
+        </motion.p>
+
+        {/* Headline */}
         <motion.h2
-          className="slide-title"
-          style={{ color: 'hsl(var(--primary))' }}
+          className="font-display"
+          style={{
+            fontSize: "clamp(1.5rem, 3vw, 2rem)",
+            fontWeight: 400,
+            lineHeight: 1.2,
+            color: "hsl(var(--foreground))",
+            marginBottom: "0.5rem",
+          }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          Your skin vector
+        </motion.h2>
+        <motion.p
+          className="slide-body mb-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          transition={{ delay: 0.1 }}
         >
-          Your Skin Profile
-        </motion.h2>
+          No two vectors are identical. This is precisely yours.
+        </motion.p>
 
-        <div className="mt-6 grid gap-8 md:grid-cols-2 items-start">
-          <RadarChart result={result} />
+        {/* Radar + bars grid */}
+        <div className="grid gap-8 md:grid-cols-2 items-start">
+          <RadarChart result={result} highlightAxis={topAxis} />
 
-          {/* Score bars — bigger */}
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {sorted.map((axis, i) => {
               const score = Math.round(result.axis_scores[axis]);
+              const isTop = i === 0;
+              const interpretation = AXIS_INTERPRETATIONS[axis]?.(score) ?? "";
+
               return (
                 <motion.div
                   key={axis}
-                  className="flex items-center gap-3"
+                  className={`rounded-xl p-3 ${isTop ? "border" : ""}`}
+                  style={isTop ? {
+                    borderColor: "hsl(var(--primary) / 0.4)",
+                    background: "hsl(var(--primary) / 0.04)",
+                  } : {}}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + i * 0.06 }}
+                  transition={{ delay: 0.15 + i * 0.05 }}
                 >
-                  <span style={{
-                    fontFamily: "'DM Sans', system-ui, sans-serif",
-                    fontSize: '1rem',
-                    fontWeight: 500,
-                    color: 'hsl(var(--foreground))',
-                    width: '130px',
-                    flexShrink: 0,
-                  }}>
-                    {AXIS_LABELS[axis]}
-                  </span>
-                  <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: 'hsl(var(--border))' }}>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <p style={{
+                      fontSize: "0.875rem",
+                      fontWeight: isTop ? 700 : 500,
+                      color: isTop ? "hsl(var(--primary))" : "hsl(var(--foreground))",
+                    }}>
+                      {AXIS_LABELS[axis]}
+                      {isTop && (
+                        <span style={{ fontSize: "0.6875rem", marginLeft: "0.4rem", opacity: 0.7 }}>
+                          — Primary focus
+                        </span>
+                      )}
+                    </p>
+                    <span
+                      className="font-display"
+                      style={{
+                        fontSize: "1rem",
+                        fontWeight: 600,
+                        color: isTop ? "hsl(var(--primary))" : "hsl(var(--foreground))",
+                      }}
+                    >
+                      {score}
+                    </span>
+                  </div>
+                  <div
+                    className="rounded-full overflow-hidden mb-1.5"
+                    style={{ height: "4px", background: "hsl(var(--border))" }}
+                  >
                     <motion.div
                       className="h-full rounded-full"
-                      style={{ backgroundColor: getBarColor(score) }}
+                      style={{
+                        background: isTop ? "hsl(var(--primary))" : "hsl(var(--foreground-hint))",
+                        opacity: isTop ? 1 : 0.5,
+                      }}
                       initial={{ width: 0 }}
                       animate={{ width: `${score}%` }}
-                      transition={{ duration: 0.6, delay: 0.4 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                      transition={{ duration: 0.6, delay: 0.2 + i * 0.05 }}
                     />
                   </div>
-                  <span className="score-number" style={{
-                    color: getBarColor(score),
-                    width: '36px',
-                    textAlign: 'right' as const,
-                    flexShrink: 0,
-                  }}>
-                    {score}
-                  </span>
+                  {interpretation && (
+                    <p style={{
+                      fontSize: "0.75rem",
+                      color: "hsl(var(--foreground-hint))",
+                      lineHeight: 1.4,
+                    }}>
+                      {interpretation}
+                    </p>
+                  )}
                 </motion.div>
               );
             })}
           </div>
         </div>
 
-        {/* Interpretations with icons */}
-        {topInterpretations.length > 0 && (
-          <motion.div
-            className="mt-8 border-t border-border pt-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1 }}
-          >
-            <h3 style={{
-              fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontSize: '0.8125rem',
-              fontWeight: 700,
-              letterSpacing: '0.16em',
-              textTransform: 'uppercase' as const,
-              color: 'hsl(var(--foreground-hint))',
-              marginBottom: '1.25rem',
-            }}>
-              What This Means
-            </h3>
-            <div className="space-y-0">
-              {topInterpretations.map((i) => (
-                <div key={i.axis} className="flex items-start gap-4 py-4 border-b border-border/40 last:border-0">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
-                       style={{ background: `${getBarColor(i.score)}22` }}>
-                    <span style={{ fontSize: '1.25rem' }}>{AXIS_ICONS[i.axis] ?? "📊"}</span>
-                  </div>
-                  <div>
-                    <p style={{
-                      fontFamily: "'DM Sans', system-ui, sans-serif",
-                      fontSize: '1.0625rem',
-                      fontWeight: 600,
-                      color: 'hsl(var(--foreground))',
-                      marginBottom: '0.25rem',
-                    }}>
-                      {AXIS_LABELS[i.axis]}
-                      <span style={{
-                        marginLeft: '0.5rem',
-                        fontSize: '0.875rem',
-                        fontWeight: 400,
-                        color: getBarColor(i.score),
-                      }}>
-                        {i.score}/100
-                      </span>
-                    </p>
-                    <p className="slide-body">{i.text}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
+        {/* Critical focus callout */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="mt-6 rounded-2xl border p-4"
+          style={{
+            borderColor: "hsl(var(--primary) / 0.25)",
+            background: "hsl(var(--primary) / 0.05)",
+          }}
+        >
+          <p className="slide-eyebrow mb-1" style={{ color: "hsl(var(--primary))" }}>
+            Protocol Priority
+          </p>
+          <p className="slide-body" style={{ lineHeight: 1.5 }}>
+            {CRITICAL_MESSAGES[topAxis] ?? "Your protocol is ordered by clinical priority, starting with your highest-scoring axis."}
+          </p>
+        </motion.div>
       </div>
     </div>
   );

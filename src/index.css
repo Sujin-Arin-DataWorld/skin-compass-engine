@@ -4,6 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,90 +12,91 @@
 
 @layer base {
   :root {
-    /* ── Light mode — Warm Espresso ── */
-    --background: 28 20% 97%;
-    /* #F7F3EF */
-    --background-2: 28 15% 93%;
+    /* ── Light mode — Serene Clinical ── */
+    --background: 210 11% 95%;
+    /* #F2F4F5 — Pale Fog */
+    --background-2: 210 8% 91%;
     --card: 0 0% 100%;
-    /* pure white — contrast against cream */
-    --card-foreground: 20 40% 11%;
-    /* #1C1008 */
+    /* pure white — clean card surface */
+    --card-foreground: 210 30% 24%;
+    /* #2C3E50 — Deep Slate */
 
-    --foreground: 20 40% 11%;
-    /* #1C1008 — primary heading */
-    --foreground-body: 20 30% 24%;
-    /* #3D2B1A — body */
-    --foreground-hint: 20 20% 47%;
-    /* #7A6352 — labels/hints */
+    --foreground: 210 30% 24%;
+    /* #2C3E50 — Deep Slate — primary heading */
+    --foreground-body: 210 20% 32%;
+    /* mid-slate — body text */
+    --foreground-hint: 210 12% 50%;
+    /* muted slate — labels/hints */
 
-    --popover: 28 20% 97%;
-    --popover-foreground: 20 40% 11%;
+    --popover: 210 11% 95%;
+    --popover-foreground: 210 30% 24%;
 
-    --primary: 38 60% 50%;
-    /* #C99B3A */
-    --primary-foreground: 28 20% 97%;
+    --primary: 76 26% 48%;
+    /* #8A9A5B — Sage Green */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 32%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 34 44% 69%;
+    /* #D2B48C — Warm Sand */
+    --secondary-foreground: 210 30% 18%;
 
-    --muted: 28 15% 90%;
-    --muted-foreground: 20 20% 47%;
+    --muted: 210 8% 90%;
+    --muted-foreground: 210 12% 50%;
 
-    --accent: 47 100% 96%;
-    --accent-foreground: 37 92% 50%;
+    --accent: 76 30% 94%;
+    --accent-foreground: 76 26% 38%;
 
     --destructive: 0 72% 50%;
     --destructive-foreground: 0 85% 97%;
 
-    --border: 28 20% 82%;
-    --input: 28 20% 88%;
-    --ring: 38 60% 50%;
+    --border: 210 10% 85%;
+    --input: 210 10% 88%;
+    --ring: 76 26% 48%;
 
     --radius: 0.75rem;
 
     /* Custom tokens — light */
-    --accent-sand: 38 60% 50%;
-    --accent-champagne: 38 55% 85%;
+    --accent-sand: 34 44% 69%;
+    --accent-champagne: 34 40% 85%;
     --accent-rose: 8 40% 52%;
 
-    --gradient-start: 38 55% 85%;
-    --gradient-end: 28 20% 97%;
+    --gradient-start: 76 20% 90%;
+    --gradient-end: 210 11% 95%;
 
     --severity-clear: 145 40% 34%;
-    --severity-mild: 40 50% 44%;
-    --severity-moderate: 24 55% 44%;
+    --severity-mild: 76 26% 44%;
+    --severity-moderate: 34 44% 50%;
     --severity-severe: 4 50% 44%;
 
     --urgency-low: 145 40% 34%;
-    --urgency-medium: 40 50% 44%;
-    --urgency-high: 24 55% 44%;
+    --urgency-medium: 76 26% 44%;
+    --urgency-high: 34 44% 50%;
     --urgency-critical: 4 50% 44%;
 
-    --face-stroke: 20 40% 11% / 0.25;
-    --face-detail: 20 20% 47%;
+    --face-stroke: 210 30% 24% / 0.25;
+    --face-detail: 210 12% 50%;
 
     --hydration: 200 70% 50%;
     --hydration-soft: 200 60% 85%;
 
-    --glow-sand: 0 0 24px hsla(38, 55%, 52%, 0.1);
-    --glow-champagne: 0 0 20px hsla(38, 55%, 85%, 0.08);
+    --glow-sand: 0 0 24px hsla(34, 44%, 69%, 0.15);
+    --glow-champagne: 0 0 20px hsla(76, 26%, 48%, 0.1);
 
     --font-display: 'Cormorant Garamond', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
 
-    --sidebar-background: 28 18% 93%;
-    --sidebar-foreground: 20 40% 11%;
-    --sidebar-primary: 38 60% 50%;
-    --sidebar-primary-foreground: 28 20% 97%;
-    --sidebar-accent: 0 0% 32%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 28 20% 82%;
-    --sidebar-ring: 38 60% 50%;
+    --sidebar-background: 210 8% 93%;
+    --sidebar-foreground: 210 30% 24%;
+    --sidebar-primary: 76 26% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 34 44% 69%;
+    --sidebar-accent-foreground: 210 30% 18%;
+    --sidebar-border: 210 10% 85%;
+    --sidebar-ring: 76 26% 48%;
 
     /* Diagnosis text tokens — WCAG AA compliant */
-    --diagnosis-text-primary: 20 40% 14%;
-    --diagnosis-text-secondary: 20 25% 25%;
-    --diagnosis-text-hint: 20 18% 40%;
+    --diagnosis-text-primary: 210 30% 20%;
+    --diagnosis-text-secondary: 210 20% 32%;
+    --diagnosis-text-hint: 210 12% 46%;
 
     /* Typography scale */
     --text-hero: clamp(2.8rem, 7vw, 5.5rem);
@@ -106,11 +108,11 @@
     --text-small: 0.9375rem;
     --text-label: 0.8125rem;
     --text-micro: 0.75rem;
-    --chart-1: 27 95% 60%;
-    --chart-2: 43 96% 56%;
-    --chart-3: 47 95% 53%;
-    --chart-4: 24 94% 53%;
-    --chart-5: 0 0% 45%;
+    --chart-1: 76 40% 50%;
+    --chart-2: 34 50% 56%;
+    --chart-3: 145 40% 45%;
+    --chart-4: 200 50% 50%;
+    --chart-5: 210 10% 55%;
     --sidebar: 0 0% 98%;
     --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-serif: 'Libre Caslon Text', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
@@ -128,90 +130,91 @@
   }
 
   .dark {
-    /* ── Dark mode — Espresso Luxury ── */
-    --background: 20 22% 7%;
-    /* #120E0A */
-    --background-2: 20 18% 10%;
-    --card: 20 18% 12%;
-    /* #1E1712 — visible card lift */
-    --card-foreground: 38 28% 91%;
-    /* #EDE4D6 */
+    /* ── Dark mode — Serene Clinical Dark ── */
+    --background: 210 18% 10%;
+    /* #141A1F */
+    --background-2: 210 14% 13%;
+    --card: 210 14% 14%;
+    /* #1E252C — visible card lift */
+    --card-foreground: 210 10% 88%;
+    /* #D9DDE1 */
 
-    --foreground: 38 28% 91%;
-    /* #EDE4D6 — warm white */
-    --foreground-body: 38 22% 78%;
-    /* #C8B49A — warm sand */
-    --foreground-hint: 38 16% 54%;
-    /* #8A7560 */
+    --foreground: 210 10% 88%;
+    /* #D9DDE1 — soft white */
+    --foreground-body: 210 8% 72%;
+    /* #ABB2B9 */
+    --foreground-hint: 210 8% 50%;
+    /* #747D86 */
 
-    --popover: 20 18% 14%;
-    --popover-foreground: 38 28% 91%;
+    --popover: 210 14% 14%;
+    --popover-foreground: 210 10% 88%;
 
-    --primary: 38 58% 56%;
-    /* #D4A84B — brighter gold for dark bg */
-    --primary-foreground: 20 22% 7%;
+    --primary: 76 30% 55%;
+    /* #96AD66 — brighter sage for dark bg */
+    --primary-foreground: 210 18% 10%;
 
-    --secondary: 0 0% 45%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 34 35% 60%;
+    /* Warm Sand brightened */
+    --secondary-foreground: 210 18% 10%;
 
-    --muted: 20 16% 16%;
-    --muted-foreground: 38 16% 54%;
+    --muted: 210 12% 18%;
+    --muted-foreground: 210 8% 50%;
 
-    --accent: 20 91% 14%;
-    --accent-foreground: 43 96% 56%;
+    --accent: 76 20% 18%;
+    --accent-foreground: 76 30% 65%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 85% 97%;
 
-    --border: 20 16% 22%;
-    --input: 20 18% 15%;
-    --ring: 38 58% 56%;
+    --border: 210 10% 22%;
+    --input: 210 12% 18%;
+    --ring: 76 30% 55%;
 
     /* Custom tokens — dark */
-    --accent-sand: 38 58% 56%;
-    --accent-champagne: 38 40% 45%;
+    --accent-sand: 34 35% 60%;
+    --accent-champagne: 34 30% 40%;
     --accent-rose: 8 40% 58%;
 
-    --gradient-start: 38 40% 20%;
-    --gradient-end: 20 22% 7%;
+    --gradient-start: 76 20% 18%;
+    --gradient-end: 210 18% 10%;
 
     --severity-clear: 145 40% 38%;
-    --severity-mild: 40 50% 50%;
-    --severity-moderate: 24 55% 48%;
+    --severity-mild: 76 26% 50%;
+    --severity-moderate: 34 44% 55%;
     --severity-severe: 4 50% 48%;
 
     --urgency-low: 145 40% 38%;
-    --urgency-medium: 40 50% 50%;
-    --urgency-high: 24 55% 48%;
+    --urgency-medium: 76 26% 50%;
+    --urgency-high: 34 44% 55%;
     --urgency-critical: 4 50% 48%;
 
-    --face-stroke: 38 28% 91% / 0.25;
-    --face-detail: 38 16% 54%;
+    --face-stroke: 210 10% 88% / 0.25;
+    --face-detail: 210 8% 50%;
 
     --hydration: 200 65% 55%;
     --hydration-soft: 200 40% 25%;
 
-    --glow-sand: 0 0 24px hsla(38, 55%, 62%, 0.1);
-    --glow-champagne: 0 0 20px hsla(38, 40%, 45%, 0.08);
+    --glow-sand: 0 0 24px hsla(34, 35%, 60%, 0.12);
+    --glow-champagne: 0 0 20px hsla(76, 30%, 55%, 0.1);
 
-    --sidebar-background: 20 16% 10%;
-    --sidebar-foreground: 38 28% 91%;
-    --sidebar-primary: 38 58% 56%;
-    --sidebar-primary-foreground: 20 22% 7%;
-    --sidebar-accent: 43 96% 56%;
-    --sidebar-accent-foreground: 20 91% 14%;
-    --sidebar-border: 20 16% 22%;
-    --sidebar-ring: 38 58% 56%;
+    --sidebar-background: 210 14% 12%;
+    --sidebar-foreground: 210 10% 88%;
+    --sidebar-primary: 76 30% 55%;
+    --sidebar-primary-foreground: 210 18% 10%;
+    --sidebar-accent: 34 35% 60%;
+    --sidebar-accent-foreground: 210 14% 14%;
+    --sidebar-border: 210 10% 22%;
+    --sidebar-ring: 76 30% 55%;
 
     /* Diagnosis text tokens — dark */
-    --diagnosis-text-primary: 38 30% 92%;
-    --diagnosis-text-secondary: 38 20% 72%;
-    --diagnosis-text-hint: 38 15% 55%;
-    --chart-1: 30 97% 72%;
-    --chart-2: 45 96% 64%;
-    --chart-3: 48 96% 76%;
-    --chart-4: 27 95% 60%;
-    --chart-5: 0 0% 45%;
+    --diagnosis-text-primary: 210 12% 90%;
+    --diagnosis-text-secondary: 210 8% 72%;
+    --diagnosis-text-hint: 210 8% 50%;
+    --chart-1: 76 40% 60%;
+    --chart-2: 34 45% 65%;
+    --chart-3: 145 35% 55%;
+    --chart-4: 200 45% 60%;
+    --chart-5: 210 10% 50%;
     --sidebar: 0 0% 14%;
     --radius: 0.75rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
@@ -234,17 +237,17 @@
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     background-image:
-      radial-gradient(ellipse 80% 50% at 20% 10%, hsl(38 60% 90% / 0.5) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, hsl(28 30% 88% / 0.4) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 60% at 50% 50%, hsl(28 20% 95% / 0.25) 0%, transparent 70%);
+      radial-gradient(ellipse 80% 50% at 20% 10%, hsl(76 26% 85% / 0.25) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, hsl(210 11% 90% / 0.3) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 60% at 50% 50%, hsl(34 44% 90% / 0.15) 0%, transparent 70%);
     background-attachment: fixed;
   }
 
   .dark body {
     background-image:
-      radial-gradient(ellipse 80% 50% at 15% 10%, hsl(30 40% 14% / 0.5) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 40% at 85% 85%, hsl(20 25% 10% / 0.6) 0%, transparent 50%),
-      radial-gradient(ellipse 100% 60% at 50% 50%, hsl(25 18% 9% / 0.25) 0%, transparent 65%);
+      radial-gradient(ellipse 80% 50% at 15% 10%, hsl(76 20% 14% / 0.4) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 40% at 85% 85%, hsl(210 18% 12% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse 100% 60% at 50% 50%, hsl(210 14% 11% / 0.2) 0%, transparent 65%);
   }
 
   h1,
@@ -267,7 +270,7 @@
 
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
-    background: linear-gradient(135deg, hsl(38 65% 45%) 0%, hsl(38 55% 65%) 50%, hsl(38 65% 45%) 100%);
+    background: linear-gradient(135deg, hsl(76 30% 40%) 0%, hsl(76 26% 55%) 50%, hsl(76 30% 40%) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -321,6 +324,142 @@
     border-radius: inherit;
     pointer-events: none;
   }
+}
+
+/* ── Landing page — Hero Serif (Playfair Display) ── */
+.hero-serif {
+  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+}
+
+.hero-headline {
+  font-size: clamp(3.2rem, 8vw, 6.5rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+/* ── Landing page — Storytelling accent ── */
+.storytelling-accent {
+  border-left: 3px solid hsl(var(--primary) / 0.25);
+  transition: border-color 0.3s ease;
+}
+
+.storytelling-accent:hover {
+  border-color: hsl(var(--primary) / 0.5);
+}
+
+/* ── Landing page — Brand seal ── */
+.brand-seal-text {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: hsl(var(--muted-foreground));
+  text-transform: uppercase;
+}
+
+/* ── Landing page — Face markers ── */
+.marker-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.marker-tag {
+  background: hsl(var(--card) / 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid hsl(var(--border) / 0.25);
+  border-radius: 6px;
+  padding: 3px 8px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dark .marker-tag {
+  background: hsl(var(--card) / 0.65);
+  border-color: hsl(var(--border) / 0.3);
+}
+
+.marker-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: hsl(var(--foreground));
+}
+
+.marker-value {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+/* ── Landing page — Authority badges ── */
+.authority-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.25rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--border) / 0.4);
+  background: hsl(var(--card) / 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px hsl(var(--primary) / 0.04);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.authority-badge:hover {
+  border-color: hsl(var(--primary) / 0.3);
+  box-shadow: 0 4px 24px hsl(var(--primary) / 0.08);
+}
+
+.dark .authority-badge {
+  background: hsl(var(--card) / 0.4);
+  box-shadow: 0 4px 20px hsl(0 0% 0% / 0.15);
+}
+
+/* ── Landing page — Progress slider ── */
+.progress-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: hsl(var(--border));
+  outline: none;
+  cursor: pointer;
+}
+
+.progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.3);
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.progress-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 14px hsl(var(--primary) / 0.5);
+}
+
+.progress-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  border: 2px solid hsl(var(--background));
+  box-shadow: 0 0 8px hsl(var(--primary) / 0.3);
+  cursor: pointer;
 }
 
 /* ── Diagnosis page contrast classes ── */

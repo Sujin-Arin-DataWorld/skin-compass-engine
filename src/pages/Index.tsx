@@ -590,7 +590,7 @@ const Index = () => {
               className="group inline-flex items-center justify-center gap-4 rounded-full bg-[#8A9A5B] backdrop-blur-2xl px-12 md:px-16 text-xl md:text-2xl font-medium tracking-[0.1em] text-white shadow-xl shadow-[#8A9A5B]/20 border border-[#8A9A5B]/30 transition-all duration-400 hover:shadow-2xl hover:shadow-[#8A9A5B]/30 hover:-translate-y-1 hover:scale-105 w-full md:w-max min-h-[54px] h-[54px]"
               style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
             >
-              Begin Your Skin Assessment
+              Analyze Skin
               <ArrowRight className="h-7 w-7 transition-transform duration-300 group-hover:translate-x-2" />
             </Link>
             <div className="flex items-center gap-3 mt-2">

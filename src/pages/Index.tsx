@@ -23,14 +23,14 @@ const fadeUp = {
 // Positioned to overlay on consistent facial zones
 // ─────────────────────────────────────────────
 const FACE_MARKERS = [
-  { label: "Sebum", value: 70, top: "20%", left: "45%", color: "hsl(43 70% 50%)" },        // T-zone / Center Forehead
-  { label: "Elasticity", value: 73, top: "70%", right: "28%", color: "hsl(145 50% 45%)" },  // Lower Cheek / Jawline
-  { label: "Hydration", value: 78, top: "42%", left: "32%", color: "hsl(200 65% 50%)" },    // Under-eye / Upper Cheek
-  { label: "Barrier", value: 62, top: "65%", left: "38%", color: "hsl(38 60% 50%)" },       // Mouth Corner
-  { label: "Sensitivity", value: 45, top: "52%", left: "25%", color: "hsl(8 50% 55%)" },    // Center Cheek
-  { label: "Pigment", value: 55, top: "80%", right: "35%", color: "hsl(28 55% 50%)" },      // Jawline / Neck
-  { label: "Texture", value: 81, top: "55%", right: "35%", color: "hsl(160 40% 45%)" },     // Side of nose / Chin
-  { label: "Aging", value: 28, top: "88%", right: "45%", color: "hsl(270 30% 55%)" },       // Neck wrinkle
+  { label: "Sebum", value: 70, top: "22%", left: "19%", color: "hsl(43 70% 50%)" },        // 이마 중앙 (T-zone)
+  { label: "Aging", value: 28, top: "39%", left: "12%", color: "hsl(270 30% 55%)" },       // 눈가 (Crow's feet)
+  { label: "Hydration", value: 78, top: "40%", left: "32%", color: "hsl(200 65% 50%)" },    // 눈밑 / 광대 상단
+  { label: "Pigment", value: 55, top: "45%", right: "18%", color: "hsl(28 55% 50%)" },      // 광대 바깥쪽
+  { label: "Sensitivity", value: 45, top: "52%", left: "8%", color: "hsl(8 50% 55%)" },    // 볼 중앙 (홍조)
+  { label: "Texture", value: 81, top: "55%", right: "32%", color: "hsl(160 40% 45%)" },     // 코 옆 (나비존)
+  { label: "Barrier", value: 62, top: "66%", left: "35%", color: "hsl(38 60% 50%)" },       // 입가 (팔자주름)
+  { label: "Elasticity", value: 73, top: "75%", left: "28%", color: "hsl(145 50% 45%)" },  // 턱선 (Jawline)
 ];
 
 // ─────────────────────────────────────────────
@@ -293,7 +293,7 @@ function ProgressSlider() {
         >
           {/* Slider thumb visual — Circular Glow Handle */}
           <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-primary/20 backdrop-blur-md border-2 border-primary/60 shadow-lg flex items-center justify-center cursor-grab"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 md:w-11 md:h-11 rounded-full bg-primary/20 backdrop-blur-md border-2 border-primary/60 shadow-lg flex items-center justify-center cursor-grab"
             animate={{ boxShadow: ['0 0 12px rgba(138,154,91,0.4)', '0 0 24px rgba(138,154,91,0.7)', '0 0 12px rgba(138,154,91,0.4)'] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -453,7 +453,7 @@ const Index = () => {
           ═══════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative min-h-screen flex items-center pt-24 pb-16 md:pt-32 md:pb-0 overflow-hidden"
+        className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 md:pt-32 md:pb-0 overflow-hidden"
       >
         {/* Ambient glow spots */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -461,124 +461,39 @@ const Index = () => {
           <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] rounded-full bg-primary/[0.08] blur-[80px]" />
         </div>
 
-        {/* Centered with max-w-7xl, items-stretch allows children to match height exactly */}
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-10 grid gap-12 md:gap-8 md:grid-cols-2 md:items-stretch py-12">
+        {/* ── Hero Top Row: Headline (Left) + Face (Right) ── */}
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-10 flex flex-col md:flex-row md:items-start gap-4 md:gap-0 py-12">
 
-          {/* ── LEFT: Copy (50%) ── */}
-          {/* No flex-col justify-center, so it sits naturally and defines the row height */}
-          <div className="relative z-10 order-2 md:order-1 flex flex-col md:py-0 md:pr-10 lg:pr-16">
+          {/* ── LEFT: Headline Only ── */}
+          <div className="relative z-10 flex-1 flex flex-col md:pr-0 lg:pr-2">
             <motion.h1
-              className="hero-serif font-light italic text-[clamp(4.2rem,7.5vw,7.5rem)] leading-[0.95] tracking-wide"
-              style={{ color: '#2C3E50' }}
+              className="hero-serif font-light italic text-[clamp(3.2rem,7.5vw,7.5rem)] leading-[1.05] tracking-wide"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
             >
-              Precision<br />
-              Skincare,<br className="hidden lg:block" />
-              <span className="text-gradient-sand">Made Simple.</span>
+              <span className="text-[#001A33] dark:text-[#E2E8F0] transition-colors duration-300">Precision Skincare,</span><br />
+              <span className="text-gradient-sand transition-colors duration-300">Made Simple.</span>
             </motion.h1>
 
             <motion.div
-              className="mt-8 h-1 w-24 bg-gradient-to-r from-primary to-transparent rounded-full"
+              className="mt-6 h-1 w-24 bg-gradient-to-r from-primary to-transparent rounded-full"
               initial={{ opacity: 0, scaleX: 0 }}
               animate={{ opacity: 1, scaleX: 1 }}
               transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               style={{ transformOrigin: "left" }}
             />
-
-            {/* Structured 3-step feature list */}
-            <div className="mt-10 space-y-6 max-w-2xl">
-              {[
-                {
-                  step: "Step 1.",
-                  title: "Precision Analysis",
-                  desc: "120+ biometric markers decoded. No guesswork."
-                },
-                {
-                  step: "Step 2.",
-                  title: "Effortless Matching",
-                  desc: "5 curations matched to your unique skin vector."
-                },
-                {
-                  step: "Step 3.",
-                  title: "Healthy Foundation",
-                  desc: "Radiant skin that stays fresh—even under makeup."
-                }
-              ].map((feature, idx) => (
-                <motion.div
-                  key={idx}
-                  className="flex items-start gap-4"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7 + idx * 0.15, duration: 0.6 }}
-                >
-                  <div className="mt-2 flex-shrink-0 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(138,154,91,0.6)]" />
-                  <div>
-                    <h3 className="text-lg md:text-xl font-bold tracking-wide text-foreground">
-                      <span className="text-primary font-mono text-sm mr-2">{feature.step}</span>
-                      {feature.title}
-                    </h3>
-                    <p className="mt-1 text-base md:text-lg text-muted-foreground">{feature.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            <motion.p
-              className="hero-serif mt-10 text-xl md:text-2xl font-light italic tracking-wide text-center max-w-xl"
-              style={{ color: '#2C3E50' }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-            >
-              Your skincare speculation ends here.
-            </motion.p>
-
-            {/* Massive CTA */}
-            <motion.div
-              className="mt-12 flex flex-col gap-4"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.6 }}
-            >
-              <Link
-                to="/diagnosis"
-                className="group inline-flex items-center justify-center gap-4 rounded-full bg-white/10 backdrop-blur-lg px-12 md:px-16 py-6 md:py-7 text-xl md:text-2xl font-bold text-foreground shadow-xl border border-white/20 transition-all duration-400 hover:bg-white/20 hover:shadow-2xl hover:-translate-y-1 w-full md:w-max"
-              >
-                Begin Your Skin Assessment
-                <ArrowRight className="h-7 w-7 transition-transform duration-300 group-hover:translate-x-2" />
-              </Link>
-              <div className="flex items-center gap-3 md:ml-6 mt-2">
-                <ShieldCheck className="h-5 w-5 text-primary/80" />
-                <span className="text-base font-medium text-muted-foreground">Free · No account needed · Under 6 min</span>
-              </div>
-            </motion.div>
-
-            {/* Expert seal — inline in hero */}
-            <motion.div
-              className="mt-16 flex items-center gap-3 text-muted-foreground/70"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.3, duration: 0.6 }}
-            >
-              <Activity className="h-5 w-5 text-primary/60" />
-              <span className="text-xs md:text-sm tracking-wide font-medium" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                Powered by Korean biometric data science · Germany
-              </span>
-            </motion.div>
           </div>
 
-          {/* ── RIGHT: Hero Face + Scanning (50%) ── */}
+          {/* ── RIGHT: Hero Face + Scanning ── */}
           <motion.div
-            className="relative order-1 md:order-2 w-full h-full"
+            className="relative w-full md:w-[45%] lg:w-[40%] flex-shrink-0"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3, duration: 1, ease: [0.22, 1, 0.36, 1] }}
           >
-            {/* Touching the edges conceptually on the right side */}
             <motion.div
-              className="relative w-full h-full lg:mr-[-2rem] 2xl:mr-0 xl:scale-105"
+              className="relative w-full"
               style={{ y: heroParallaxY }}
             >
               {/* Soft gold glow behind face */}
@@ -588,13 +503,16 @@ const Index = () => {
                 aria-hidden="true"
               />
 
-              {/* Face image with scanning effects - larger rounded corners */}
-              <div className="relative w-full h-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/15">
+              {/* Face image with scanning effects */}
+              <div className="relative w-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/15">
                 <img
                   src="/assets/hero-face.png"
                   alt="European woman with natural, glowing skin — freckles and dewy highlights"
-                  className="w-full h-full object-cover"
+                  className="w-full h-auto object-cover"
                   loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  sizes="(max-width: 768px) 100vw, 40vw"
                 />
                 <ScanBeam />
               </div>
@@ -604,6 +522,94 @@ const Index = () => {
                 <FaceMarker key={marker.label} marker={marker} index={i} />
               ))}
             </motion.div>
+          </motion.div>
+        </div>
+
+        {/* ── Full-Width: Steps (3-col desktop / stacked mobile) ── */}
+        <div className="relative z-20 mx-auto w-full max-w-7xl px-6 md:px-10 mt-8">
+          <div className="flex flex-col md:grid md:grid-cols-3 gap-6 md:gap-8">
+            {[
+              {
+                step: "Step 1.",
+                title: "Precision Analysis",
+                desc: "120+ biometric markers decoded. No guesswork.",
+                icon: Scan
+              },
+              {
+                step: "Step 2.",
+                title: "Effortless Matching",
+                desc: "5 curations matched to your unique skin vector.",
+                icon: Brain
+              },
+              {
+                step: "Step 3.",
+                title: "Healthy Foundation",
+                desc: "Radiant skin that stays fresh—even under makeup.",
+                icon: Sparkles
+              }
+            ].map((feature, idx) => (
+              <motion.div
+                key={idx}
+                className="flex items-start gap-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 + idx * 0.15, duration: 0.6 }}
+              >
+                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center shadow-[0_0_12px_rgba(138,154,91,0.15)]">
+                  <feature.icon className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg md:text-xl font-bold tracking-wide text-foreground">
+                    {feature.title}
+                  </h3>
+                  <p className="mt-0.5 text-base md:text-lg text-muted-foreground">{feature.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Tagline */}
+          <motion.p
+            className="hero-serif mt-12 text-xl md:text-2xl font-light italic tracking-wide text-center max-w-xl mx-auto text-[#2C3E50] dark:text-[#E2E8F0] transition-colors duration-300"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            Your skincare speculation ends here.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            className="mt-10 flex flex-col items-center gap-4"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.6 }}
+          >
+            <Link
+              to="/diagnosis"
+              className="group inline-flex items-center justify-center gap-4 rounded-full bg-[#8A9A5B] backdrop-blur-2xl px-12 md:px-16 text-xl md:text-2xl font-medium tracking-[0.1em] text-white shadow-xl shadow-[#8A9A5B]/20 border border-[#8A9A5B]/30 transition-all duration-400 hover:shadow-2xl hover:shadow-[#8A9A5B]/30 hover:-translate-y-1 hover:scale-105 w-full md:w-max min-h-[54px] h-[54px]"
+              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            >
+              Begin Your Skin Assessment
+              <ArrowRight className="h-7 w-7 transition-transform duration-300 group-hover:translate-x-2" />
+            </Link>
+            <div className="flex items-center gap-3 mt-2">
+              <ShieldCheck className="h-5 w-5 text-primary/80" />
+              <span className="text-base font-medium text-muted-foreground">Free · No account needed · Under 6 min</span>
+            </div>
+          </motion.div>
+
+          {/* Expert seal */}
+          <motion.div
+            className="mt-12 flex items-center justify-center gap-3 text-muted-foreground/70"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.3, duration: 0.6 }}
+          >
+            <Activity className="h-5 w-5 text-primary/60" />
+            <span className="text-xs md:text-sm tracking-wide font-medium" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              Powered by Korean biometric data science · Germany
+            </span>
           </motion.div>
         </div>
 
@@ -628,10 +634,10 @@ const Index = () => {
       {/* ═══════════════════════════════════════
           AUTHORITY BADGES + PROGRESS SLIDER (Full Width)
           ═══════════════════════════════════════ */}
-      <section className="w-full px-6 md:px-10 py-24 md:py-36 border-t border-border bg-card/10">
-        <div className="w-full mx-auto">
+      <section className="w-full px-6 md:px-8 lg:px-12 py-16 md:py-32 border-t border-border bg-card/10">
+        <div className="w-full mx-auto max-w-7xl">
           {/* Authority badges - Full width grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 mb-24 md:mb-32">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 mb-20 md:mb-32">
             <AuthorityBadge icon={ShieldCheck} value="83%" label="Diagnostic Confidence" />
             <AuthorityBadge icon={Activity} value="10" label="Clinical Axes" />
             <AuthorityBadge icon={Brain} value="120" label="Validated Markers" />
@@ -646,7 +652,7 @@ const Index = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight mb-6">
+            <h2 className="hero-serif text-3xl md:text-6xl text-foreground tracking-tight mb-6">
               Real Results. Visible Progress.
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
@@ -662,8 +668,8 @@ const Index = () => {
       {/* ═══════════════════════════════════════
           DIAGNOSIS VISUALIZATION
           ═══════════════════════════════════════ */}
-      <section className="px-6 md:px-10 py-32 md:py-40 border-t border-border">
-        <div className="mx-auto w-full max-w-[1400px]">
+      <section className="px-6 md:px-8 lg:px-12 py-16 md:py-32 border-t border-border">
+        <div className="mx-auto w-full max-w-7xl">
           <motion.div
             className="mb-20 text-center"
             initial={{ opacity: 0, y: 30 }}
@@ -672,7 +678,7 @@ const Index = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="mx-auto mb-8 h-1 w-16 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
-            <h2 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight mb-6">
+            <h2 className="hero-serif text-3xl md:text-6xl text-foreground tracking-tight mb-6">
               Diagnosis Meets Beauty.
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
@@ -680,7 +686,7 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <div className="relative grid gap-16 lg:gap-24 lg:grid-cols-2 items-center">
+          <div className="relative flex flex-col items-center justify-center gap-6 lg:flex-row lg:justify-center lg:gap-8 mx-auto w-full">
 
             {/* ── Data Pulse Line (Connecting the cards on Desktop) ── */}
             <div className="hidden lg:block absolute top-[40%] left-[45%] right-[45%] h-px z-10 w-[10%] min-w-[80px]">
@@ -694,13 +700,13 @@ const Index = () => {
 
             {/* Left Card — Data Blueprint (The Input) */}
             <motion.div
-              className="relative flex justify-center lg:justify-end z-20"
+              className="relative flex justify-center z-20 w-full lg:w-auto"
               initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="relative w-full max-w-[420px] flex flex-col items-center p-8 md:p-10 bg-card/40 backdrop-blur-md rounded-3xl border border-primary/20 shadow-2xl shadow-[0_0_40px_-10px_rgba(138,154,91,0.15)] group transition-all duration-500 hover:border-primary/40 hover:shadow-primary/20">
+              <div className="relative w-full max-w-[420px] mx-auto flex flex-col items-center p-8 md:p-10 bg-card/40 backdrop-blur-md rounded-3xl border border-primary/20 shadow-2xl shadow-[0_0_40px_-10px_rgba(138,154,91,0.15)] group transition-all duration-500 hover:border-primary/40 hover:shadow-primary/20">
                 <div
                   className="absolute inset-0 rounded-3xl blur-[40px] opacity-20 group-hover:opacity-30 transition-opacity duration-500"
                   style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.5), transparent 70%)" }}
@@ -712,6 +718,9 @@ const Index = () => {
                     alt="Abstract topographic wireframe mesh with glowing 10-axis skin vector radar chart"
                     className="w-full h-auto object-cover aspect-square"
                     loading="lazy"
+                    fetchPriority="high"
+                    decoding="async"
+                    sizes="(max-width: 768px) 100vw, 420px"
                   />
                 </div>
                 <p className="mt-10 text-center text-xl md:text-2xl text-muted-foreground leading-relaxed font-light">
@@ -722,13 +731,13 @@ const Index = () => {
 
             {/* Right Card — K-Beauty Product Lineup (Solution) */}
             <motion.div
-              className="relative flex justify-center lg:justify-start z-20"
+              className="relative flex justify-center z-20 w-full lg:w-auto"
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              <div className="relative w-full max-w-[420px] flex flex-col items-center p-8 md:p-10 bg-card/40 backdrop-blur-md rounded-3xl border border-primary/20 shadow-2xl shadow-[0_0_40px_-10px_rgba(138,154,91,0.15)] group transition-all duration-500 hover:border-primary/40 hover:shadow-primary/20">
+              <div className="relative w-full max-w-[420px] mx-auto flex flex-col items-center p-8 md:p-10 bg-card/40 backdrop-blur-md rounded-3xl border border-primary/20 shadow-2xl shadow-[0_0_40px_-10px_rgba(138,154,91,0.15)] group transition-all duration-500 hover:border-primary/40 hover:shadow-primary/20">
                 <div
                   className="absolute inset-0 rounded-3xl blur-[40px] opacity-20 group-hover:opacity-30 transition-opacity duration-500"
                   style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.5), transparent 70%)" }}
@@ -781,8 +790,8 @@ const Index = () => {
       {/* ═══════════════════════════════════════
           THE SKIN STRATEGY JOURNEY
           ═══════════════════════════════════════ */}
-      <section className="px-6 md:px-10 py-32 md:py-40 bg-card/5 border-t border-border">
-        <div className="mx-auto w-full max-w-[1200px]">
+      <section className="px-6 md:px-8 lg:px-12 py-16 md:py-32 bg-card/5 border-t border-border">
+        <div className="mx-auto w-full max-w-7xl">
           <motion.div
             className="mb-24 text-center"
             initial={{ opacity: 0, y: 30 }}
@@ -791,7 +800,7 @@ const Index = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="mx-auto mb-8 h-1 w-16 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
-            <h2 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight mb-6">
+            <h2 className="hero-serif text-3xl md:text-6xl text-foreground tracking-tight mb-6">
               The Skin Strategy Journey
             </h2>
             <p className="text-xl md:text-2xl leading-relaxed text-muted-foreground max-w-3xl mx-auto font-normal">
@@ -809,7 +818,7 @@ const Index = () => {
       {/* ═══════════════════════════════════════
           CTA BAND (Massive)
           ═══════════════════════════════════════ */}
-      <section className="relative px-6 md:px-10 py-32 md:py-48 overflow-hidden">
+      <section className="relative px-6 md:px-8 lg:px-12 py-24 md:py-48 overflow-hidden">
         <div
           className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
@@ -818,13 +827,13 @@ const Index = () => {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/[0.03] blur-[120px] rounded-full pointer-events-none" />
 
         <motion.div
-          className="relative text-center max-w-4xl mx-auto"
+          className="relative text-center w-full max-w-7xl mx-auto"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="hero-serif text-4xl md:text-7xl text-foreground tracking-tight mb-8">
+          <h2 className="hero-serif text-3xl md:text-7xl text-foreground tracking-tight mb-8">
             Ready to decode your skin?
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground font-light mb-12">
@@ -833,7 +842,7 @@ const Index = () => {
           <div className="flex justify-center">
             <Link
               to="/diagnosis"
-              className="group inline-flex items-center justify-center gap-4 rounded-full bg-primary px-12 md:px-20 py-6 md:py-8 text-xl md:text-3xl font-bold text-primary-foreground transition-all duration-400 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2 hover:scale-105 w-full md:w-auto"
+              className="hero-serif group inline-flex items-center justify-center gap-4 rounded-full bg-primary px-12 md:px-20 py-6 md:py-8 text-xl md:text-3xl font-bold text-primary-foreground transition-all duration-400 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2 hover:scale-105 w-full md:w-auto min-h-[48px]"
             >
               Start Free Assessment
               <ArrowRight className="h-8 w-8 transition-transform duration-300 group-hover:translate-x-3" />

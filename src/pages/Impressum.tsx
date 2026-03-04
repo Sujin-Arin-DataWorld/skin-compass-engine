@@ -6,21 +6,45 @@ const Impressum = () => (
     <Navbar />
     <div className="mx-auto max-w-[960px] px-6 pt-24 pb-16">
       <h1 className="font-display text-3xl text-foreground">Impressum</h1>
-      <div className="mt-8 space-y-4 text-sm leading-relaxed text-muted-foreground">
-        <p className="font-medium text-foreground">Angaben gemäß § 5 TMG</p>
-        <p>[Name / Unternehmensname]: [PLACEHOLDER]</p>
-        <p>[Adresse]: [PLACEHOLDER]</p>
-        <p>[Kontakt]: [PLACEHOLDER]</p>
-        <p>[E-Mail]: [PLACEHOLDER]</p>
-        <p className="mt-6 font-medium text-foreground">
-          Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV:
-        </p>
-        <p>[PLACEHOLDER]</p>
-        <p className="mt-6 font-medium text-foreground">Haftungsausschluss / Disclaimer:</p>
-        <p>
-          Die Inhalte dieser Website dienen ausschließlich zu Informationszwecken
-          und ersetzen keine ärztliche Beratung oder Diagnose.
-        </p>
+      <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
+
+        <section>
+          <h2 className="font-medium text-foreground mb-3">Angaben gemäß § 5 TMG</h2>
+          <div className="space-y-1">
+            <p>[Vorname] [Nachname]</p>
+            <p>[Straße Hausnummer]</p>
+            <p>[PLZ] [Ort]</p>
+            <p>Deutschland</p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="font-medium text-foreground mb-3">Kontakt</h2>
+          <div className="space-y-1">
+            <p>Telefon: [Ihre Telefonnummer]</p>
+            <p>E-Mail: <a href="mailto:ihre-email@beispiel.de" className="text-primary hover:underline">[ire-email@beispiel.de]</a></p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="font-medium text-foreground mb-3">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+          <div className="space-y-1">
+            <p>[Vorname] [Nachname]</p>
+            <p>[Straße Hausnummer]</p>
+            <p>[PLZ] [Ort]</p>
+          </div>
+        </section>
+
+        <section className="pt-8 border-t border-border/50 text-xs">
+          <h3 className="font-medium text-foreground mb-2">Haftungsausschluss (Disclaimer)</h3>
+          <p className="mb-4">
+            Die Inhalte dieser Website (insbesondere die Hautanalyse) dienen ausschließlich zu Informationszwecken und ersetzen keine professionelle medizinische Beratung, Diagnose oder Behandlung.
+          </p>
+          <p>
+            Wir sind gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.
+          </p>
+        </section>
+
       </div>
     </div>
     <Footer />

@@ -6,7 +6,7 @@ const Footer = () =>
       <div className="flex gap-6">
         <Link to="/impressum" className="hover:text-foreground transition-colors">Impressum</Link>
         <Link to="/datenschutz" className="hover:text-foreground transition-colors">Datenschutz</Link>
-        <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+        <Link to="/about" className="hover:text-foreground transition-colors">AGB</Link>
       </div>
       <p className="text-[11px] font-bold tracking-[0.15em] text-muted-foreground/70 uppercase">
         POWERED BY KOREAN BIOMETRIC DATA SCIENCE — GERMANY

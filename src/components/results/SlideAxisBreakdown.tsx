@@ -33,9 +33,14 @@ const CRITICAL_MESSAGES: Partial<Record<AxisKey, string>> = {
   ox: "Antioxidant integration is the first line of defence.",
 };
 
-// SVG radar chart
+// SVG radar chart — always 10 axes
 function RadarChart({ result, highlightAxis }: { result: DiagnosisResult; highlightAxis: AxisKey }) {
-  const axes = result.radar_chart_data;
+  // Build full 10-axis data from AXIS_KEYS
+  const axes = AXIS_KEYS.map((key) => ({
+    axis: AXIS_LABELS[key],
+    score: Math.round(result.axis_scores[key] ?? 0),
+    key,
+  }));
   const n = axes.length;
   const VIEWBOX = 340, CENTER = VIEWBOX / 2, RADIUS = 100;
 
@@ -66,7 +71,7 @@ function RadarChart({ result, highlightAxis }: { result: DiagnosisResult; highli
       })}
       <motion.polygon
         points={poly}
-        fill="hsl(var(--primary) / 0.12)" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeLinejoin="round"
+        fill="hsl(var(--primary) / 0.25)" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
@@ -74,18 +79,17 @@ function RadarChart({ result, highlightAxis }: { result: DiagnosisResult; highli
       />
       {axes.map((a, i) => {
         const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        const r = RADIUS + 42;
+        const r = RADIUS + 30;
         return (
           <text
-            key={a.axis} x={CENTER + r * Math.cos(angle)} y={CENTER + r * Math.sin(angle)}
+            key={a.key} x={CENTER + r * Math.cos(angle)} y={CENTER + r * Math.sin(angle)}
             textAnchor="middle" dominantBaseline="central"
             style={{
-              fontSize: "12px",
+              fontSize: "10px",
               fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontWeight: 500,
-              fill: "hsl(var(--foreground))",
+              fontWeight: a.key === highlightAxis ? 700 : 500,
+              fill: a.key === highlightAxis ? "hsl(var(--primary))" : "hsl(var(--foreground))",
               opacity: 0.85,
-              textTransform: "capitalize" as const,
             }}
           >
             {a.axis}
@@ -144,7 +148,7 @@ const SlideAxisBreakdown = ({ result }: Props) => {
         <div className="grid gap-8 md:grid-cols-2 items-start">
           <RadarChart result={result} highlightAxis={topAxis} />
 
-          <div className="space-y-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {sorted.map((axis, i) => {
               const score = Math.round(result.axis_scores[axis]);
               const isTop = i === 0;
@@ -153,32 +157,32 @@ const SlideAxisBreakdown = ({ result }: Props) => {
               return (
                 <motion.div
                   key={axis}
-                  className={`rounded-xl p-3 ${isTop ? "border" : ""}`}
+                  className={`rounded-xl p-3 ${isTop ? "border md:col-span-2" : ""}`}
                   style={isTop ? {
                     borderColor: "hsl(var(--primary) / 0.4)",
                     background: "hsl(var(--primary) / 0.04)",
                   } : {}}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.15 + i * 0.05 }}
+                  transition={{ delay: 0.15 + i * 0.03 }}
                 >
                   <div className="flex justify-between items-center mb-1.5">
                     <p style={{
-                      fontSize: "0.875rem",
+                      fontSize: "0.8125rem",
                       fontWeight: isTop ? 700 : 500,
                       color: isTop ? "hsl(var(--primary))" : "hsl(var(--foreground))",
                     }}>
                       {AXIS_LABELS[axis]}
                       {isTop && (
-                        <span style={{ fontSize: "0.6875rem", marginLeft: "0.4rem", opacity: 0.7 }}>
-                          — Primary focus
+                        <span style={{ fontSize: "0.625rem", marginLeft: "0.4rem", opacity: 0.7 }}>
+                          — Primary
                         </span>
                       )}
                     </p>
                     <span
                       className="font-display"
                       style={{
-                        fontSize: "1rem",
+                        fontSize: "0.9375rem",
                         fontWeight: 600,
                         color: isTop ? "hsl(var(--primary))" : "hsl(var(--foreground))",
                       }}
@@ -187,8 +191,8 @@ const SlideAxisBreakdown = ({ result }: Props) => {
                     </span>
                   </div>
                   <div
-                    className="rounded-full overflow-hidden mb-1.5"
-                    style={{ height: "4px", background: "hsl(var(--border))" }}
+                    className="rounded-full overflow-hidden mb-1"
+                    style={{ height: "3px", background: "hsl(var(--border))" }}
                   >
                     <motion.div
                       className="h-full rounded-full"
@@ -198,12 +202,12 @@ const SlideAxisBreakdown = ({ result }: Props) => {
                       }}
                       initial={{ width: 0 }}
                       animate={{ width: `${score}%` }}
-                      transition={{ duration: 0.6, delay: 0.2 + i * 0.05 }}
+                      transition={{ duration: 0.6, delay: 0.2 + i * 0.03 }}
                     />
                   </div>
                   {interpretation && (
                     <p style={{
-                      fontSize: "0.75rem",
+                      fontSize: "0.6875rem",
                       color: "hsl(var(--foreground-hint))",
                       lineHeight: 1.4,
                     }}>

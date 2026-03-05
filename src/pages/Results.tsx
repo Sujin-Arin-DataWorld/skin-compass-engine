@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAuthStore } from "@/store/authStore";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 import SlideDiagnosisSummary from "@/components/results/SlideDiagnosisSummary";
@@ -76,11 +77,20 @@ const ResultsPage = () => {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
 
+  // Auto-save diagnosis result to user profile if logged in
+  const { isLoggedIn, saveDiagnosisResult } = useAuthStore();
+  useEffect(() => {
+    if (isLoggedIn && result) {
+      saveDiagnosisResult(result);
+    }
+  }, [isLoggedIn, result, saveDiagnosisResult]);
+
   const goTo = useCallback(
     (idx: number) => {
       if (idx < 0 || idx >= 6) return;
       setDirection(idx > current ? 1 : -1);
       setCurrent(idx);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     },
     [current]
   );

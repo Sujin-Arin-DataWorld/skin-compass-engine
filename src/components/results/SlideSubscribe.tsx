@@ -18,58 +18,58 @@ const PLANS: {
   features: string[];
   gated: string[];
 }[] = [
-  {
-    key: "entry",
-    label: "Entry",
-    tagline: "Essential 3-step routine — one-time",
-    price: "€49",
-    priceNote: "",
-    perDay: null,
-    features: [
-      "Core 3-product routine matched to your skin vector",
-      "Protocol PDF (AM + PM steps)",
-      "Dermatologist reviewed formulas",
-    ],
-    gated: [
-      "Monthly recalibration — products re-rank as skin changes",
-      "Protocol gating (active safety logic)",
-      "Progress history & Baseline Snapshot",
-    ],
-  },
-  {
-    key: "full",
-    label: "Full Protocol",
-    tagline: "Complete 5-phase adaptive routine",
-    price: "€89",
-    priceNote: "/ month",
-    perDay: "€2.97",
-    badge: "Recommended",
-    features: [
-      "All 5 protocol phases, built from your diagnosis",
-      "Monthly recalibration — products re-rank as your skin shifts",
-      "Protocol gating — actives unlock only when barrier is ready",
-      "Baseline Snapshot + monthly progress score comparison",
-      "Swap any product anytime — no questions asked",
-      "Ships EU 3–5 business days",
-    ],
-    gated: ["Clinical-grade device integration"],
-  },
-  {
-    key: "premium",
-    label: "Premium Strategy",
-    tagline: "Full routine + clinical device",
-    price: "€149",
-    priceNote: "/ month",
-    perDay: "€4.97",
-    features: [
-      "Everything in Full Protocol",
-      "Clinical-grade device (LED or microcurrent) matched to your phase",
-      "Priority recalibration within 48h of any skin event",
-      "Exclusive ingredient unlocks (prescription-adjacent actives)",
-    ],
-    gated: [],
-  },
-];
+    {
+      key: "entry",
+      label: "Entry",
+      tagline: "Essential 3-step routine — one-time",
+      price: "€49",
+      priceNote: "",
+      perDay: null,
+      features: [
+        "Core 3-product routine matched to your skin vector",
+        "Protocol PDF (AM + PM steps)",
+        "Dermatologist reviewed formulas",
+      ],
+      gated: [
+        "Monthly recalibration — products re-rank as skin changes",
+        "Protocol gating (active safety logic)",
+        "Progress history & Baseline Snapshot",
+      ],
+    },
+    {
+      key: "full",
+      label: "Full Protocol",
+      tagline: "Complete 5-phase adaptive routine",
+      price: "€89",
+      priceNote: "/ month",
+      perDay: "€2.97",
+      badge: "Recommended",
+      features: [
+        "All 5 protocol phases, built from your diagnosis",
+        "Monthly recalibration — products re-rank as your skin shifts",
+        "Protocol gating — actives unlock only when barrier is ready",
+        "Baseline Snapshot + monthly progress score comparison",
+        "Swap any product anytime — no questions asked",
+        "Ships EU 3–5 business days",
+      ],
+      gated: ["Clinical-grade device integration"],
+    },
+    {
+      key: "premium",
+      label: "Premium Strategy",
+      tagline: "Full routine + clinical device",
+      price: "€149",
+      priceNote: "/ month",
+      perDay: "€4.97",
+      features: [
+        "Everything in Full Protocol",
+        "Clinical-grade device (LED or microcurrent) matched to your phase",
+        "Priority recalibration within 48h of any skin event",
+        "Exclusive ingredient unlocks (prescription-adjacent actives)",
+      ],
+      gated: [],
+    },
+  ];
 
 interface Props {
   result: DiagnosisResult;
@@ -85,6 +85,8 @@ function Slide5A({
   onNext: () => void;
   pattern: string;
   topConcern: string;
+  topAxisName: string;
+  topScore: number;
   signalCount: number;
 }) {
   const recalibrationDate = new Date();
@@ -143,8 +145,38 @@ function Slide5A({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        A one-time product match solves today's problem. An adaptive strategy solves next month's — and the month after that.
+        A one-time product match solves today's <strong>{topConcern}</strong>. An adaptive strategy adjusts these formulas as your {topAxisName} levels stabilize next month.
       </motion.p>
+
+      {/* Dynamic Clinical Focus Asset */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.12 }}
+        className="rounded-2xl border p-5 mb-5 overflow-hidden relative"
+        style={{ borderColor: "hsl(var(--border))", background: "hsl(var(--card))" }}
+      >
+        <div className="absolute inset-0 opacity-5 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary via-transparent to-transparent" />
+        <p className="slide-eyebrow mb-3" style={{ color: "hsl(var(--primary))" }}>Clinical Focus: {topAxisName}</p>
+
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-full bg-border/50 h-2 rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${topScore}%` }}
+              transition={{ delay: 0.5, duration: 1 }}
+              className="h-full bg-primary rounded-full relative"
+            >
+              <div className="absolute top-0 right-0 bottom-0 w-8 bg-gradient-to-r from-transparent to-white/30 animate-shimmer" />
+            </motion.div>
+          </div>
+          <span className="ml-4 font-display text-xl font-bold text-foreground">{topScore}</span>
+        </div>
+
+        <p className="slide-body text-sm" style={{ color: "hsl(var(--foreground-hint))" }}>
+          Your baseline {topAxisName} score is highly active. The adaptive strategy prioritizes this vector first, unlocking stronger actives only when your barrier can tolerate them.
+        </p>
+      </motion.div>
 
       {/* Diagnosis summary banner */}
       <motion.div
@@ -414,10 +446,10 @@ function Slide5B({ onBack, signalCount, result }: { onBack: () => void; signalCo
 const SlideSubscribe = ({ result }: Props) => {
   const [subSlide, setSubSlide] = useState<"5A" | "5B">("5A");
 
-  const topAxis = result.primary_concerns[0];
-  const topConcern = topAxis
-    ? `${AXIS_LABELS[topAxis]} (${Math.round(result.axis_scores[topAxis])}/100)`
-    : "Sensitivity";
+  const topAxis = result.primary_concerns[0] || "sen";
+  const topAxisName = AXIS_LABELS[topAxis];
+  const topScore = Math.round(result.axis_scores[topAxis]);
+  const topConcern = `${topAxisName} (${topScore}/100)`;
   const patternName = result.detected_patterns[0]?.pattern.name_en ?? "Balanced Profile";
   const signalCount = result.radar_chart_data.filter((d) => d.score > 0).length;
 
@@ -436,6 +468,8 @@ const SlideSubscribe = ({ result }: Props) => {
               onNext={() => setSubSlide("5B")}
               pattern={patternName}
               topConcern={topConcern}
+              topAxisName={topAxisName}
+              topScore={topScore}
               signalCount={signalCount}
             />
           </motion.div>

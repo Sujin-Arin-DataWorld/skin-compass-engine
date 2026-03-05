@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ChevronDown, User } from "lucide-react";
 import { useTheme } from "next-themes";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { useAuthStore } from "@/store/authStore";
 
 function Logo() {
   return (
@@ -22,8 +24,13 @@ function Logo() {
   );
 }
 
+const CONCERNS = ["Sensitivity", "Hydration", "Oily / Pores", "Trouble", "Dead Skin", "Whitening", "Anti-aging"];
+const TYPES = ["Cleansing", "Peeling", "Toner / Mist", "Essence / Ampoule", "Cream", "Sun Care"];
+
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { isLoggedIn, userProfile } = useAuthStore();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md pt-[env(safe-area-inset-top)]">
@@ -31,6 +38,50 @@ const Navbar = () => {
         <Logo />
 
         <div className="flex items-center gap-3">
+          {/* Products Mega-Menu Trigger */}
+          <div className="relative hidden md:block" onMouseEnter={() => setMenuOpen(true)} onMouseLeave={() => setMenuOpen(false)}>
+            <button
+              className="flex items-center gap-1 text-sm text-foreground/70 hover:text-foreground transition-colors"
+            >
+              Products <ChevronDown className="h-3 w-3" />
+            </button>
+
+            <AnimatePresence>
+              {menuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute top-full right-0 mt-2 w-[420px] rounded-2xl border border-border bg-card/95 backdrop-blur-xl shadow-2xl p-6"
+                >
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">By Concern</p>
+                      <div className="space-y-1.5">
+                        {CONCERNS.map((c) => (
+                          <button key={c} onClick={() => setMenuOpen(false)} className="block w-full text-left text-sm text-foreground/70 hover:text-primary transition-colors py-0.5">
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">By Type</p>
+                      <div className="space-y-1.5">
+                        {TYPES.map((t) => (
+                          <button key={t} onClick={() => setMenuOpen(false)} className="block w-full text-left text-sm text-foreground/70 hover:text-primary transition-colors py-0.5">
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           {/* Theme toggle */}
           <motion.button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -51,6 +102,32 @@ const Navbar = () => {
           >
             Start Diagnosis
           </Link>
+
+          {/* Auth buttons */}
+          {isLoggedIn ? (
+            <Link
+              to="/profile"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 border border-primary/30 text-primary transition-colors hover:bg-primary/20"
+              aria-label="Profile"
+            >
+              <User className="h-4 w-4" />
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden sm:inline-flex text-sm text-foreground/60 hover:text-foreground transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className="rounded-full bg-primary px-5 py-2 font-body text-sm font-medium text-primary-foreground transition-all hover:opacity-90"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

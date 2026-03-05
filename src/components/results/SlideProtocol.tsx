@@ -191,7 +191,7 @@ const SlideProtocol = ({ result }: Props) => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p style={{ fontSize: "0.6875rem", letterSpacing: "0.1em", fontWeight: 600, color: "hsl(var(--foreground-hint))", textTransform: "uppercase" }}>{product.brand}</p>
-                      <p style={{ fontSize: "0.9375rem", fontWeight: 500, color: "hsl(var(--foreground))", lineHeight: 1.3 }}>{product.name}</p>
+                      <p style={{ fontSize: "0.9375rem", fontWeight: 500, color: "hsl(var(--foreground))", lineHeight: 1.3 }}>{product.name.en}</p>
                       <p className="slide-body truncate" style={{ fontSize: "0.8125rem", marginTop: "0.15rem" }}>
                         {product.key_ingredients.slice(0, 3).join(" · ")}
                       </p>

@@ -47,9 +47,12 @@ const SlideWhyItWorks = ({ result }: Props) => {
             >
               {/* Product info */}
               <div>
-                <p className="slide-eyebrow" style={{ fontSize: '0.6875rem', letterSpacing: '0.12em' }}>{product.brand}</p>
-                <p style={{ fontSize: '1rem', fontWeight: 500, color: 'hsl(var(--foreground))', marginTop: '0.25rem' }}>{product.name}</p>
-                <p className="slide-body" style={{ fontSize: '0.875rem', marginTop: '0.125rem' }}>{product.type}</p>
+                <div className="flex-1 mt-1 sm:mt-0 px-2 sm:px-0 text-center sm:text-left">
+                  <p style={{ fontSize: '0.625rem', letterSpacing: '0.15em', fontWeight: 700, color: 'hsl(var(--primary))', textTransform: 'uppercase' }}>{product.brand}</p>
+                  <p style={{ fontSize: '1rem', fontWeight: 500, color: 'hsl(var(--foreground))', marginTop: '0.25rem' }}>{product.name.en}</p>
+                  <p style={{ fontSize: '0.75rem', fontWeight: 400, color: 'hsl(var(--foreground-hint))', marginTop: '0.25rem' }}>
+                    {product.key_ingredients.slice(0, 2).join(' · ')}
+                  </p></div>
               </div>
 
               {/* Matched axes */}

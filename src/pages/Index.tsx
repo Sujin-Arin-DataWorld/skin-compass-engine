@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { ArrowRight, ChevronDown, Scan, Brain, FlaskConical, PackageCheck, Sparkles, ShieldCheck, Activity } from "lucide-react";
+import { ArrowRight, ChevronDown, Scan, Brain, FlaskConical, PackageCheck, Sparkles, ShieldCheck, Activity, Target } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
-import AnalysisProgress from "@/components/AnalysisProgress";
+import { useProductStore } from "@/store/productStore";
+import { AXIS_LABELS } from "@/engine/types";
 
 // ─────────────────────────────────────────────
 // Animation variants
@@ -436,8 +437,8 @@ function ExpertSeal() {
 const Index = () => {
   const [scrolled, setScrolled] = useState(false);
   const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroParallaxY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const { products } = useProductStore();
 
   const [analysisStep, setAnalysisStep] = useState(0);
 
@@ -477,203 +478,150 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      {/* ═══════════════════════════════════════
+          HERO — Luxury 3-Slide Swiper
+          ═══════════════════════════════════════ */}
+      <section className="relative h-screen min-h-[600px] w-full bg-background overflow-hidden">
+        <AnimatePresence initial={false} mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            {/* Background Image / Overlay logic per slide */}
+            {currentSlide === 0 && (
+              <>
+                <img src="/assets/hero-face.png" alt="Precision Skincare" className="w-full h-full object-cover object-center" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 z-20 flex flex-col justify-end">
+                  <h1 className="hero-serif text-5xl md:text-7xl lg:text-8xl text-[#001A33] dark:text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4 transition-colors duration-300">
+                    Precision<br />Skincare.
+                  </h1>
+                  <p className="text-lg md:text-2xl text-[#1A1A1A] dark:text-white/90 drop-shadow-md max-w-xl font-light leading-snug transition-colors duration-300">
+                    End the cycle of skincare speculation.<br />
+                    Clinical data matches you to exact formulas.
+                  </p>
+                  <Link
+                    to="/diagnosis"
+                    className="mt-8 inline-flex items-center justify-center gap-4 rounded-full bg-primary/90 text-primary-foreground px-8 py-4 text-sm md:text-base font-bold tracking-widest uppercase hover:bg-primary transition-colors w-max backdrop-blur-md border border-white/20"
+                  >
+                    Start Analysis
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                </div>
+              </>
+            )}
+            {currentSlide === 1 && (
+              <>
+                <img src="/assets/data-blueprint.png" alt="10-Axis Analysis" className="w-full h-full object-cover object-center" />
+                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center z-20">
+                  <Scan className="w-12 h-12 text-primary mb-6 animate-pulse" />
+                  <h1 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight font-light mb-4">
+                    The 10-Axis<br />Analysis Process.
+                  </h1>
+                  <p className="text-base md:text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">
+                    120 clinical markers processed in real-time to generate your bespoke biometric skin vector.
+                  </p>
+                </div>
+              </>
+            )}
+            {currentSlide === 2 && (
+              <>
+                <img src="/assets/kbeauty-lineup.png" alt="Strategy Lab Kit" className="w-full h-full object-cover object-center" />
+                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent md:to-background/20" />
+                <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 md:flex items-end justify-between z-20">
+                  <div className="max-w-xl">
+                    <h1 className="hero-serif text-4xl md:text-6xl lg:text-7xl text-foreground tracking-tight font-light mb-4">
+                      The Complete<br />Strategy Lab Kit.
+                    </h1>
+                    <p className="text-base md:text-xl text-muted-foreground leading-relaxed mb-6 md:mb-0">
+                      5 formulas perfectly curated to shift your exact clinical vector toward harmony. Delivered monthly.
+                    </p>
+                  </div>
+                  <Link
+                    to="/diagnosis"
+                    className="hidden md:inline-flex items-center justify-center gap-4 rounded-full bg-foreground text-background px-8 py-4 text-sm font-bold tracking-widest uppercase hover:bg-foreground/90 transition-colors shrink-0"
+                  >
+                    Explore Kit
+                  </Link>
+                </div>
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Global Slider Elements */}
+        <div className="absolute bottom-10 right-6 md:right-12 z-30 flex items-center gap-6">
+          {/* Pagination */}
+          <div className="text-white/80 dark:text-foreground/80 font-mono text-sm tracking-widest mix-blend-difference">
+            0{currentSlide + 1} / 03
+          </div>
+
+          {/* Controls */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))}
+              className="w-10 h-10 rounded-full border border-white/30 dark:border-foreground/30 flex items-center justify-center text-white dark:text-foreground mix-blend-difference hover:bg-white/10 transition-colors"
+            >
+              <ChevronDown className="w-5 h-5 rotate-90" />
+            </button>
+            <button
+              onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))}
+              className="w-10 h-10 rounded-full border border-white/30 dark:border-foreground/30 flex items-center justify-center text-white dark:text-foreground mix-blend-difference hover:bg-white/10 transition-colors"
+            >
+              <ChevronDown className="w-5 h-5 -rotate-90" />
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* ═══════════════════════════════════════
-          HERO — 50/50 Full-Width Split Screen
+          PRODUCTS GRID (2-Column Mobile, 4 Desktop)
           ═══════════════════════════════════════ */}
-      <section
-        ref={heroRef}
-        className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 md:pt-32 md:pb-0 overflow-hidden"
-      >
-        {/* Ambient glow spots */}
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-          <div className="absolute top-[10%] left-[5%] w-[600px] h-[600px] rounded-full bg-primary/[0.05] blur-[100px]" />
-          <div className="absolute bottom-[10%] right-[5%] w-[500px] h-[500px] rounded-full bg-primary/[0.08] blur-[80px]" />
-        </div>
-
-        {/* ── Hero Top Row: Headline (Left) + Face (Right) ── */}
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-10 flex flex-col md:flex-row md:items-start gap-4 md:gap-0 py-12">
-
-          {/* ── LEFT: Headline Only ── */}
-          <div className="relative z-10 flex-1 flex flex-col md:pr-0 lg:pr-2">
-            <motion.h1
-              className="hero-serif font-light italic text-[clamp(3.2rem,7.5vw,7.5rem)] leading-[1.05] tracking-wide"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <span className="text-[#001A33] dark:text-[#E2E8F0] transition-colors duration-300">Precision Skincare,</span><br />
-              <span className="text-gradient-sand transition-colors duration-300">Made Simple.</span>
-            </motion.h1>
-
-            <motion.div
-              className="mt-6 h-1 w-24 bg-gradient-to-r from-primary to-transparent rounded-full"
-              initial={{ opacity: 0, scaleX: 0 }}
-              animate={{ opacity: 1, scaleX: 1 }}
-              transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              style={{ transformOrigin: "left" }}
-            />
+      <section className="py-20 px-6 md:px-12 bg-background">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
+            <div>
+              <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-2">Die Kollektion</p>
+              <h2 className="hero-serif text-3xl md:text-5xl text-foreground font-light">Targeted Formulas</h2>
+            </div>
+            <p className="text-sm text-muted-foreground mt-4 md:mt-0 font-medium">Alle Produkte werden per Biometrie gematcht.</p>
           </div>
 
-          {/* ── RIGHT: Hero Face + Scanning ── */}
-          <motion.div
-            className="relative w-full md:w-[45%] lg:w-[40%] flex-shrink-0"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.3, duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <motion.div
-              className="relative w-full"
-              style={{ y: heroParallaxY }}
-            >
-              {/* Soft gold glow behind face */}
-              <div
-                className="absolute inset-[-10%] rounded-full blur-[80px] opacity-30"
-                style={{ background: "radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.4), transparent 70%)" }}
-                aria-hidden="true"
-              />
-
-              {/* Face image with scanning effects */}
-              <div className="relative w-full rounded-[2.5rem] md:rounded-[3rem] overflow-hidden border border-primary/20 shadow-2xl shadow-primary/15">
-                <img
-                  src="/assets/hero-face.png"
-                  alt="European woman with natural, glowing skin — freckles and dewy highlights"
-                  className="w-full h-auto object-cover"
-                  loading="eager"
-                  fetchPriority="high"
-                  decoding="async"
-                  sizes="(max-width: 768px) 100vw, 40vw"
-                />
-                <ScanBeam />
-              </div>
-
-              {/* Persistent data markers floating around face */}
-              {FACE_MARKERS.map((marker, i) => (
-                <FaceMarker key={marker.label} marker={marker} index={i} />
-              ))}
-
-              {/* Analysis Progress UI overlaid on the face */}
-              <motion.div
-                className="absolute bottom-[-15px] md:bottom-[-25px] left-1/2 -translate-x-1/2 z-30"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <AnalysisProgress
-                  currentStep={analysisStep}
-                  totalSteps={8}
-                  label={progressLabels[analysisStep]}
-                  className="scale-90 md:scale-100"
-                />
-              </motion.div>
-            </motion.div>
-          </motion.div>
-        </div>
-
-        {/* ── Full-Width: Steps (3-col desktop / stacked mobile) ── */}
-        <div className="relative z-20 mx-auto w-full max-w-7xl px-6 md:px-10 mt-8">
-          <div className="flex flex-col md:grid md:grid-cols-3 gap-6 md:gap-8">
-            {[
-              {
-                step: "Step 1.",
-                title: "Precision Analysis",
-                desc: "120+ biometric markers decoded. No guesswork.",
-                icon: Scan
-              },
-              {
-                step: "Step 2.",
-                title: "Effortless Matching",
-                desc: "5 curations matched to your unique skin vector.",
-                icon: Brain
-              },
-              {
-                step: "Step 3.",
-                title: "Healthy Foundation",
-                desc: "Radiant skin that stays fresh—even under makeup.",
-                icon: Sparkles
-              }
-            ].map((feature, idx) => (
-              <motion.div
-                key={idx}
-                className="flex items-start gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7 + idx * 0.15, duration: 0.6 }}
-              >
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 border border-primary/25 flex items-center justify-center shadow-[0_0_12px_rgba(138,154,91,0.15)]">
-                  <feature.icon className="w-6 h-6 text-primary" />
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+            {products.map((p) => (
+              <Link key={p.id} to={`/formula/${p.id}`} className="group flex flex-col bg-card/50 rounded-[2rem] border border-border/50 overflow-hidden hover:border-primary/50 transition-colors shadow-sm hover:shadow-lg hover:shadow-primary/5">
+                <div className="relative aspect-square w-full bg-gray-50 dark:bg-white/5 flex items-center justify-center p-6">
+                  {p.image ? (
+                    <img src={p.image} alt={p.name.en} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
+                  ) : (
+                    <span className="text-4xl opacity-50">🧴</span>
+                  )}
+                  {/* Target Vector Badge */}
+                  <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full border border-border shadow-sm">
+                    <span className="text-[0.6rem] font-bold tracking-widest uppercase text-primary flex items-center gap-1">
+                      <Target className="w-3 h-3" /> {AXIS_LABELS[p.targetVector] || "Target"}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg md:text-xl font-bold tracking-wide text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-0.5 text-base md:text-lg text-muted-foreground">{feature.desc}</p>
+                <div className="p-5 flex flex-col flex-1">
+                  <p className="text-[clamp(0.55rem,1.2vw,0.65rem)] font-bold tracking-widest uppercase text-primary mb-1">{p.brand}</p>
+                  <p className="text-[clamp(0.85rem,2vw,1.1rem)] font-semibold text-foreground leading-tight flex-1 group-hover:text-primary transition-colors">
+                    {p.name.en}
+                  </p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <p className="text-[clamp(0.75rem,1.5vw,0.875rem)] font-medium text-muted-foreground">{p.type}</p>
+                    <p className="font-display text-[clamp(1.1rem,2.5vw,1.25rem)] font-bold text-foreground">€{p.price}</p>
+                  </div>
                 </div>
-              </motion.div>
+              </Link>
             ))}
           </div>
-
-          {/* Tagline */}
-          <motion.p
-            className="hero-serif mt-12 text-xl md:text-2xl font-light italic tracking-wide text-center max-w-xl mx-auto text-[#2C3E50] dark:text-[#E2E8F0] transition-colors duration-300"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-          >
-            Your skincare speculation ends here.
-          </motion.p>
-
-          {/* CTA */}
-          <motion.div
-            className="mt-10 flex flex-col items-center gap-4"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.6 }}
-          >
-            <Link
-              to="/diagnosis"
-              className="group inline-flex items-center justify-center gap-4 rounded-full bg-[#8A9A5B] backdrop-blur-2xl px-12 md:px-16 text-xl md:text-2xl font-medium tracking-[0.1em] text-white shadow-xl shadow-[#8A9A5B]/20 border border-[#8A9A5B]/30 transition-all duration-400 hover:shadow-2xl hover:shadow-[#8A9A5B]/30 hover:-translate-y-1 hover:scale-105 w-full md:w-max min-h-[54px] h-[54px]"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-            >
-              Analyze Skin
-              <ArrowRight className="h-7 w-7 transition-transform duration-300 group-hover:translate-x-2" />
-            </Link>
-            <div className="flex items-center gap-3 mt-2">
-              <ShieldCheck className="h-5 w-5 text-primary/80" />
-              <span className="text-base font-medium text-muted-foreground">Free · No account needed · Under 6 min</span>
-            </div>
-          </motion.div>
-
-          {/* Expert seal */}
-          <motion.div
-            className="mt-12 flex items-center justify-center gap-3 text-muted-foreground/70"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.3, duration: 0.6 }}
-          >
-            <Activity className="h-5 w-5 text-primary/60" />
-            <span className="text-xs md:text-sm tracking-wide font-medium" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              Powered by Korean biometric data science · Germany
-            </span>
-          </motion.div>
         </div>
-
-        {/* Scroll indicator */}
-        <AnimatePresence>
-          {!scrolled &&
-            <motion.div
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-foreground/50 hidden md:flex"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <span className="text-xs font-bold uppercase tracking-widest">Scroll</span>
-              <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                <ChevronDown className="h-6 w-6" />
-              </motion.div>
-            </motion.div>
-          }
-        </AnimatePresence>
       </section>
 
       {/* ═══════════════════════════════════════

@@ -11,9 +11,9 @@ const Impressum = () => (
         <section>
           <h2 className="font-medium text-foreground mb-3">Angaben gemäß § 5 TMG</h2>
           <div className="space-y-1">
-            <p>[Vorname] [Nachname]</p>
-            <p>[Straße Hausnummer]</p>
-            <p>[PLZ] [Ort]</p>
+            <p>Skin Strategy Lab GmbH</p>
+            <p>Musterstraße 123</p>
+            <p>10115 Berlin</p>
             <p>Deutschland</p>
           </div>
         </section>
@@ -21,17 +21,32 @@ const Impressum = () => (
         <section>
           <h2 className="font-medium text-foreground mb-3">Kontakt</h2>
           <div className="space-y-1">
-            <p>Telefon: [Ihre Telefonnummer]</p>
-            <p>E-Mail: <a href="mailto:ihre-email@beispiel.de" className="text-primary hover:underline">[ire-email@beispiel.de]</a></p>
+            <p>Telefon: +49 (0) 30 12345678</p>
+            <p>E-Mail: <a href="mailto:kontakt@skinstrategylab.de" className="text-primary hover:underline">kontakt@skinstrategylab.de</a></p>
           </div>
         </section>
 
         <section>
-          <h2 className="font-medium text-foreground mb-3">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+          <h2 className="font-medium text-foreground mb-3">Vertreten durch</h2>
           <div className="space-y-1">
-            <p>[Vorname] [Nachname]</p>
-            <p>[Straße Hausnummer]</p>
-            <p>[PLZ] [Ort]</p>
+            <p>Dr. med. Beispiel Name (Geschäftsführer)</p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="font-medium text-foreground mb-3">Registereintrag</h2>
+          <div className="space-y-1">
+            <p>Eintragung im Handelsregister.</p>
+            <p>Registergericht: Amtsgericht Berlin (Charlottenburg)</p>
+            <p>Registernummer: HRB 123456 B</p>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="font-medium text-foreground mb-3">Umsatzsteuer-ID</h2>
+          <div className="space-y-1">
+            <p>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:</p>
+            <p>DE 999 999 999</p>
           </div>
         </section>
 

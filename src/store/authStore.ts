@@ -44,6 +44,7 @@ interface AuthState {
     saveDiagnosisResult: (result: DiagnosisResult) => void;
     addAddress: (address: Address) => void;
     removeAddress: (id: string) => void;
+    purchaseProduct: (product: { name: { en: string; de: string }; price: number }) => void;
 }
 
 const ADMIN_EMAIL = "admin@skinstrategylab.de";
@@ -162,6 +163,29 @@ export const useAuthStore = create<AuthState>()(
                 const profile = get().userProfile;
                 if (!profile) return;
                 set({ userProfile: { ...profile, addresses: profile.addresses.filter((a) => a.id !== id) } });
+            },
+
+            purchaseProduct: (product) => {
+                const profile = get().userProfile;
+                if (!profile) return;
+
+                const newOrder: Order = {
+                    id: `ORD-${Math.random().toString(36).substring(2, 9).toUpperCase()}`,
+                    date: new Date().toISOString(),
+                    status: "pending",
+                    total: product.price,
+                    items: [{ name: product.name.en, qty: 1, price: product.price }]
+                };
+
+                const updated = {
+                    ...profile,
+                    orderHistory: [newOrder, ...profile.orderHistory]
+                };
+
+                set({
+                    userProfile: updated,
+                    allUsers: get().allUsers.map((u) => (u.email === updated.email ? updated : u)),
+                });
             },
         }),
         { name: "skin-strategy-auth" }

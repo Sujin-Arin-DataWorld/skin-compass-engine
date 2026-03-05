@@ -57,7 +57,9 @@ const Navbar = () => {
                 >
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <p className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">By Concern</p>
+                      <p className="flex items-center gap-1.5 text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">
+                        <span className="text-sm">🎯</span> Concern (고민별)
+                      </p>
                       <div className="space-y-1.5">
                         {CONCERNS.map((c) => (
                           <button key={c} onClick={() => setMenuOpen(false)} className="block w-full text-left text-sm text-foreground/70 hover:text-primary transition-colors py-0.5">
@@ -67,7 +69,9 @@ const Navbar = () => {
                       </div>
                     </div>
                     <div>
-                      <p className="text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">By Type</p>
+                      <p className="flex items-center gap-1.5 text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">
+                        <span className="text-sm">🧴</span> Type (유형별)
+                      </p>
                       <div className="space-y-1.5">
                         {TYPES.map((t) => (
                           <button key={t} onClick={() => setMenuOpen(false)} className="block w-full text-left text-sm text-foreground/70 hover:text-primary transition-colors py-0.5">

@@ -69,13 +69,38 @@ export interface DetectedPattern {
   severity: 0 | 1 | 2 | 3;
 }
 
+export interface LocalizedContent {
+  de: string;
+  en: string;
+}
+
 export interface Product {
   id: string;
-  name: string;
+  name: LocalizedContent;
   brand: string;
   phase: string;
   type: string;
-  price_eur: number;
+
+  // Commerce & Pricing
+  price: number;
+  price_eur: number; // Keep for backward compatibility initially
+  volume: string;
+  unitPrice: string;
+  shelfLife: string;
+  stockStatus: "available" | "out_of_stock";
+
+  // Content
+  benefitSummary: LocalizedContent;
+  description: LocalizedContent;
+  howToUse: LocalizedContent;
+  ingredients: string[]; // Full INCI list
+
+  // Scientific Metadata
+  phLevel: number;
+  targetVector: AxisKey;
+  vectorImpact: Partial<Record<AxisKey, number>>;
+
+  // Legacy / Other
   tier: string[];
   shopify_handle: string;
   key_ingredients: string[];

@@ -13,7 +13,8 @@ import SlideSubscriptionTable from "@/components/results/SlideSubscriptionTable"
 import SlideSubscribe from "@/components/results/SlideSubscribe";
 import SlideNav from "@/components/results/SlideNav";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
-import type { DiagnosisResult, AxisScores, AxisSeverity } from "@/engine/types";
+import { useProductStore } from "@/store/productStore";
+import type { DiagnosisResult, AxisScores, AxisSeverity, Product } from "@/engine/types";
 
 const SLIDE_LABELS = [
   { key: "diagnosis", short: "Pattern", full: "Your Skin Pattern" },
@@ -31,7 +32,7 @@ const slideVariants = {
 };
 
 // Dev-only mock result for testing Results UI without running full diagnosis
-function makeMockResult(): DiagnosisResult {
+function makeMockResult(products: Product[]): DiagnosisResult {
   const axis_scores: AxisScores = { seb: 62, hyd: 48, bar: 74, sen: 85, ox: 33, acne: 71, pigment: 45, texture: 56, aging: 38, makeup_stability: 22 };
   const axis_severity: AxisSeverity = { seb: 2, hyd: 1, bar: 2, sen: 3, ox: 1, acne: 2, pigment: 1, texture: 2, aging: 1, makeup_stability: 0 };
   return {
@@ -53,26 +54,27 @@ function makeMockResult(): DiagnosisResult {
     primary_concerns: ["sen", "bar", "acne"],
     secondary_concerns: ["seb", "hyd", "texture"],
     product_bundle: {
-      Phase1: [{ id: "p1", name: "Gentle Barrier Cleanser", brand: "DERMATICA", phase: "Phase 1", type: "Cleanser", price_eur: 24, tier: ["Entry", "Full", "Premium"], shopify_handle: "gentle-cleanser", key_ingredients: ["Ceramide NP", "Glycerin", "Panthenol"], target_axes: ["bar", "sen"], for_skin: ["sensitive", "combination"] }],
-      Phase2: [{ id: "p2", name: "Barrier Repair Serum", brand: "SKINCEUTICALS", phase: "Phase 2", type: "Serum", price_eur: 42, tier: ["Full", "Premium"], shopify_handle: "barrier-serum", key_ingredients: ["Niacinamide 10%", "Madecassoside", "Hyaluronic Acid"], target_axes: ["bar", "hyd", "sen"], for_skin: ["sensitive", "dry"] }],
-      Phase3: [{ id: "p3", name: "Anti-Blemish Treatment", brand: "PAULA'S CHOICE", phase: "Phase 3", type: "Treatment", price_eur: 36, tier: ["Full", "Premium"], shopify_handle: "blemish-treatment", key_ingredients: ["Salicylic Acid 2%", "Green Tea Extract"], target_axes: ["acne", "seb", "texture"], for_skin: ["oily", "combination"] }],
-      Phase4: [{ id: "p4", name: "Recovery Moisturiser", brand: "LA ROCHE-POSAY", phase: "Phase 4", type: "Moisturiser", price_eur: 28, tier: ["Entry", "Full", "Premium"], shopify_handle: "recovery-moisturiser", key_ingredients: ["Shea Butter", "Thermal Water", "Ceramide AP"], target_axes: ["bar", "hyd"], for_skin: ["all"] }],
-      Phase5: [{ id: "p5", name: "UV Shield SPF50+", brand: "HELIOCARE", phase: "Phase 5", type: "Sunscreen", price_eur: 32, tier: ["Entry", "Full", "Premium"], shopify_handle: "uv-shield", key_ingredients: ["Fernblock", "Zinc Oxide", "Vitamin E"], target_axes: ["pigment", "ox", "aging"], for_skin: ["all"] }],
+      Phase1: products[0] ? [products[0]] : [],
+      Phase2: products[1] ? [products[1]] : [],
+      Phase3: products[2] ? [products[2]] : [],
+      Phase4: products[3] ? [products[3]] : [],
+      Phase5: products[4] ? [products[4]] : [],
     },
   };
 }
 
 const ResultsPage = () => {
   const { result: storeResult } = useDiagnosisStore();
+  const { products } = useProductStore();
   const [searchParams] = useSearchParams();
   const isDebug = searchParams.get("debug") === "true";
 
   // Use mock data in dev when no real result exists
   const result = useMemo(() => {
     if (storeResult) return storeResult;
-    if (import.meta.env.DEV) return makeMockResult();
+    if (import.meta.env.DEV) return makeMockResult(products);
     return null;
-  }, [storeResult]);
+  }, [storeResult, products]);
 
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);

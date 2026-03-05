@@ -94,7 +94,7 @@ function SkinProgressTab() {
                                 <div className="flex-1 min-w-0">
                                     <p className="text-[0.6rem] font-bold tracking-widest uppercase text-primary">{product.brand}</p>
                                     <p className="text-sm font-medium text-foreground truncate group-hover:text-primary transition-colors">
-                                        {product.name}
+                                        {product.name.en}
                                     </p>
                                 </div>
                                 <span className="text-xs text-foreground/40">€{product.price_eur}</span>

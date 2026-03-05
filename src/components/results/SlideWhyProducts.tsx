@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
+import { toast } from "sonner";
 import { DiagnosisResult, Product, AXIS_LABELS, AxisKey } from "@/engine/types";
 
 function getBarColor(score: number): string {
@@ -110,6 +112,8 @@ const SlideWhyProducts = ({ result }: Props) => {
 function EnhancedProductCard({ product, result, index }: { product: Product; result: DiagnosisResult; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const { matchedAxes, because, helps, phaseLabel, phaseIcon, phaseNum, phaseName } = generateWhyData(product, result);
+  const { isLoggedIn, purchaseProduct } = useAuthStore();
+  const navigate = useNavigate();
 
   return (
     <motion.div
@@ -131,7 +135,7 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
         <Link to={`/formula/${product.id}`} className="block relative w-full aspect-square max-w-[160px] mx-auto group cursor-pointer">
           <div className="w-full h-full bg-white dark:bg-white/5 rounded-xl shadow-sm flex items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105">
             {product.image ? (
-              <img src={product.image} alt={product.name} className="max-w-full max-h-full object-contain" />
+              <img src={product.image} alt={product.name.en} className="max-w-full max-h-full object-contain" />
             ) : (
               <div className="w-full h-full bg-gray-50 dark:bg-white/5 rounded-lg flex items-center justify-center text-[#1A1A1A] dark:text-gray-300 text-xs">No Image</div>
             )}
@@ -169,16 +173,32 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
           <div className="flex items-start justify-between gap-4">
             <div className="mt-1">
               <p className="dark:text-white" style={{ fontSize: "1.125rem", fontWeight: 600, color: "#1A1A1A", lineHeight: 1.2 }}>
-                {product.name}
+                {product.name.en}
               </p>
               <p className="dark:text-gray-400" style={{ fontSize: "0.8125rem", color: "#4A4A4A", marginTop: "0.2rem" }}>
                 {product.type}
               </p>
             </div>
-            <div className="text-right flex-shrink-0">
+            <div className="text-right flex-shrink-0 flex flex-col items-end gap-2">
               <p className="font-display dark:text-white" style={{ fontSize: "1.25rem", fontWeight: 600, color: "#1A1A1A" }}>
                 €{product.price_eur}
               </p>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!isLoggedIn) {
+                    toast.error("Bitte melden Sie sich an, um Produkte zu kaufen.");
+                    navigate("/login");
+                    return;
+                  }
+                  purchaseProduct({ name: product.name, price: product.price_eur });
+                  toast.success("Zum Warenkorb hinzugefügt und als Bestellung simuliert!");
+                }}
+                className="rounded-full bg-primary px-3 py-1.5 font-bold uppercase tracking-wider text-primary-foreground hover:opacity-90 transition-opacity whitespace-nowrap"
+                style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.65rem)" }}
+              >
+                Kaufen
+              </button>
             </div>
           </div>
         </div>

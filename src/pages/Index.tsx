@@ -557,7 +557,7 @@ const Index = () => {
         {/* Global Slider Elements */}
         <div className="absolute bottom-10 right-6 md:right-12 z-30 flex items-center gap-6">
           {/* Pagination */}
-          <div className="text-white/80 dark:text-foreground/80 font-mono text-sm tracking-widest mix-blend-difference">
+          <div className="text-[#1A1A1A] dark:text-white/90 font-mono text-sm tracking-widest transition-colors duration-300">
             0{currentSlide + 1} / 03
           </div>
 
@@ -565,13 +565,13 @@ const Index = () => {
           <div className="flex gap-2">
             <button
               onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))}
-              className="w-10 h-10 rounded-full border border-white/30 dark:border-foreground/30 flex items-center justify-center text-white dark:text-foreground mix-blend-difference hover:bg-white/10 transition-colors"
+              className="w-10 h-10 rounded-full border border-[#1A1A1A]/30 dark:border-white/30 flex items-center justify-center text-[#1A1A1A] dark:text-white hover:bg-[#1A1A1A]/10 dark:hover:bg-white/10 transition-colors duration-300"
             >
               <ChevronDown className="w-5 h-5 rotate-90" />
             </button>
             <button
               onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))}
-              className="w-10 h-10 rounded-full border border-white/30 dark:border-foreground/30 flex items-center justify-center text-white dark:text-foreground mix-blend-difference hover:bg-white/10 transition-colors"
+              className="w-10 h-10 rounded-full border border-[#1A1A1A]/30 dark:border-white/30 flex items-center justify-center text-[#1A1A1A] dark:text-white hover:bg-[#1A1A1A]/10 dark:hover:bg-white/10 transition-colors duration-300"
             >
               <ChevronDown className="w-5 h-5 -rotate-90" />
             </button>

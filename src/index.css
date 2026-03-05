@@ -21,11 +21,11 @@
     --card-foreground: 210 30% 24%;
     /* #2C3E50 — Deep Slate */
 
-    --foreground: 210 30% 24%;
-    /* #2C3E50 — Deep Slate — primary heading */
-    --foreground-body: 210 20% 32%;
-    /* mid-slate — body text */
-    --foreground-hint: 210 12% 50%;
+    --foreground: 0 0% 10%;
+    /* #1A1A1A — Deep Charcoal — primary heading */
+    --foreground-body: 210 30% 24%;
+    /* #2C3E50 — Slate Blue — body text */
+    --foreground-hint: 210 20% 35%;
     /* muted slate — labels/hints */
 
     --popover: 210 11% 95%;
@@ -40,7 +40,7 @@
     --secondary-foreground: 210 30% 18%;
 
     --muted: 210 8% 90%;
-    --muted-foreground: 210 12% 50%;
+    --muted-foreground: 210 20% 35%;
 
     --accent: 76 30% 94%;
     --accent-foreground: 76 26% 38%;
@@ -94,9 +94,9 @@
     --sidebar-ring: 76 26% 48%;
 
     /* Diagnosis text tokens — WCAG AA compliant */
-    --diagnosis-text-primary: 210 30% 20%;
-    --diagnosis-text-secondary: 210 20% 32%;
-    --diagnosis-text-hint: 210 12% 46%;
+    --diagnosis-text-primary: 0 0% 10%;
+    --diagnosis-text-secondary: 210 30% 24%;
+    --diagnosis-text-hint: 210 20% 35%;
 
     /* Typography scale */
     --text-hero: clamp(2.8rem, 7vw, 5.5rem);

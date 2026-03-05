@@ -5,6 +5,7 @@ import { ArrowRight, ChevronDown, Scan, Brain, FlaskConical, PackageCheck, Spark
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
+import AnalysisProgress from "@/components/AnalysisProgress";
 
 // ─────────────────────────────────────────────
 // Animation variants
@@ -438,10 +439,39 @@ const Index = () => {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroParallaxY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
+  const [analysisStep, setAnalysisStep] = useState(0);
+
+  const progressLabels = [
+    "Initializing...",
+    "Scanning Sebum...",
+    "Checking Hydration...",
+    "Analyzing Texture...",
+    "Evaluating Barrier...",
+    "Measuring Elasticity...",
+    "Detecting Pigment...",
+    "Assessing Aging...",
+    "Analysis Complete"
+  ];
+
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 80);
     window.addEventListener("scroll", handler, { passive: true });
-    return () => window.removeEventListener("scroll", handler);
+
+    // Simulate biometric scanning progression
+    const interval = setInterval(() => {
+      setAnalysisStep(prev => {
+        if (prev >= 8) {
+          // Pause briefly at Complete before looping (optional, or just stop)
+          return 0; // Or keep it at 8 for final state
+        }
+        return prev + 1;
+      });
+    }, 1500); // 1.5 seconds per step
+
+    return () => {
+      window.removeEventListener("scroll", handler);
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -521,6 +551,21 @@ const Index = () => {
               {FACE_MARKERS.map((marker, i) => (
                 <FaceMarker key={marker.label} marker={marker} index={i} />
               ))}
+
+              {/* Analysis Progress UI overlaid on the face */}
+              <motion.div
+                className="absolute bottom-[-15px] md:bottom-[-25px] left-1/2 -translate-x-1/2 z-30"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <AnalysisProgress
+                  currentStep={analysisStep}
+                  totalSteps={8}
+                  label={progressLabels[analysisStep]}
+                  className="scale-90 md:scale-100"
+                />
+              </motion.div>
             </motion.div>
           </motion.div>
         </div>

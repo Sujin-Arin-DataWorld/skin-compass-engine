@@ -215,9 +215,6 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <span className="category-badge">
-          Category {category} of 8
-        </span>
         <h2 className="category-title mt-1 flex items-center gap-3">
           <span>{info?.emoji}</span>
           {info?.name}

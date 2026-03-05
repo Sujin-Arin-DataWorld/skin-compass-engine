@@ -12,6 +12,7 @@ import CategoryInteractive from "@/components/diagnosis/CategoryInteractive";
 import SeveritySelector from "@/components/diagnosis/SeveritySelector";
 import LabCard from "@/components/diagnosis/LabCard";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
+import GlobalProgressLine from "@/components/GlobalProgressLine";
 import { useProgressPersistence, getSavedProgress, clearSavedProgress, estimateTimeRemaining } from "@/hooks/useProgressPersistence";
 import { usePerformanceMode } from "@/hooks/usePerformanceMode";
 import React from "react";
@@ -118,6 +119,7 @@ const DiagnosisPage = () => {
   }, [metaCategoryJustCompleted, store.severities, store.contexts]);
 
   const goNext = useCallback(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     if (store.currentStep >= 2 && store.currentStep <= 9) {
       const completedCat = store.currentStep - 1;
       const metaQs = META_QUESTIONS.filter((q) => {
@@ -145,6 +147,7 @@ const DiagnosisPage = () => {
   }, [store, showMeta]);
 
   const goBack = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     if (showMeta) {
       setShowMeta(false);
       setMetaCategoryJustCompleted(null);
@@ -184,24 +187,7 @@ const DiagnosisPage = () => {
       <SilkBackground />
       <Navbar />
 
-      {/* Progress bar + time estimate */}
-      <div className="fixed top-[65px] left-0 right-0 z-40">
-        <div className="h-0.5 bg-border">
-          <motion.div
-            className="h-full bg-primary"
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: reducedMotion ? 0.1 : 0.3 }}
-          />
-        </div>
-        {store.currentStep < 10 && store.currentStep > 0 && (
-          <div className="flex justify-end px-4 py-1">
-            <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-              <Clock className="h-3 w-3" />
-              {timeEstimate}
-            </span>
-          </div>
-        )}
-      </div>
+      {/* Removed old fixed top progress bar and time estimate */}
 
       {/* Resume prompt */}
       <AnimatePresence>
@@ -242,6 +228,9 @@ const DiagnosisPage = () => {
 
       <div className="flex min-h-screen flex-col items-center justify-start px-4 sm:px-6 pt-24 pb-12">
         <div className="mx-auto w-full max-w-[640px]">
+          {/* Global persistent line sitting above all changing step content */}
+          {store.currentStep < 10 && <GlobalProgressLine />}
+
           <AnimatePresence mode="wait">
             {/* Step 0: Context */}
             {store.currentStep === 0 && (
@@ -257,11 +246,10 @@ const DiagnosisPage = () => {
                     <motion.button
                       key={opt.key}
                       onClick={() => store.toggleContext(opt.key)}
-                      className={`rounded-lg border px-5 py-4 text-left text-sm transition-all min-h-[44px] touch-manipulation ${
-                        store.contexts.includes(opt.key)
-                          ? "border-primary bg-primary/10 text-foreground"
-                          : "border-border text-muted-foreground hover:border-primary/50"
-                      }`}
+                      className={`rounded-lg border px-5 py-4 text-left text-sm transition-all min-h-[44px] touch-manipulation ${store.contexts.includes(opt.key)
+                        ? "border-primary bg-primary/10 text-foreground"
+                        : "border-border text-muted-foreground hover:border-primary/50"
+                        }`}
                       whileTap={reducedMotion ? undefined : { scale: 0.98 }}
                     >
                       {opt.label}
@@ -285,11 +273,10 @@ const DiagnosisPage = () => {
                     <motion.button
                       key={st.key}
                       onClick={() => store.setSkinType(st.key)}
-                      className={`rounded-lg border px-5 py-4 text-left transition-all min-h-[44px] touch-manipulation ${
-                        store.skinType === st.key
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
-                      }`}
+                      className={`rounded-lg border px-5 py-4 text-left transition-all min-h-[44px] touch-manipulation ${store.skinType === st.key
+                        ? "border-primary bg-primary/10"
+                        : "border-border hover:border-primary/50"
+                        }`}
                       whileTap={reducedMotion ? undefined : { scale: 0.98 }}
                     >
                       <span className="font-medium text-foreground">{st.label}</span>
@@ -330,11 +317,10 @@ const DiagnosisPage = () => {
                             <motion.button
                               key={String(v)}
                               onClick={() => store.setMetaAnswer(q.id, v)}
-                              className={`flex-1 rounded-md px-4 py-2 text-sm transition-all min-h-[44px] touch-manipulation border ${
-                                store.metaAnswers[q.id] === v
-                                  ? "bg-primary/20 text-primary border-primary"
-                                  : "bg-secondary/50 text-foreground/70 border-transparent hover:bg-secondary"
-                              }`}
+                              className={`flex-1 rounded-md px-4 py-2 text-sm transition-all min-h-[44px] touch-manipulation border ${store.metaAnswers[q.id] === v
+                                ? "bg-primary/20 text-primary border-primary"
+                                : "bg-secondary/50 text-foreground/70 border-transparent hover:bg-secondary"
+                                }`}
                               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                             >
                               {v ? "Yes" : "No"}
@@ -351,11 +337,10 @@ const DiagnosisPage = () => {
                           {(q.id === "premenstrual_7_10d") && (
                             <motion.button
                               onClick={() => store.setMetaAnswer(q.id, -1)}
-                              className={`w-full rounded-md px-4 py-2.5 text-sm transition-all min-h-[44px] touch-manipulation border ${
-                                store.metaAnswers[q.id] === -1
-                                  ? "bg-muted text-foreground border-border"
-                                  : "bg-secondary/30 text-foreground/60 border-transparent hover:bg-secondary/60"
-                              }`}
+                              className={`w-full rounded-md px-4 py-2.5 text-sm transition-all min-h-[44px] touch-manipulation border ${store.metaAnswers[q.id] === -1
+                                ? "bg-muted text-foreground border-border"
+                                : "bg-secondary/30 text-foreground/60 border-transparent hover:bg-secondary/60"
+                                }`}
                               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                             >
                               Not applicable (I do not menstruate / prefer not to answer)

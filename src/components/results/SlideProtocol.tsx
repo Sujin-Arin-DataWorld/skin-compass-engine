@@ -5,11 +5,46 @@ import { useI18nStore } from "@/store/i18nStore";
 import { Lock } from "lucide-react";
 
 const PHASES = [
-  { key: "Phase1", num: 1, name: { en: "Cleanse", de: "Reinigen" }, icon: "💧", am: true, pm: true, desc: { en: "Remove impurities without disrupting barrier integrity.", de: "Verunreinigungen entfernen, ohne die Barriereintegrität zu stören." }, skipWarning: { en: "Skipping leaves barrier-disrupting residue that amplifies reactivity.", de: "Auslassen hinterlässt barrierestörende Rückstände, die die Reaktivität verstärken." } },
-  { key: "Phase2", num: 2, name: { en: "Prep", de: "Vorbereiten" }, icon: "🌿", am: true, pm: true, desc: { en: "Rebuild and reinforce the skin's moisture barrier.", de: "Wiederaufbau und Stärkung der Feuchtigkeitsbarriere der Haut." }, skipWarning: { en: "Barrier support is the foundation — skipping collapses all downstream phases.", de: "Barriereunterstützung ist das Fundament — Auslassen lässt alle nachfolgenden Phasen kollabieren." } },
-  { key: "Phase3", num: 3, name: { en: "Treat", de: "Behandeln" }, icon: "🔬", am: false, pm: true, desc: { en: "Address primary concerns with active ingredients.", de: "Hauptprobleme mit aktiven Wirkstoffen angehen." }, skipWarning: { en: "Treatment actives without barrier prep cause reactive flare-ups.", de: "Behandlungs-Wirkstoffe ohne Barrierevorbereitung verursachen reaktive Schübe." } },
-  { key: "Phase4", num: 4, name: { en: "Seal", de: "Versiegeln" }, icon: "🛡", am: true, pm: true, desc: { en: "Lock in moisture and create a protective film.", de: "Feuchtigkeit einschließen und einen Schutzfilm bilden." }, skipWarning: { en: "Recovery phase locks in treatment gains — skipping reduces efficacy by ~40%.", de: "Die Erholungsphase sichert den Behandlungserfolg — Auslassen reduziert die Wirksamkeit um ~40%." } },
-  { key: "Phase5", num: 5, name: { en: "Protect", de: "Schützen" }, icon: "☀️", am: true, pm: false, desc: { en: "UV protection — always the final step.", de: "UV-Schutz — immer der letzte Schritt." }, skipWarning: { en: "Without SPF, all pigmentation and barrier work is partially reversed daily.", de: "Ohne LSF wird die Arbeit an Pigmentierung und Barriere täglich teilweise rückgängig gemacht." } },
+  {
+    key: "Phase1", num: 1,
+    name: { en: "Prepare", de: "Vorbereiten" },
+    icon: "💧", am: true, pm: true,
+    axisDriver: { en: "Sebum · Hydration", de: "Talg · Feuchtigkeit" },
+    desc: { en: "Double cleanse and tone. Resets sebum balance and opens hydration pathways for full protocol absorption.", de: "Doppelreinigung und Toner. Reguliert den Talghaushalt und öffnet Feuchtigkeitswege für maximale Protokollaufnahme." },
+    skipWarning: { en: "Skipping traps oxidative residue — Phase 2 absorption drops by 60%.", de: "Auslassen hinterlässt oxidative Rückstände — Phase 2 Absorption sinkt um 60%." },
+  },
+  {
+    key: "Phase2", num: 2,
+    name: { en: "Activate", de: "Aktivieren" },
+    icon: "🌿", am: true, pm: true,
+    axisDriver: { en: "Barrier", de: "Hautbarriere" },
+    desc: { en: "Barrier essence layer. Reinforces the structural matrix and seals moisture channels before actives.", de: "Barriere-Essenz-Schicht. Stärkt die Strukturmatrix und versiegelt Feuchtigkeitskanäle vor den Wirkstoffen." },
+    skipWarning: { en: "Barrier activation is the foundation — skipping collapses all downstream treatment phases.", de: "Barriere-Aktivierung ist das Fundament — Auslassen lässt alle nachfolgenden Phasen kollabieren." },
+  },
+  {
+    key: "Phase3", num: 3,
+    name: { en: "Treat", de: "Behandeln" },
+    icon: "🔬", am: false, pm: true,
+    axisDriver: { en: "Acne · Pigment · Aging · Oxidative", de: "Akne · Pigment · Alterung · Oxidativer Stress" },
+    desc: { en: "The Formula. PM-only targeted actives addressing your highest-priority clinical vector.", de: "Die Formel. Nur-PM-Wirkstoffe, die Ihren dringendsten klinischen Vektor adressieren." },
+    skipWarning: { en: "Actives on unprimed barrier trigger reactive flare-ups. Phase 2 must precede.", de: "Wirkstoffe auf unvorbereiteter Barriere lösen Reaktivität aus. Phase 2 muss vorangehen." },
+  },
+  {
+    key: "Phase4", num: 4,
+    name: { en: "Recover", de: "Regenerieren" },
+    icon: "🛡", am: true, pm: true,
+    axisDriver: { en: "Sensitivity · Aging", de: "Empfindlichkeit · Alterung" },
+    desc: { en: "Moisturizer + repair matrix. Locks treatment gains and fuels overnight collagen synthesis.", de: "Feuchtigkeitscreme + Reparatur-Matrix. Sichert Behandlungserfolge und fördert die nächtliche Kollagensynthese." },
+    skipWarning: { en: "Recovery seals treatment gains — skipping reduces cumulative protocol efficacy by ~40%.", de: "Regeneration sichert Behandlungserfolge — Auslassen reduziert die kumulierte Wirksamkeit um ~40%." },
+  },
+  {
+    key: "Phase5", num: 5,
+    name: { en: "Protect", de: "Schützen" },
+    icon: "☀️", am: true, pm: false,
+    axisDriver: { en: "Oxidative Stress · Makeup Stability", de: "Oxidativer Stress · Make-up Stabilität" },
+    desc: { en: "Barrier shield + UV armor. Neutralizes oxidative attack and seals the protocol for lasting results.", de: "Barriere-Schutzschild + UV-Schutz. Neutralisiert oxidativen Stress und versiegelt das Protokoll für dauerhafte Ergebnisse." },
+    skipWarning: { en: "Without SPF, all pigmentation and barrier gains are reversed by UV exposure daily.", de: "Ohne LSF werden alle Pigmentierungs- und Barriereerfolge täglich durch UV rückgängig gemacht." },
+  },
 ];
 
 const FLAG_MESSAGES: Record<string, { icon: string; title: { en: string; de: string }; body: { en: string; de: string } }> = {
@@ -130,8 +165,8 @@ const SlideProtocol = ({ result }: Props) => {
               </div>
               <p style={{
                 fontSize: "0.8125rem",
-                fontWeight: activePhase === i ? 600 : 400,
-                color: activePhase === i ? "hsl(var(--foreground))" : "hsl(var(--foreground-hint))",
+                fontWeight: activePhase === i ? 700 : 400,
+                color: activePhase === i ? "#D4AF37" : "hsl(var(--foreground-hint))",
                 textAlign: "center",
                 lineHeight: 1.3,
               }}>
@@ -152,8 +187,11 @@ const SlideProtocol = ({ result }: Props) => {
             className="mt-6 rounded-2xl p-6 md:p-8"
             style={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }}
           >
-            <p className="slide-eyebrow mb-2" style={{ color: "hsl(var(--primary))" }}>
+            <p className="slide-eyebrow mb-1" style={{ color: "#D4AF37", letterSpacing: "0.14em" }}>
               Phase {phase.num} · {phase.name[language as keyof typeof phase.name]}
+            </p>
+            <p style={{ fontSize: "0.65rem", fontWeight: 600, color: "#947E5C", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.5rem" }}>
+              ↳ {phase.axisDriver[language as keyof typeof phase.axisDriver]}
             </p>
             <p className="slide-body mb-1">{phase.desc[language as keyof typeof phase.desc]}</p>
 

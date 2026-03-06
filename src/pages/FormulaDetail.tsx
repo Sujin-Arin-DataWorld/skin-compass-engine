@@ -1,9 +1,10 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { ShoppingBag, Check } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
-import { useAuthStore } from "@/store/authStore";
 import { useProductStore } from "@/store/productStore";
+import { useCartStore } from "@/store/cartStore";
 import { AXIS_LABELS, Product } from "@/engine/types";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
@@ -11,20 +12,31 @@ import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
 
 const PHASE_META: Record<string, { icon: string; name: string; desc: string }> = {
-    "Phase 1": { icon: "💧", name: "Cleanse", desc: "Remove impurities without disrupting barrier integrity." },
-    "Phase 2": { icon: "🌿", name: "Prep", desc: "Rebuild and reinforce the skin's moisture barrier." },
-    "Phase 3": { icon: "🔬", name: "Treat", desc: "Address primary concerns with active ingredients." },
-    "Phase 4": { icon: "🛡", name: "Seal", desc: "Lock in moisture and create a protective film." },
-    "Phase 5": { icon: "☀️", name: "Protect", desc: "UV protection — always the final step." },
+    "1": { icon: "💧", name: "Cleanse", desc: "Remove impurities without disrupting barrier integrity." },
+    "2": { icon: "🌿", name: "Prep", desc: "Rebuild and reinforce the skin's moisture barrier." },
+    "3": { icon: "🔬", name: "Treat", desc: "Address primary concerns with active ingredients." },
+    "4": { icon: "🛡", name: "Seal", desc: "Lock in moisture and create a protective film." },
+    "5": { icon: "☀️", name: "Protect", desc: "UV protection — always the final step." },
+    "Device": { icon: "✨", name: "Device", desc: "Clinical device to amplify protocol results." },
 };
+
+// Normalize phase strings like "Phase1", "Phase 1", "Phase2A", "Phase3_Acne", "Device" → key for PHASE_META
+function getPhaseKey(phase: string): string {
+    if (!phase) return "1";
+    if (phase === "Device") return "Device";
+    const match = phase.match(/(\d)/);
+    return match ? match[1] : "1";
+}
 
 
 export default function FormulaDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { result } = useDiagnosisStore();
-    const { products } = useProductStore(); // Added this line
-    const { isLoggedIn, purchaseProduct } = useAuthStore();
+    const { products } = useProductStore();
+    const { addItem, items } = useCartStore();
+    const [added, setAdded] = useState(false);
+    const inCart = items.some((i) => i.product.id === id);
 
     const product = useMemo(() => {
         if (result) {
@@ -45,14 +57,18 @@ export default function FormulaDetail() {
         );
     }
 
-    const phaseMeta = PHASE_META[product.phase || "Phase 1"] ?? PHASE_META["Phase 1"];
+    const phaseMeta = PHASE_META[getPhaseKey(product.phase)] ?? PHASE_META["1"];
+
+    const effectivePrice = product.price ?? product.price_eur;
 
     // Find lowest scoring axis this product targets
-    const lowestTarget = product.target_axes.reduce((low, axis) => {
-        const score = result?.axis_scores?.[axis] ?? 50;
-        return score < (result?.axis_scores?.[low] ?? 50) ? axis : low;
-    }, product.target_axes[0]);
-    const lowestScore = Math.round(result?.axis_scores?.[lowestTarget] ?? 50);
+    const lowestTarget = product.target_axes.length > 0
+        ? product.target_axes.reduce((low, axis) => {
+            const score = result?.axis_scores?.[axis] ?? 50;
+            return score < (result?.axis_scores?.[low] ?? 50) ? axis : low;
+        }, product.target_axes[0])
+        : null;
+    const lowestScore = lowestTarget ? Math.round(result?.axis_scores?.[lowestTarget] ?? 50) : 50;
     const improvement = Math.min(25, Math.round(lowestScore * 0.2));
 
     return (
@@ -98,30 +114,39 @@ export default function FormulaDetail() {
                     <div className="px-6 pb-6 border-t border-border/50">
                         <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mt-4 mb-1">{product.brand}</p>
                         <h1 className="font-display text-2xl md:text-3xl font-light text-foreground mb-1">{product.name.en}</h1>
-                        <p className="text-foreground/60 text-sm mb-4">{product.type} · €{product.price}</p>
+                        <p className="text-foreground/60 text-sm mb-4">{product.type} · €{effectivePrice}</p>
                         <p className="text-[#1A1A1A] dark:text-gray-300 text-sm leading-relaxed mb-6 font-medium">{product.description?.en || phaseMeta.desc}</p>
 
                         {/* Buy Button Action */}
                         <button
                             onClick={() => {
-                                if (!isLoggedIn) {
-                                    toast.error("Bitte melden Sie sich an, um Produkte zu kaufen.");
-                                    navigate("/login");
-                                    return;
-                                }
-                                purchaseProduct({ name: product.name, price: product.price });
-                                toast.success("Zum Warenkorb hinzugefügt und als Bestellung simuliert!");
-                                navigate("/profile");
+                                addItem(product);
+                                setAdded(true);
+                                if (navigator.vibrate) navigator.vibrate(20);
+                                toast.success("Added to cart", {
+                                    action: { label: "View Cart", onClick: () => navigate("/cart") },
+                                });
+                                setTimeout(() => setAdded(false), 2000);
                             }}
-                            className="w-full rounded-2xl py-3.5 font-bold tracking-wide uppercase transition-all bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20"
-                            style={{ fontSize: "clamp(0.8rem, 2.5vw, 0.875rem)" }}
+                            className="w-full rounded-2xl py-3.5 font-bold tracking-wide uppercase transition-all shadow-lg flex items-center justify-center gap-2"
+                            style={{
+                                fontSize: "clamp(0.8rem, 2.5vw, 0.875rem)",
+                                background: added || inCart ? "transparent" : "hsl(var(--primary))",
+                                color: added || inCart ? "#D4AF37" : "hsl(var(--primary-foreground))",
+                                border: added || inCart ? "2px solid #D4AF37" : "2px solid transparent",
+                                boxShadow: added || inCart ? "none" : undefined,
+                            }}
                         >
-                            Direkt Kaufen
+                            {added || inCart
+                                ? <><Check className="w-4 h-4" /> In Cart</>
+                                : <><ShoppingBag className="w-4 h-4" /> Add to Cart</>
+                            }
                         </button>
                     </div>
                 </motion.div>
 
                 {/* The Strategy Section */}
+                {lowestTarget && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -148,7 +173,7 @@ export default function FormulaDetail() {
                     </div>
                     {product.vectorImpact && Object.keys(product.vectorImpact).length > 0 ? (
                         <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">
-                            Based on your {lowestScore} {AXIS_LABELS[lowestTarget]} score, this product is mapped to shift this vector by <strong className="text-primary">{product.vectorImpact[lowestTarget] > 0 ? '+' : ''}{product.vectorImpact[lowestTarget]} points</strong>. The key ingredients precisely trigger the mechanisms required for this clinical improvement.
+                            Based on your {lowestScore} {AXIS_LABELS[lowestTarget]} score, this product is mapped to shift this vector by <strong className="text-primary">{(product.vectorImpact[lowestTarget] ?? 0) > 0 ? '+' : ''}{product.vectorImpact[lowestTarget] ?? 0} points</strong>. The key ingredients precisely trigger the mechanisms required for this clinical improvement.
                         </p>
                     ) : (
                         <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">
@@ -156,6 +181,7 @@ export default function FormulaDetail() {
                         </p>
                     )}
                 </motion.div>
+                )}
 
                 {/* Usage Instructions */}
                 {(product.howToUse?.en || product.howToUse?.de) && (
@@ -193,6 +219,7 @@ export default function FormulaDetail() {
                 </motion.div>
 
                 {/* Targeted Axes */}
+                {product.target_axes.length > 0 && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -208,6 +235,7 @@ export default function FormulaDetail() {
                         ))}
                     </div>
                 </motion.div>
+                )}
             </main>
 
             <Footer />

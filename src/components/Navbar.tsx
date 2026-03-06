@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
-import { Moon, Sun, ChevronDown, User, Globe, Search, Check } from "lucide-react";
+import { Moon, Sun, ChevronDown, User, Globe, Search, Check, ShoppingBag } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore, translations } from "@/store/i18nStore";
+import { useCartStore } from "@/store/cartStore";
 
 function Logo() {
   return (
@@ -32,6 +33,7 @@ const Navbar = () => {
   const { isLoggedIn } = useAuthStore();
   const { language, setLanguage } = useI18nStore();
   const t = translations[language];
+  const cartCount = useCartStore((s) => s.totalItems());
 
   const langRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -107,6 +109,16 @@ const Navbar = () => {
           <button className="p-2 text-foreground/80 hover:text-primary transition-colors">
             <Search className="h-5 w-5" />
           </button>
+
+          {/* 모바일 장바구니 */}
+          <Link to="/cart" className="relative flex h-10 w-10 items-center justify-center">
+            <ShoppingBag className="h-5 w-5 text-foreground/80" />
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[0.6rem] font-bold text-primary-foreground">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
+          </Link>
         </div>
 
         {/* 💻 Desktop UI (기존 로직 완벽 보존) */}
@@ -159,6 +171,16 @@ const Navbar = () => {
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </motion.button>
+
+          {/* 데스크탑 장바구니 */}
+          <Link to="/cart" className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/50 text-foreground/70 hover:border-primary/40 hover:text-foreground transition-colors">
+            <ShoppingBag className="h-4 w-4" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[0.6rem] font-bold text-primary-foreground">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
+          </Link>
 
           <Link to="/diagnosis" className="rounded-full border border-primary px-5 py-2 font-body text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground">
             {t.startDiagnosis}

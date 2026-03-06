@@ -121,9 +121,12 @@ const ResultsPage = () => {
 
   if (!result) return <Navigate to="/diagnosis" replace />;
 
+  // PRODUCTS slide is at index 4
+  const PRODUCTS_SLIDE = 4;
+
   const slides = [
     <SlideDiagnosisSummary result={result} />,
-    <SlideAxisBreakdown result={result} />,
+    <SlideAxisBreakdown result={result} goToProducts={() => goTo(PRODUCTS_SLIDE)} />,
     <SlideProtocol result={result} />,
     <SlideSubscriptionTable result={result} />,
     <SlideWhyProducts result={result} />,

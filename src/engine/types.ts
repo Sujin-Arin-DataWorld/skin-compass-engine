@@ -33,7 +33,7 @@ export const AXIS_LABELS_DE: Record<AxisKey, string> = {
   makeup_stability: "Make-up Stabilität",
 };
 
-export const RADAR_AXES: AxisKey[] = ["seb", "hyd", "bar", "sen", "acne", "aging"];
+export const RADAR_AXES: AxisKey[] = ["seb", "hyd", "bar", "sen", "acne", "pigment", "texture", "aging", "ox", "makeup_stability"];
 
 export type SkinType = "dry" | "oily" | "combination" | "sensitive" | "normal";
 
@@ -99,23 +99,23 @@ export interface Product {
   type: string;
 
   // Commerce & Pricing
-  price: number;
-  price_eur: number; // Keep for backward compatibility initially
-  volume: string;
-  unitPrice: string;
-  shelfLife: string;
-  stockStatus: "available" | "out_of_stock";
+  price?: number;
+  price_eur: number;
+  volume?: string;
+  unitPrice?: string;
+  shelfLife?: string;
+  stockStatus?: "available" | "out_of_stock";
 
   // Content
-  benefitSummary: LocalizedContent;
-  description: LocalizedContent;
-  howToUse: LocalizedContent;
-  ingredients: string[]; // Full INCI list
+  benefitSummary?: LocalizedContent;
+  description?: LocalizedContent;
+  howToUse?: LocalizedContent;
+  ingredients?: string[]; // Full INCI list
 
   // Scientific Metadata
-  phLevel: number;
-  targetVector: AxisKey;
-  vectorImpact: Partial<Record<AxisKey, number>>;
+  phLevel?: number;
+  targetVector?: AxisKey;
+  vectorImpact?: Partial<Record<AxisKey, number>>;
 
   // Legacy / Other
   tier: string[];

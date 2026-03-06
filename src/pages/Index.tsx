@@ -757,13 +757,13 @@ const Index = () => {
         {/* 4x2 그리드 배열 */}
         <div className="grid grid-cols-4 gap-y-6 gap-x-3 px-6">
           {[
-            { id: "sebum", label: t.markers?.sebum || "Sebum", icon: Activity },
-            { id: "sensitivity", label: t.markers?.sensitivity || "Sensitivity", icon: ShieldCheck },
-            { id: "hydration", label: t.markers?.hydration || "Hydration", icon: FlaskConical },
+            { id: "seb", label: t.markers?.sebum || "Sebum", icon: Activity },
+            { id: "sen", label: t.markers?.sensitivity || "Sensitivity", icon: ShieldCheck },
+            { id: "hyd", label: t.markers?.hydration || "Hydration", icon: FlaskConical },
             { id: "aging", label: t.markers?.aging || "Aging", icon: Brain },
-            { id: "pigment", label: t.markers?.pigment || "Pigment", icon: Target },
+            { id: "pig", label: t.markers?.pigment || "Pigment", icon: Target },
             { id: "texture", label: t.markers?.texture || "Texture", icon: Sparkles },
-            { id: "barrier", label: t.markers?.barrier || "Barrier", icon: PackageCheck },
+            { id: "bar", label: t.markers?.barrier || "Barrier", icon: PackageCheck },
             { id: "pores", label: "Pores", icon: Scan }, // 8번째 모공 항목 추가
           ].map((concern) => (
             <Link key={concern.id} to="/diagnosis" className="flex flex-col items-center gap-2">

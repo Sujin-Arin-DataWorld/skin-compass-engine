@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useI18nStore } from "@/store/i18nStore";
-import { DiagnosisResult, AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS, AxisKey } from "@/engine/types";
+import { DiagnosisResult, AXIS_LABELS, AXIS_LABELS_DE, RADAR_AXES, AxisKey } from "@/engine/types";
 
 interface RadarChartProps {
     result: DiagnosisResult;
@@ -11,7 +11,7 @@ export default function RadarChart({ result, highlightAxis }: RadarChartProps) {
     const { language } = useI18nStore();
     const activeLabels = language === "de" ? AXIS_LABELS_DE : AXIS_LABELS;
 
-    const axes = AXIS_KEYS.map((key) => ({
+    const axes = RADAR_AXES.map((key) => ({
         axis: activeLabels[key],
         score: Math.round(result.axis_scores[key] ?? 0),
         key,

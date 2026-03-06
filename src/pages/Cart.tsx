@@ -1,0 +1,203 @@
+import { Link, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
+import { toast } from "sonner";
+import { useCartStore } from "@/store/cartStore";
+import { useAuthStore } from "@/store/authStore";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SilkBackground from "@/components/SilkBackground";
+
+export default function Cart() {
+  const { items, removeItem, updateQty, clear, totalItems, totalPrice } = useCartStore();
+  const { isLoggedIn, purchaseProduct } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleCheckout = () => {
+    if (!isLoggedIn) {
+      toast.error("Please sign in to complete your purchase.");
+      navigate("/login");
+      return;
+    }
+    items.forEach((item) => {
+      for (let i = 0; i < item.quantity; i++) {
+        purchaseProduct({
+          name: item.product.name,
+          price: item.product.price ?? item.product.price_eur,
+        });
+      }
+    });
+    clear();
+    toast.success("Order placed successfully! Check your profile for details.");
+    navigate("/profile");
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <SilkBackground />
+      <Navbar />
+
+      <main className="pt-24 pb-20 px-6 md:px-10 max-w-3xl mx-auto relative z-10">
+        <Link
+          to="/results"
+          className="inline-flex items-center gap-1 text-sm text-foreground/60 hover:text-foreground mb-8 transition-colors"
+        >
+          ← Back to Results
+        </Link>
+
+        <div className="flex items-center gap-3 mb-8">
+          <ShoppingBag className="w-6 h-6 text-primary" />
+          <h1 className="font-display text-2xl md:text-3xl font-light text-foreground">
+            Your Cart
+          </h1>
+          {totalItems() > 0 && (
+            <span className="rounded-full bg-primary/15 border border-primary/25 px-2.5 py-0.5 text-xs font-bold text-primary">
+              {totalItems()} item{totalItems() !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
+
+        {items.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-3xl border border-border bg-card p-12 text-center"
+          >
+            <ShoppingBag className="w-12 h-12 text-foreground/20 mx-auto mb-4" />
+            <p className="text-foreground/60 text-sm mb-6">Your cart is empty.</p>
+            <Link
+              to="/results"
+              className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              View Recommendations <ArrowRight className="w-4 h-4" />
+            </Link>
+          </motion.div>
+        ) : (
+          <>
+            {/* Cart items */}
+            <div className="space-y-3 mb-6">
+              <AnimatePresence>
+                {items.map((item) => {
+                  const price = item.product.price ?? item.product.price_eur;
+                  return (
+                    <motion.div
+                      key={item.product.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, x: -60 }}
+                      className="rounded-2xl border border-border bg-card p-4 flex items-center gap-4"
+                    >
+                      {/* Image / placeholder */}
+                      <div className="w-16 h-16 rounded-xl bg-primary/8 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                        {item.product.image ? (
+                          <img
+                            src={item.product.image}
+                            alt={item.product.name.en}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-2xl">🧴</span>
+                        )}
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[0.65rem] font-bold tracking-[0.18em] uppercase text-primary mb-0.5">
+                          {item.product.brand}
+                        </p>
+                        <p className="text-sm font-semibold text-foreground leading-tight truncate">
+                          {item.product.name.en}
+                        </p>
+                        <p className="text-xs text-foreground/50 mt-0.5">{item.product.type}</p>
+                      </div>
+
+                      {/* Qty controls */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => updateQty(item.product.id, item.quantity - 1)}
+                          className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground/60 hover:text-foreground hover:border-primary/40 transition-colors"
+                        >
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="w-5 text-center text-sm font-bold text-foreground">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQty(item.product.id, item.quantity + 1)}
+                          className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-foreground/60 hover:text-foreground hover:border-primary/40 transition-colors"
+                        >
+                          <Plus className="w-3 h-3" />
+                        </button>
+                      </div>
+
+                      {/* Price */}
+                      <div className="text-right flex-shrink-0 min-w-[60px]">
+                        <p className="font-display text-base font-bold text-foreground">
+                          €{(price * item.quantity).toFixed(2)}
+                        </p>
+                        {item.quantity > 1 && (
+                          <p className="text-xs text-foreground/40">€{price} each</p>
+                        )}
+                      </div>
+
+                      {/* Remove */}
+                      <button
+                        onClick={() => removeItem(item.product.id)}
+                        className="w-8 h-8 rounded-full flex items-center justify-center text-foreground/40 hover:text-red-500 transition-colors flex-shrink-0"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+
+            {/* Summary */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-3xl border border-border bg-card p-6 mb-4"
+            >
+              <div className="flex justify-between items-center mb-4 pb-4 border-b border-border/50">
+                <p className="text-sm text-foreground/60">Subtotal ({totalItems()} items)</p>
+                <p className="font-display text-lg font-bold text-foreground">
+                  €{totalPrice().toFixed(2)}
+                </p>
+              </div>
+              <div className="flex justify-between items-center mb-1">
+                <p className="text-sm text-foreground/60">Shipping (EU)</p>
+                <p className="text-sm text-foreground/60">Calculated at checkout</p>
+              </div>
+              <p className="text-xs text-foreground/40 mb-6">Free shipping on orders over €60</p>
+
+              <button
+                onClick={handleCheckout}
+                className="w-full rounded-2xl py-4 font-bold text-sm tracking-wide uppercase bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+              >
+                Complete Purchase <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <p className="text-xs text-foreground/40 text-center mt-3">
+                Secure checkout · Cancel anytime · Ships EU 3–5 days
+              </p>
+            </motion.div>
+
+            {/* Clear cart */}
+            <button
+              onClick={() => {
+                clear();
+                toast.info("Cart cleared.");
+              }}
+              className="text-xs text-foreground/40 hover:text-foreground/60 transition-colors underline underline-offset-2 mx-auto block"
+            >
+              Clear cart
+            </button>
+          </>
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

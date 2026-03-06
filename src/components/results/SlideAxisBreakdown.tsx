@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useI18nStore } from "@/store/i18nStore";
 import { DiagnosisResult, AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS, AxisKey } from "@/engine/types";
 import RadarChart from "@/components/diagnosis/RadarChart";
@@ -66,9 +67,10 @@ const CRITICAL_MESSAGES: Partial<Record<AxisKey, { en: string, de: string }>> = 
 
 interface Props {
   result: DiagnosisResult;
+  goToProducts?: () => void;
 }
 
-const SlideAxisBreakdown = ({ result }: Props) => {
+const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
   const { language } = useI18nStore();
   const sorted = useMemo(
     () => [...AXIS_KEYS].sort((a, b) => result.axis_scores[b] - result.axis_scores[a]),
@@ -209,6 +211,22 @@ const SlideAxisBreakdown = ({ result }: Props) => {
                 : "Your protocol is ordered by clinical priority, starting with your highest-scoring axis."
             )}
           </p>
+
+          {goToProducts && (
+            <button
+              onClick={goToProducts}
+              className="mt-3 flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-bold transition-all"
+              style={{
+                background: "hsl(var(--primary))",
+                color: "hsl(var(--primary-foreground))",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              {language === "de" ? "Passende Produkte ansehen" : "See Matched Products"}
+              <ArrowRight size={14} />
+            </button>
+          )}
         </motion.div>
       </div>
     </div>

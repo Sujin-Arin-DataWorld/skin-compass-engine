@@ -12,6 +12,7 @@ import Checkout from "./pages/Checkout";
 import Impressum from "./pages/Impressum";
 import Datenschutz from "./pages/Datenschutz";
 import FormulaDetail from "./pages/FormulaDetail";
+import Cart from "./pages/Cart";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/diagnosis" element={<Diagnosis />} />
             <Route path="/results" element={<Results />} />
             <Route path="/formula/:id" element={<FormulaDetail />} />
+            <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />

@@ -82,7 +82,7 @@ export function runDiagnosis(input: DiagnosisInput): DiagnosisResult {
   const primary = sorted.filter((s) => s.score >= 46).slice(0, 3).map((s) => s.axis);
   const secondary = sorted.filter((s) => s.score >= 21 && s.score < 46).slice(0, 4).map((s) => s.axis);
 
-  // Radar chart data (6 axes)
+  // Radar chart data (10 axes — full clinical profile)
   const radarData = RADAR_AXES.map((k) => ({
     axis: AXIS_LABELS[k],
     score: Math.round(boosted[k]),
@@ -152,14 +152,17 @@ function buildProductBundle(
     Phase1: [], Phase2: [], Phase3: [], Phase4: [], Phase5: [], Device: [],
   };
 
-  if (scores.seb >= 40 || scores.acne >= 30) {
-    bundle.Phase1.push(PRODUCT_CATALOG.drg_cleanser_oily);
-  } else {
-    bundle.Phase1.push(PRODUCT_CATALOG.biplain_cleanser);
+  // Phase 1: Prepare — Cleanse + Tone (driven by seb, hyd)
+  bundle.Phase1.push(scores.seb >= 40 || scores.acne >= 30
+    ? PRODUCT_CATALOG.drg_cleanser_oily
+    : PRODUCT_CATALOG.biplain_cleanser);
+  if (scores.hyd >= 25 && tier === "Entry") {
+    bundle.Phase1.push(PRODUCT_CATALOG.snature_toner);
   }
 
-  if (scores.hyd >= 25) {
-    bundle.Phase2.push(tier === "Entry" ? PRODUCT_CATALOG.snature_toner : PRODUCT_CATALOG.torriden_serum);
+  // Phase 2: Activate — Barrier Essence (driven by bar, hyd)
+  if (scores.hyd >= 25 && tier !== "Entry") {
+    bundle.Phase2.push(PRODUCT_CATALOG.torriden_serum);
   }
   if (scores.bar >= 35) {
     bundle.Phase2.push(tier === "Entry" ? PRODUCT_CATALOG.snature_squalane : PRODUCT_CATALOG.aestura_cream);

@@ -80,6 +80,8 @@ function Slide5A({
   onNext,
   pattern,
   topConcern,
+  topAxisName,
+  topScore,
   signalCount,
 }: {
   onNext: () => void;

@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/authStore";
+import { ShoppingBag, Check } from "lucide-react";
 import { useI18nStore, translations } from "@/store/i18nStore";
 import { toast } from "sonner";
 import { DiagnosisResult, Product, AXIS_LABELS, AxisKey } from "@/engine/types";
+import { useCartStore } from "@/store/cartStore";
 
 function getBarColor(score: number): string {
   if (score >= 70) return "hsl(var(--severity-severe))";
@@ -112,11 +113,13 @@ const SlideWhyProducts = ({ result }: Props) => {
 
 function EnhancedProductCard({ product, result, index }: { product: Product; result: DiagnosisResult; index: number }) {
   const [expanded, setExpanded] = useState(false);
+  const [added, setAdded] = useState(false);
   const { matchedAxes, because, helps, phaseLabel, phaseIcon, phaseNum, phaseName } = generateWhyData(product, result);
-  const { isLoggedIn, purchaseProduct } = useAuthStore();
+  const { addItem, items } = useCartStore();
   const navigate = useNavigate();
   const { language } = useI18nStore();
   const t = language === "de" ? translations.de : translations.en;
+  const inCart = items.some((i) => i.product.id === product.id);
 
   return (
     <motion.div
@@ -189,18 +192,27 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  if (!isLoggedIn) {
-                    toast.error("Bitte melden Sie sich an, um Produkte zu kaufen.");
-                    navigate("/login");
-                    return;
-                  }
-                  purchaseProduct({ name: product.name, price: product.price_eur });
-                  toast.success("Zum Warenkorb hinzugefügt und als Bestellung simuliert!");
+                  addItem(product);
+                  setAdded(true);
+                  if (navigator.vibrate) navigator.vibrate(20);
+                  toast.success(
+                    language === "de" ? "Zum Warenkorb hinzugefügt" : "Added to cart",
+                    { action: { label: language === "de" ? "Warenkorb" : "View Cart", onClick: () => navigate("/cart") } }
+                  );
+                  setTimeout(() => setAdded(false), 2000);
                 }}
-                className="rounded-full bg-primary px-3 py-1.5 font-bold uppercase tracking-wider text-primary-foreground hover:opacity-90 transition-opacity whitespace-nowrap"
-                style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.65rem)" }}
+                className="rounded-full px-3 py-1.5 font-bold uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1"
+                style={{
+                  fontSize: "clamp(0.6rem, 1.5vw, 0.65rem)",
+                  background: added || inCart ? "transparent" : "hsl(var(--primary))",
+                  color: added || inCart ? "#D4AF37" : "hsl(var(--primary-foreground))",
+                  border: added || inCart ? "1px solid #D4AF37" : "1px solid transparent",
+                }}
               >
-                Kaufen
+                {added || inCart
+                  ? <><Check className="w-3 h-3" />{language === "de" ? "Im Warenkorb" : "Added"}</>
+                  : <><ShoppingBag className="w-3 h-3" />{language === "de" ? "Warenkorb" : "Add to Cart"}</>
+                }
               </button>
             </div>
           </div>

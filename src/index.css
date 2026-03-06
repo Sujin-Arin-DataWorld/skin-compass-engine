@@ -363,45 +363,35 @@
   text-transform: uppercase;
 }
 
-/* ── Landing page — Face markers ── */
-.marker-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.marker-tag {
-  background: hsl(var(--card) / 0.75);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid hsl(var(--border) / 0.25);
-  border-radius: 6px;
-  padding: 3px 8px;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.dark .marker-tag {
-  background: hsl(var(--card) / 0.65);
-  border-color: hsl(var(--border) / 0.3);
-}
-
-.marker-label {
-  font-size: 0.65rem;
+/* ── Landing page — Radar scanner labels ── */
+.radar-label {
+  font-family: 'DM Sans', 'Space Grotesk', system-ui, sans-serif;
+  font-size: 0.6rem;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  color: hsl(var(--foreground));
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #947E5C;
+  text-shadow: 0 1px 6px rgba(148, 126, 92, 0.2);
 }
 
-.marker-value {
-  font-family: 'Roboto Mono', monospace;
+.radar-value {
+  font-family: 'Roboto Mono', 'Space Mono', monospace;
   font-size: 0.65rem;
   font-weight: 600;
-  color: hsl(var(--foreground));
+  color: #947E5C;
+  text-shadow: 0 1px 6px rgba(148, 126, 92, 0.2);
 }
+
+.dark .radar-label {
+  color: #F1E9DA;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
+.dark .radar-value {
+  color: #F1E9DA;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+}
+
 
 /* ── Landing page — Authority badges ── */
 .authority-badge {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, AnimatePresence, animate, useMotionValue, useMotionValueEvent } from "framer-motion";
 import { ArrowRight, ChevronDown, Scan, Brain, FlaskConical, PackageCheck, Sparkles, ShieldCheck, Activity, Target } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -25,14 +25,14 @@ const fadeUp = {
 // Positioned to overlay on consistent facial zones
 // ─────────────────────────────────────────────
 const FACE_MARKERS = [
-  { label: "Sebum", value: 70, top: "22%", left: "19%", color: "hsl(43 70% 50%)" },        // 이마 중앙 (T-zone)
-  { label: "Aging", value: 28, top: "39%", left: "12%", color: "hsl(270 30% 55%)" },       // 눈가 (Crow's feet)
-  { label: "Hydration", value: 78, top: "40%", left: "32%", color: "hsl(200 65% 50%)" },    // 눈밑 / 광대 상단
-  { label: "Pigment", value: 55, top: "45%", right: "18%", color: "hsl(28 55% 50%)" },      // 광대 바깥쪽
-  { label: "Sensitivity", value: 45, top: "52%", left: "8%", color: "hsl(8 50% 55%)" },    // 볼 중앙 (홍조)
-  { label: "Texture", value: 81, top: "55%", right: "32%", color: "hsl(160 40% 45%)" },     // 코 옆 (나비존)
-  { label: "Barrier", value: 62, top: "66%", left: "35%", color: "hsl(38 60% 50%)" },       // 입가 (팔자주름)
-  { label: "Elasticity", value: 73, top: "75%", left: "28%", color: "hsl(145 50% 45%)" },  // 턱선 (Jawline)
+  { label: "Sebum", value: 70, top: "22%", left: "35%", color: "hsl(43 70% 50%)" },        // 이마 중앙 (T-zone)
+  { label: "Aging", value: 28, top: "17%", left: "55%", color: "hsl(270 30% 55%)" },       // 눈가 (Crow's feet)
+  { label: "Hydration", value: 78, top: "25%", left: "52%", color: "hsl(200 65% 50%)" },    // 눈밑 / 광대 상단
+  { label: "Pigment", value: 55, top: "32%", right: "38%", color: "hsl(28 55% 50%)" },      // 광대 바깥쪽
+  { label: "Sensitivity", value: 45, top: "40%", left: "50%", color: "hsl(8 50% 55%)" },    // 볼 중앙 (홍조)
+  { label: "Texture", value: 81, top: "50%", right: "55%", color: "hsl(160 40% 45%)" },     // 코 옆 (나비존)
+  { label: "Barrier", value: 62, top: "63%", left: "60%", color: "hsl(38 60% 50%)" },       // 입가 (팔자주름)
+  { label: "Elasticity", value: 73, top: "75%", left: "55%", color: "hsl(145 50% 45%)" },  // 턱선 (Jawline)
 ];
 
 // ─────────────────────────────────────────────
@@ -75,36 +75,61 @@ const journeyItems = [
 // ─────────────────────────────────────────────
 // FaceMarker — persistent floating data tag
 // ─────────────────────────────────────────────
-function FaceMarker({ marker, index }: { marker: typeof FACE_MARKERS[0]; index: number }) {
+function FaceMarker({ marker, isVisible, isActive }: { marker: typeof FACE_MARKERS[0]; isVisible: boolean; isActive: boolean }) {
   const isLeft = marker.left !== undefined;
 
   return (
     <motion.div
-      className="absolute flex items-center gap-2"
+      className="absolute z-20 pointer-events-none"
       style={{
         top: marker.top,
         ...(isLeft ? { left: marker.left } : { right: (marker as any).right }),
       }}
-      initial={{ opacity: 0, x: isLeft ? -16 : 16 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: 1.0 + index * 0.12, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      animate={isVisible ? { opacity: 1 } : { opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
-      {/* Connector line */}
-      {isLeft ? (
-        <div className="flex items-center gap-1.5 flex-row-reverse">
-          <div className="marker-dot" style={{ background: marker.color, boxShadow: `0 0 8px ${marker.color}40` }} />
-          <div className="marker-tag">
-            <span className="marker-label scale-110">{marker.label}</span>
-            <span className="marker-value scale-110 pl-1">{marker.value}</span>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center gap-1.5">
-          <div className="marker-dot" style={{ background: marker.color, boxShadow: `0 0 8px ${marker.color}40` }} />
-          <div className="marker-tag">
-            <span className="marker-label scale-110">{marker.label}</span>
-            <span className="marker-value scale-110 pl-1">{marker.value}</span>
-          </div>
+      {isVisible && (
+        <div className={`flex items-center gap-0 ${isLeft ? "flex-row" : "flex-row-reverse"}`}>
+          {/* Crosshair target */}
+          <motion.div
+            className="relative w-5 h-5 flex items-center justify-center shrink-0"
+            initial={{ scale: 0 }}
+            animate={{ scale: [0, 1.2, 1], opacity: [0.5, 1, 0.8] }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            {/* Focus square */}
+            <div className={`absolute inset-0 border rounded-[2px] transition-colors duration-500 ${isActive ? 'border-[#D4AF37]/80' : 'border-[#947E5C]/60'} dark:border-[#F1E9DA]/50`} />
+            {/* Crosshair lines */}
+            <div className={`absolute w-full h-[0.5px] transition-colors duration-500 ${isActive ? 'bg-[#D4AF37]' : 'bg-[#947E5C]/70'} dark:bg-[#F1E9DA]/60`} />
+            <div className={`absolute h-full w-[0.5px] transition-colors duration-500 ${isActive ? 'bg-[#D4AF37]' : 'bg-[#947E5C]/70'} dark:bg-[#F1E9DA]/60`} />
+            {/* Center dot — pulsing glow */}
+            <motion.div
+              className={`w-[3px] h-[3px] rounded-full transition-colors duration-500 ${isActive ? 'bg-[#D4AF37]' : 'bg-[#947E5C]'} dark:bg-[#F1E9DA]`}
+              animate={{ boxShadow: isActive ? ["0 0 6px rgba(212,175,55,0.6)", "0 0 12px rgba(212,175,55,1)", "0 0 6px rgba(212,175,55,0.6)"] : ["0 0 4px rgba(148,126,92,0.5)", "0 0 10px rgba(148,126,92,0.9)", "0 0 4px rgba(148,126,92,0.5)"] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.div>
+
+          {/* Hairline connector */}
+          <motion.div
+            className={`h-[0.5px] ${isLeft ? "bg-gradient-to-r" : "bg-gradient-to-l"} from-[#947E5C] to-[#947E5C]/10 dark:from-[#F1E9DA]/60 dark:to-[#F1E9DA]/15`}
+            style={{ width: "28px" }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+          />
+
+          {/* Label text — immediate fade-in upon crossing */}
+          <motion.div
+            className="flex items-baseline gap-1.5 whitespace-nowrap overflow-hidden"
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            transition={{ delay: 0.2, duration: 0.5, ease: "easeOut" }}
+          >
+            <span className={`radar-label text-[#947E5C] dark:text-[#F1E9DA] ${isLeft ? 'ml-1.5' : 'mr-1.5'}`}>{marker.label}</span>
+            <span className={`radar-value text-[#947E5C] dark:text-[#F1E9DA] ${isLeft ? 'mr-1.5' : 'ml-1.5'}`}>{marker.value}</span>
+          </motion.div>
         </div>
       )}
     </motion.div>
@@ -112,39 +137,116 @@ function FaceMarker({ marker, index }: { marker: typeof FACE_MARKERS[0]; index: 
 }
 
 // ─────────────────────────────────────────────
-// ScanBeam — vertical scanning light effect
+// ScanBeam — Dynamic X/Y Radar Scanner
 // ─────────────────────────────────────────────
-function ScanBeam() {
+function ScanBeam({ scanX, scanY }: { scanX: any; scanY: any }) {
+  const leftPos = useTransform(scanX, v => `${v}%`);
+  const topPos = useTransform(scanY, v => `${v}%`);
+
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-      {/* Vertical scan beam */}
+    <div className="absolute inset-0 pointer-events-none overflow-hidden z-10" aria-hidden="true">
+      {/* Primary vertical scan beam */}
       <motion.div
-        className="absolute top-0 bottom-0 w-[2px]"
+        className="absolute top-0 bottom-0 w-[0.7px] will-change-transform"
         style={{
-          background: "linear-gradient(180deg, transparent 0%, hsl(var(--primary) / 0.6) 30%, hsl(var(--primary) / 0.8) 50%, hsl(var(--primary) / 0.6) 70%, transparent 100%)",
-          boxShadow: "0 0 20px 4px hsl(var(--primary) / 0.15)"
+          left: leftPos,
+          background: "linear-gradient(180deg, transparent 0%, rgba(151,169,124,0.9) 25%, rgba(151,169,124,1) 50%, rgba(151,169,124,0.9) 75%, transparent 100%)",
+          filter: "drop-shadow(0 0 6px rgba(151,169,124,0.9))"
         }}
-        initial={{ left: "15%" }}
-        animate={{ left: ["15%", "85%", "15%"] }}
-        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", repeatDelay: 2 }}
       />
 
       {/* Horizontal scan sweep */}
       <motion.div
-        className="absolute left-0 right-0 h-[1px]"
+        className="absolute left-0 right-0 h-[0.7px] will-change-transform"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.3) 20%, hsl(var(--primary) / 0.5) 50%, hsl(var(--primary) / 0.3) 80%, transparent 100%)",
+          top: topPos,
+          background: "linear-gradient(90deg, transparent 0%, rgba(151,169,124,0.8) 15%, rgba(151,169,124,1) 50%, rgba(151,169,124,0.8) 85%, transparent 100%)",
+          filter: "drop-shadow(0 0 6px rgba(151,169,124,0.9))"
         }}
-        initial={{ top: "10%" }}
-        animate={{ top: ["10%", "90%", "10%"] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
       />
 
-      {/* Corner brackets */}
-      <div className="absolute top-3 left-3 w-5 h-5 border-t-[1.5px] border-l-[1.5px] border-primary/30" />
-      <div className="absolute top-3 right-3 w-5 h-5 border-t-[1.5px] border-r-[1.5px] border-primary/30" />
-      <div className="absolute bottom-3 left-3 w-5 h-5 border-b-[1.5px] border-l-[1.5px] border-primary/30" />
-      <div className="absolute bottom-3 right-3 w-5 h-5 border-b-[1.5px] border-r-[1.5px] border-primary/30" />
+      {/* Status indicator — bottom left */}
+      <motion.div
+        className="absolute bottom-5 left-5 flex items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: [0, 0.8, 0.8, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <div className="w-1.5 h-1.5 rounded-full bg-[#97A97C]" />
+        <span className="text-[9px] font-mono tracking-[0.2em] text-[#97A97C] font-bold uppercase">
+          Targeting
+        </span>
+      </motion.div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────
+// ScannerOverlay — Coordinates animation sync
+// ─────────────────────────────────────────────
+function ScannerOverlay() {
+  const scanX = useMotionValue(50);
+  const scanY = useMotionValue(0);
+  const [activeMarkerIndex, setActiveMarkerIndex] = useState(-1);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const runSequence = async () => {
+      while (!isCancelled) {
+        // Reset and wait before starting cycle
+        setActiveMarkerIndex(-1);
+        await new Promise(r => setTimeout(r, 500));
+
+        for (let i = 0; i < FACE_MARKERS.length; i++) {
+          if (isCancelled) return;
+          const marker = FACE_MARKERS[i];
+          const targetX = marker.left ? parseFloat(marker.left) : (100 - parseFloat((marker as any).right || "0"));
+          const targetY = parseFloat(marker.top);
+
+          // Animate beam to target point (duration 600ms)
+          const durationMs = 600;
+          animate(scanX, targetX, { duration: durationMs / 1000, ease: "easeInOut" });
+          animate(scanY, targetY, { duration: durationMs / 1000, ease: "easeInOut" });
+
+          await new Promise(r => setTimeout(r, durationMs));
+
+          if (isCancelled) return;
+
+          // Trigger marker entrance and hold focus for 1s
+          setActiveMarkerIndex(i);
+          await new Promise(r => setTimeout(r, 1000));
+        }
+
+        if (isCancelled) return;
+        // Pause 3 seconds when all 8 are visible
+        await new Promise(r => setTimeout(r, 3000));
+
+        // Return beam to neutral quickly to restart
+        if (isCancelled) return;
+        animate(scanX, 50, { duration: 0.8, ease: "easeInOut" });
+        animate(scanY, 0, { duration: 0.8, ease: "easeInOut" });
+      }
+    };
+
+    runSequence();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [scanX, scanY]);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none z-10">
+      <ScanBeam scanX={scanX} scanY={scanY} />
+      {FACE_MARKERS.map((marker, idx) => (
+        <FaceMarker
+          key={idx}
+          marker={marker}
+          isVisible={idx <= activeMarkerIndex}
+          isActive={idx === activeMarkerIndex}
+        />
+      ))}
     </div>
   );
 }
@@ -496,6 +598,7 @@ const Index = () => {
               <>
                 <img src="/assets/hero-face.png" alt="Precision Skincare" className="w-full h-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                <ScannerOverlay />
                 <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 z-20 flex flex-col justify-end">
                   <h1 className="hero-serif text-5xl md:text-7xl lg:text-8xl text-[#001A33] dark:text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4 transition-colors duration-300">
                     Precision<br />Skincare.

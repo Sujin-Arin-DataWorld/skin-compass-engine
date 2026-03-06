@@ -555,6 +555,12 @@ const Index = () => {
   const { language } = useI18nStore();
   const t = translations[language];
 
+  // Swipe utility for the hero slider
+  const swipeConfidenceThreshold = 10000;
+  const swipePower = (offset: number, velocity: number) => {
+    return Math.abs(offset) * velocity;
+  };
+
   // Rest of Index function ...
 
   const progressLabels = [
@@ -600,11 +606,22 @@ const Index = () => {
         <AnimatePresence initial={false} mode="wait">
           <motion.div
             key={currentSlide}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(e, { offset, velocity }) => {
+              const swipe = swipePower(offset.x, velocity.x);
+              if (swipe < -swipeConfidenceThreshold) {
+                setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
+              } else if (swipe > swipeConfidenceThreshold) {
+                setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1));
+              }
+            }}
             initial={{ opacity: 0, scale: 1.05 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="absolute inset-0"
+            className="absolute inset-0 cursor-grab active:cursor-grabbing"
           >
             {/* Background Image / Overlay logic per slide */}
             {currentSlide === 0 && (
@@ -689,6 +706,34 @@ const Index = () => {
       </section>
 
       {/* ═══════════════════════════════════════
+          MOBILE QUICK-ACCESS GRID (Skin Concerns) - MD:HIDDEN
+          ═══════════════════════════════════════ */}
+      <section className="w-full bg-background pt-6 pb-2 md:hidden">
+        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 gap-5 pb-4">
+          {[
+            { id: "sebum", label: t.markers?.sebum || "Sebum", icon: "💧" },
+            { id: "inflammation", label: t.markers?.sensitivity || "Inflammation", icon: "🔥" },
+            { id: "hydration", label: t.markers?.hydration || "Hydration", icon: "💦" },
+            { id: "elasticity", label: t.markers?.aging || "Elasticity", icon: "✨" },
+            { id: "pigmentation", label: t.markers?.pigment || "Pigmentation", icon: "🎯" },
+          ].map((concern) => (
+            <Link
+              key={concern.id}
+              to="/diagnosis"
+              className="snap-start shrink-0 flex flex-col items-center gap-3 w-[72px]"
+            >
+              <div className="w-16 h-16 rounded-full bg-card border border-border/50 flex items-center justify-center shadow-sm">
+                <span className="text-2xl">{concern.icon}</span>
+              </div>
+              <span className="radar-label text-[9px] whitespace-nowrap tracking-widest text-[#947E5C] dark:text-[#D4AF37]">
+                {concern.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════
           PRODUCTS GRID (2-Column Mobile, 4 Desktop)
           ═══════════════════════════════════════ */}
       <section className="py-20 px-6 md:px-12 bg-background">
@@ -701,9 +746,9 @@ const Index = () => {
             <p className="text-sm text-muted-foreground mt-4 md:mt-0 font-medium">{t.index.collectionSub}</p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-5 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-8 pb-6">
             {products.map((p) => (
-              <Link key={p.id} to={`/formula/${p.id}`} className="group flex flex-col bg-card/50 rounded-[2rem] border border-border/50 overflow-hidden hover:border-primary/50 transition-colors shadow-sm hover:shadow-lg hover:shadow-primary/5">
+              <Link key={p.id} to={`/formula/${p.id}`} className="snap-center shrink-0 w-[80vw] md:w-auto group flex flex-col bg-card/50 rounded-[2rem] border border-border/50 overflow-hidden hover:border-primary/50 transition-colors shadow-sm hover:shadow-lg hover:shadow-primary/5">
                 <div className="relative aspect-square w-full bg-gray-50 dark:bg-white/5 flex items-center justify-center p-6">
                   {p.image ? (
                     <img src={p.image} alt={p.name.en} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />

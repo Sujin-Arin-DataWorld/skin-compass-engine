@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Moon, Sun, ChevronDown, User, Globe } from "lucide-react";
+import { Moon, Sun, ChevronDown, User, Globe, Search } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -10,13 +10,13 @@ function Logo() {
   return (
     <Link to="/" className="flex flex-col items-start leading-none group" aria-label="Skin Strategy Lab">
       <span
-        className="font-display text-[1.35rem] font-light tracking-[0.12em] text-foreground transition-colors group-hover:text-primary"
+        className="font-display text-[1.1rem] md:text-[1.35rem] font-light tracking-[0.12em] text-foreground transition-colors group-hover:text-primary"
         style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.14em" }}
       >
         SKIN STRATEGY
       </span>
       <span
-        className="font-body text-[0.6rem] font-medium uppercase tracking-[0.35em] text-primary mt-[-2px]"
+        className="font-body text-[0.5rem] md:text-[0.6rem] font-medium uppercase tracking-[0.35em] text-primary mt-[-2px]"
         style={{ letterSpacing: "0.4em" }}
       >
         — LAB —
@@ -38,7 +38,15 @@ const Navbar = () => {
       <div className="flex w-full items-center justify-between px-6 md:px-10 py-4">
         <Logo />
 
-        <div className="flex items-center gap-3">
+        {/* Mobile-only Search Icon */}
+        <div className="flex items-center md:hidden">
+          <button className="p-2 text-foreground/80 hover:text-primary transition-colors" aria-label="Search">
+            <Search className="h-5 w-5" />
+          </button>
+        </div>
+
+        {/* Desktop-only functionality (Hidden on mobile) */}
+        <div className="hidden md:flex items-center gap-3">
           {/* Products Mega-Menu Trigger */}
           <div className="relative hidden md:block" onMouseEnter={() => setMenuOpen(true)} onMouseLeave={() => setMenuOpen(false)}>
             <button

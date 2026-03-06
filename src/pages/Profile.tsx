@@ -10,6 +10,32 @@ import type { Address } from "@/store/authStore";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
+import { useTheme } from "next-themes";
+import { Moon, Sun, Globe } from "lucide-react";
+
+/* ── Settings Controls ── */
+export function GlobalSettings() {
+    const { theme, setTheme } = useTheme();
+    const { language, toggleLanguage } = useI18nStore();
+
+    return (
+        <div className="flex gap-4 justify-center mt-6">
+            <button
+                onClick={toggleLanguage}
+                className="flex h-10 items-center justify-center gap-2 rounded-full border border-border px-4 text-[#947E5C] dark:text-[#D4AF37] transition-colors hover:border-primary/40 bg-card/50 shadow-sm"
+            >
+                <Globe className="h-4 w-4" />
+                <span className="text-xs font-bold uppercase tracking-widest">{language}</span>
+            </button>
+            <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground hover:border-primary/40 bg-card/50 shadow-sm"
+            >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+        </div>
+    );
+}
 
 type Tab = "progress" | "addresses" | "orders";
 
@@ -266,6 +292,12 @@ export default function Profile() {
                             {t.signUp}
                         </Link>
                     </div>
+
+                    {/* Settings Panel for Guests */}
+                    <div className="mt-12 pt-12 border-t border-border/30">
+                        <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4">App Settings</p>
+                        <GlobalSettings />
+                    </div>
                 </main>
                 <Footer />
             </div>
@@ -351,6 +383,12 @@ export default function Profile() {
                     >
                         {t.logout}
                     </button>
+                </div>
+
+                {/* Settings Panel for Authenticated Users */}
+                <div className="mt-12 pt-12 border-t border-border/30 text-center">
+                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4">App Settings</p>
+                    <GlobalSettings />
                 </div>
             </main>
 

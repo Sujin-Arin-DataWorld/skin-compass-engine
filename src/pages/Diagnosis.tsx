@@ -46,14 +46,38 @@ const LOADING_MESSAGES = [
   "Building your protocol...",
 ];
 
-const StepWrapper = React.forwardRef<HTMLDivElement, { children: React.ReactNode; reducedMotion?: boolean }>(
-  ({ children, reducedMotion, ...props }, ref) => (
+const swipeConfidenceThreshold = 10000;
+const swipePower = (offset: number, velocity: number) => {
+  return Math.abs(offset) * velocity;
+};
+
+type StepWrapperProps = {
+  children: React.ReactNode;
+  reducedMotion?: boolean;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
+} & import("framer-motion").HTMLMotionProps<"div">;
+
+const StepWrapper = React.forwardRef<HTMLDivElement, StepWrapperProps>(
+  ({ children, reducedMotion, onSwipeLeft, onSwipeRight, ...props }, ref) => (
     <motion.div
       ref={ref}
+      drag={onSwipeLeft || onSwipeRight ? "x" : false}
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.2}
+      onDragEnd={(e, { offset, velocity }) => {
+        const swipe = swipePower(offset.x, velocity.x);
+        if (swipe < -swipeConfidenceThreshold && onSwipeLeft) {
+          onSwipeLeft();
+        } else if (swipe > swipeConfidenceThreshold && onSwipeRight) {
+          onSwipeRight();
+        }
+      }}
       initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: -30 }}
       transition={{ duration: reducedMotion ? 0.15 : 0.3, ease: [0.4, 0, 0.2, 1] }}
+      className={onSwipeLeft || onSwipeRight ? "cursor-grab active:cursor-grabbing w-full" : "w-full"}
       {...props}
     >
       {children}
@@ -246,7 +270,7 @@ const DiagnosisPage = () => {
           <AnimatePresence mode="wait">
             {/* Step 0: Context */}
             {store.currentStep === 0 && (
-              <StepWrapper key="context" reducedMotion={reducedMotion}>
+              <StepWrapper key="context" reducedMotion={reducedMotion} onSwipeLeft={goNext} onSwipeRight={store.currentStep > 0 ? goBack : undefined}>
                 <h2 className="font-display text-3xl text-foreground">
                   {t.diagnosis.contextTitle}
                 </h2>
@@ -312,7 +336,7 @@ const DiagnosisPage = () => {
 
             {/* Meta Questions */}
             {showMeta && metaQuestionsForCategory.length > 0 && (
-              <StepWrapper key="meta" reducedMotion={reducedMotion}>
+              <StepWrapper key="meta" reducedMotion={reducedMotion} onSwipeLeft={goNext} onSwipeRight={store.currentStep > 0 ? goBack : undefined}>
                 <h2 className="font-display text-2xl text-foreground">
                   {t.diagnosis.metaTitle}
                 </h2>

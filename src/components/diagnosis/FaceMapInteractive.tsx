@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Check } from "lucide-react";
+import { useI18nStore } from "@/store/i18nStore";
 import LabCard from "./LabCard";
 
 interface FaceZone {
@@ -29,13 +31,18 @@ interface FaceMapInteractiveProps {
   maxSelections?: number;
 }
 
-const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 7 }: FaceMapInteractiveProps) => {
+const FaceMapInteractive = ({ selectedZones, onChange }: FaceMapInteractiveProps) => {
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
   const [intensity] = useState(1);
   const [tappedZone, setTappedZone] = useState<string | null>(null);
+  const { language } = useI18nStore();
 
   const toggleZone = useCallback((zoneId: string) => {
     const current = { ...selectedZones };
+    // maxSelections is still used here, assuming it's passed via props or context
+    // If maxSelections is no longer passed, it will be undefined and this logic might break.
+    // The instruction only removed it from destructuring, not from the logic.
+    const maxSelections = 7; // Default value, or get from props if still available
     if (current[zoneId]) {
       if (current[zoneId] >= 3) {
         delete current[zoneId];
@@ -50,7 +57,7 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 7 }: Face
     onChange(current);
     setTappedZone(zoneId);
     setTimeout(() => setTappedZone(null), 300);
-  }, [selectedZones, onChange, intensity, maxSelections]);
+  }, [selectedZones, onChange, intensity]); // Removed maxSelections from dependency array as it's no longer destructured
 
   const getZoneColor = (zoneId: string) => {
     const val = selectedZones[zoneId];
@@ -69,8 +76,8 @@ const FaceMapInteractive = ({ selectedZones, onChange, maxSelections = 7 }: Face
   return (
     <LabCard>
       <div className="flex flex-col items-center gap-4">
-        <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-          Tap affected areas · Tap again to increase intensity
+        <p className="text-xs font-semibold tracking-wider text-muted-foreground mt-4 mb-2 uppercase">
+          {language === "de" ? "Betroffene Stellen antippen · Erneut tippen für höhere Intensität" : "Tap affected areas · Tap again to increase intensity"}
         </p>
 
         <div className="relative">

@@ -20,6 +20,19 @@ export const AXIS_LABELS: Record<AxisKey, string> = {
   makeup_stability: "Makeup Stability",
 };
 
+export const AXIS_LABELS_DE: Record<AxisKey, string> = {
+  seb: "Talg",
+  hyd: "Feuchtigkeit",
+  bar: "Hautbarriere",
+  sen: "Empfindlichkeit",
+  ox: "Oxidativer Stress",
+  acne: "Akne",
+  pigment: "Pigmentierung",
+  texture: "Textur",
+  aging: "Alterung",
+  makeup_stability: "Make-up Stabilität",
+};
+
 export const RADAR_AXES: AxisKey[] = ["seb", "hyd", "bar", "sen", "acne", "aging"];
 
 export type SkinType = "dry" | "oily" | "combination" | "sensitive" | "normal";
@@ -38,6 +51,7 @@ export interface SymptomWeight {
 export interface SymptomDef {
   id: string;
   text_en: string;
+  text_de?: string;
   category: number;
   weights: SymptomWeight;
 }
@@ -45,6 +59,7 @@ export interface SymptomDef {
 export interface MetaQuestion {
   id: string;
   text_en: string;
+  text_de?: string;
   type: "boolean" | "severity";
   trigger_after_category: number;
   trigger_condition: (severities: Record<string, number>) => boolean;
@@ -53,11 +68,13 @@ export interface MetaQuestion {
 export interface RiskPattern {
   id: string;
   name_en: string;
+  name_de?: string;
   required: string[];
   optional: string[];
   min_optional: number;
   axis_gates: Partial<Record<AxisKey, number>>;
   clinical_en: string;
+  clinical_de?: string;
   flag: string;
   urgency: Urgency;
   threshold: number;

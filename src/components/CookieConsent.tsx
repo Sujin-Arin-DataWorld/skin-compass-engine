@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 const CookieConsent = () => {
   const [show, setShow] = useState(false);
+  const { language } = useI18nStore();
+  const t = translations[language];
 
   useEffect(() => {
     const consent = localStorage.getItem("cookie_consent");
@@ -23,21 +26,21 @@ const CookieConsent = () => {
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-md px-6 py-4">
       <div className="mx-auto flex max-w-[960px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          We use necessary cookies for site functionality. With your consent, we also use analytics cookies.{" "}
-          <Link to="/datenschutz" className="text-primary underline">Mehr erfahren</Link>
+          {t.cookie.text}{" "}
+          <Link to="/datenschutz" className="text-primary underline">{t.cookie.more}</Link>
         </p>
         <div className="flex gap-3">
           <button
             onClick={() => accept(false)}
             className="rounded-md border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            Necessary Only
+            {t.cookie.necessary}
           </button>
           <button
             onClick={() => accept(true)}
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-all hover:opacity-90"
           >
-            Accept All
+            {t.cookie.acceptAll}
           </button>
         </div>
       </div>

@@ -1,11 +1,14 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { Navigate } from "react-router-dom";
 import { ArrowRight, ArrowLeft, Clock } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAuthStore } from "@/store/authStore";
 import { CATEGORY_INFO, META_QUESTIONS } from "@/engine/weights";
 import { runDiagnosis } from "@/engine/runDiagnosisV4";
 import type { SkinType, ContextKey } from "@/engine/types";
+import { useI18nStore, translations } from "@/store/i18nStore";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 import CategoryInteractive from "@/components/diagnosis/CategoryInteractive";
@@ -63,6 +66,10 @@ const DiagnosisPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const store = useDiagnosisStore();
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const { language } = useI18nStore();
+  const t = translations[language];
+
   const [loadingMsg, setLoadingMsg] = useState(0);
   const [showMeta, setShowMeta] = useState(false);
   const [metaCategoryJustCompleted, setMetaCategoryJustCompleted] = useState<number | null>(null);
@@ -70,6 +77,11 @@ const DiagnosisPage = () => {
 
   const isDebug = searchParams.get("debug") === "true" && import.meta.env.DEV;
   const { reducedMotion } = usePerformanceMode();
+
+  // Auth Guard: Redirect anonymous users to login before capturing data
+  if (!isLoggedIn) {
+    return <Navigate to={`/login?redirect=/diagnosis`} replace />;
+  }
 
   // Progress persistence
   useProgressPersistence();
@@ -203,22 +215,22 @@ const DiagnosisPage = () => {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
             >
-              <h3 className="font-display text-lg text-foreground">Welcome back</h3>
+              <h3 className="font-display text-lg text-foreground">{t.diagnosis.resumeTitle}</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                You have an unfinished assessment. Would you like to continue where you left off?
+                {t.diagnosis.resumeSub}
               </p>
               <div className="mt-5 flex gap-3">
                 <button
                   onClick={handleResume}
                   className="flex-1 rounded-lg bg-primary px-4 py-3 text-sm font-medium text-primary-foreground min-h-[44px] touch-manipulation"
                 >
-                  Resume
+                  {t.diagnosis.resumeBtn}
                 </button>
                 <button
                   onClick={handleStartFresh}
                   className="flex-1 rounded-lg border border-border px-4 py-3 text-sm text-muted-foreground min-h-[44px] touch-manipulation hover:text-foreground"
                 >
-                  Start Fresh
+                  {t.diagnosis.startFreshBtn}
                 </button>
               </div>
             </motion.div>
@@ -236,10 +248,10 @@ const DiagnosisPage = () => {
             {store.currentStep === 0 && (
               <StepWrapper key="context" reducedMotion={reducedMotion}>
                 <h2 className="font-display text-3xl text-foreground">
-                  First, tell us about your skin context
+                  {t.diagnosis.contextTitle}
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  Select all that apply — this personalises your assessment
+                  {t.diagnosis.contextSub}
                 </p>
                 <div className="mt-8 flex flex-col gap-3">
                   {CONTEXT_OPTIONS.map((opt) => (
@@ -252,7 +264,7 @@ const DiagnosisPage = () => {
                         }`}
                       whileTap={reducedMotion ? undefined : { scale: 0.98 }}
                     >
-                      {opt.label}
+                      {t.diagnosis.contexts[opt.key as keyof typeof t.diagnosis.contexts]}
                     </motion.button>
                   ))}
                 </div>
@@ -263,10 +275,10 @@ const DiagnosisPage = () => {
             {store.currentStep === 1 && (
               <StepWrapper key="skintype" reducedMotion={reducedMotion}>
                 <h2 className="font-display text-3xl text-foreground">
-                  What's your baseline skin type?
+                  {t.diagnosis.skinTypeTitle}
                 </h2>
                 <p className="mt-2 text-muted-foreground">
-                  Choose the option that best describes your skin on an average day
+                  {t.diagnosis.skinTypeSub}
                 </p>
                 <div className="mt-8 flex flex-col gap-3">
                   {SKIN_TYPES.map((st) => (
@@ -279,8 +291,8 @@ const DiagnosisPage = () => {
                         }`}
                       whileTap={reducedMotion ? undefined : { scale: 0.98 }}
                     >
-                      <span className="font-medium text-foreground">{st.label}</span>
-                      <span className="ml-3 text-sm text-muted-foreground">— {st.desc}</span>
+                      <span className="font-medium text-foreground">{t.diagnosis.skinTypes[st.key as keyof typeof t.diagnosis.skinTypes].label}</span>
+                      <span className="ml-3 text-sm text-muted-foreground">— {t.diagnosis.skinTypes[st.key as keyof typeof t.diagnosis.skinTypes].desc}</span>
                     </motion.button>
                   ))}
                 </div>
@@ -302,15 +314,15 @@ const DiagnosisPage = () => {
             {showMeta && metaQuestionsForCategory.length > 0 && (
               <StepWrapper key="meta" reducedMotion={reducedMotion}>
                 <h2 className="font-display text-2xl text-foreground">
-                  Additional Precision Questions
+                  {t.diagnosis.metaTitle}
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Based on your responses, we need a few more details
+                  {t.diagnosis.metaSub}
                 </p>
                 <div className="mt-8 flex flex-col gap-6">
                   {metaQuestionsForCategory.map((q) => (
                     <LabCard key={q.id}>
-                      <p className="question-label mb-3">{q.text_en}</p>
+                      <p className="question-label mb-3">{language === "de" ? q.text_de : q.text_en}</p>
                       {q.type === "boolean" ? (
                         <div className="flex gap-2">
                           {[true, false].map((v) => (
@@ -323,7 +335,7 @@ const DiagnosisPage = () => {
                                 }`}
                               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                             >
-                              {v ? "Yes" : "No"}
+                              {v ? t.diagnosis.btnYes : t.diagnosis.btnNo}
                             </motion.button>
                           ))}
                         </div>
@@ -343,7 +355,7 @@ const DiagnosisPage = () => {
                                 }`}
                               whileTap={reducedMotion ? undefined : { scale: 0.96 }}
                             >
-                              Not applicable (I do not menstruate / prefer not to answer)
+                              {t.diagnosis.btnNotApplicable}
                             </motion.button>
                           )}
                         </div>
@@ -376,7 +388,7 @@ const DiagnosisPage = () => {
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.3 }}
                     >
-                      {LOADING_MESSAGES[loadingMsg]}
+                      {t.diagnosis.loading[loadingMsg]}
                     </motion.p>
                   </AnimatePresence>
                 </div>
@@ -397,7 +409,7 @@ const DiagnosisPage = () => {
                 disabled={store.currentStep === 0 && !showMeta}
                 className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30 min-h-[44px] touch-manipulation"
               >
-                <ArrowLeft className="h-4 w-4" /> Back
+                <ArrowLeft className="h-4 w-4" /> {t.diagnosis.btnBack}
               </button>
               <motion.button
                 onClick={goNext}
@@ -405,7 +417,7 @@ const DiagnosisPage = () => {
                 className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 disabled:opacity-30 min-h-[44px] touch-manipulation"
                 whileTap={reducedMotion ? undefined : { scale: 0.96 }}
               >
-                {store.currentStep === 9 && !showMeta ? "Analyse My Skin" : "Continue"}
+                {store.currentStep === 9 && !showMeta ? t.diagnosis.btnAnalyze : t.diagnosis.btnContinue}
                 <ArrowRight className="h-4 w-4" />
               </motion.button>
             </motion.div>

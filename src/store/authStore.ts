@@ -21,9 +21,12 @@ export interface Order {
 }
 
 export interface UserProfile {
+    userId: string;
     firstName: string;
     lastName: string;
     email: string;
+    avatar?: string;
+    provider: "email" | "google";
     role: "user" | "admin";
     createdAt: string;
     savedResults: DiagnosisResult[];
@@ -39,6 +42,7 @@ interface AuthState {
 
     signup: (data: { firstName: string; lastName: string; email: string; password: string }) => void;
     login: (email: string, password: string) => boolean;
+    loginWithGoogle: () => void;
     logout: () => void;
     updateProfile: (updates: Partial<Pick<UserProfile, "firstName" | "lastName">>) => void;
     saveDiagnosisResult: (result: DiagnosisResult) => void;
@@ -59,9 +63,11 @@ export const useAuthStore = create<AuthState>()(
 
             signup: (data) => {
                 const profile: UserProfile = {
+                    userId: `usr_${Math.random().toString(36).substring(2, 9)}`,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
+                    provider: "email",
                     role: "user",
                     createdAt: new Date().toISOString(),
                     savedResults: [],
@@ -80,9 +86,11 @@ export const useAuthStore = create<AuthState>()(
                 // Admin shortcut
                 if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                     const adminProfile: UserProfile = {
+                        userId: "admin_001",
                         firstName: "Admin",
                         lastName: "",
                         email: ADMIN_EMAIL,
+                        provider: "email",
                         role: "admin",
                         createdAt: new Date().toISOString(),
                         savedResults: [],
@@ -102,9 +110,11 @@ export const useAuthStore = create<AuthState>()(
 
                 // New user (demo mode)
                 const profile: UserProfile = {
+                    userId: `usr_${Math.random().toString(36).substring(2, 9)}`,
                     firstName: "User",
                     lastName: "",
                     email,
+                    provider: "email",
                     role: "user",
                     createdAt: new Date().toISOString(),
                     savedResults: [],
@@ -117,6 +127,36 @@ export const useAuthStore = create<AuthState>()(
                     allUsers: [...get().allUsers, profile],
                 });
                 return true;
+            },
+
+            loginWithGoogle: () => {
+                const googleEmail = "user@gmail.com";
+                // Find existing Google user
+                const found = get().allUsers.find((u) => u.email === googleEmail);
+                if (found) {
+                    set({ isLoggedIn: true, userProfile: found });
+                    return;
+                }
+
+                // Fake Google Authentication response
+                const profile: UserProfile = {
+                    userId: `usr_${Math.random().toString(36).substring(2, 9)}`,
+                    firstName: "Google",
+                    lastName: "User",
+                    email: googleEmail,
+                    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+                    provider: "google",
+                    role: "user",
+                    createdAt: new Date().toISOString(),
+                    savedResults: [],
+                    addresses: [],
+                    orderHistory: [],
+                };
+                set({
+                    isLoggedIn: true,
+                    userProfile: profile,
+                    allUsers: [...get().allUsers, profile],
+                });
             },
 
             logout: () => {

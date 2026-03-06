@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
+import { useI18nStore, translations } from "@/store/i18nStore";
 import { toast } from "sonner";
 import { DiagnosisResult, Product, AXIS_LABELS, AxisKey } from "@/engine/types";
 
@@ -50,12 +51,14 @@ interface Props {
 const SlideWhyProducts = ({ result }: Props) => {
   const allProducts: Product[] = Object.values(result.product_bundle).flat();
   const displayed = allProducts.slice(0, 5);
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
 
   return (
     <div className="results-slide flex flex-1 flex-col px-6 py-10 overflow-y-auto">
       <div className="mx-auto w-full max-w-xl">
         <motion.p className="slide-eyebrow mb-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          Personalized Selection
+          {t.results.personalizedSelection}
         </motion.p>
         <motion.h2
           className="font-display"
@@ -70,11 +73,11 @@ const SlideWhyProducts = ({ result }: Props) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
         >
-          {displayed.length} formulas matched to your vector
+          {displayed.length} {t.results.formulasMatched}
         </motion.h2>
 
         <motion.p className="slide-body mb-10" style={{ color: "#D1D1D1" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
-          Each product was selected because of specific signals in your diagnosis — not because of your skin type alone.
+          {t.results.selectionReason}
         </motion.p>
 
         {/* Product cards */}
@@ -96,12 +99,10 @@ const SlideWhyProducts = ({ result }: Props) => {
           }}
         >
           <p className="slide-eyebrow mb-1" style={{ color: "hsl(var(--primary))" }}>
-            One-time vs. Adaptive
+            {t.results.oneTimeVsAdaptive}
           </p>
           <p className="slide-body" style={{ lineHeight: 1.55 }}>
-            These products are matched to your skin <em>today</em>.
-            Next month, your barrier may shift, or a new active may unlock.
-            The subscription keeps the match current.
+            {t.results.adaptiveReason}
           </p>
         </motion.div>
       </div>
@@ -114,6 +115,8 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
   const { matchedAxes, because, helps, phaseLabel, phaseIcon, phaseNum, phaseName } = generateWhyData(product, result);
   const { isLoggedIn, purchaseProduct } = useAuthStore();
   const navigate = useNavigate();
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
 
   return (
     <motion.div
@@ -267,7 +270,7 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
               cursor: "pointer",
             }}
           >
-            <span>Why this works for you</span>
+            <span>{t.results.whyThisWorks}</span>
             <motion.span animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
               ↓
             </motion.span>
@@ -283,13 +286,13 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
                 className="px-5 pb-5 space-y-4 overflow-hidden"
               >
                 <div>
-                  <p className="slide-eyebrow mb-1.5 dark:text-white" style={{ letterSpacing: "0.1em", color: "#1A1A1A" }}>Because we observed</p>
+                  <p className="slide-eyebrow mb-1.5 dark:text-white" style={{ letterSpacing: "0.1em", color: "#1A1A1A" }}>{t.results.becauseObserved}</p>
                   {because.map((b, i) => (
                     <p key={i} className="slide-body dark:text-gray-300" style={{ lineHeight: 1.6, color: "#1A1A1A", fontFamily: b.includes("/100") ? "'Courier New', Courier, monospace" : "inherit" }}>· {b}</p>
                   ))}
                 </div>
                 <div>
-                  <p className="slide-eyebrow mb-1.5 dark:text-white" style={{ letterSpacing: "0.1em", color: "#1A1A1A" }}>This product helps by</p>
+                  <p className="slide-eyebrow mb-1.5 dark:text-white" style={{ letterSpacing: "0.1em", color: "#1A1A1A" }}>{t.results.helpsBy}</p>
                   {helps.map((h, i) => (
                     <p key={i} className="slide-body dark:text-gray-300" style={{ lineHeight: 1.6, color: "#1A1A1A" }}>✓ {h}</p>
                   ))}

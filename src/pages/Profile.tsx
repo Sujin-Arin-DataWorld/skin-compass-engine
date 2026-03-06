@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useI18nStore, translations } from "@/store/i18nStore";
+import RadarChart from "@/components/diagnosis/RadarChart";
 import { AXIS_LABELS, AXIS_KEYS, Product } from "@/engine/types";
 import type { Address } from "@/store/authStore";
 import Navbar from "@/components/Navbar";
@@ -33,44 +35,38 @@ function TabButton({ active, label, onClick }: { active: boolean; label: string;
 function SkinProgressTab() {
     const diagnosisResult = useDiagnosisStore((s) => s.result);
     const { userProfile } = useAuthStore();
+    const { language } = useI18nStore();
+    const t = translations[language];
+
     const latestResult = diagnosisResult ?? userProfile?.savedResults[0] ?? null;
+    const previousResult = userProfile?.savedResults[1] ?? null; // For historical trend tracking
+
     const allProducts: Product[] = latestResult
         ? Object.values(latestResult.product_bundle).flat()
         : [];
 
     return (
         <div className="space-y-6">
-            {/* 10-Axis Vector */}
-            <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
-                <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-4">
-                    Mein Skin-Vektor (10 Achsen)
+            {/* 10-Axis Vector Radar Chart */}
+            <div className="rounded-2xl border border-border bg-card p-5 md:p-6 text-center">
+                <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-2">
+                    {t.myVector}
                 </p>
                 {latestResult ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {AXIS_KEYS.map((key) => {
-                            const score = Math.round(latestResult.axis_scores[key] ?? 0);
-                            return (
-                                <div key={key} className="flex items-center gap-2 py-1">
-                                    <span className="text-xs text-foreground/60 flex-shrink-0" style={{ width: "clamp(5rem, 12vw, 7rem)" }}>
-                                        {AXIS_LABELS[key]}
-                                    </span>
-                                    <div className="flex-1 h-2 bg-border/30 rounded-full overflow-hidden">
-                                        <motion.div
-                                            className="h-full rounded-full bg-primary"
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${score}%` }}
-                                            transition={{ duration: 0.6 }}
-                                        />
-                                    </div>
-                                    <span className="text-xs font-bold text-foreground w-6 text-right">{score}</span>
-                                </div>
-                            );
-                        })}
+                    <div className="mt-4 flex flex-col items-center">
+                        <RadarChart result={latestResult} />
+
+                        {previousResult && (
+                            <div className="mt-6 flex items-center justify-center gap-2 bg-primary/5 border border-primary/20 rounded-full px-4 py-2">
+                                <span className="text-xs text-foreground/60 font-medium">{t.profileTab.progressDetected}</span>
+                                <span className="text-xs font-bold text-primary">{t.profileTab.vectorOptimized}</span>
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    <p className="text-sm text-foreground/40 italic">
-                        Noch keine Diagnose vorhanden.{" "}
-                        <Link to="/diagnosis" className="text-primary hover:underline">Jetzt starten →</Link>
+                    <p className="text-sm text-foreground/40 italic py-10">
+                        {t.noDiagnosis}{" "}
+                        <Link to="/diagnosis" className="text-primary hover:underline">{t.startNow}</Link>
                     </p>
                 )}
             </div>
@@ -78,7 +74,7 @@ function SkinProgressTab() {
             {/* 5 Formulas */}
             <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
                 <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-4">
-                    Meine Routine (5 Formeln)
+                    {t.myRoutine}
                 </p>
                 {allProducts.length > 0 ? (
                     <div className="space-y-2.5">
@@ -102,14 +98,14 @@ function SkinProgressTab() {
                         ))}
                     </div>
                 ) : (
-                    <p className="text-sm text-foreground/40 italic">Noch keine Produkte zugewiesen.</p>
+                    <p className="text-sm text-foreground/40 italic">{t.profileTab.noProducts}</p>
                 )}
             </div>
 
             {/* History count */}
             {userProfile && userProfile.savedResults.length > 1 && (
                 <p className="text-xs text-foreground/40 text-center">
-                    {userProfile.savedResults.length} Diagnosen gespeichert
+                    {userProfile.savedResults.length} {t.diagnosesSaved}
                 </p>
             )}
         </div>
@@ -121,6 +117,9 @@ function AddressBookTab() {
     const { userProfile, addAddress, removeAddress } = useAuthStore();
     const [adding, setAdding] = useState(false);
     const [form, setForm] = useState({ label: "", name: "", street: "", city: "", zip: "", country: "Deutschland" });
+
+    const { language } = useI18nStore();
+    const t = translations[language];
 
     const handleAdd = () => {
         if (!form.name || !form.street || !form.city || !form.zip) return;
@@ -136,7 +135,7 @@ function AddressBookTab() {
         <div className="space-y-4">
             {addresses.length === 0 && !adding && (
                 <p className="text-sm text-foreground/40 italic text-center py-6">
-                    Keine Adressen gespeichert.
+                    {t.profileTab.noAddresses}
                 </p>
             )}
 
@@ -152,24 +151,24 @@ function AddressBookTab() {
                         onClick={() => removeAddress(addr.id)}
                         className="absolute top-4 right-4 text-xs text-foreground/30 hover:text-red-400 transition-colors"
                     >
-                        Entfernen
+                        {t.profileTab.remove}
                     </button>
                 </div>
             ))}
 
             {adding ? (
                 <div className="rounded-2xl border border-primary/30 bg-card p-5 space-y-3">
-                    <p className="text-xs font-bold tracking-widest uppercase text-primary mb-2">Neue Adresse</p>
-                    <input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder="Label (z.B. Zuhause)" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
-                    <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Vollständiger Name *" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
-                    <input value={form.street} onChange={(e) => setForm({ ...form, street: e.target.value })} placeholder="Straße und Hausnummer *" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                    <p className="text-xs font-bold tracking-widest uppercase text-primary mb-2">{t.profileTab.newAddress}</p>
+                    <input value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} placeholder={t.profileTab.labelHome} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t.profileTab.fullName} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                    <input value={form.street} onChange={(e) => setForm({ ...form, street: e.target.value })} placeholder={t.profileTab.street} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
                     <div className="grid grid-cols-2 gap-3">
-                        <input value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} placeholder="PLZ *" className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
-                        <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Stadt *" className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                        <input value={form.zip} onChange={(e) => setForm({ ...form, zip: e.target.value })} placeholder={t.profileTab.zip} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
+                        <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder={t.profileTab.city} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" required />
                     </div>
                     <div className="flex gap-2 pt-1">
-                        <button onClick={handleAdd} className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold">Speichern</button>
-                        <button onClick={() => setAdding(false)} className="rounded-xl border border-border px-4 py-2 text-sm text-foreground/60">Abbrechen</button>
+                        <button onClick={handleAdd} className="rounded-xl bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold">{t.profileTab.save}</button>
+                        <button onClick={() => setAdding(false)} className="rounded-xl border border-border px-4 py-2 text-sm text-foreground/60">{t.profileTab.cancel}</button>
                     </div>
                 </div>
             ) : (
@@ -177,7 +176,7 @@ function AddressBookTab() {
                     onClick={() => setAdding(true)}
                     className="w-full rounded-2xl border border-dashed border-border py-4 text-sm text-foreground/50 hover:text-primary hover:border-primary/40 transition-colors"
                 >
-                    + Neue Adresse hinzufügen
+                    {t.profileTab.addAddress}
                 </button>
             )}
         </div>
@@ -188,11 +187,13 @@ function AddressBookTab() {
 function OrderHistoryTab() {
     const { userProfile } = useAuthStore();
     const orders = userProfile?.orderHistory ?? [];
+    const { language } = useI18nStore();
+    const t = translations[language];
 
     const statusLabel: Record<string, string> = {
-        pending: "Ausstehend",
-        shipped: "Versendet",
-        delivered: "Geliefert",
+        pending: t.profileTab.pending,
+        shipped: t.profileTab.shipped,
+        delivered: t.profileTab.delivered,
     };
     const statusColor: Record<string, string> = {
         pending: "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400",
@@ -203,7 +204,7 @@ function OrderHistoryTab() {
     if (orders.length === 0) {
         return (
             <p className="text-sm text-foreground/40 italic text-center py-10">
-                Noch keine Bestellungen vorhanden.
+                {t.profileTab.noOrders}
             </p>
         );
     }
@@ -230,7 +231,7 @@ function OrderHistoryTab() {
                         </div>
                     ))}
                     <div className="flex justify-end mt-2">
-                        <span className="text-sm font-bold text-foreground">Gesamt: €{order.total.toFixed(2)}</span>
+                        <span className="text-sm font-bold text-foreground">{t.profileTab.total} €{order.total.toFixed(2)}</span>
                     </div>
                 </div>
             ))}
@@ -241,6 +242,8 @@ function OrderHistoryTab() {
 /* ── Main Profile Page ── */
 export default function Profile() {
     const { isLoggedIn, userProfile, logout, updateProfile } = useAuthStore();
+    const { language } = useI18nStore();
+    const t = translations[language];
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState<Tab>("progress");
@@ -254,13 +257,13 @@ export default function Profile() {
                 <SilkBackground />
                 <Navbar />
                 <main className="pt-28 pb-20 px-6 max-w-md mx-auto relative z-10 text-center">
-                    <p className="text-foreground text-lg font-semibold mb-4">Bitte melden Sie sich an.</p>
+                    <p className="text-foreground text-lg font-semibold mb-4">{t.profileTab.pleaseLogin}</p>
                     <div className="flex gap-4 justify-center">
                         <Link to="/login" className="rounded-full border border-primary px-5 py-2 text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
-                            Anmelden
+                            {t.login}
                         </Link>
                         <Link to="/signup" className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition-all">
-                            Registrieren
+                            {t.signUp}
                         </Link>
                     </div>
                 </main>
@@ -282,12 +285,12 @@ export default function Profile() {
             <main className="pt-28 pb-20 px-6 md:px-10 max-w-3xl mx-auto relative z-10">
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-2">Mein Profil</p>
-                    <h1 className="font-display text-foreground" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 300 }}>
-                        Willkommen, {userProfile.firstName || "User"}
+                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-2">{t.profile}</p>
+                    <h1 className="hero-serif text-foreground" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 300 }}>
+                        {t.welcome}, {userProfile.firstName || "User"}
                     </h1>
                     <p className="text-xs text-foreground/50 mt-1">
-                        {userProfile.email} · Mitglied seit {new Date(userProfile.createdAt).toLocaleDateString("de-DE", { month: "long", year: "numeric" })}
+                        {userProfile.email} · {new Date(userProfile.createdAt).toLocaleDateString(language === "en" ? "en-US" : "de-DE", { month: "long", year: "numeric" })}
                     </p>
                 </motion.div>
 
@@ -298,31 +301,31 @@ export default function Profile() {
                     transition={{ delay: 0.05 }}
                     className="rounded-2xl border border-border bg-card p-5 md:p-6 mb-6"
                 >
-                    <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-3">Persönliche Daten</p>
+                    <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-3">{t.personalInfo}</p>
                     {editingName ? (
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-3">
-                                <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Vorname" />
-                                <input value={lastName} onChange={(e) => setLastName(e.target.value)} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="Nachname" />
+                                <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder={t.profileTab.firstName} />
+                                <input value={lastName} onChange={(e) => setLastName(e.target.value)} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder={t.profileTab.lastName} />
                             </div>
                             <div className="flex gap-2">
-                                <button onClick={handleSaveName} className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold">Speichern</button>
-                                <button onClick={() => setEditingName(false)} className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/60">Abbrechen</button>
+                                <button onClick={handleSaveName} className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold">{t.profileTab.save}</button>
+                                <button onClick={() => setEditingName(false)} className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/60">{t.profileTab.cancel}</button>
                             </div>
                         </div>
                     ) : (
                         <div className="flex items-center justify-between">
                             <p className="text-foreground font-medium">{userProfile.firstName} {userProfile.lastName}</p>
-                            <button onClick={() => setEditingName(true)} className="text-xs text-primary hover:underline">Bearbeiten</button>
+                            <button onClick={() => setEditingName(true)} className="text-xs text-primary hover:underline">{t.profileTab.edit}</button>
                         </div>
                     )}
                 </motion.div>
 
                 {/* Tab Navigation */}
                 <div className="flex gap-1 border-b border-border/50 mb-6">
-                    <TabButton active={activeTab === "progress"} label="Skin Progress" onClick={() => setActiveTab("progress")} />
-                    <TabButton active={activeTab === "addresses"} label="Adressbuch" onClick={() => setActiveTab("addresses")} />
-                    <TabButton active={activeTab === "orders"} label="Bestellungen" onClick={() => setActiveTab("orders")} />
+                    <TabButton active={activeTab === "progress"} label={t.skinProgress} onClick={() => setActiveTab("progress")} />
+                    <TabButton active={activeTab === "addresses"} label={t.addressBook} onClick={() => setActiveTab("addresses")} />
+                    <TabButton active={activeTab === "orders"} label={t.orders} onClick={() => setActiveTab("orders")} />
                 </div>
 
                 {/* Tab Content */}
@@ -346,7 +349,7 @@ export default function Profile() {
                         onClick={() => { logout(); navigate("/"); }}
                         className="text-sm text-foreground/30 hover:text-foreground transition-colors"
                     >
-                        Abmelden
+                        {t.logout}
                     </button>
                 </div>
             </main>

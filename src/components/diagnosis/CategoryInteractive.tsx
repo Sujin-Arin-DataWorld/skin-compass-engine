@@ -15,30 +15,31 @@ import LabCard from "./LabCard";
 import { SYMPTOMS, CATEGORY_INFO } from "@/engine/weights";
 import { TAGGED_QUESTIONS, selectTopQuestions, computeTagDelta } from "@/engine/questionEngine";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useI18nStore, translations } from "@/store/i18nStore";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // ---------- Photo match presets per category ----------
 
-const ACNE_PHOTOS: PhotoOption[] = [
-  { id: "mild_scattered", label: "Mild Scattered", description: "A few small spots here and there", icon: "🔸", severityMap: { C1_01: 1, C1_09: 1 } },
-  { id: "hormonal_jaw", label: "Hormonal Jawline", description: "Concentrated along jaw & chin", icon: "🔻", severityMap: { C1_02: 2, C1_03: 2 } },
-  { id: "cystic", label: "Deep Cystic", description: "Hard, painful nodules under skin", icon: "🔴", severityMap: { C1_07: 3, C1_08: 2 } },
-  { id: "comedonal", label: "Mostly Comedonal", description: "Blackheads and closed bumps", icon: "⚫", severityMap: { C1_09: 2, C1_11: 2 } },
+const ACNE_PHOTOS = (lg: string): PhotoOption[] => [
+  { id: "mild_scattered", label: lg === "de" ? "Leicht" : "Mild Scattered", description: lg === "de" ? "Ein paar Pickel hier und da" : "A few small spots here and there", icon: "🔸", severityMap: { C1_01: 1, C1_09: 1 } },
+  { id: "hormonal_jaw", label: lg === "de" ? "Hormonelle Kieferpartie" : "Hormonal Jawline", description: lg === "de" ? "Am Kiefer & Kinn zentriert" : "Concentrated along jaw & chin", icon: "🔻", severityMap: { C1_02: 2, C1_03: 2 } },
+  { id: "cystic", label: lg === "de" ? "Tiefe Zysten" : "Deep Cystic", description: lg === "de" ? "Harte, schmerzhafte Knoten" : "Hard, painful nodules under skin", icon: "🔴", severityMap: { C1_07: 3, C1_08: 2 } },
+  { id: "comedonal", label: lg === "de" ? "Komedonen" : "Mostly Comedonal", description: lg === "de" ? "Mitesser und Unebenheiten" : "Blackheads and closed bumps", icon: "⚫", severityMap: { C1_09: 2, C1_11: 2 } },
 ];
 
-const DRYNESS_PHOTOS: PhotoOption[] = [
-  { id: "normal_dry", label: "Normal", description: "Comfortable, minimal tightness", icon: "💧", severityMap: {} },
-  { id: "tight", label: "Tight", description: "Taut feeling after cleansing", icon: "🫧", severityMap: { C3_01: 2, C3_11: 1 } },
-  { id: "flaky", label: "Flaky", description: "Visible dry patches and flaking", icon: "🧊", severityMap: { C3_03: 2, C3_04: 2 } },
-  { id: "severely_dehydrated", label: "Severely Dehydrated", description: "Cracking, lines, chronic dryness", icon: "🏜️", severityMap: { C3_02: 3, C3_13: 3 } },
+const DRYNESS_PHOTOS = (lg: string): PhotoOption[] => [
+  { id: "normal_dry", label: lg === "de" ? "Normal" : "Normal", description: lg === "de" ? "Komfortabel, minimales Spannen" : "Comfortable, minimal tightness", icon: "💧", severityMap: {} },
+  { id: "tight", label: lg === "de" ? "Spannend" : "Tight", description: lg === "de" ? "Straffes Gefühl nach Reinigung" : "Taut feeling after cleansing", icon: "🫧", severityMap: { C3_01: 2, C3_11: 1 } },
+  { id: "flaky", label: lg === "de" ? "Schuppig" : "Flaky", description: lg === "de" ? "Trockene Stellen und Schuppen" : "Visible dry patches and flaking", icon: "🧊", severityMap: { C3_03: 2, C3_04: 2 } },
+  { id: "severely_dehydrated", label: lg === "de" ? "Stark Dehydriert" : "Severely Dehydrated", description: lg === "de" ? "Rissige, chronische Trockenheit" : "Cracking, lines, chronic dryness", icon: "🏜️", severityMap: { C3_02: 3, C3_13: 3 } },
 ];
 
-const PIGMENT_PHOTOS: PhotoOption[] = [
-  { id: "pih", label: "PIH Spots", description: "Post-inflammatory dark marks", icon: "🟤", severityMap: { C5_03: 2, C5_01: 2 } },
-  { id: "melasma", label: "Melasma", description: "Patches on cheeks/forehead", icon: "🌑", severityMap: { C5_02: 3, C5_14: 2 } },
-  { id: "uneven_dull", label: "Uneven Dull", description: "Overall lack of radiance", icon: "🌫️", severityMap: { C5_04: 2, C5_05: 2 } },
-  { id: "minimal_pigment", label: "Minimal", description: "Little to no pigmentation concern", icon: "✨", severityMap: {} },
+const PIGMENT_PHOTOS = (lg: string): PhotoOption[] => [
+  { id: "pih", label: lg === "de" ? "PIH-Flecken" : "PIH Spots", description: lg === "de" ? "Dunkle Flecken nach Entzündung" : "Post-inflammatory dark marks", icon: "🟤", severityMap: { C5_03: 2, C5_01: 2 } },
+  { id: "melasma", label: lg === "de" ? "Melasma" : "Melasma", description: lg === "de" ? "Flecken an Wangen/Stirn" : "Patches on cheeks/forehead", icon: "🌑", severityMap: { C5_02: 3, C5_14: 2 } },
+  { id: "uneven_dull", label: lg === "de" ? "Fahl" : "Uneven Dull", description: lg === "de" ? "Mangel an Ausstrahlung" : "Overall lack of radiance", icon: "🌫️", severityMap: { C5_04: 2, C5_05: 2 } },
+  { id: "minimal_pigment", label: lg === "de" ? "Minimal" : "Minimal", description: lg === "de" ? "Wenig Pigmentierung" : "Little to no pigmentation concern", icon: "✨", severityMap: {} },
 ];
 
 // ---------- Zone presets ----------
@@ -136,6 +137,9 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
   const activeToggles = interactiveState.activeToggles;
   const expandedQuestions = interactiveState.expandedQuestions[category] ?? false;
 
+  const { language } = useI18nStore();
+  const t = translations[language];
+
   const categorySymptoms = useMemo(() => {
     return Object.values(SYMPTOMS).filter((s) => s.category === category);
   }, [category]);
@@ -217,23 +221,23 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       <div className="mb-6">
         <h2 className="category-title mt-1 flex items-center gap-3">
           <span>{info?.emoji}</span>
-          {info?.name}
+          {language === "de" ? (info as any)?.name_de : info?.name}
         </h2>
-        <p className="category-description mt-2 max-w-lg">{info?.clinical}</p>
+        <p className="category-description mt-2 max-w-lg">{language === "de" ? (info as any)?.clinical_de : info?.clinical}</p>
       </div>
 
       {/* ===== CATEGORY 1: ACNE ===== */}
       {category === 1 && (
         <>
           <PhotoMatchSelector
-            title="Which image looks closest to your skin?"
-            options={ACNE_PHOTOS}
+            title={t.diagnosis.ui.photoAcne}
+            options={ACNE_PHOTOS(language)}
             selected={acnePhoto}
             onSelect={(id) => {
               setInteractive("acnePhoto", id);
               markInteractive();
-              applyPhotoMatch(id, ACNE_PHOTOS);
-              const idx = ACNE_PHOTOS.findIndex(p => p.id === id);
+              applyPhotoMatch(id, ACNE_PHOTOS(language));
+              const idx = ACNE_PHOTOS(language).findIndex(p => p.id === id);
               setUiSignals("acne", { photo_match: idx as 0 | 1 | 2 | 3 });
               // Selection mode: photo only sets severity context.
               // User must manually tap face zones below.
@@ -250,19 +254,19 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       {category === 2 && (
         <>
           <TimelineSlider
-            label="When does shine appear?"
+            label={t.diagnosis.ui.shineAppear}
             value={timelineHour}
             onChange={handleTimelineChange}
-            unit="hours after cleansing"
+            unit={language === "de" ? "Stunden nach Reinigung" : "hours after cleansing"}
             markers={[
-              { value: 0, label: "Immediately" },
-              { value: 12, label: "Midday" },
-              { value: 24, label: "Never" },
+              { value: 0, label: language === "de" ? "Sofort" : "Immediately" },
+              { value: 12, label: language === "de" ? "Mittags" : "Midday" },
+              { value: 24, label: language === "de" ? "Nie" : "Never" },
             ]}
           />
           <AreaTapOverlay
-            title="Where does oil appear most?"
-            subtitle="Tap affected areas"
+            title={t.diagnosis.ui.oilAreas}
+            subtitle={t.diagnosis.ui.tapAreas}
             zones={OILINESS_ZONES}
             selected={oilFullFace ? OILINESS_ZONES.map(z => z.id) : oilZones}
             onToggle={(id) => {
@@ -302,7 +306,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               }`}
             whileTap={{ scale: 0.97 }}
           >
-            Full Face — Oil everywhere
+            {t.diagnosis.ui.fullFaceOil}
           </motion.button>
         </>
       )}
@@ -320,14 +324,14 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             }}
           />
           <PhotoMatchSelector
-            title="Which best describes your dryness?"
-            options={DRYNESS_PHOTOS}
+            title={t.diagnosis.ui.drynessDesc}
+            options={DRYNESS_PHOTOS(language)}
             selected={drynessPhoto}
             onSelect={(id) => {
               setInteractive("drynessPhoto", id);
               markInteractive();
-              applyPhotoMatch(id, DRYNESS_PHOTOS);
-              const idx = DRYNESS_PHOTOS.findIndex(p => p.id === id);
+              applyPhotoMatch(id, DRYNESS_PHOTOS(language));
+              const idx = DRYNESS_PHOTOS(language).findIndex(p => p.id === id);
               setUiSignals("dry", { photo_match: idx as 0 | 1 | 2 | 3 });
             }}
           />
@@ -345,11 +349,11 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               if (v >= 2) onSeverityChange("C4_07", Math.max(severities["C4_07"] ?? 0, v - 1));
               setUiSignals("sensitivity", { reactivity: v * 33 });
             }}
-            label="Flush Reactivity"
+            label={language === "de" ? "Rötungs-Reaktion" : "Flush Reactivity"}
           />
           <LabCard>
             <p className="section-header mb-3">
-              Which actives cause stinging?
+              {t.diagnosis.ui.activesSting}
             </p>
             <TooltipProvider delayDuration={200}>
               <div className="flex flex-wrap gap-3 justify-center">
@@ -425,7 +429,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                       animate={isNotSure ? { scale: [1, 1.05, 1] } : {}}
                       transition={{ duration: 0.3 }}
                     >
-                      ❓ Not sure
+                      ❓ {t.diagnosis.ui.notSure}
                     </motion.div>
                   </motion.button>
                 </div>
@@ -454,22 +458,22 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
         return (
           <>
             <PhotoMatchSelector
-              title="Which pigmentation pattern matches yours?"
-              options={PIGMENT_PHOTOS}
+              title={t.diagnosis.ui.pigmentPattern}
+              options={PIGMENT_PHOTOS(language)}
               selected={pigmentPhoto}
               onSelect={(id) => {
                 setInteractive("pigmentPhoto", id);
                 markInteractive();
-                applyPhotoMatch(id, PIGMENT_PHOTOS);
-                const idx = PIGMENT_PHOTOS.findIndex(p => p.id === id);
+                applyPhotoMatch(id, PIGMENT_PHOTOS(language));
+                const idx = PIGMENT_PHOTOS(language).findIndex(p => p.id === id);
                 setUiSignals("pigment", { photo_match: idx as 0 | 1 | 2 | 3 });
                 // Selection mode: user must manually tap zones below.
                 // Switching patterns does NOT clear existing markers.
               }}
             />
             <AreaTapOverlay
-              title="Where is pigmentation visible?"
-              subtitle={`Tap to mark ${PIGMENT_MARKER_STYLES[currentPattern]?.label ?? "affected"} zones`}
+              title={t.diagnosis.ui.pigmentVisible}
+              subtitle={language === "de" ? `Tippen Sie zur Markierung von ${PIGMENT_MARKER_STYLES[currentPattern]?.label}` : `Tap to mark ${PIGMENT_MARKER_STYLES[currentPattern]?.label ?? "affected"} zones`}
               zones={PIGMENT_ZONES}
               selected={markedZoneIds}
               markers={pigmentMarkers}
@@ -519,8 +523,8 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             }}
           />
           <AreaTapOverlay
-            title="Where are pores most visible?"
-            subtitle="Tap to mark"
+            title={t.diagnosis.ui.poresVisible}
+            subtitle={t.diagnosis.ui.tapToMark}
             zones={PORE_ZONES}
             selected={poreFullFace ? PORE_ZONES.map(z => z.id) : poreZones}
             onToggle={(id) => {
@@ -554,7 +558,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               }`}
             whileTap={{ scale: 0.97 }}
           >
-            Full Face — Pores everywhere
+            {t.diagnosis.ui.fullFacePores}
           </motion.button>
         </>
       )}
@@ -572,8 +576,8 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
             }}
           />
           <AreaTapOverlay
-            title="Where do you notice firmness loss?"
-            subtitle="Tap affected areas"
+            title={t.diagnosis.ui.firmnessLoss}
+            subtitle={t.diagnosis.ui.tapAreas}
             zones={AGING_ZONES}
             selected={agingZones}
             onToggle={(id) => {
@@ -608,7 +612,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
       {/* Dynamically selected questions (top 3 by QuestionEngine) */}
       <LabCard>
         <p className="section-header mb-4">
-          Core Assessment
+          {t.diagnosis.ui.coreAssessment}
         </p>
         <div className="flex flex-col gap-5">
           {coreSymptoms.map((symptom) => (
@@ -620,7 +624,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
                 border: "1px solid hsl(var(--primary) / 0.15)",
               }}
             >
-              <p className="question-label" style={{ color: "hsl(var(--foreground))" }}>{symptom.text_en}</p>
+              <p className="question-label" style={{ color: "hsl(var(--foreground))" }}>{language === "de" ? symptom.text_de : symptom.text_en}</p>
               <SeveritySelector
                 value={severities[symptom.id] ?? 0}
                 onChange={(v) => {
@@ -648,7 +652,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               className="flex w-full items-center justify-between rounded-lg border border-border px-5 py-3 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
               whileTap={{ scale: 0.98 }}
             >
-              <span>Improve accuracy ({extraSymptoms.length} more questions)</span>
+              <span>{t.diagnosis.improveAccuracy} ({extraSymptoms.length} {t.diagnosis.moreQuestions})</span>
               <motion.div
                 animate={{ rotate: expandedQuestions ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
@@ -662,7 +666,7 @@ const CategoryInteractive = ({ category, severities, onSeverityChange }: Categor
               <div className="flex flex-col gap-5">
                 {extraSymptoms.map((symptom) => (
                   <div key={symptom.id} className="space-y-2">
-                    <p className="question-label">{symptom.text_en}</p>
+                    <p className="question-label">{language === "de" ? symptom.text_de : symptom.text_en}</p>
                     <SeveritySelector
                       value={severities[symptom.id] ?? 0}
                       onChange={(v) => {

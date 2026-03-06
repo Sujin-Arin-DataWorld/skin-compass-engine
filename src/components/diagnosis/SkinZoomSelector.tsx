@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import LabCard from "./LabCard";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 interface SkinPatch {
   id: string;
@@ -8,13 +9,6 @@ interface SkinPatch {
   pattern: string;
   severity: number;
 }
-
-const PATCHES: SkinPatch[] = [
-  { id: "smooth", label: "Smooth", description: "Even surface, minimal pores", pattern: "smooth", severity: 0 },
-  { id: "visible_pores", label: "Visible Pores", description: "Open, visible pore structure", pattern: "pores", severity: 1 },
-  { id: "oxidised", label: "Oxidised Pores", description: "Dark, congested pores", pattern: "oxidised", severity: 2 },
-  { id: "rough", label: "Rough Texture", description: "Bumpy, uneven surface", pattern: "rough", severity: 3 },
-];
 
 interface SkinZoomSelectorProps {
   selected: string | null;
@@ -60,45 +54,57 @@ const renderPatchSVG = (pattern: string) => {
   );
 };
 
-const SkinZoomSelector = ({ selected, onSelect }: SkinZoomSelectorProps) => (
-  <LabCard>
-    <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-      Skin Surface Analysis
-    </p>
-    <p className="mb-5 text-sm text-foreground">
-      Which texture patch looks closest to your skin?
-    </p>
+const SkinZoomSelector = ({ selected, onSelect }: SkinZoomSelectorProps) => {
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
 
-    <div className="grid grid-cols-2 gap-3">
-      {PATCHES.map((patch, i) => (
-        <motion.button
-          key={patch.id}
-          onClick={() => onSelect(patch.id, patch.severity)}
-          className={`flex flex-col gap-2 rounded-xl overflow-hidden transition-all min-h-[100px] select-none touch-manipulation ${selected === patch.id
+  const PATCHES: SkinPatch[] = [
+    { id: "smooth", label: t.diagnosis.ui.textureSmooth, description: t.diagnosis.ui.textureSmoothDesc, pattern: "smooth", severity: 0 },
+    { id: "visible_pores", label: t.diagnosis.ui.texturePores, description: t.diagnosis.ui.texturePoresDesc, pattern: "pores", severity: 1 },
+    { id: "oxidised", label: t.diagnosis.ui.textureOxidised, description: t.diagnosis.ui.textureOxidisedDesc, pattern: "oxidised", severity: 2 },
+    { id: "rough", label: t.diagnosis.ui.textureRough, description: t.diagnosis.ui.textureRoughDesc, pattern: "rough", severity: 3 },
+  ];
+
+  return (
+    <LabCard>
+      <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        {t.diagnosis.ui.skinSurfaceAnalysis}
+      </p>
+      <p className="mb-5 text-sm text-foreground">
+        {t.diagnosis.ui.whichTexture}
+      </p>
+
+      <div className="grid grid-cols-2 gap-3">
+        {PATCHES.map((patch, i) => (
+          <motion.button
+            key={patch.id}
+            onClick={() => onSelect(patch.id, patch.severity)}
+            className={`flex flex-col gap-2 rounded-xl overflow-hidden transition-all min-h-[100px] select-none touch-manipulation ${selected === patch.id
               ? "ring-0 shadow-[0_0_16px_-4px_hsla(45,95%,55%,0.4)]"
               : "hover:shadow-md active:shadow-lg"
-            }`}
-          style={{
-            border: selected === patch.id
-              ? "3px solid hsl(45, 95%, 55%)"
-              : "1px solid hsl(var(--border))",
-          }}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: i * 0.08, duration: 0.3 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <div className="h-20 w-full">
-            {renderPatchSVG(patch.pattern)}
-          </div>
-          <div className="px-3 pb-3">
-            <span className="text-xs font-medium text-foreground">{patch.label}</span>
-            <span className="block text-[10px] text-muted-foreground">{patch.description}</span>
-          </div>
-        </motion.button>
-      ))}
-    </div>
-  </LabCard>
-);
+              }`}
+            style={{
+              border: selected === patch.id
+                ? "3px solid hsl(45, 95%, 55%)"
+                : "1px solid hsl(var(--border))",
+            }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: i * 0.08, duration: 0.3 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <div className="h-20 w-full">
+              {renderPatchSVG(patch.pattern)}
+            </div>
+            <div className="px-3 pb-3">
+              <span className="text-xs font-medium text-foreground">{patch.label}</span>
+              <span className="block text-[10px] text-muted-foreground">{patch.description}</span>
+            </div>
+          </motion.button>
+        ))}
+      </div>
+    </LabCard>
+  );
+};
 
 export default SkinZoomSelector;

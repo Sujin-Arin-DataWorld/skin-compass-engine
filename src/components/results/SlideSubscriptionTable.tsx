@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Lock } from "lucide-react";
 import { DiagnosisResult, Tier } from "@/engine/types";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 interface Props {
   result: DiagnosisResult;
@@ -17,49 +18,51 @@ const TIERS: {
   recommended?: boolean;
   cta: string;
 }[] = [
-  {
-    tier: "Entry",
-    label: "Entry",
-    price: 49,
-    features: [
-      { text: "5-Phase Product Bundle", value: "✓" },
-      { text: "Monthly Recalibration", value: "✓" },
-      { text: "Ingredient Gating", value: "✓" },
-      { text: "Clinical Device", value: "✕" },
-    ],
-    cta: "Start My Protocol",
-  },
-  {
-    tier: "Full",
-    label: "Full Protocol",
-    price: 89,
-    recommended: true,
-    features: [
-      { text: "5-Phase Product Bundle", value: "✓" },
-      { text: "Monthly Recalibration", value: "✓" },
-      { text: "Ingredient Gating", value: "✓" },
-      { text: "Clinical Device", value: "✕" },
-    ],
-    cta: "Start My Protocol",
-  },
-  {
-    tier: "Premium",
-    label: "Premium Strategy",
-    price: 149,
-    sub: "Includes €120 Clinical Device",
-    features: [
-      { text: "5-Phase Product Bundle", value: "✓" },
-      { text: "Monthly Recalibration", value: "✓" },
-      { text: "Ingredient Gating", value: "✓" },
-      { text: "Clinical Device", value: "Month 2 Reward", highlight: true },
-    ],
-    cta: "Start My Protocol",
-  },
-];
+    {
+      tier: "Entry",
+      label: "Entry",
+      price: 49,
+      features: [
+        { text: "5-Phase Product Bundle", value: "✓" },
+        { text: "Monthly Recalibration", value: "✓" },
+        { text: "Ingredient Gating", value: "✓" },
+        { text: "Clinical Device", value: "✕" },
+      ],
+      cta: "Start My Protocol",
+    },
+    {
+      tier: "Full",
+      label: "Full Protocol",
+      price: 89,
+      recommended: true,
+      features: [
+        { text: "5-Phase Product Bundle", value: "✓" },
+        { text: "Monthly Recalibration", value: "✓" },
+        { text: "Ingredient Gating", value: "✓" },
+        { text: "Clinical Device", value: "✕" },
+      ],
+      cta: "Start My Protocol",
+    },
+    {
+      tier: "Premium",
+      label: "Premium Strategy",
+      price: 149,
+      sub: "Includes €120 Clinical Device",
+      features: [
+        { text: "5-Phase Product Bundle", value: "✓" },
+        { text: "Monthly Recalibration", value: "✓" },
+        { text: "Ingredient Gating", value: "✓" },
+        { text: "Clinical Device", value: "Month 2 Reward", highlight: true },
+      ],
+      cta: "Start My Protocol",
+    },
+  ];
 
 const SlideSubscriptionTable = ({ result }: Props) => {
   const navigate = useNavigate();
   const setTier = useDiagnosisStore((s) => s.setTier);
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
 
   const barrierScore = Math.round(result?.axis_scores.bar ?? 0);
   const sensitivityScore = Math.round(result?.axis_scores.sen ?? 0);
@@ -79,7 +82,7 @@ const SlideSubscriptionTable = ({ result }: Props) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          Choose Your Subscription
+          {t.results.chooseSubscription}
         </motion.p>
         <motion.p
           className="slide-body mt-1 text-center mb-6"
@@ -88,7 +91,7 @@ const SlideSubscriptionTable = ({ result }: Props) => {
           transition={{ delay: 0.05 }}
           style={{ color: "#D1D1D1" }}
         >
-          Adaptive monthly delivery — recalibrated to your skin every 28 days
+          {t.results.adaptiveDelivery}
         </motion.p>
 
         {/* Device lock notice */}
@@ -105,8 +108,7 @@ const SlideSubscriptionTable = ({ result }: Props) => {
           >
             <Lock className="w-4 h-4 flex-shrink-0" style={{ color: "hsl(var(--foreground-hint))" }} />
             <p style={{ fontSize: "0.8125rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.4 }}>
-              <span style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Device gated:</span>{" "}
-              Your barrier score ({barrierScore}) indicates Month 1 should focus on repair. The clinical device ships in Month 2 once stability is confirmed.
+              {t.results.deviceGated.replace("{score}", barrierScore.toString())}
             </p>
           </motion.div>
         )}
@@ -123,22 +125,22 @@ const SlideSubscriptionTable = ({ result }: Props) => {
               style={
                 tier.recommended
                   ? {
-                      background:
-                        "linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.03) 100%)",
-                      boxShadow: "0 8px 30px rgba(200,150,60,0.08)",
-                      border: "1px solid hsl(var(--primary) / 0.18)",
-                    }
+                    background:
+                      "linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.03) 100%)",
+                    boxShadow: "0 8px 30px rgba(200,150,60,0.08)",
+                    border: "1px solid hsl(var(--primary) / 0.18)",
+                  }
                   : {
-                      background: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                    }
+                    background: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                  }
               }
             >
               {/* Badge */}
               {tier.recommended && (
                 <div className="relative mb-4">
                   <span className="absolute -top-8 left-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow">
-                    Most Recommended
+                    {t.results.mostRecommended}
                   </span>
                 </div>
               )}
@@ -146,7 +148,7 @@ const SlideSubscriptionTable = ({ result }: Props) => {
               {/* Price header */}
               <div>
                 <p className="text-sm font-semibold" style={{ color: "hsl(var(--foreground))" }}>
-                  {tier.label}
+                  {tier.tier === "Entry" ? t.results.entry : tier.tier === "Full" ? t.results.fullProtocol : t.results.premiumStrategy}
                 </p>
                 <div className="flex items-baseline gap-1 mt-1">
                   <span
@@ -195,17 +197,17 @@ const SlideSubscriptionTable = ({ result }: Props) => {
                 style={
                   tier.recommended
                     ? {
-                        background: "hsl(var(--primary))",
-                        color: "hsl(var(--primary-foreground))",
-                      }
+                      background: "hsl(var(--primary))",
+                      color: "hsl(var(--primary-foreground))",
+                    }
                     : {
-                        background: "transparent",
-                        border: "1px solid hsl(var(--border))",
-                        color: "hsl(var(--foreground))",
-                      }
+                      background: "transparent",
+                      border: "1px solid hsl(var(--border))",
+                      color: "hsl(var(--foreground))",
+                    }
                 }
               >
-                {tier.cta}
+                {t.results.startProtocol}
               </button>
             </motion.div>
           ))}
@@ -230,12 +232,10 @@ const SlideSubscriptionTable = ({ result }: Props) => {
               marginBottom: "0.25rem",
             }}
           >
-            Premium — Device Safety &amp; Timing
+            {t.results.premiumTiming}
           </p>
           <p style={{ fontSize: "0.775rem", color: "#D1D1D1", lineHeight: 1.55 }}>
-            The Clinical EMS / LED Device is a lease-to-own reward, not a first-month gift. It ships
-            only after your barrier stability is confirmed — typically Month 2. This protects reactive
-            skin from premature device stimulation and ensures results are measurable before dispatch.
+            {t.results.premiumTimingDesc}
           </p>
           <p
             style={{

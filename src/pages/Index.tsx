@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
 import { useProductStore } from "@/store/productStore";
 import { AXIS_LABELS } from "@/engine/types";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 // ─────────────────────────────────────────────
 // Animation variants
@@ -24,50 +25,50 @@ const fadeUp = {
 // Persistent data markers on face
 // Positioned to overlay on consistent facial zones
 // ─────────────────────────────────────────────
-const FACE_MARKERS = [
-  { label: "Sebum", value: 70, top: "22%", left: "35%", color: "hsl(43 70% 50%)" },        // 이마 중앙 (T-zone)
-  { label: "Aging", value: 28, top: "17%", left: "55%", color: "hsl(270 30% 55%)" },       // 눈가 (Crow's feet)
-  { label: "Hydration", value: 78, top: "25%", left: "52%", color: "hsl(200 65% 50%)" },    // 눈밑 / 광대 상단
-  { label: "Pigment", value: 55, top: "32%", right: "38%", color: "hsl(28 55% 50%)" },      // 광대 바깥쪽
-  { label: "Sensitivity", value: 45, top: "40%", left: "50%", color: "hsl(8 50% 55%)" },    // 볼 중앙 (홍조)
-  { label: "Texture", value: 81, top: "50%", right: "55%", color: "hsl(160 40% 45%)" },     // 코 옆 (나비존)
-  { label: "Barrier", value: 62, top: "63%", left: "60%", color: "hsl(38 60% 50%)" },       // 입가 (팔자주름)
-  { label: "Elasticity", value: 73, top: "75%", left: "55%", color: "hsl(145 50% 45%)" },  // 턱선 (Jawline)
+const getFaceMarkers = (t: any) => [
+  { label: t.markers.sebum, value: 70, top: "22%", left: "35%", color: "hsl(43 70% 50%)" },
+  { label: t.markers.aging, value: 28, top: "17%", left: "55%", color: "hsl(270 30% 55%)" },
+  { label: t.markers.hydration, value: 78, top: "25%", left: "52%", color: "hsl(200 65% 50%)" },
+  { label: t.markers.pigment, value: 55, top: "32%", right: "38%", color: "hsl(28 55% 50%)" },
+  { label: t.markers.sensitivity, value: 45, top: "40%", left: "50%", color: "hsl(8 50% 55%)" },
+  { label: t.markers.texture, value: 81, top: "50%", right: "55%", color: "hsl(160 40% 45%)" },
+  { label: t.markers.barrier, value: 62, top: "63%", left: "60%", color: "hsl(38 60% 50%)" },
+  { label: t.markers.aging, value: 73, top: "75%", left: "55%", color: "hsl(145 50% 45%)" },  // Elasticity in the mockup
 ];
 
 // ─────────────────────────────────────────────
 // Static data
-const journeyItems = [
+const getJourneyItems = (t: any) => [
   {
     num: "01",
-    title: "Context Setup",
-    subtitle: "Age, environment & lifestyle baseline",
-    desc: "We begin by establishing your environmental and lifestyle parameters. Every algorithmic decision accounts for your local climate and daily routine.",
-    accent: "30 sec",
+    title: t.index.journey[0].title,
+    subtitle: t.index.journey[0].subtitle,
+    desc: t.index.journey[0].desc,
+    accent: t.index.journey[0].accent,
     icon: Scan
   },
   {
     num: "02",
-    title: "Biometric Symptom Check",
-    subtitle: "120 clinical markers assessed",
-    desc: "Our diagnostic engine evaluates your skin across multiple dimensions based on IGA, TEWL, and MASI—the exact clinical scales used in dermatological research.",
-    accent: "3-5 min",
+    title: t.index.journey[1].title,
+    subtitle: t.index.journey[1].subtitle,
+    desc: t.index.journey[1].desc,
+    accent: t.index.journey[1].accent,
     icon: Brain
   },
   {
     num: "03",
-    title: "Data-Driven Analysis",
-    subtitle: "10-axis scoring computed",
-    desc: "Your responses generate a unique biometric skin vector. We don't sort you into a generic \"skin type.\" Your clinical metrics drive the entire recommendation engine.",
-    accent: "< 3 sec",
+    title: t.index.journey[2].title,
+    subtitle: t.index.journey[2].subtitle,
+    desc: t.index.journey[2].desc,
+    accent: t.index.journey[2].accent,
     icon: FlaskConical
   },
   {
     num: "04",
-    title: "Your Targeted Protocol",
-    subtitle: "5-phase K-beauty routine",
-    desc: "Every product recommendation passes a dual filter: dermatological efficacy for your specific data vector, and EU-compliant safety standards. No guesswork.",
-    accent: "Personalized",
+    title: t.index.journey[3].title,
+    subtitle: t.index.journey[3].subtitle,
+    desc: t.index.journey[3].desc,
+    accent: t.index.journey[3].accent,
     icon: PackageCheck
   }
 ];
@@ -75,7 +76,7 @@ const journeyItems = [
 // ─────────────────────────────────────────────
 // FaceMarker — persistent floating data tag
 // ─────────────────────────────────────────────
-function FaceMarker({ marker, isVisible, isActive }: { marker: typeof FACE_MARKERS[0]; isVisible: boolean; isActive: boolean }) {
+function FaceMarker({ marker, isVisible, isActive }: { marker: any; isVisible: boolean; isActive: boolean }) {
   const isLeft = marker.left !== undefined;
 
   return (
@@ -139,7 +140,7 @@ function FaceMarker({ marker, isVisible, isActive }: { marker: typeof FACE_MARKE
 // ─────────────────────────────────────────────
 // ScanBeam — Dynamic X/Y Radar Scanner
 // ─────────────────────────────────────────────
-function ScanBeam({ scanX, scanY }: { scanX: any; scanY: any }) {
+function ScanBeam({ scanX, scanY, t }: { scanX: any; scanY: any; t: any }) {
   const leftPos = useTransform(scanX, v => `${v}%`);
   const topPos = useTransform(scanY, v => `${v}%`);
 
@@ -174,7 +175,7 @@ function ScanBeam({ scanX, scanY }: { scanX: any; scanY: any }) {
       >
         <div className="w-1.5 h-1.5 rounded-full bg-[#97A97C]" />
         <span className="text-[9px] font-mono tracking-[0.2em] text-[#97A97C] font-bold uppercase">
-          Targeting
+          {t.index.targeting}
         </span>
       </motion.div>
     </div>
@@ -188,6 +189,10 @@ function ScannerOverlay() {
   const scanX = useMotionValue(50);
   const scanY = useMotionValue(0);
   const [activeMarkerIndex, setActiveMarkerIndex] = useState(-1);
+  const { language } = useI18nStore();
+  const t = translations[language];
+
+  const markers = getFaceMarkers(t);
 
   useEffect(() => {
     let isCancelled = false;
@@ -198,9 +203,9 @@ function ScannerOverlay() {
         setActiveMarkerIndex(-1);
         await new Promise(r => setTimeout(r, 500));
 
-        for (let i = 0; i < FACE_MARKERS.length; i++) {
+        for (let i = 0; i < markers.length; i++) {
           if (isCancelled) return;
-          const marker = FACE_MARKERS[i];
+          const marker = markers[i];
           const targetX = marker.left ? parseFloat(marker.left) : (100 - parseFloat((marker as any).right || "0"));
           const targetY = parseFloat(marker.top);
 
@@ -238,8 +243,8 @@ function ScannerOverlay() {
 
   return (
     <div className="absolute inset-0 pointer-events-none z-10">
-      <ScanBeam scanX={scanX} scanY={scanY} />
-      {FACE_MARKERS.map((marker, idx) => (
+      <ScanBeam scanX={scanX} scanY={scanY} t={t} />
+      {markers.map((marker, idx) => (
         <FaceMarker
           key={idx}
           marker={marker}
@@ -254,13 +259,13 @@ function ScannerOverlay() {
 // ─────────────────────────────────────────────
 // RadarChartMockup (Abstract Biometric Dashboard)
 // ─────────────────────────────────────────────
-function RadarChartMockup() {
+function RadarChartMockup({ t }: { t: any }) {
   return (
     <div className="relative w-full aspect-[4/5] bg-card/10 rounded-[2rem] flex flex-col items-center justify-center overflow-hidden border border-border/10 shadow-inner z-10 transition-transform duration-500 group-hover:scale-[1.02]">
       {/* Brand header */}
       <div className="absolute top-6 left-6 flex items-center gap-2 text-primary">
         <Activity className="w-5 h-5" />
-        <span className="text-xs font-bold tracking-widest uppercase">Skin Strategie</span>
+        <span className="text-xs font-bold tracking-widest uppercase">{t.index.radarBrand}</span>
       </div>
 
       {/* Abstract Radar Chart */}
@@ -290,7 +295,7 @@ function RadarChartMockup() {
       </div>
 
       <div className="absolute bottom-6 flex gap-3">
-        <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] text-primary font-mono tracking-widest uppercase">SCAN IN PROGRESS</span>
+        <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-[10px] text-primary font-mono tracking-widest uppercase">{t.index.scanInProgress}</span>
       </div>
     </div>
   );
@@ -299,7 +304,7 @@ function RadarChartMockup() {
 // ─────────────────────────────────────────────
 // BespokeProductMockup
 // ─────────────────────────────────────────────
-function BespokeProductMockup() {
+function BespokeProductMockup({ t }: { t: any }) {
   return (
     <div className="relative w-full aspect-[4/5] bg-card/10 rounded-[2rem] flex flex-col items-center justify-center overflow-hidden border border-border/10 shadow-inner z-10 transition-transform duration-500 group-hover:scale-[1.02]">
       {/* Glow behind product */}
@@ -330,7 +335,7 @@ function BespokeProductMockup() {
         transition={{ delay: 0.5, duration: 0.6 }}
       >
         <Sparkles className="w-4 h-4 text-primary" />
-        <span className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-light">Match: 98.4% Accuracy</span>
+        <span className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-light">{t.index.matchAccuracy}</span>
       </motion.div>
     </div>
   );
@@ -339,7 +344,7 @@ function BespokeProductMockup() {
 // ─────────────────────────────────────────────
 // ProgressSlider – 2 Weeks vs 6 Weeks
 // ─────────────────────────────────────────────
-function ProgressSlider() {
+function ProgressSlider({ t }: { t: any }) {
   const [sliderValue, setSliderValue] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -385,7 +390,7 @@ function ProgressSlider() {
         >
           <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
             <span className="text-lg font-bold text-primary-foreground bg-primary/90 backdrop-blur-md px-6 py-3 rounded-full border border-primary/20 shadow-xl">
-              Week 6 — Visible Improvement
+              {t.index.progress.week6Improvement}
             </span>
           </div>
         </div>
@@ -407,10 +412,10 @@ function ProgressSlider() {
 
         {/* Labels - High Contrast Gold Pills */}
         <div className="absolute top-6 left-6 md:top-8 md:left-8 bg-primary/90 backdrop-blur-md px-6 py-2.5 rounded-full border border-primary/30 shadow-xl shadow-black/20 z-10">
-          <span className="text-lg md:text-xl font-bold text-primary-foreground tracking-wide">Week 2</span>
+          <span className="text-lg md:text-xl font-bold text-primary-foreground tracking-wide">{t.index.progress.week2}</span>
         </div>
         <div className="absolute top-6 right-6 md:top-8 md:right-8 bg-primary/90 backdrop-blur-md px-6 py-2.5 rounded-full border border-primary/30 shadow-xl shadow-black/20 z-10">
-          <span className="text-lg md:text-xl font-bold text-primary-foreground tracking-wide">Week 6</span>
+          <span className="text-lg md:text-xl font-bold text-primary-foreground tracking-wide">{t.index.progress.week6}</span>
         </div>
       </div>
 
@@ -426,7 +431,7 @@ function ProgressSlider() {
           aria-label="Drag to compare Week 2 vs Week 6 results"
         />
         <p className="mt-4 text-center text-[1rem] md:text-lg text-muted-foreground font-medium">
-          Drag to compare · Illustrative results
+          {t.index.progress.dragToCompare}
         </p>
       </div>
     </motion.div>
@@ -458,7 +463,7 @@ function AuthorityBadge({ icon: Icon, value, label }: { icon: any; value: string
 // ─────────────────────────────────────────────
 // JourneyCard – staggered proof item
 // ─────────────────────────────────────────────
-function JourneyCard({ item, i }: { item: (typeof journeyItems)[0]; i: number }) {
+function JourneyCard({ item, i }: { item: ReturnType<typeof getJourneyItems>[0]; i: number }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const isEven = i % 2 === 0;
@@ -496,7 +501,7 @@ function JourneyCard({ item, i }: { item: (typeof journeyItems)[0]; i: number })
 // ─────────────────────────────────────────────
 // Expert Seal
 // ─────────────────────────────────────────────
-function ExpertSeal() {
+function ExpertSeal({ t }: { t: any }) {
   return (
     <motion.div
       className="py-20 px-10 text-center"
@@ -515,12 +520,12 @@ function ExpertSeal() {
         <div className="flex items-center gap-4">
           <Activity className="h-8 w-8 text-primary/70" />
           <p className="hero-serif text-2xl md:text-4xl text-foreground font-medium tracking-wide">
-            Biometric Skin Analysis
+            {t.index.expertSealTitle}
           </p>
           <Activity className="h-8 w-8 text-primary/70" />
         </div>
         <p className="text-[11px] md:text-sm text-muted-foreground tracking-[0.2em] font-bold mt-2 uppercase">
-          POWERED BY KOREAN BIOMETRIC DATA SCIENCE — GERMANY
+          {t.index.expertSealSub}
         </p>
 
         <div className="flex items-center gap-4 w-full max-w-[360px] mt-2">
@@ -541,19 +546,23 @@ const Index = () => {
   const heroRef = useRef(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const { products } = useProductStore();
-
   const [analysisStep, setAnalysisStep] = useState(0);
 
+  const { language } = useI18nStore();
+  const t = translations[language];
+
+  // Rest of Index function ...
+
   const progressLabels = [
-    "Initializing...",
-    "Scanning Sebum...",
-    "Checking Hydration...",
-    "Analyzing Texture...",
-    "Evaluating Barrier...",
-    "Measuring Elasticity...",
-    "Detecting Pigment...",
-    "Assessing Aging...",
-    "Analysis Complete"
+    t.index.initializing,
+    t.index.scanningSebum,
+    t.index.checkingHydration,
+    t.index.analyzingTexture,
+    t.index.evaluatingBarrier,
+    t.index.measuringElasticity,
+    t.index.detectingPigment,
+    t.index.assessingAging,
+    t.index.analysisComplete
   ];
 
   useEffect(() => {
@@ -600,18 +609,15 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                 <ScannerOverlay />
                 <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 z-20 flex flex-col justify-end">
-                  <h1 className="hero-serif text-5xl md:text-7xl lg:text-8xl text-[#001A33] dark:text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4 transition-colors duration-300">
-                    Precision<br />Skincare.
-                  </h1>
+                  <h1 className="hero-serif text-5xl md:text-7xl lg:text-8xl text-[#001A33] dark:text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4 transition-colors duration-300" dangerouslySetInnerHTML={{ __html: t.heroTitle }} />
                   <p className="text-lg md:text-2xl text-[#1A1A1A] dark:text-white/90 drop-shadow-md max-w-xl font-light leading-snug transition-colors duration-300">
-                    End the cycle of skincare speculation.<br />
-                    Clinical data matches you to exact formulas.
+                    {t.heroSlogan}
                   </p>
                   <Link
                     to="/diagnosis"
                     className="mt-8 inline-flex items-center justify-center gap-4 rounded-full bg-primary/90 text-primary-foreground px-8 py-4 text-sm md:text-base font-bold tracking-widest uppercase hover:bg-primary transition-colors w-max backdrop-blur-md border border-white/20"
                   >
-                    Start Analysis
+                    {t.startAnalysis}
                     <ArrowRight className="w-5 h-5" />
                   </Link>
                 </div>
@@ -623,11 +629,9 @@ const Index = () => {
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center z-20">
                   <Scan className="w-12 h-12 text-primary mb-6 animate-pulse" />
-                  <h1 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight font-light mb-4">
-                    The 10-Axis<br />Analysis Process.
-                  </h1>
+                  <h1 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.steps.step1 }} />
                   <p className="text-base md:text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                    120 clinical markers processed in real-time to generate your bespoke biometric skin vector.
+                    {t.steps.step1Desc}
                   </p>
                 </div>
               </>
@@ -638,18 +642,16 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent md:to-background/20" />
                 <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 md:flex items-end justify-between z-20">
                   <div className="max-w-xl">
-                    <h1 className="hero-serif text-4xl md:text-6xl lg:text-7xl text-foreground tracking-tight font-light mb-4">
-                      The Complete<br />Strategy Lab Kit.
-                    </h1>
+                    <h1 className="hero-serif text-4xl md:text-6xl lg:text-7xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.index.kitTitle }}></h1>
                     <p className="text-base md:text-xl text-muted-foreground leading-relaxed mb-6 md:mb-0">
-                      5 formulas perfectly curated to shift your exact clinical vector toward harmony. Delivered monthly.
+                      {t.index.kitSub}
                     </p>
                   </div>
                   <Link
                     to="/diagnosis"
                     className="hidden md:inline-flex items-center justify-center gap-4 rounded-full bg-foreground text-background px-8 py-4 text-sm font-bold tracking-widest uppercase hover:bg-foreground/90 transition-colors shrink-0"
                   >
-                    Explore Kit
+                    {t.index.exploreKit}
                   </Link>
                 </div>
               </>
@@ -689,10 +691,10 @@ const Index = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
             <div>
-              <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-2">Die Kollektion</p>
-              <h2 className="hero-serif text-3xl md:text-5xl text-foreground font-light">Targeted Formulas</h2>
+              <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-2">{t.index.collection}</p>
+              <h2 className="hero-serif text-3xl md:text-5xl text-foreground font-light">{t.index.targetedFormulas}</h2>
             </div>
-            <p className="text-sm text-muted-foreground mt-4 md:mt-0 font-medium">Alle Produkte werden per Biometrie gematcht.</p>
+            <p className="text-sm text-muted-foreground mt-4 md:mt-0 font-medium">{t.index.collectionSub}</p>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
@@ -714,7 +716,7 @@ const Index = () => {
                 <div className="p-5 flex flex-col flex-1">
                   <p className="text-[clamp(0.55rem,1.2vw,0.65rem)] font-bold tracking-widest uppercase text-primary mb-1">{p.brand}</p>
                   <p className="text-[clamp(0.85rem,2vw,1.1rem)] font-semibold text-foreground leading-tight flex-1 group-hover:text-primary transition-colors">
-                    {p.name.en}
+                    {p.name[language as "en" | "de"]}
                   </p>
                   <div className="mt-4 flex items-center justify-between">
                     <p className="text-[clamp(0.75rem,1.5vw,0.875rem)] font-medium text-muted-foreground">{p.type}</p>
@@ -734,10 +736,10 @@ const Index = () => {
         <div className="w-full mx-auto max-w-7xl">
           {/* Authority badges - Full width grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 mb-20 md:mb-32">
-            <AuthorityBadge icon={ShieldCheck} value="83%" label="Diagnostic Confidence" />
-            <AuthorityBadge icon={Activity} value="10" label="Clinical Axes" />
-            <AuthorityBadge icon={Brain} value="120" label="Validated Markers" />
-            <AuthorityBadge icon={PackageCheck} value="5" label="Phase Protocol" />
+            <AuthorityBadge icon={ShieldCheck} value="83%" label={t.index.authority.confidence} />
+            <AuthorityBadge icon={Activity} value="10" label={t.index.authority.axes} />
+            <AuthorityBadge icon={Brain} value="120" label={t.index.authority.markers} />
+            <AuthorityBadge icon={PackageCheck} value="5" label={t.index.authority.phase} />
           </div>
 
           {/* Section header */}
@@ -749,15 +751,15 @@ const Index = () => {
             transition={{ duration: 0.8 }}
           >
             <h2 className="hero-serif text-3xl md:text-6xl text-foreground tracking-tight mb-6">
-              Real Results. Visible Progress.
+              {t.index.authority.realResults}
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
-              See how a clinically matched K-Beauty protocol transforms your skin over time.
+              {t.index.authority.realResultsSub}
             </p>
           </motion.div>
 
           {/* Progress Slider (Full Width Container) */}
-          <ProgressSlider />
+          <ProgressSlider t={t} />
         </div>
       </section>
 
@@ -774,11 +776,12 @@ const Index = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="mx-auto mb-8 h-1 w-16 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
+            <div className="mx-auto mb-8 h-1 w-16 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
             <h2 className="hero-serif text-3xl md:text-6xl text-foreground tracking-tight mb-6">
-              Diagnosis Meets Beauty.
+              {t.index.diagnosisMeets}
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-3xl mx-auto font-light">
-              End the cycle of skincare speculation. We curate exactly what your unique skin vector demands.
+              {t.index.diagnosisMeetsSub}
             </p>
           </motion.div>
 
@@ -820,7 +823,7 @@ const Index = () => {
                   />
                 </div>
                 <p className="mt-10 text-center text-xl md:text-2xl text-muted-foreground leading-relaxed font-light">
-                  10-Axis Skin Vector Analysis
+                  {t.index.tenAxisAnalysis}
                 </p>
               </div>
             </motion.div>
@@ -849,7 +852,7 @@ const Index = () => {
                 </div>
                 <div className="mt-8 flex items-center gap-2">
                   <p className="text-center text-xl md:text-2xl text-muted-foreground leading-relaxed font-light">
-                    Clinically Matched Formulas
+                    {t.index.clinicallyMatched}
                   </p>
                 </div>
                 {/* Accuracy Badge */}
@@ -874,11 +877,11 @@ const Index = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.7 }}
           >
-            <span className="text-sm md:text-base font-medium tracking-wide">Diagnosis</span>
+            <span className="text-sm md:text-base font-medium tracking-wide">{t.index.flow.diagnosis}</span>
             <span className="text-primary text-lg">→</span>
-            <span className="text-sm md:text-base font-medium tracking-wide">Your protocol</span>
+            <span className="text-sm md:text-base font-medium tracking-wide">{t.index.flow.protocol}</span>
             <span className="text-primary text-lg">→</span>
-            <span className="text-sm md:text-base font-medium tracking-wide text-primary">K-beauty routine</span>
+            <span className="text-sm md:text-base font-medium tracking-wide text-primary">{t.index.flow.routine}</span>
           </motion.div>
         </div>
       </section>
@@ -897,14 +900,14 @@ const Index = () => {
           >
             <div className="mx-auto mb-8 h-1 w-16 bg-gradient-to-r from-transparent via-primary to-transparent rounded-full" />
             <h2 className="hero-serif text-3xl md:text-6xl text-foreground tracking-tight mb-6">
-              The Skin Strategy Journey
+              {t.index.journeyTitle}
             </h2>
             <p className="text-xl md:text-2xl leading-relaxed text-muted-foreground max-w-3xl mx-auto font-normal">
-              A biometrically precise timeline — from intelligent clinical analysis to a vibrant, personalized European-Korean protocol.
+              {t.index.journeySub}
             </p>
           </motion.div>
           <div className="space-y-20 md:space-y-32 flex flex-col items-center">
-            {journeyItems.map((item, i) => (
+            {getJourneyItems(t).map((item, i) => (
               <JourneyCard key={item.num} item={item} i={i} />
             ))}
           </div>
@@ -930,17 +933,17 @@ const Index = () => {
           transition={{ duration: 0.8 }}
         >
           <h2 className="hero-serif text-3xl md:text-7xl text-foreground tracking-tight mb-8">
-            Ready to decode your skin?
+            {t.index.readyTitle}
           </h2>
           <p className="text-xl md:text-2xl text-muted-foreground font-light mb-12">
-            No registration · Results in under 6 min · Backed by clinical scales
+            {t.index.readySub}
           </p>
           <div className="flex justify-center">
             <Link
               to="/diagnosis"
               className="hero-serif group inline-flex items-center justify-center gap-4 rounded-full bg-primary px-12 md:px-20 py-6 md:py-8 text-xl md:text-3xl font-bold text-primary-foreground transition-all duration-400 hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-2 hover:scale-105 w-full md:w-auto min-h-[48px]"
             >
-              Start Free Assessment
+              {t.index.startFree}
               <ArrowRight className="h-8 w-8 transition-transform duration-300 group-hover:translate-x-3" />
             </Link>
           </div>
@@ -948,7 +951,7 @@ const Index = () => {
       </section>
 
       {/* ── Expert Seal ─────────────────────── */}
-      <ExpertSeal />
+      <ExpertSeal t={t} />
 
       <Footer />
       <CookieConsent />

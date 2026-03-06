@@ -1,18 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import LabCard from "./LabCard";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 interface ElasticitySimulationProps {
   value: number;
   onChange: (v: number) => void;
 }
-
-const LEVELS = [
-  { label: "Firm", description: "Skin snaps back immediately — no visible deformation", recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: "Fast", pct: 100, dipDepth: 6 },
-  { label: "Mild", description: "Skin returns within 1–2 seconds after release", recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: "Medium", pct: 72, dipDepth: 12 },
-  { label: "Moderate", description: "Skin takes 3–5 seconds to recover its shape", recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: "Slow", pct: 42, dipDepth: 20 },
-  { label: "Significant", description: "Skin stays deformed or recovers very slowly", recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: "Very slow", pct: 15, dipDepth: 28 },
-];
 
 const PRESS_EASE: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
@@ -26,6 +20,15 @@ function skinSurfacePath(dip: number): string {
 const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) => {
   const surfaceControls = useAnimation();
   const arrowControls = useAnimation();
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
+
+  const LEVELS = [
+    { label: t.diagnosis.ui.elasticFirm, description: t.diagnosis.ui.elasticFirmDesc, recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: t.diagnosis.ui.recoveryFast, pct: 100, dipDepth: 6 },
+    { label: t.diagnosis.ui.elasticMild, description: t.diagnosis.ui.elasticMildDesc, recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: t.diagnosis.ui.recoveryMedium, pct: 72, dipDepth: 12 },
+    { label: t.diagnosis.ui.elasticModerate, description: t.diagnosis.ui.elasticModerateDesc, recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: t.diagnosis.ui.recoverySlow, pct: 42, dipDepth: 20 },
+    { label: t.diagnosis.ui.elasticSignificant, description: t.diagnosis.ui.elasticSignificantDesc, recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: t.diagnosis.ui.recoveryVerySlow, pct: 15, dipDepth: 28 },
+  ];
 
   const config = LEVELS[value];
   const animating = useRef(false);

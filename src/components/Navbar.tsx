@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { Moon, Sun, ChevronDown, User } from "lucide-react";
+import { Moon, Sun, ChevronDown, User, Globe } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 function Logo() {
   return (
@@ -24,13 +25,13 @@ function Logo() {
   );
 }
 
-const CONCERNS = ["Sensitivity", "Hydration", "Oily / Pores", "Trouble", "Dead Skin", "Whitening", "Anti-aging"];
-const TYPES = ["Cleansing", "Peeling", "Toner / Mist", "Essence / Ampoule", "Cream", "Sun Care"];
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const { isLoggedIn, userProfile } = useAuthStore();
+  const { language, toggleLanguage } = useI18nStore();
+  const t = translations[language];
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md pt-[env(safe-area-inset-top)]">
@@ -43,7 +44,7 @@ const Navbar = () => {
             <button
               className="flex items-center gap-1 text-sm text-foreground/70 hover:text-foreground transition-colors"
             >
-              Products <ChevronDown className="h-3 w-3" />
+              {t.products} <ChevronDown className="h-3 w-3" />
             </button>
 
             <AnimatePresence>
@@ -58,10 +59,10 @@ const Navbar = () => {
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <p className="flex items-center gap-1.5 text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">
-                        <span className="text-sm">🎯</span> Concern (고민별)
+                        <span className="text-sm">🎯</span> {t.navbar.concernsTitle}
                       </p>
                       <div className="space-y-1.5">
-                        {CONCERNS.map((c) => (
+                        {t.navbar.concernsList.map((c: string) => (
                           <button key={c} onClick={() => setMenuOpen(false)} className="block w-full text-left text-sm text-foreground/70 hover:text-primary transition-colors py-0.5">
                             {c}
                           </button>
@@ -70,12 +71,12 @@ const Navbar = () => {
                     </div>
                     <div>
                       <p className="flex items-center gap-1.5 text-[0.65rem] font-bold tracking-[0.2em] uppercase text-primary mb-3">
-                        <span className="text-sm">🧴</span> Type (유형별)
+                        <span className="text-sm">🧴</span> {t.navbar.typesTitle}
                       </p>
                       <div className="space-y-1.5">
-                        {TYPES.map((t) => (
-                          <button key={t} onClick={() => setMenuOpen(false)} className="block w-full text-left text-sm text-foreground/70 hover:text-primary transition-colors py-0.5">
-                            {t}
+                        {t.navbar.typesList.map((typeObj: string) => (
+                          <button key={typeObj} onClick={() => setMenuOpen(false)} className="block w-full text-left text-sm text-foreground/70 hover:text-primary transition-colors py-0.5">
+                            {typeObj}
                           </button>
                         ))}
                       </div>
@@ -85,6 +86,17 @@ const Navbar = () => {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Globe Toggle */}
+          <motion.button
+            onClick={toggleLanguage}
+            className="flex h-9 items-center justify-center gap-1.5 rounded-full border border-border px-3 text-[#947E5C] dark:text-[#D4AF37] transition-colors hover:border-primary/40 bg-card/50"
+            whileTap={{ scale: 0.92 }}
+            aria-label="Toggle language"
+          >
+            <Globe className="h-4 w-4" />
+            <span className="text-xs font-bold uppercase tracking-widest">{language}</span>
+          </motion.button>
 
           {/* Theme toggle */}
           <motion.button
@@ -104,7 +116,7 @@ const Navbar = () => {
             to="/diagnosis"
             className="rounded-full border border-primary px-5 py-2 font-body text-sm font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground"
           >
-            Start Diagnosis
+            {t.startDiagnosis}
           </Link>
 
           {/* Auth buttons */}
@@ -122,13 +134,13 @@ const Navbar = () => {
                 to="/login"
                 className="hidden sm:inline-flex text-sm text-foreground/60 hover:text-foreground transition-colors"
               >
-                Login
+                {t.login}
               </Link>
               <Link
                 to="/signup"
                 className="rounded-full bg-primary px-5 py-2 font-body text-sm font-medium text-primary-foreground transition-all hover:opacity-90"
               >
-                Sign Up
+                {t.signUp}
               </Link>
             </>
           )}

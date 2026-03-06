@@ -170,23 +170,6 @@ export default function AdminDashboard() {
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
     const [activeTab, setActiveTab] = useState<"analysis" | "products">("analysis");
 
-    // Guard: must be logged in as admin
-    if (!isLoggedIn || userProfile?.role !== "admin") {
-        return (
-            <div className="min-h-screen bg-background">
-                <SilkBackground />
-                <Navbar />
-                <main className="pt-28 pb-20 px-6 max-w-md mx-auto relative z-10 text-center">
-                    <p className="text-foreground text-lg font-semibold mb-2">Zugriff verweigert</p>
-                    <p className="text-sm text-foreground/50 mb-4">Diese Seite ist nur für Administratoren zugänglich.</p>
-                    <Link to="/login" className="text-primary hover:underline text-sm">→ Als Admin anmelden</Link>
-                    <p className="text-xs text-foreground/30 mt-6">Admin: admin@skinstrategylab.de</p>
-                </main>
-                <Footer />
-            </div>
-        );
-    }
-
     // Compute aggregate data from real users
     const usersWithResults = allUsers.filter((u) => u.savedResults.length > 0);
     const totalDiagnoses = allUsers.reduce((sum, u) => sum + u.savedResults.length, 0);

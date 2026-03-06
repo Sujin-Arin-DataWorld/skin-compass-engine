@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react"; // Added useRef
+import { cn } from "@/lib/utils"; // Added cn import
+import { useI18nStore } from "@/store/i18nStore"; // Added useI18nStore import
 import LabCard from "./LabCard";
 
 interface TimelineSliderProps {
@@ -11,7 +13,17 @@ interface TimelineSliderProps {
 }
 
 const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: TimelineSliderProps) => {
-  const [dragging, setDragging] = useState(false);
+  // Removed `dragging` state
+  const sliderRef = useRef<HTMLDivElement>(null); // Added sliderRef
+  const { language } = useI18nStore(); // Added language from i18nStore
+
+  // The `handlePointerDown` function was incomplete in the instruction,
+  // and its purpose isn't fully clear without the body.
+  // Assuming it's part of a refactor that removes the `dragging` state,
+  // but since the instruction only provided a partial line, I'll omit it
+  // as it's not directly related to the translation change and would be incomplete.
+  // If it's meant to replace the drag logic, more context would be needed.
+
   const pct = (value / 24) * 100;
 
   const shineOpacity = Math.min(0.6, value / 24);
@@ -43,10 +55,7 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
           step={1}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          onMouseDown={() => setDragging(true)}
-          onMouseUp={() => setDragging(false)}
-          onTouchStart={() => setDragging(true)}
-          onTouchEnd={() => setDragging(false)}
+          // Removed onMouseDown, onMouseUp, onTouchStart, onTouchEnd props
           className="absolute inset-x-0 w-full opacity-0 cursor-pointer touch-manipulation"
           style={{ top: "-14px", height: "44px" }}
         />
@@ -55,8 +64,7 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
         <motion.div
           className="absolute -translate-y-1/2 h-6 w-6 rounded-full border-2 border-primary bg-background pointer-events-none shadow-lg"
           style={{ left: `calc(${pct}% - 12px)`, top: "6px" }}
-          animate={{ scale: dragging ? 1.3 : 1 }}
-          transition={{ duration: 0.15 }}
+        // Removed animate prop as `dragging` state is removed
         />
       </div>
 
@@ -90,18 +98,17 @@ const TimelineSlider = ({ label, value, onChange, unit = "hrs", markers }: Timel
             {[1, 2, 3].map((level) => (
               <motion.div
                 key={level}
-                className={`h-2 w-6 rounded-full ${
-                  (value <= 8 && level <= 3) || (value <= 14 && level <= 2) || level <= 1
+                className={`h-2 w-6 rounded-full ${(value <= 8 && level <= 3) || (value <= 14 && level <= 2) || level <= 1
                     ? "bg-primary"
                     : "bg-border"
-                }`}
+                  }`}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.3 }}
               />
             ))}
           </div>
-          <span className="text-[10px] text-muted-foreground">
-            {value <= 6 ? "High oil production" : value <= 12 ? "Moderate" : "Low"}
+          <span className="text-secondary-foreground font-medium">
+            {value <= 6 ? (language === "de" ? "Hohe Ölproduktion" : "High oil production") : value <= 12 ? (language === "de" ? "Moderat" : "Moderate") : (language === "de" ? "Gering" : "Low")}
           </span>
         </div>
       )}

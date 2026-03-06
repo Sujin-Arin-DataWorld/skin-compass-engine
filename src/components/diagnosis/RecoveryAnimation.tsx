@@ -1,19 +1,23 @@
 import { motion } from "framer-motion";
 import LabCard from "./LabCard";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 interface RecoveryAnimationProps {
   recoverySpeed: number; // 0-3 (0 = fast recovery, 3 = very slow)
   onChange: (v: number) => void;
 }
 
-const RECOVERY_LABELS = [
-  { label: "Fast", desc: "Recovers within hours" },
-  { label: "Moderate", desc: "1-2 days to settle" },
-  { label: "Slow", desc: "Days of irritation" },
-  { label: "Very Slow", desc: "Week+ recovery" },
-];
-
 const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) => {
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
+
+  const RECOVERY_LABELS = [
+    { label: t.diagnosis.ui.recoveryFast, desc: t.diagnosis.ui.recoversHours },
+    { label: t.diagnosis.ui.recoveryMedium, desc: t.diagnosis.ui.daysToSettle },
+    { label: t.diagnosis.ui.recoverySlow, desc: t.diagnosis.ui.daysIrritation },
+    { label: t.diagnosis.ui.recoveryVerySlow, desc: t.diagnosis.ui.weekRecovery },
+  ];
+
   // Recovery animation duration maps to selected speed
   const animDuration = recoverySpeed === 0 ? 1 : recoverySpeed === 1 ? 3 : recoverySpeed === 2 ? 6 : 10;
   const irritationLevel = recoverySpeed / 3;
@@ -21,10 +25,10 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
   return (
     <LabCard>
       <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-        Recovery Speed
+        {t.diagnosis.ui.recoverySpeedLabel}
       </p>
       <p className="mb-4 text-xs text-muted-foreground">
-        How quickly does your skin calm after irritation?
+        {t.diagnosis.ui.calmAfterIrritation}
       </p>
 
       <div className="flex flex-col items-center gap-5">
@@ -85,7 +89,7 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: animDuration, repeat: Infinity, repeatDelay: 1 }}
             >
-              {recoverySpeed === 0 ? "Quick recovery" : `Recovering... (~${animDuration}s cycle)`}
+              {recoverySpeed === 0 ? t.diagnosis.ui.quickRecovery : t.diagnosis.ui.recoveringCycle.replace("{s}", animDuration.toString())}
             </motion.span>
           </div>
         </div>
@@ -97,14 +101,14 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
               key={i}
               onClick={() => onChange(i)}
               className={`flex-1 flex flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-2.5 text-center transition-all min-h-[44px] ${recoverySpeed === i
-                  ? i === 0
-                    ? "bg-severity-clear/20 text-severity-clear"
-                    : i === 1
-                      ? "bg-severity-mild/20 text-severity-mild"
-                      : i === 2
-                        ? "bg-severity-moderate/20 text-severity-moderate"
-                        : "bg-severity-severe/20 text-severity-severe"
-                  : "text-muted-foreground hover:opacity-80"
+                ? i === 0
+                  ? "bg-severity-clear/20 text-severity-clear"
+                  : i === 1
+                    ? "bg-severity-mild/20 text-severity-mild"
+                    : i === 2
+                      ? "bg-severity-moderate/20 text-severity-moderate"
+                      : "bg-severity-severe/20 text-severity-severe"
+                : "text-muted-foreground hover:opacity-80"
                 }`}
               style={
                 recoverySpeed !== i

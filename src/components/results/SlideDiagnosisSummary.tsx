@@ -1,33 +1,72 @@
 import { motion } from "framer-motion";
+import { useI18nStore } from "@/store/i18nStore";
 import { DiagnosisResult, AXIS_LABELS, AxisKey } from "@/engine/types";
 
 // ── Empathy map: pattern → human acknowledgment ──
-const EMPATHY_MAP: Record<string, string> = {
-  'Hormonal Acne Cascade':
-    'Breakouts that follow a pattern, not a random one. Your skin is reacting to something deeper than surface oil.',
-  'Barrier Stress Pattern':
-    'Your skin is working harder than it should have to. It\'s not sensitivity — it\'s a barrier under pressure.',
-  'Dehydrated-Oily Complex':
-    'Shine on the surface, tightness underneath. These two signals together tell us something specific about your skin.',
-  'Melasma-Dominant Pattern':
-    'Your pigmentation has a logic to it. UV and hormones are both in the picture.',
-  'Texture-Congestion Overlap':
-    'Rough texture and congested pores usually share the same root. Your skin is telling us where to focus.',
-  'Elasticity Loss — Early Stage':
-    'The changes you\'re noticing aren\'t sudden. They\'ve been building, and that means they can be addressed systematically.',
-  default:
-    'Your skin has a specific pattern. It\'s not random, and it\'s not unsolvable.',
+const EMPATHY_MAP: Record<string, { en: string; de: string }> = {
+  'Hormonal Acne Cascade': {
+    en: 'Breakouts that follow a pattern, not a random one. Your skin is reacting to something deeper than surface oil.',
+    de: 'Ausbrüche, die einem Muster folgen, nicht zufällig sind. Ihre Haut reagiert auf tieferliegende hormonelle Signale.'
+  },
+  'Barrier Stress Pattern': {
+    en: 'Your skin is working harder than it should have to. It\'s not sensitivity — it\'s a barrier under pressure.',
+    de: 'Ihre Haut arbeitet härter als sie müsste. Das ist keine Empfindlichkeit — das ist eine Barriere unter Stress.'
+  },
+  'Dehydrated-Oily Complex': {
+    en: 'Shine on the surface, tightness underneath. These two signals together tell us something specific about your skin.',
+    de: 'Glanz an der Oberfläche, Spannungsgefühl darunter. Diese widersprüchlichen Signale verraten uns etwas Spezifisches.'
+  },
+  'Melasma-Dominant Pattern': {
+    en: 'Your pigmentation has a logic to it. UV and hormones are both in the picture.',
+    de: 'Ihre Pigmentierung folgt einer Logik. UV-Strahlung und Hormone spielen hier eng zusammen.'
+  },
+  'Texture-Congestion Overlap': {
+    en: 'Rough texture and congested pores usually share the same root. Your skin is telling us where to focus.',
+    de: 'Raue Textur und verstopfte Poren haben meist dieselbe Wurzel. Ihre Haut sagt uns genau, wo wir ansetzen müssen.'
+  },
+  'Elasticity Loss — Early Stage': {
+    en: 'The changes you\'re noticing aren\'t sudden. They\'ve been building, and that means they can be addressed systematically.',
+    de: 'Die Veränderungen, die Sie bemerken, kamen nicht plötzlich. Sie haben sich aufgebaut, und können nun systematisch adressiert werden.'
+  },
+  default: {
+    en: 'Your skin has a specific pattern. It\'s not random, and it\'s not unsolvable.',
+    de: 'Ihre Haut hat ein spezifisches Muster. Nichts ist zufällig, und nichts ist unlösbar.'
+  }
 };
 
-const OBSERVATION_TEMPLATES: Partial<Record<AxisKey, (score: number) => string>> = {
-  acne: (s) => `Breakout activity ${s > 60 ? 'concentrated and cyclical' : 'present with moderate frequency'}`,
-  seb: (s) => `Sebum overproduction${s > 60 ? ' returning within 2–4h of cleansing' : ' in the T-zone'}`,
-  hyd: (s) => `Moisture retention ${s > 60 ? 'significantly compromised (fast TEWL pattern)' : 'below optimal'}`,
-  sen: (s) => `Reactive sensitivity${s > 60 ? ' — multiple actives causing stinging' : ' with thermal flush tendency'}`,
-  pigment: (s) => `Pigmentation${s > 60 ? ' showing UV-responsive deepening' : ' with residual post-inflammatory marks'}`,
-  texture: (s) => `Pore and texture irregularity${s > 60 ? ' across both nose and forehead zones' : ' in T-zone'}`,
-  aging: (s) => `Firmness response${s > 60 ? ' — pinch recoil significantly delayed' : ' showing early-stage reduction'}`,
-  bar: (s) => `Barrier stress${s > 60 ? ' — redness + tightness + stinging triad present' : ' with recovery delay'}`,
+const OBSERVATION_TEMPLATES: Partial<Record<AxisKey, { en: (score: number) => string; de: (score: number) => string }>> = {
+  acne: {
+    en: (s) => `Breakout activity ${s > 60 ? 'concentrated and cyclical' : 'present with moderate frequency'}`,
+    de: (s) => `Ausbruchsaktivität ${s > 60 ? 'konzentriert und zyklisch' : 'mit mäßiger Häufigkeit vorhanden'}`
+  },
+  seb: {
+    en: (s) => `Sebum overproduction${s > 60 ? ' returning within 2–4h of cleansing' : ' in the T-zone'}`,
+    de: (s) => `Talgüberproduktion${s > 60 ? ', die 2–4h nach der Reinigung zurückkehrt' : ' primär in der T-Zone'}`
+  },
+  hyd: {
+    en: (s) => `Moisture retention ${s > 60 ? 'significantly compromised (fast TEWL pattern)' : 'below optimal'}`,
+    de: (s) => `Feuchtigkeitsspeicherung ${s > 60 ? 'erheblich beeinträchtigt (schneller TEWL)' : 'unter dem Optimum'}`
+  },
+  sen: {
+    en: (s) => `Reactive sensitivity${s > 60 ? ' — multiple actives causing stinging' : ' with thermal flush tendency'}`,
+    de: (s) => `Reaktive Empfindlichkeit${s > 60 ? ' — mehrere Wirkstoffe verursachen Stechen' : ' mit Tendenz zum Hitzeflush'}`
+  },
+  pigment: {
+    en: (s) => `Pigmentation${s > 60 ? ' showing UV-responsive deepening' : ' with residual post-inflammatory marks'}`,
+    de: (s) => `Pigmentierung${s > 60 ? ' zeigt UV-reaktive Vertiefung' : ' mit verbleibenden post-entzündlichen Spuren'}`
+  },
+  texture: {
+    en: (s) => `Pore and texture irregularity${s > 60 ? ' across both nose and forehead zones' : ' in T-zone'}`,
+    de: (s) => `Poren- und Texturunregelmäßigkeiten${s > 60 ? ' über Nasen- und Stirnpartien' : ' leicht in der T-Zone'}`
+  },
+  aging: {
+    en: (s) => `Firmness response${s > 60 ? ' — pinch recoil significantly delayed' : ' showing early-stage reduction'}`,
+    de: (s) => `Festigkeitsreaktion${s > 60 ? ' — Hautrückbildung nach Kneifen deutlich verzögert' : ' zeigt Rückgang im Frühstadium'}`
+  },
+  bar: {
+    en: (s) => `Barrier stress${s > 60 ? ' — redness + tightness + stinging triad present' : ' with recovery delay'}`,
+    de: (s) => `Barriere-Stress${s > 60 ? ' — Rötung + Spannungsgefühl + Stechen (Triade) vorhanden' : ' mit Verzögerung der Erholungsphase'}`
+  },
 };
 
 interface Props {
@@ -35,8 +74,15 @@ interface Props {
 }
 
 const SlideDiagnosisSummary = ({ result }: Props) => {
-  const patternName = result.detected_patterns[0]?.pattern.name_en ?? "Balanced Profile";
-  const empathyText = EMPATHY_MAP[patternName] ?? EMPATHY_MAP.default;
+  const { language } = useI18nStore();
+
+  // Use _de fields if language is German
+  const patternNameEN = result.detected_patterns[0]?.pattern.name_en ?? "Balanced Profile";
+  const patternName = language === "de"
+    ? (result.detected_patterns[0]?.pattern as any)?.name_de ?? "Ausgeglichenes Profil"
+    : patternNameEN;
+
+  const empathyText = EMPATHY_MAP[patternNameEN]?.[language] ?? EMPATHY_MAP.default[language];
   const signalCount = result.radar_chart_data.reduce((sum, d) => sum + (d.score > 0 ? 1 : 0), 0);
   const confidence = Math.min(95, 65 + signalCount * 3);
   const activeCategories = result.primary_concerns.slice(0, 4);
@@ -52,7 +98,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="mb-6"
         >
-          <p className="slide-eyebrow mb-2.5">Diagnostic Result</p>
+          <p className="slide-eyebrow mb-2.5">{language === "de" ? "Diagnose-Ergebnis" : "Diagnostic Result"}</p>
           <p
             className="font-display italic leading-snug"
             style={{
@@ -77,7 +123,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           }}
         >
           <p className="slide-eyebrow mb-1" style={{ letterSpacing: "0.14em" }}>
-            Identified Skin Pattern
+            {language === "de" ? "Identifiziertes Hautmuster" : "Identified Skin Pattern"}
           </p>
           <h1
             className="font-display"
@@ -92,11 +138,11 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
             {patternName}
           </h1>
           <div className="flex gap-5">
-            <StatMini label="Signals captured" value={String(signalCount)} />
+            <StatMini label={language === "de" ? "Signale erfasst" : "Signals captured"} value={String(signalCount)} />
             <div className="w-px" style={{ background: "hsl(var(--border))" }} />
-            <StatMini label="Diagnostic confidence" value={`${confidence}%`} />
+            <StatMini label={language === "de" ? "Konfidenzniveau" : "Diagnostic confidence"} value={`${confidence}%`} />
             <div className="w-px" style={{ background: "hsl(var(--border))" }} />
-            <StatMini label="Dermatologist reviewed" value="✓" accent />
+            <StatMini label={language === "de" ? "Dermatologisch geprüft" : "Dermatologist reviewed"} value="✓" accent />
           </div>
         </motion.div>
 
@@ -108,8 +154,9 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           transition={{ delay: 0.3 }}
           style={{ lineHeight: 1.6 }}
         >
-          This pattern was identified from the intersection of your highest-scoring axes.
-          It describes how your skin's concerns interact — not just what they are individually.
+          {language === "de"
+            ? "Dieses Muster wurde aus der Überschneidung Ihrer am höchsten bewerteten Achsen identifiziert. Es beschreibt, wie Ihre Hautprobleme interagieren — nicht nur, was sie einzeln bedeuten."
+            : "This pattern was identified from the intersection of your highest-scoring axes. It describes how your skin's concerns interact — not just what they are individually."}
         </motion.p>
 
         {/* ── Section D: Observation bullets ── */}
@@ -120,7 +167,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           className="space-y-2 mb-6"
         >
           <p className="slide-eyebrow mb-2" style={{ letterSpacing: "0.1em" }}>
-            What we observed
+            {language === "de" ? "Was wir beobachtet haben" : "What we observed"}
           </p>
           {activeCategories.map((axis) => {
             const score = Math.round(result.axis_scores[axis]);
@@ -135,7 +182,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
                   ·
                 </span>
                 <p className="slide-body" style={{ lineHeight: 1.5 }}>
-                  {template(score)}
+                  {template[language](score)}
                 </p>
               </div>
             );
@@ -153,7 +200,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
             textAlign: "center",
           }}
         >
-          See your full clinical map →
+          {language === "de" ? "Ihre vollständige klinische Karte ansehen →" : "See your full clinical map →"}
         </motion.p>
       </div>
     </div>

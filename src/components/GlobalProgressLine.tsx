@@ -1,10 +1,13 @@
 import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useI18nStore, translations } from "@/store/i18nStore";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
 export default function GlobalProgressLine() {
     const store = useDiagnosisStore();
+    const { language } = useI18nStore();
+    const t = translations[language];
 
     // Track the deepest step the user has reached so we allow forward jumps if they go back
     const [maxStepVisited, setMaxStepVisited] = useState(store.currentStep);
@@ -43,18 +46,18 @@ export default function GlobalProgressLine() {
     // Encouragement logic
     let encouragement = "";
     if (store.currentStep <= 1) {
-        encouragement = "Initializing scan... Deep-diving into your skin context.";
+        encouragement = t.diagnosis.progress.enc1;
     } else if (rawStep <= 4) {
-        encouragement = "Analysis in progress. You're doing great—stay focused!";
+        encouragement = t.diagnosis.progress.enc2;
     } else if (rawStep <= 7) {
-        encouragement = "Almost there! We're mapping your unique skin vector now.";
+        encouragement = t.diagnosis.progress.enc3;
     } else {
-        encouragement = "Finalizing your results. Get ready for your report.";
+        encouragement = t.diagnosis.progress.enc4;
     }
 
     const isFinale = rawStep === 8 || store.currentStep >= 10;
     if (isFinale) {
-        encouragement = "Diagnosis complete! High-precision report incoming...";
+        encouragement = t.diagnosis.progress.encFinal;
     }
 
     // Typography logic
@@ -121,7 +124,7 @@ export default function GlobalProgressLine() {
 
             {/* The Target Label */}
             <div className="text-[11px] md:text-xs font-bold tracking-widest text-primary uppercase">
-                {rawStep === 8 && store.currentStep >= 10 ? "PROCESSING DATA" : (store.currentStep <= 1 ? `CONTEXT ${store.currentStep + 1} OF 2` : `CATEGORY ${rawStep} OF 8`)}
+                {rawStep === 8 && store.currentStep >= 10 ? t.diagnosis.progress.processing : (store.currentStep <= 1 ? `${t.diagnosis.progress.context} ${store.currentStep + 1} ${t.diagnosis.progress.of} 2` : `${t.diagnosis.progress.category} ${rawStep} ${t.diagnosis.progress.of} 8`)}
             </div>
         </div>
     );

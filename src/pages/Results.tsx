@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
+import { useI18nStore } from "@/store/i18nStore";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 import SlideDiagnosisSummary from "@/components/results/SlideDiagnosisSummary";
@@ -16,14 +17,24 @@ import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { useProductStore } from "@/store/productStore";
 import type { DiagnosisResult, AxisScores, AxisSeverity, Product } from "@/engine/types";
 
-const SLIDE_LABELS = [
-  { key: "diagnosis", short: "Pattern", full: "Your Skin Pattern" },
-  { key: "axes", short: "Analysis", full: "Clinical Analysis" },
-  { key: "protocol", short: "Protocol", full: "Your Routine" },
-  { key: "plans", short: "Plans", full: "Choose Your Plan" },
-  { key: "products", short: "Products", full: "Matched Products" },
-  { key: "subscribe", short: "Strategy", full: "Adaptive Strategy" },
-];
+const SLIDE_LABELS = {
+  en: [
+    { key: "diagnosis", short: "Pattern", full: "Your Skin Pattern" },
+    { key: "axes", short: "Analysis", full: "Clinical Analysis" },
+    { key: "protocol", short: "Protocol", full: "Your Routine" },
+    { key: "plans", short: "Plans", full: "Choose Your Plan" },
+    { key: "products", short: "Products", full: "Matched Products" },
+    { key: "subscribe", short: "Strategy", full: "Adaptive Strategy" },
+  ],
+  de: [
+    { key: "diagnosis", short: "Muster", full: "Ihr Hautmuster" },
+    { key: "axes", short: "Analyse", full: "Klinische Analyse" },
+    { key: "protocol", short: "Protokoll", full: "Ihre Routine" },
+    { key: "plans", short: "Abo", full: "Plan wählen" },
+    { key: "products", short: "Produkte", full: "Passende Produkte" },
+    { key: "subscribe", short: "Strategie", full: "Adaptive Strategie" },
+  ]
+};
 
 const slideVariants = {
   enter: (d: number) => ({ x: d > 0 ? "100%" : "-100%", opacity: 0 }),
@@ -68,6 +79,7 @@ const ResultsPage = () => {
   const { products } = useProductStore();
   const [searchParams] = useSearchParams();
   const isDebug = searchParams.get("debug") === "true";
+  const { language } = useI18nStore();
 
   // Use mock data in dev when no real result exists
   const result = useMemo(() => {
@@ -159,8 +171,8 @@ const ResultsPage = () => {
       <SlideNav
         current={current}
         total={6}
-        labels={SLIDE_LABELS.map((l) => l.short)}
-        fullLabels={SLIDE_LABELS.map((l) => l.full)}
+        labels={SLIDE_LABELS[language].map((l) => l.short)}
+        fullLabels={SLIDE_LABELS[language].map((l) => l.full)}
         onPrev={() => goTo(current - 1)}
         onNext={() => goTo(current + 1)}
         onGoTo={goTo}

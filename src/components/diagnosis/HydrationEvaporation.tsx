@@ -1,20 +1,24 @@
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 import LabCard from "./LabCard";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 interface HydrationEvaporationProps {
   retentionLevel: number; // 0-3 (0 = no issue, 3 = evaporates immediately)
   onChange: (v: number) => void;
 }
 
-const RETENTION_LABELS = [
-  { label: "Holds Well", desc: "Moisture stays for hours" },
-  { label: "Fades Gradually", desc: "Dries within 2–3 hours" },
-  { label: "Evaporates Fast", desc: "Gone within an hour" },
-  { label: "Won't Absorb", desc: "Immediate moisture loss" },
-];
-
 const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporationProps) => {
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
+
+  const RETENTION_LABELS = [
+    { label: t.diagnosis.ui.holdsWell, desc: t.diagnosis.ui.moistureStays },
+    { label: t.diagnosis.ui.fadesGradually, desc: t.diagnosis.ui.driesWithin },
+    { label: t.diagnosis.ui.evaporatesFast, desc: t.diagnosis.ui.goneWithin },
+    { label: t.diagnosis.ui.wontAbsorb, desc: t.diagnosis.ui.immediateLoss },
+  ];
+
   const droplets = useMemo(() => {
     return Array.from({ length: 12 }, (_, i) => ({
       id: i,
@@ -32,7 +36,7 @@ const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporation
   return (
     <LabCard>
       <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-        Hydration Retention
+        {t.diagnosis.ui.hydrationRetention}
       </p>
 
       <div className="mt-4 flex flex-col items-center gap-5">
@@ -108,14 +112,14 @@ const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporation
               key={i}
               onClick={() => onChange(i)}
               className={`flex-1 flex flex-col items-center justify-center gap-0.5 rounded-lg px-1 py-2.5 text-center transition-all min-h-[44px] ${retentionLevel === i
-                  ? i === 0
-                    ? "bg-severity-clear/20 text-severity-clear"
-                    : i === 1
-                      ? "bg-severity-mild/20 text-severity-mild"
-                      : i === 2
-                        ? "bg-severity-moderate/20 text-severity-moderate"
-                        : "bg-severity-severe/20 text-severity-severe"
-                  : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+                ? i === 0
+                  ? "bg-severity-clear/20 text-severity-clear"
+                  : i === 1
+                    ? "bg-severity-mild/20 text-severity-mild"
+                    : i === 2
+                      ? "bg-severity-moderate/20 text-severity-moderate"
+                      : "bg-severity-severe/20 text-severity-severe"
+                : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
                 }`}
             >
               <span className="text-xs font-medium">{lvl.label}</span>

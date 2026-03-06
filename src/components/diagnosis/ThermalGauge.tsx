@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import LabCard from "./LabCard";
 import FaceBase from "./FaceBase";
+import { useI18nStore, translations } from "@/store/i18nStore";
 
 interface ThermalGaugeProps {
   value: number; // 0-3
@@ -8,14 +9,17 @@ interface ThermalGaugeProps {
   label: string;
 }
 
-const THERMAL_LEVELS = [
-  { label: "None", color: "var(--severity-clear)", spread: 0 },
-  { label: "Mild flush", color: "var(--severity-mild)", spread: 0.2 },
-  { label: "Moderate redness", color: "var(--severity-moderate)", spread: 0.5 },
-  { label: "Intense flush", color: "var(--severity-severe)", spread: 0.85 },
-];
-
 const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
+  const { language } = useI18nStore();
+  const t = language === "de" ? translations.de : translations.en;
+
+  const THERMAL_LEVELS = [
+    { label: t.diagnosis.ui.flushNone, color: "var(--severity-clear)", spread: 0 },
+    { label: t.diagnosis.ui.flushMild, color: "var(--severity-mild)", spread: 0.2 },
+    { label: t.diagnosis.ui.flushModerate, color: "var(--severity-moderate)", spread: 0.5 },
+    { label: t.diagnosis.ui.flushIntense, color: "var(--severity-severe)", spread: 0.85 },
+  ];
+
   const level = THERMAL_LEVELS[value];
 
   return (
@@ -69,14 +73,14 @@ const ThermalGauge = ({ value, onChange, label }: ThermalGaugeProps) => {
               key={i}
               onClick={() => onChange(i)}
               className={`flex-1 min-h-[44px] rounded-lg px-2 py-3 text-xs font-medium transition-all select-none touch-manipulation ${value === i
-                  ? i === 0
-                    ? "bg-muted text-foreground"
-                    : i === 1
-                      ? "bg-severity-mild/20 text-severity-mild"
-                      : i === 2
-                        ? "bg-severity-moderate/20 text-severity-moderate"
-                        : "bg-severity-severe/20 text-severity-severe"
-                  : "bg-secondary/50 text-muted-foreground hover:bg-secondary active:bg-secondary"
+                ? i === 0
+                  ? "bg-muted text-foreground"
+                  : i === 1
+                    ? "bg-severity-mild/20 text-severity-mild"
+                    : i === 2
+                      ? "bg-severity-moderate/20 text-severity-moderate"
+                      : "bg-severity-severe/20 text-severity-severe"
+                : "bg-secondary/50 text-muted-foreground hover:bg-secondary active:bg-secondary"
                 }`}
               whileTap={{ scale: 0.93 }}
             >

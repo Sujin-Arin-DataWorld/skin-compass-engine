@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { DiagnosisResult, AXIS_LABELS, AXIS_KEYS, AxisKey } from "@/engine/types";
+import { useI18nStore } from "@/store/i18nStore";
+import { DiagnosisResult, AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS, AxisKey } from "@/engine/types";
+import RadarChart from "@/components/diagnosis/RadarChart";
 
 function getBarColor(score: number): string {
   if (score >= 70) return "hsl(var(--severity-severe))";
@@ -9,102 +11,65 @@ function getBarColor(score: number): string {
   return "hsl(var(--severity-clear))";
 }
 
-const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, (s: number) => string>> = {
-  acne: (s) => s >= 75 ? "Cyclical, likely hormonally driven" : s >= 50 ? "Moderate, inflammatory pattern" : "Occasional, surface-level",
-  seb: (s) => s >= 75 ? "Rapid sebum return, T-zone dominant" : s >= 50 ? "Balanced but reactive to humidity" : "Controlled",
-  hyd: (s) => s >= 75 ? "Compromised moisture barrier (TEWL risk)" : s >= 50 ? "Suboptimal retention" : "Adequate",
-  sen: (s) => s >= 75 ? "High reactivity — multiple trigger exposure" : s >= 50 ? "Moderate — flush and thermal reactivity" : "Manageable",
-  pigment: (s) => s >= 75 ? "UV-responsive, melasma-type deepening" : s >= 50 ? "Post-inflammatory marks, localized" : "Mild",
-  texture: (s) => s >= 75 ? "Dual mechanism — pores + surface roughness" : s >= 50 ? "Congestion-dominant" : "Minor irregularity",
-  aging: (s) => s >= 75 ? "Recoil delay across multiple contour zones" : s >= 50 ? "Early-stage firmness reduction" : "Within normal range",
-  bar: (s) => s >= 75 ? "Barrier compromise triad present" : s >= 50 ? "Stress pattern, recovery delayed" : "Mild disruption",
-  ox: (s) => s >= 75 ? "High oxidative stress — antioxidant protocol essential" : s >= 50 ? "Moderate environmental damage" : "Low oxidative burden",
+const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, { en: (s: number) => string, de: (s: number) => string }>> = {
+  acne: {
+    en: (s) => s >= 75 ? "Cyclical, likely hormonally driven" : s >= 50 ? "Moderate, inflammatory pattern" : "Occasional, surface-level",
+    de: (s) => s >= 75 ? "Zyklisch, wahrscheinlich hormonell bedingt" : s >= 50 ? "Mäßiges, entzündliches Muster" : "Gelegentlich, oberflächlich"
+  },
+  seb: {
+    en: (s) => s >= 75 ? "Rapid sebum return, T-zone dominant" : s >= 50 ? "Balanced but reactive to humidity" : "Controlled",
+    de: (s) => s >= 75 ? "Schnelle Talgproduktion, T-Zonen-dominant" : s >= 50 ? "Ausgeglichen, reagiert auf Feuchtigkeit" : "Kontrolliert"
+  },
+  hyd: {
+    en: (s) => s >= 75 ? "Compromised moisture barrier (TEWL risk)" : s >= 50 ? "Suboptimal retention" : "Adequate",
+    de: (s) => s >= 75 ? "Geschädigte Feuchtigkeitsbarriere (TEWL-Risiko)" : s >= 50 ? "Suboptimale Speicherung" : "Ausreichend"
+  },
+  sen: {
+    en: (s) => s >= 75 ? "High reactivity — multiple trigger exposure" : s >= 50 ? "Moderate — flush and thermal reactivity" : "Manageable",
+    de: (s) => s >= 75 ? "Hohe Reaktivität — reagiert auf multiple Trigger" : s >= 50 ? "Mäßig — Flush und thermische Reaktivität" : "Handhabbar"
+  },
+  pigment: {
+    en: (s) => s >= 75 ? "UV-responsive, melasma-type deepening" : s >= 50 ? "Post-inflammatory marks, localized" : "Mild",
+    de: (s) => s >= 75 ? "UV-reaktiv, Melasma-artige Verdunkelung" : s >= 50 ? "Post-inflammatorische Spuren, lokalisiert" : "Mild"
+  },
+  texture: {
+    en: (s) => s >= 75 ? "Dual mechanism — pores + surface roughness" : s >= 50 ? "Congestion-dominant" : "Minor irregularity",
+    de: (s) => s >= 75 ? "Dualer Mechanismus — Poren + Oberflächenrauheit" : s >= 50 ? "Von Verstopfung dominiert" : "Geringe Unregelmäßigkeit"
+  },
+  aging: {
+    en: (s) => s >= 75 ? "Recoil delay across multiple contour zones" : s >= 50 ? "Early-stage firmness reduction" : "Within normal range",
+    de: (s) => s >= 75 ? "Rückstellverzögerung an mehreren Konturenzonen" : s >= 50 ? "Frühstadium der Festigkeitsminderung" : "Im Normalbereich"
+  },
+  bar: {
+    en: (s) => s >= 75 ? "Barrier compromise triad present" : s >= 50 ? "Stress pattern, recovery delayed" : "Mild disruption",
+    de: (s) => s >= 75 ? "Trias einer Barrierebeeinträchtigung vorhanden" : s >= 50 ? "Stressmuster, Erholung verzögert" : "Leichte Störung"
+  },
+  ox: {
+    en: (s) => s >= 75 ? "High oxidative stress — antioxidant protocol essential" : s >= 50 ? "Moderate environmental damage" : "Low oxidative burden",
+    de: (s) => s >= 75 ? "Hoher oxidativer Stress — Antioxidantien zwingend" : s >= 50 ? "Mäßige Umweltschäden" : "Geringe oxidative Belastung"
+  },
 };
 
-const CRITICAL_MESSAGES: Partial<Record<AxisKey, string>> = {
-  acne: "Inflammation control must come before any actives.",
-  seb: "Sebum regulation is the gateway to texture and pore improvement.",
-  hyd: "Barrier hydration is Phase 1 before any targeted treatment.",
-  sen: "Barrier calming must precede all active ingredients.",
-  pigment: "SPF protocol activation is the highest leverage action.",
-  texture: "Gentle exfoliation cadence is the critical variable.",
-  aging: "Collagen-supporting actives unlock in Phase 4.",
-  bar: "Barrier repair must be established before adding any new actives.",
-  ox: "Antioxidant integration is the first line of defence.",
+const CRITICAL_MESSAGES: Partial<Record<AxisKey, { en: string, de: string }>> = {
+  acne: { en: "Inflammation control must come before any actives.", de: "Entzündungskontrolle muss vor anderen Wirkstoffen kommen." },
+  seb: { en: "Sebum regulation is the gateway to texture and pore improvement.", de: "Talgregulierung ist das Tor zur Verbesserung von Textur und Poren." },
+  hyd: { en: "Barrier hydration is Phase 1 before any targeted treatment.", de: "Barriere-Hydratation ist Phase 1 vor jeder gezielten Behandlung." },
+  sen: { en: "Barrier calming must precede all active ingredients.", de: "Barriere-Beruhigung muss vor der starken Wirkstofftherapie stehen." },
+  pigment: { en: "SPF protocol activation is the highest leverage action.", de: "Aktivierung des SPF-Protokolls ist die wirkungsvollste Maßnahme." },
+  texture: { en: "Gentle exfoliation cadence is the critical variable.", de: "Regelmäßiges, schonendes Peeling ist die entscheidende Variable." },
+  aging: { en: "Collagen-supporting actives unlock in Phase 4.", de: "Kollagenunterstützende Wirkstoffe entfalten Phase 4." },
+  bar: { en: "Barrier repair must be established before adding any new actives.", de: "Die Barrierereparatur muss aufgebaut sein, bevor neue Wirkstoffe hinzugefügt werden." },
+  ox: { en: "Antioxidant integration is the first line of defence.", de: "Antioxidantien-Integration ist die erste Verteidigungslinie." },
 };
 
-// SVG radar chart — always 10 axes
-function RadarChart({ result, highlightAxis }: { result: DiagnosisResult; highlightAxis: AxisKey }) {
-  // Build full 10-axis data from AXIS_KEYS
-  const axes = AXIS_KEYS.map((key) => ({
-    axis: AXIS_LABELS[key],
-    score: Math.round(result.axis_scores[key] ?? 0),
-    key,
-  }));
-  const n = axes.length;
-  const VIEWBOX = 340, CENTER = VIEWBOX / 2, RADIUS = 100;
 
-  const points = axes.map((a, i) => {
-    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-    const r = (a.score / 100) * RADIUS;
-    return { x: CENTER + r * Math.cos(angle), y: CENTER + r * Math.sin(angle) };
-  });
-  const poly = points.map((p) => `${p.x},${p.y}`).join(" ");
-
-  return (
-    <svg width="100%" viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`} className="mx-auto max-w-[320px]">
-      {[0.25, 0.5, 0.75, 1].map((r) => (
-        <polygon
-          key={r}
-          points={Array.from({ length: n }, (_, i) => {
-            const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-            const rad = r * RADIUS;
-            return `${CENTER + rad * Math.cos(angle)},${CENTER + rad * Math.sin(angle)}`;
-          }).join(" ")}
-          fill="none" stroke="hsl(var(--border))" strokeWidth="0.5" opacity={r === 1 ? 0.4 : 0.15}
-        />
-      ))}
-      {points.map((_, i) => {
-        const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        const end = { x: CENTER + RADIUS * Math.cos(angle), y: CENTER + RADIUS * Math.sin(angle) };
-        return <line key={i} x1={CENTER} y1={CENTER} x2={end.x} y2={end.y} stroke="hsl(var(--border))" strokeWidth="0.5" opacity={0.2} />;
-      })}
-      <motion.polygon
-        points={poly}
-        fill="hsl(var(--primary) / 0.25)" stroke="hsl(var(--primary))" strokeWidth="2.5" strokeLinejoin="round"
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
-      />
-      {axes.map((a, i) => {
-        const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-        const r = RADIUS + 30;
-        return (
-          <text
-            key={a.key} x={CENTER + r * Math.cos(angle)} y={CENTER + r * Math.sin(angle)}
-            textAnchor="middle" dominantBaseline="central"
-            style={{
-              fontSize: "10px",
-              fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontWeight: a.key === highlightAxis ? 700 : 500,
-              fill: a.key === highlightAxis ? "hsl(var(--primary))" : "hsl(var(--foreground))",
-              opacity: 0.85,
-            }}
-          >
-            {a.axis}
-          </text>
-        );
-      })}
-    </svg>
-  );
-}
 
 interface Props {
   result: DiagnosisResult;
 }
 
 const SlideAxisBreakdown = ({ result }: Props) => {
+  const { language } = useI18nStore();
   const sorted = useMemo(
     () => [...AXIS_KEYS].sort((a, b) => result.axis_scores[b] - result.axis_scores[a]),
     [result]
@@ -116,7 +81,7 @@ const SlideAxisBreakdown = ({ result }: Props) => {
       <div className="mx-auto w-full max-w-[800px]">
         {/* Eyebrow */}
         <motion.p className="slide-eyebrow mb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          Clinical Analysis
+          {language === "de" ? "Klinische Analyse" : "Clinical Analysis"}
         </motion.p>
 
         {/* Headline */}
@@ -133,7 +98,7 @@ const SlideAxisBreakdown = ({ result }: Props) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
         >
-          Your skin vector
+          {language === "de" ? "Ihr Hautvektor" : "Your skin vector"}
         </motion.h2>
         <motion.p
           className="slide-body mb-6"
@@ -141,7 +106,9 @@ const SlideAxisBreakdown = ({ result }: Props) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
         >
-          No two vectors are identical. This is precisely yours.
+          {language === "de"
+            ? "Keine zwei Vektoren sind identisch. Dies ist genau Ihrer."
+            : "No two vectors are identical. This is precisely yours."}
         </motion.p>
 
         {/* Radar + bars grid */}
@@ -152,7 +119,8 @@ const SlideAxisBreakdown = ({ result }: Props) => {
             {sorted.map((axis, i) => {
               const score = Math.round(result.axis_scores[axis]);
               const isTop = i === 0;
-              const interpretation = AXIS_INTERPRETATIONS[axis]?.(score) ?? "";
+              const interpretation = AXIS_INTERPRETATIONS[axis]?.[language]?.(score) ?? "";
+              const labels = language === "de" ? AXIS_LABELS_DE : AXIS_LABELS;
 
               return (
                 <motion.div
@@ -172,10 +140,10 @@ const SlideAxisBreakdown = ({ result }: Props) => {
                       fontWeight: isTop ? 700 : 500,
                       color: isTop ? "hsl(var(--primary))" : "hsl(var(--foreground))",
                     }}>
-                      {AXIS_LABELS[axis]}
+                      {labels[axis]}
                       {isTop && (
                         <span style={{ fontSize: "0.625rem", marginLeft: "0.4rem", opacity: 0.7 }}>
-                          — Primary
+                          — {language === "de" ? "Primär" : "Primary"}
                         </span>
                       )}
                     </p>
@@ -232,10 +200,14 @@ const SlideAxisBreakdown = ({ result }: Props) => {
           }}
         >
           <p className="slide-eyebrow mb-1" style={{ color: "hsl(var(--primary))" }}>
-            Protocol Priority
+            {language === "de" ? "Protokoll-Priorität" : "Protocol Priority"}
           </p>
           <p className="slide-body" style={{ lineHeight: 1.5 }}>
-            {CRITICAL_MESSAGES[topAxis] ?? "Your protocol is ordered by clinical priority, starting with your highest-scoring axis."}
+            {CRITICAL_MESSAGES[topAxis]?.[language] ?? (
+              language === "de"
+                ? "Ihr Protokoll ist nach klinischer Priorität geordnet, beginnend mit Ihrer am höchsten bewerteten Achse."
+                : "Your protocol is ordered by clinical priority, starting with your highest-scoring axis."
+            )}
           </p>
         </motion.div>
       </div>

@@ -49,6 +49,11 @@ const Checkout = () => {
   const tier: Tier = (location.state as { tier?: Tier })?.tier ?? storeTier;
   const deviceLocked: boolean = (location.state as { deviceLocked?: boolean })?.deviceLocked ?? true;
 
+  if (!tier || !PLAN_DETAILS[tier]) {
+    navigate("/");
+    return null;
+  }
+
   const plan = PLAN_DETAILS[tier];
 
   return (

@@ -600,132 +600,155 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       {/* ═══════════════════════════════════════
-          HERO — Luxury 3-Slide Swiper
+          HERO — DESKTOP ONLY (기존 연구소 디자인 보존)
           ═══════════════════════════════════════ */}
-      <section className="relative h-screen min-h-[600px] w-full bg-background overflow-hidden">
-        <AnimatePresence initial={false} mode="wait">
-          <motion.div
-            key={currentSlide}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={(e, { offset, velocity }) => {
-              const swipe = swipePower(offset.x, velocity.x);
-              if (swipe < -swipeConfidenceThreshold) {
-                setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
-              } else if (swipe > swipeConfidenceThreshold) {
-                setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1));
-              }
-            }}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            className="absolute inset-0 cursor-grab active:cursor-grabbing"
-          >
-            {/* Background Image / Overlay logic per slide */}
-            {currentSlide === 0 && (
-              <>
-                <img src="/assets/hero-face.png" alt="Precision Skincare" className="w-full h-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
-                <ScannerOverlay />
-                <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 z-20 flex flex-col justify-end">
-                  <h1 className="hero-serif text-5xl md:text-7xl lg:text-8xl text-[#001A33] dark:text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4 transition-colors duration-300" dangerouslySetInnerHTML={{ __html: t.heroTitle }} />
-                  <p className="text-lg md:text-2xl text-[#1A1A1A] dark:text-white/90 drop-shadow-md max-w-xl font-light leading-snug transition-colors duration-300">
-                    {t.heroSlogan}
-                  </p>
-                  <Link
-                    to="/diagnosis"
-                    className="mt-8 inline-flex items-center justify-center gap-4 rounded-full bg-primary/90 text-primary-foreground px-8 py-4 text-sm md:text-base font-bold tracking-widest uppercase hover:bg-primary transition-colors w-max backdrop-blur-md border border-white/20"
-                  >
-                    {t.startAnalysis}
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                </div>
-              </>
-            )}
-            {currentSlide === 1 && (
-              <>
-                <img src="/assets/data-blueprint.png" alt="10-Axis Analysis" className="w-full h-full object-cover object-center" />
-                <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center z-20">
-                  <Scan className="w-12 h-12 text-primary mb-6 animate-pulse" />
-                  <h1 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.steps.step1 }} />
-                  <p className="text-base md:text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                    {t.steps.step1Desc}
-                  </p>
-                </div>
-              </>
-            )}
-            {currentSlide === 2 && (
-              <>
-                <img src="/assets/kbeauty-lineup.png" alt="Strategy Lab Kit" className="w-full h-full object-cover object-center" />
-                <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent md:to-background/20" />
-                <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 md:flex items-end justify-between z-20">
-                  <div className="max-w-xl">
-                    <h1 className="hero-serif text-4xl md:text-6xl lg:text-7xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.index.kitTitle }}></h1>
-                    <p className="text-base md:text-xl text-muted-foreground leading-relaxed mb-6 md:mb-0">
-                      {t.index.kitSub}
-                    </p>
+      <div className="hidden md:block">
+        <section className="relative h-screen min-h-[600px] w-full bg-background overflow-hidden">
+          <AnimatePresence initial={false} mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              className="absolute inset-0"
+            >
+              {currentSlide === 0 && (
+                <>
+                  <img src="/assets/hero-face.png" alt="Precision Skincare" className="w-full h-full object-cover object-center" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
+                  <ScannerOverlay />
+                  <div className="absolute inset-x-12 bottom-24 z-20 flex flex-col justify-end">
+                    <h1 className="hero-serif text-7xl lg:text-8xl text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.heroTitle }} />
+                    <p className="text-2xl text-white/90 drop-shadow-md max-w-xl font-light leading-snug">{t.heroSlogan}</p>
+                    <Link to="/diagnosis" className="mt-8 inline-flex items-center gap-4 rounded-full bg-primary/90 text-primary-foreground px-8 py-4 text-base font-bold tracking-widest uppercase hover:bg-primary transition-colors w-max backdrop-blur-md">
+                      {t.startAnalysis} <ArrowRight className="w-5 h-5" />
+                    </Link>
                   </div>
-                  <Link
-                    to="/diagnosis"
-                    className="hidden md:inline-flex items-center justify-center gap-4 rounded-full bg-foreground text-background px-8 py-4 text-sm font-bold tracking-widest uppercase hover:bg-foreground/90 transition-colors shrink-0"
-                  >
-                    {t.index.exploreKit}
-                  </Link>
-                </div>
-              </>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Global Slider Elements */}
-        <div className="absolute bottom-10 right-6 md:right-12 z-30 flex items-center gap-6">
-          {/* Pagination */}
-          <div className="text-[#1A1A1A] dark:text-white/90 font-mono text-sm tracking-widest transition-colors duration-300">
-            0{currentSlide + 1} / 03
+                </>
+              )}
+              {currentSlide === 1 && (
+                <>
+                  <img src="/assets/data-blueprint.png" alt="10-Axis Analysis" className="w-full h-full object-cover object-center" />
+                  <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center z-20">
+                    <Scan className="w-12 h-12 text-primary mb-6 animate-pulse" />
+                    <h1 className="hero-serif text-6xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.steps.step1 }} />
+                    <p className="text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">{t.steps.step1Desc}</p>
+                  </div>
+                </>
+              )}
+              {currentSlide === 2 && (
+                <>
+                  <img src="/assets/kbeauty-lineup.png" alt="Strategy Lab Kit" className="w-full h-full object-cover object-center" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
+                  <div className="absolute inset-x-12 bottom-24 md:flex items-end justify-between z-20">
+                    <div className="max-w-xl">
+                      <h1 className="hero-serif text-6xl lg:text-7xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.index.kitTitle }}></h1>
+                      <p className="text-xl text-muted-foreground leading-relaxed">{t.index.kitSub}</p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+          <div className="absolute bottom-10 right-12 z-30 flex items-center gap-6">
+            <div className="text-white/90 font-mono text-sm tracking-widest">0{currentSlide + 1} / 03</div>
+            <div className="flex gap-2">
+              <button onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))} className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/10"><ChevronDown className="w-5 h-5 rotate-90" /></button>
+              <button onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))} className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/10"><ChevronDown className="w-5 h-5 -rotate-90" /></button>
+            </div>
           </div>
-
-          {/* Controls */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))}
-              className="w-10 h-10 rounded-full border border-[#1A1A1A]/30 dark:border-white/30 flex items-center justify-center text-[#1A1A1A] dark:text-white hover:bg-[#1A1A1A]/10 dark:hover:bg-white/10 transition-colors duration-300"
-            >
-              <ChevronDown className="w-5 h-5 rotate-90" />
-            </button>
-            <button
-              onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))}
-              className="w-10 h-10 rounded-full border border-[#1A1A1A]/30 dark:border-white/30 flex items-center justify-center text-[#1A1A1A] dark:text-white hover:bg-[#1A1A1A]/10 dark:hover:bg-white/10 transition-colors duration-300"
-            >
-              <ChevronDown className="w-5 h-5 -rotate-90" />
-            </button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       {/* ═══════════════════════════════════════
-          MOBILE QUICK-ACCESS GRID (Skin Concerns) - MD:HIDDEN
+          HERO — MOBILE ONLY (올리브영 스타일 컨테이너)
           ═══════════════════════════════════════ */}
-      <section className="w-full bg-background pt-6 pb-2 md:hidden">
-        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide px-6 gap-5 pb-4">
-          {[
-            { id: "sebum", label: t.markers?.sebum || "Sebum", icon: "💧" },
-            { id: "inflammation", label: t.markers?.sensitivity || "Inflammation", icon: "🔥" },
-            { id: "hydration", label: t.markers?.hydration || "Hydration", icon: "💦" },
-            { id: "elasticity", label: t.markers?.aging || "Elasticity", icon: "✨" },
-            { id: "pigmentation", label: t.markers?.pigment || "Pigmentation", icon: "🎯" },
-          ].map((concern) => (
-            <Link
-              key={concern.id}
-              to="/diagnosis"
-              className="snap-start shrink-0 flex flex-col items-center gap-3 w-[72px]"
+      <div className="block md:hidden pt-20 pb-2 bg-background">
+        <div className="w-[92%] mx-auto h-[45vh] min-h-[380px] rounded-[2rem] overflow-hidden shadow-2xl relative border border-border/20">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+              className="absolute inset-0"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              onDragEnd={(e, { offset, velocity }) => {
+                const swipe = Math.abs(offset.x) * velocity.x;
+                if (swipe < -10000) setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1));
+                else if (swipe > 10000) setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1));
+              }}
             >
-              <div className="w-16 h-16 rounded-full bg-card border border-border/50 flex items-center justify-center shadow-sm">
-                <span className="text-2xl">{concern.icon}</span>
+              {currentSlide === 0 && (
+                <>
+                  <img src="/assets/hero-face.png" alt="Skincare" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute inset-x-5 bottom-8 z-20">
+                    <h1 className="hero-serif text-3xl text-white tracking-tight mb-2" dangerouslySetInnerHTML={{ __html: t.heroTitle }} />
+                    <Link to="/diagnosis" className="mt-4 inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-full text-xs font-bold tracking-widest uppercase">
+                      {t.startAnalysis} <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </>
+              )}
+              {currentSlide === 1 && (
+                <>
+                  <img src="/assets/data-blueprint.png" alt="Blueprint" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-20">
+                    <Scan className="w-10 h-10 text-primary mb-4" />
+                    <h1 className="hero-serif text-3xl text-foreground mb-2" dangerouslySetInnerHTML={{ __html: t.steps.step1 }} />
+                  </div>
+                </>
+              )}
+              {currentSlide === 2 && (
+                <>
+                  <img src="/assets/kbeauty-lineup.png" alt="Products" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute inset-x-5 bottom-8 z-20">
+                    <h1 className="hero-serif text-3xl text-white tracking-tight mb-2" dangerouslySetInnerHTML={{ __html: t.index.kitTitle }}></h1>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+          <div className="absolute bottom-4 right-4 z-30 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full text-[10px] text-white font-mono">
+            0{currentSlide + 1} / 03
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════
+          MOBILE QUICK-ACCESS GRID (4x2 Grid & 8 Categories)
+          ═══════════════════════════════════════ */}
+      <section className="w-full bg-background pt-8 pb-6 md:hidden">
+        {/* 타이틀 영역 */}
+        <div className="px-6 mb-5">
+          <p className="text-[10px] font-bold tracking-widest uppercase text-primary mb-1">Items by Concern</p>
+        </div>
+
+        {/* 4x2 그리드 배열 */}
+        <div className="grid grid-cols-4 gap-y-6 gap-x-3 px-6">
+          {[
+            { id: "sebum", label: t.markers?.sebum || "Sebum", icon: Activity },
+            { id: "sensitivity", label: t.markers?.sensitivity || "Sensitivity", icon: ShieldCheck },
+            { id: "hydration", label: t.markers?.hydration || "Hydration", icon: FlaskConical },
+            { id: "aging", label: t.markers?.aging || "Aging", icon: Brain },
+            { id: "pigment", label: t.markers?.pigment || "Pigment", icon: Target },
+            { id: "texture", label: t.markers?.texture || "Texture", icon: Sparkles },
+            { id: "barrier", label: t.markers?.barrier || "Barrier", icon: PackageCheck },
+            { id: "pores", label: "Pores", icon: Scan }, // 8번째 모공 항목 추가
+          ].map((concern) => (
+            <Link key={concern.id} to="/diagnosis" className="flex flex-col items-center gap-2">
+              {/* 한 줄에 4개가 넉넉히 들어가도록 사이즈 최적화 (w-full aspect-square) */}
+              <div className="w-full max-w-[70px] aspect-square rounded-[1rem] bg-card border border-border/50 flex items-center justify-center shadow-sm hover:border-primary transition-colors">
+                <concern.icon className="w-7 h-7 text-primary opacity-80" />
               </div>
-              <span className="radar-label text-[9px] whitespace-nowrap tracking-widest text-[#947E5C] dark:text-[#D4AF37]">
+              <span className="radar-label text-[9px] whitespace-nowrap tracking-wider text-[#947E5C] dark:text-[#D4AF37]">
                 {concern.label}
               </span>
             </Link>

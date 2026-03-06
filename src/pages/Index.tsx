@@ -618,11 +618,18 @@ const Index = () => {
                   <img src="/assets/hero-face.png" alt="Precision Skincare" className="w-full h-full object-cover object-center" />
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
                   <ScannerOverlay />
-                  <div className="absolute inset-x-12 bottom-24 z-20 flex flex-col justify-end">
-                    <h1 className="hero-serif text-7xl lg:text-8xl text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.heroTitle }} />
-                    <p className="text-2xl text-white/90 drop-shadow-md max-w-xl font-light leading-snug">{t.heroSlogan}</p>
-                    <Link to="/diagnosis" className="mt-8 inline-flex items-center gap-4 rounded-full bg-primary/90 text-primary-foreground px-8 py-4 text-base font-bold tracking-widest uppercase hover:bg-primary transition-colors w-max backdrop-blur-md">
-                      {t.startAnalysis} <ArrowRight className="w-5 h-5" />
+                  <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 z-20 flex flex-col justify-end">
+                    {/* 🌟 수정됨: 화이트모드(진한 남색) / 다크모드(흰색) 자동 변환 */}
+                    <h1 className="hero-serif text-5xl md:text-7xl lg:text-8xl text-[#001A33] dark:text-[#FFFFFF] drop-shadow-lg tracking-tight font-light mb-4 transition-colors duration-300" dangerouslySetInnerHTML={{ __html: t.heroTitle }} />
+                    <p className="text-lg md:text-2xl text-[#1A1A1A] dark:text-white/90 drop-shadow-md max-w-xl font-light leading-snug transition-colors duration-300">
+                      {t.heroSlogan}
+                    </p>
+                    <Link
+                      to="/diagnosis"
+                      className="mt-8 inline-flex items-center justify-center gap-4 rounded-full bg-primary/90 text-primary-foreground px-8 py-4 text-sm md:text-base font-bold tracking-widest uppercase hover:bg-primary transition-colors w-max backdrop-blur-md border border-white/20"
+                    >
+                      {t.startAnalysis}
+                      <ArrowRight className="w-5 h-5" />
                     </Link>
                   </div>
                 </>
@@ -633,30 +640,46 @@ const Index = () => {
                   <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center z-20">
                     <Scan className="w-12 h-12 text-primary mb-6 animate-pulse" />
-                    <h1 className="hero-serif text-6xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.steps.step1 }} />
-                    <p className="text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">{t.steps.step1Desc}</p>
+                    {/* 🌟 텍스트 색상 자동 대응 (text-foreground) */}
+                    <h1 className="hero-serif text-4xl md:text-6xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.steps.step1 }} />
+                    <p className="text-base md:text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">{t.steps.step1Desc}</p>
                   </div>
                 </>
               )}
               {currentSlide === 2 && (
                 <>
                   <img src="/assets/kbeauty-lineup.png" alt="Strategy Lab Kit" className="w-full h-full object-cover object-center" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
-                  <div className="absolute inset-x-12 bottom-24 md:flex items-end justify-between z-20">
+                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent md:to-background/20" />
+                  <div className="absolute inset-x-6 md:inset-x-12 bottom-32 md:bottom-24 md:flex items-end justify-between z-20">
                     <div className="max-w-xl">
-                      <h1 className="hero-serif text-6xl lg:text-7xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.index.kitTitle }}></h1>
-                      <p className="text-xl text-muted-foreground leading-relaxed">{t.index.kitSub}</p>
+                      {/* 🌟 텍스트 색상 자동 대응 (text-foreground) */}
+                      <h1 className="hero-serif text-4xl md:text-6xl lg:text-7xl text-foreground tracking-tight font-light mb-4" dangerouslySetInnerHTML={{ __html: t.index.kitTitle }}></h1>
+                      <p className="text-base md:text-xl text-muted-foreground leading-relaxed mb-6 md:mb-0">{t.index.kitSub}</p>
                     </div>
                   </div>
                 </>
               )}
             </motion.div>
           </AnimatePresence>
-          <div className="absolute bottom-10 right-12 z-30 flex items-center gap-6">
-            <div className="text-white/90 font-mono text-sm tracking-widest">0{currentSlide + 1} / 03</div>
+
+          {/* 🌟 수정됨: 슬라이더 컨트롤러(화살표)와 숫자도 다크/라이트 모드 자동 변환 */}
+          <div className="absolute bottom-10 right-6 md:right-12 z-30 flex items-center gap-6">
+            <div className="text-[#1A1A1A] dark:text-white/90 font-mono text-sm tracking-widest transition-colors duration-300">
+              0{currentSlide + 1} / 03
+            </div>
             <div className="flex gap-2">
-              <button onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))} className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/10"><ChevronDown className="w-5 h-5 rotate-90" /></button>
-              <button onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))} className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:bg-white/10"><ChevronDown className="w-5 h-5 -rotate-90" /></button>
+              <button
+                onClick={() => setCurrentSlide((prev) => (prev === 0 ? 2 : prev - 1))}
+                className="w-10 h-10 rounded-full border border-[#1A1A1A]/30 dark:border-white/30 flex items-center justify-center text-[#1A1A1A] dark:text-white hover:bg-[#1A1A1A]/10 dark:hover:bg-white/10 transition-colors duration-300"
+              >
+                <ChevronDown className="w-5 h-5 rotate-90" />
+              </button>
+              <button
+                onClick={() => setCurrentSlide((prev) => (prev === 2 ? 0 : prev + 1))}
+                className="w-10 h-10 rounded-full border border-[#1A1A1A]/30 dark:border-white/30 flex items-center justify-center text-[#1A1A1A] dark:text-white hover:bg-[#1A1A1A]/10 dark:hover:bg-white/10 transition-colors duration-300"
+              >
+                <ChevronDown className="w-5 h-5 -rotate-90" />
+              </button>
             </div>
           </div>
         </section>

@@ -33,10 +33,10 @@ const PhotoMatchSelector = ({ options, title, selected, onSelect }: PhotoMatchSe
         {options.map((opt, i) => (
           <motion.button
             key={opt.id}
-            onClick={() => onSelect(opt.id)}
+            onClick={() => onSelect(opt.id, opt.severityMap)}
             className={`flex flex-col items-center gap-2 rounded-xl border p-4 min-h-[100px] transition-all select-none touch-manipulation ${selected === opt.id
-                ? "border-primary bg-primary/10 shadow-[0_0_20px_-8px_hsl(var(--primary)/0.3)]"
-                : "border-border bg-card hover:border-primary/40 active:border-primary/60"
+              ? "border-primary bg-primary/10 shadow-[0_0_20px_-8px_hsl(var(--primary)/0.3)]"
+              : "border-border bg-card hover:border-primary/40 active:border-primary/60"
               }`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -53,5 +53,6 @@ const PhotoMatchSelector = ({ options, title, selected, onSelect }: PhotoMatchSe
       </div>
     </LabCard>
   );
+};
 
-  export default PhotoMatchSelector;
+export default PhotoMatchSelector;

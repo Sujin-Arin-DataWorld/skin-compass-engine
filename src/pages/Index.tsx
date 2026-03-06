@@ -411,11 +411,15 @@ function ProgressSlider({ t }: { t: any }) {
         </div>
 
         {/* Labels - High Contrast Gold Pills */}
-        <div className="absolute top-6 left-6 md:top-8 md:left-8 bg-primary/90 backdrop-blur-md px-6 py-2.5 rounded-full border border-primary/30 shadow-xl shadow-black/20 z-10">
-          <span className="text-lg md:text-xl font-bold text-primary-foreground tracking-wide">{t.index.progress.week2}</span>
+        <div className="absolute top-4 left-4 md:top-5 md:left-5 bg-primary/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 shadow-md shadow-black/10 z-10 w-max">
+          <span className="text-[0.65rem] md:text-[0.75rem] font-['DM_Sans',_'Space_Grotesk',_system-ui,_sans-serif] font-bold uppercase tracking-[0.08em] text-primary-foreground">
+            {t.index.progress.week2}
+          </span>
         </div>
-        <div className="absolute top-6 right-6 md:top-8 md:right-8 bg-primary/90 backdrop-blur-md px-6 py-2.5 rounded-full border border-primary/30 shadow-xl shadow-black/20 z-10">
-          <span className="text-lg md:text-xl font-bold text-primary-foreground tracking-wide">{t.index.progress.week6}</span>
+        <div className="absolute top-4 right-4 md:top-5 md:right-5 bg-primary/90 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 shadow-md shadow-black/10 z-10 w-max">
+          <span className="text-[0.65rem] md:text-[0.75rem] font-['DM_Sans',_'Space_Grotesk',_system-ui,_sans-serif] font-bold uppercase tracking-[0.08em] text-primary-foreground">
+            {t.index.progress.week6}
+          </span>
         </div>
       </div>
 

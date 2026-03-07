@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Navigate, Link, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
@@ -183,6 +183,33 @@ const ResultsPage = () => {
 
       {/* Debug panel */}
       {isDebug && result?._debug && <DebugPanel debugData={result._debug} />}
+
+      {/* Guest save banner — shown when user is not logged in */}
+      {!isLoggedIn && (
+        <motion.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.4, ease: "easeOut" }}
+          className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-3 px-5 py-3
+                     bg-white/95 dark:bg-[#0D0D0D]/95 backdrop-blur-sm
+                     border-t border-[#947E5C]/30 dark:border-[#D4AF37]/20"
+        >
+          <p className="text-xs font-medium text-[#947E5C] dark:text-white/70 leading-snug">
+            {language === "de"
+              ? "Analyse bewahren. Jetzt in Ihr Konto einloggen."
+              : "Keep your analysis. Sign in to your account."}
+          </p>
+          <Link
+            to="/login?redirect=/results"
+            className="shrink-0 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase transition-all
+                       bg-white text-[#947E5C] border border-[#947E5C]/60 shadow-md hover:shadow-lg
+                       dark:bg-transparent dark:text-[#D4AF37] dark:border-[#D4AF37]
+                       dark:shadow-[0_0_10px_rgba(212,175,55,0.2)] dark:hover:shadow-[0_0_18px_rgba(212,175,55,0.45)]"
+          >
+            {language === "de" ? "Anmelden" : "Sign In"}
+          </Link>
+        </motion.div>
+      )}
     </div>
   );
 };

@@ -1,34 +1,42 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
+import { useOrders } from "@/hooks/useOrders";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
 
 export default function Cart() {
   const { items, removeItem, updateQty, clear, totalItems, totalPrice } = useCartStore();
-  const { isLoggedIn, purchaseProduct } = useAuthStore();
+  const { isLoggedIn } = useAuthStore();
+  const { placeOrder } = useOrders();
   const navigate = useNavigate();
+  const [placing, setPlacing] = useState(false);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isLoggedIn) {
       toast.error("Please sign in to complete your purchase.");
-      navigate("/login");
+      navigate("/login?redirect=/cart");
       return;
     }
-    items.forEach((item) => {
-      for (let i = 0; i < item.quantity; i++) {
-        purchaseProduct({
-          name: item.product.name,
-          price: item.product.price ?? item.product.price_eur,
-        });
-      }
-    });
+
+    setPlacing(true);
+    const { orderId, error } = await placeOrder(items);
+    setPlacing(false);
+
+    if (error || !orderId) {
+      toast.error(error ?? "Could not place order. Please try again.");
+      return;
+    }
+
     clear();
-    toast.success("Order placed successfully! Check your profile for details.");
+    toast.success(`Order ${orderId.slice(0, 8).toUpperCase()} placed!`, {
+      description: "Check your profile for order details.",
+    });
     navigate("/profile");
   };
 
@@ -173,9 +181,14 @@ export default function Cart() {
 
               <button
                 onClick={handleCheckout}
-                className="w-full rounded-2xl py-4 font-bold text-sm tracking-wide uppercase bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                disabled={placing}
+                className="w-full rounded-2xl py-4 font-bold text-sm tracking-wide uppercase bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-60"
               >
-                Complete Purchase <ArrowRight className="w-4 h-4" />
+                {placing ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
+                ) : (
+                  <>Complete Purchase <ArrowRight className="w-4 h-4" /></>
+                )}
               </button>
 
               <p className="text-xs text-foreground/40 text-center mt-3">

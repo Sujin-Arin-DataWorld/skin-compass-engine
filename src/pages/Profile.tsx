@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store/authStore";
+import { useProfile } from "@/hooks/useProfile";
+import { useOrders } from "@/hooks/useOrders";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useI18nStore, translations } from "@/store/i18nStore";
 import RadarChart from "@/components/diagnosis/RadarChart";
@@ -211,8 +213,7 @@ function AddressBookTab() {
 
 /* ── Order History Tab ── */
 function OrderHistoryTab() {
-    const { userProfile } = useAuthStore();
-    const orders = userProfile?.orderHistory ?? [];
+    const { orders, loading } = useOrders();
     const { language } = useI18nStore();
     const t = translations[language];
 
@@ -226,6 +227,16 @@ function OrderHistoryTab() {
         shipped: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
         delivered: "bg-green-500/15 text-green-600 dark:text-green-400",
     };
+
+    if (loading) {
+        return (
+            <div className="space-y-3">
+                {[1, 2].map((i) => (
+                    <div key={i} className="rounded-2xl border border-border bg-card h-24 animate-pulse" />
+                ))}
+            </div>
+        );
+    }
 
     if (orders.length === 0) {
         return (
@@ -241,9 +252,9 @@ function OrderHistoryTab() {
                 <div key={order.id} className="rounded-2xl border border-border bg-card p-5">
                     <div className="flex items-center justify-between mb-3">
                         <div>
-                            <p className="text-xs text-foreground/40 font-mono">{order.id}</p>
+                            <p className="text-xs text-foreground/40 font-mono">{order.id.slice(0, 8).toUpperCase()}</p>
                             <p className="text-xs text-foreground/50 mt-0.5">
-                                {new Date(order.date).toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" })}
+                                {new Date(order.created_at).toLocaleDateString("de-DE", { day: "2-digit", month: "short", year: "numeric" })}
                             </p>
                         </div>
                         <span className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold ${statusColor[order.status]}`}>
@@ -252,8 +263,8 @@ function OrderHistoryTab() {
                     </div>
                     {order.items.map((item, i) => (
                         <div key={i} className="flex items-center justify-between py-1 border-b border-border/20 last:border-0">
-                            <span className="text-sm text-foreground">{item.name} × {item.qty}</span>
-                            <span className="text-sm text-foreground/60">€{item.price.toFixed(2)}</span>
+                            <span className="text-sm text-foreground">{item.product_name} × {item.quantity}</span>
+                            <span className="text-sm text-foreground/60">€{item.unit_price.toFixed(2)}</span>
                         </div>
                     ))}
                     <div className="flex justify-end mt-2">
@@ -267,13 +278,15 @@ function OrderHistoryTab() {
 
 /* ── Main Profile Page ── */
 export default function Profile() {
-    const { isLoggedIn, userProfile, logout, updateProfile } = useAuthStore();
+    const { isLoggedIn, userProfile, logout } = useAuthStore();
+    const { updateProfile } = useProfile();
     const { language } = useI18nStore();
     const t = translations[language];
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState<Tab>("progress");
     const [editingName, setEditingName] = useState(false);
+    const [saving, setSaving] = useState(false);
     const [firstName, setFirstName] = useState(userProfile?.firstName ?? "");
     const [lastName, setLastName] = useState(userProfile?.lastName ?? "");
 
@@ -304,8 +317,10 @@ export default function Profile() {
         );
     }
 
-    const handleSaveName = () => {
-        updateProfile({ firstName, lastName });
+    const handleSaveName = async () => {
+        setSaving(true);
+        await updateProfile({ firstName, lastName });
+        setSaving(false);
         setEditingName(false);
     };
 
@@ -341,8 +356,8 @@ export default function Profile() {
                                 <input value={lastName} onChange={(e) => setLastName(e.target.value)} className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder={t.profileTab.lastName} />
                             </div>
                             <div className="flex gap-2">
-                                <button onClick={handleSaveName} className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold">{t.profileTab.save}</button>
-                                <button onClick={() => setEditingName(false)} className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/60">{t.profileTab.cancel}</button>
+                                <button onClick={handleSaveName} disabled={saving} className="rounded-lg bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold disabled:opacity-50">{saving ? "…" : t.profileTab.save}</button>
+                                <button onClick={() => setEditingName(false)} disabled={saving} className="rounded-lg border border-border px-4 py-2 text-sm text-foreground/60 disabled:opacity-50">{t.profileTab.cancel}</button>
                             </div>
                         </div>
                     ) : (

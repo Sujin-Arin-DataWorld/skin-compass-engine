@@ -18,6 +18,7 @@ import DebugPanel from "@/components/diagnosis/DebugPanel";
 import GlobalProgressLine from "@/components/GlobalProgressLine";
 import { useProgressPersistence, getSavedProgress, clearSavedProgress, estimateTimeRemaining } from "@/hooks/useProgressPersistence";
 import { usePerformanceMode } from "@/hooks/usePerformanceMode";
+import { useDiagnosis } from "@/hooks/useDiagnosis";
 import React from "react";
 
 const CONTEXT_OPTIONS: { key: ContextKey; label: string }[] = [
@@ -101,6 +102,7 @@ const DiagnosisPage = () => {
 
   const isDebug = searchParams.get("debug") === "true" && import.meta.env.DEV;
   const { reducedMotion } = usePerformanceMode();
+  const { saveDiagnosis } = useDiagnosis();
 
   // Auth Guard: Redirect anonymous users to login before capturing data
   if (!isLoggedIn) {
@@ -209,6 +211,14 @@ const DiagnosisPage = () => {
           });
           store.setResult(result);
           clearSavedProgress();
+
+          // Persist to Supabase asynchronously (fire-and-forget)
+          const TIER_MAP: Record<string, string> = { Entry: "Entry", Full: "Advanced", Premium: "Clinical" };
+          const flatProducts = Object.entries(result.product_bundle).flatMap(([phase, prods]) =>
+            prods.map((p) => ({ id: p.id, name: p.name.en, phase }))
+          );
+          saveDiagnosis(result.axis_scores, TIER_MAP[store.selectedTier] ?? "Entry", flatProducts);
+
           setTimeout(() => navigate("/results"), 500);
           return prev;
         }

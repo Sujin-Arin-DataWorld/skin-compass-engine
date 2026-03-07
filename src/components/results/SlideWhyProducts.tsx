@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBag, Check } from "lucide-react";
+import { ShoppingBag, Check, Heart } from "lucide-react";
 import { useI18nStore, translations } from "@/store/i18nStore";
 import { toast } from "sonner";
 import { DiagnosisResult, Product, AXIS_LABELS, AxisKey } from "@/engine/types";
 import { useCartStore } from "@/store/cartStore";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useAuthStore } from "@/store/authStore";
 
 function getBarColor(score: number): string {
   if (score >= 70) return "hsl(var(--severity-severe))";
@@ -120,6 +122,9 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
   const { language } = useI18nStore();
   const t = language === "de" ? translations.de : translations.en;
   const inCart = items.some((i) => i.product.id === product.id);
+  const { isLoggedIn } = useAuthStore();
+  const { toggle, isWished } = useWishlist();
+  const wished = isWished(product.id);
 
   return (
     <motion.div
@@ -186,9 +191,34 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
               </p>
             </div>
             <div className="text-right flex-shrink-0 flex flex-col items-end gap-2">
-              <p className="font-display dark:text-white" style={{ fontSize: "1.25rem", fontWeight: 600, color: "#1A1A1A" }}>
-                €{product.price_eur}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="font-display dark:text-white" style={{ fontSize: "1.25rem", fontWeight: 600, color: "#1A1A1A" }}>
+                  €{product.price_eur}
+                </p>
+                {isLoggedIn && (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      toggle({
+                        product_id: product.id,
+                        product_name: product.name.en,
+                        product_image: product.image ?? null,
+                        price: product.price_eur ?? null,
+                      });
+                    }}
+                    aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+                    className="transition-transform hover:scale-110 active:scale-95"
+                  >
+                    <Heart
+                      className="w-4 h-4 transition-colors"
+                      style={{
+                        fill: wished ? "hsl(var(--primary))" : "none",
+                        stroke: wished ? "hsl(var(--primary))" : "hsl(var(--foreground) / 0.4)",
+                      }}
+                    />
+                  </button>
+                )}
+              </div>
               <button
                 onClick={(e) => {
                   e.preventDefault();

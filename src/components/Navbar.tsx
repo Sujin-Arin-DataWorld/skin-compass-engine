@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
-import { Moon, Sun, ChevronDown, User, Globe, Search, Check, ShoppingBag } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Moon, Sun, ChevronDown, User, Globe, Search, Check, ShoppingBag, LogOut, LayoutDashboard } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -26,21 +26,52 @@ function Logo() {
   );
 }
 
+// ── Avatar/initials circle ────────────────────────────────────────────────
+function AvatarCircle({ avatar, firstName, lastName, size = "md" }: { avatar?: string; firstName: string; lastName: string; size?: "sm" | "md" }) {
+  const initials = `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() || "?";
+  const dim = size === "sm" ? "h-8 w-8 text-xs" : "h-9 w-9 text-xs";
+
+  if (avatar) {
+    return (
+      <img
+        src={avatar}
+        alt={initials}
+        className={`${dim} rounded-full object-cover border border-[#947E5C] dark:border-[#D4AF37]`}
+      />
+    );
+  }
+  return (
+    <span
+      className={`${dim} rounded-full flex items-center justify-center font-bold border border-[#947E5C] dark:border-[#D4AF37] text-[#947E5C] dark:text-[#D4AF37] bg-card/80`}
+    >
+      {initials}
+    </span>
+  );
+}
+
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const { isLoggedIn } = useAuthStore();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const { isLoggedIn, userProfile, logout } = useAuthStore();
   const { language, setLanguage } = useI18nStore();
   const t = translations[language];
   const cartCount = useCartStore((s) => s.totalItems());
+  const location = useLocation();
+
+  // Preserve current path so auth redirects the user back after login
+  const redirectParam = encodeURIComponent(location.pathname);
+  const loginUrl = `/login?redirect=${redirectParam}`;
+  const signupUrl = `/login?tab=signup&redirect=${redirectParam}`;
 
   const langRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (langRef.current && !langRef.current.contains(e.target as Node)) {
-        setLangOpen(false);
-      }
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -48,17 +79,22 @@ const Navbar = () => {
 
   const languages = [
     { code: "en", label: "English" },
-    { code: "de", label: "Deutsch" }
+    { code: "de", label: "Deutsch" },
   ];
+
+  const handleLogout = async () => {
+    setUserMenuOpen(false);
+    await logout();
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md pt-[env(safe-area-inset-top)]">
       <div className="flex w-full items-center justify-between px-6 md:px-10 py-4">
         <Logo />
 
-        {/* 📱 Mobile UI - 테마 전환 버튼이 지구본 왼쪽에 추가되었습니다 */}
+        {/* ── 📱 Mobile UI ── */}
         <div className="flex items-center gap-1 md:hidden">
-          {/* 모바일용 테마 전환 버튼 */}
+          {/* Theme toggle */}
           <motion.button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
@@ -68,7 +104,7 @@ const Navbar = () => {
             {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </motion.button>
 
-          {/* 모바일용 지구본 드롭다운 */}
+          {/* Language dropdown */}
           <div className="relative" ref={langRef}>
             <motion.button
               onClick={() => setLangOpen(!langOpen)}
@@ -77,7 +113,6 @@ const Navbar = () => {
             >
               <Globe className="h-5 w-5" />
             </motion.button>
-
             <AnimatePresence>
               {langOpen && (
                 <motion.div
@@ -89,10 +124,7 @@ const Navbar = () => {
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => {
-                        setLanguage(lang.code as any);
-                        setLangOpen(false);
-                      }}
+                      onClick={() => { setLanguage(lang.code as any); setLangOpen(false); }}
                       className="flex w-full items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-primary/10"
                     >
                       <span className={language === lang.code ? "font-bold text-primary" : "text-foreground/70"}>
@@ -110,7 +142,18 @@ const Navbar = () => {
             <Search className="h-5 w-5" />
           </button>
 
-          {/* 모바일 장바구니 */}
+          {/* Mobile auth: avatar when logged in, user icon when logged out */}
+          {isLoggedIn && userProfile ? (
+            <Link to="/profile" className="flex h-10 w-10 items-center justify-center">
+              <AvatarCircle avatar={userProfile.avatar} firstName={userProfile.firstName} lastName={userProfile.lastName} size="sm" />
+            </Link>
+          ) : (
+            <Link to={loginUrl} className="flex h-10 w-10 items-center justify-center text-foreground/70 hover:text-foreground transition-colors">
+              <User className="h-5 w-5" />
+            </Link>
+          )}
+
+          {/* Cart */}
           <Link to="/cart" className="relative flex h-10 w-10 items-center justify-center">
             <ShoppingBag className="h-5 w-5 text-foreground/80" />
             {cartCount > 0 && (
@@ -121,15 +164,16 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* 💻 Desktop UI (기존 로직 완벽 보존) */}
+        {/* ── 💻 Desktop UI ── */}
         <div className="hidden md:flex items-center gap-3">
-          <div className="relative" onMouseEnter={() => setMenuOpen(true)} onMouseLeave={() => setMenuOpen(false)}>
+          {/* Products dropdown */}
+          <div className="relative">
             <button className="flex items-center gap-1 text-sm text-foreground/70 hover:text-foreground transition-colors">
               {t.products} <ChevronDown className="h-3 w-3" />
             </button>
-            {/* ... Mega Menu 생략 (내부 로직 동일) ... */}
           </div>
 
+          {/* Language dropdown */}
           <div className="relative" ref={langRef}>
             <motion.button
               onClick={() => setLangOpen(!langOpen)}
@@ -149,10 +193,7 @@ const Navbar = () => {
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
-                      onClick={() => {
-                        setLanguage(lang.code as any);
-                        setLangOpen(false);
-                      }}
+                      onClick={() => { setLanguage(lang.code as any); setLangOpen(false); }}
                       className="flex w-full items-center justify-between px-4 py-2 text-sm hover:bg-primary/10"
                     >
                       {lang.label}
@@ -164,6 +205,7 @@ const Navbar = () => {
             </AnimatePresence>
           </div>
 
+          {/* Theme toggle */}
           <motion.button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:text-foreground hover:border-primary/40"
@@ -172,7 +214,7 @@ const Navbar = () => {
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </motion.button>
 
-          {/* 데스크탑 장바구니 */}
+          {/* Cart */}
           <Link to="/cart" className="relative flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card/50 text-foreground/70 hover:border-primary/40 hover:text-foreground transition-colors">
             <ShoppingBag className="h-4 w-4" />
             {cartCount > 0 && (
@@ -182,14 +224,93 @@ const Navbar = () => {
             )}
           </Link>
 
-          <Link to="/diagnosis" className="rounded-full border border-primary px-5 py-2 font-body text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground">
+          {/* Start Diagnosis */}
+          <Link
+            to="/diagnosis"
+            className="rounded-full border border-primary px-5 py-2 font-body text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+          >
             {t.startDiagnosis}
           </Link>
-          
-          {!isLoggedIn && (
-            <Link to="/signup" className="rounded-full bg-primary px-5 py-2 font-body text-sm font-medium text-primary-foreground hover:opacity-90">
-              {t.signUp}
-            </Link>
+
+          {/* ── Auth area ── */}
+          {isLoggedIn && userProfile ? (
+            // Logged-in: avatar + dropdown
+            <div className="relative" ref={userMenuRef}>
+              <motion.button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center gap-2 rounded-full focus:outline-none"
+                aria-label="Benutzerkonto"
+              >
+                <AvatarCircle avatar={userProfile.avatar} firstName={userProfile.firstName} lastName={userProfile.lastName} />
+              </motion.button>
+
+              <AnimatePresence>
+                {userMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-48 overflow-hidden rounded-xl border border-border bg-card shadow-xl z-50"
+                  >
+                    {/* User name header */}
+                    <div className="px-4 py-3 border-b border-border/60">
+                      <p className="text-xs font-bold text-foreground truncate">
+                        {userProfile.firstName} {userProfile.lastName}
+                      </p>
+                      <p className="text-xs text-foreground/40 truncate">{userProfile.email}</p>
+                    </div>
+
+                    <Link
+                      to="/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground/80 hover:bg-primary/10 hover:text-foreground transition-colors"
+                    >
+                      <User className="h-4 w-4" />
+                      {t.profile}
+                    </Link>
+
+                    {userProfile.role === "admin" && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground/80 hover:bg-primary/10 hover:text-foreground transition-colors"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        {t.admin}
+                      </Link>
+                    )}
+
+                    <div className="border-t border-border/60 mt-1">
+                      <button
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        {t.logout}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            // Logged-out: Login + Sign Up
+            <div className="flex items-center gap-2">
+              <Link
+                to={loginUrl}
+                className="rounded-full border border-border px-4 py-2 font-body text-sm font-medium text-foreground/70 hover:text-foreground hover:border-primary/50 transition-colors"
+              >
+                {t.login}
+              </Link>
+              <Link
+                to={signupUrl}
+                className="rounded-full bg-primary px-5 py-2 font-body text-sm font-medium text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                {t.signUp}
+              </Link>
+            </div>
           )}
         </div>
       </div>

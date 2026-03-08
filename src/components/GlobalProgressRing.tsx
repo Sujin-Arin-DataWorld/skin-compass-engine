@@ -62,7 +62,7 @@ export default function GlobalProgressRing() {
         <AnimatePresence>
             <motion.div
                 className={cn(
-                    "fixed z-50 pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] flex flex-col items-center justify-center",
+                    "fixed z-50 pointer-events-none transition-all duration-1000 ease-spring flex flex-col items-center justify-center",
                     isGenerating
                         ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
                         : "top-8 left-1/2 -translate-x-1/2"

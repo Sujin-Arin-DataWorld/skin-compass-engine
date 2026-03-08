@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type Language = "en" | "de";
+export type Language = "en" | "de" | "ko";
 
 interface I18nState {
     language: Language;
@@ -12,10 +12,14 @@ interface I18nState {
 export const useI18nStore = create<I18nState>()(
     persist(
         (set, get) => ({
-            language: "en", // Default to English for international luxury feel, or 'de'
+            language: "de",
             setLanguage: (lang) => set({ language: lang }),
             toggleLanguage: () =>
-                set((state) => ({ language: state.language === "en" ? "de" : "en" })),
+                set((state) => {
+                    const cycle: Language[] = ["de", "en", "ko"];
+                    const next = cycle[(cycle.indexOf(state.language) + 1) % cycle.length];
+                    return { language: next };
+                }),
         }),
         { name: "skin-strategy-language" }
     )
@@ -696,3 +700,153 @@ export const translations = {
         }
     }
 };
+
+// ── Phase 1 translations (Navbar + Homepage) ─────────────────────────────────
+export const phase1T = {
+    de: {
+        nav: {
+            hautAnalyse:      "Haut-Analyse",
+            kMaskLab:         "K-Mask Lab",
+            kMask: { augen: "Augen", vLinie: "V-Linie", gesicht: "Gesicht" },
+            routinenSets:     "Routinen & Sets",
+            hautbeduerfnisse: "Hautbedürfnisse",
+            bestseller:       "Bestseller",
+            science:          "Science & K-Beauty",
+            signIn:           "Anmelden",
+        },
+        concerns: {
+            sebum: "Sebum", sensitivity: "Sensitivität", hydration: "Hydration",
+            aging: "Anti-Aging", pigment: "Pigment", texture: "Textur",
+            barrier: "Barriere", pores: "Poren", neuro: "Neurodermitis",
+        },
+        home: {
+            hero: [
+                { headline: "Beenden Sie das Rätselraten.", sub: "Präzise Hautdiagnose.\nPersonalisierte K-Beauty Routine in 5 Minuten.", cta: "Diagnose starten" },
+                { headline: "Präzise. Wissenschaftlich. Persönlich.", sub: "Korean Biometric Data Science trifft auf Ihre Haut — 10 klinische Achsen, ein einzigartiges Profil.", cta: "Jetzt analysieren" },
+                { headline: "Ihre maßgeschneiderte Routine.", sub: "Wählen Sie aus unserem kuratieren 3-Step, 5-Step oder 5-Step + Heimgerät Set.", cta: "Routinen entdecken" },
+            ],
+            usp: [
+                { label: "Korean Biometric Science" },
+                { label: "Dermatologisch getestet" },
+                { label: "Made in Korea" },
+                { label: "Personalisiertes Protokoll" },
+            ],
+            concernTitle: "Ihr Hautanliegen",
+            concernSub:   "Wählen Sie ein Anliegen, um passende Produkte zu entdecken.",
+            noProducts:   "Keine Produkte für diese Kategorie gefunden.",
+            routineTitle: "Unsere Routinen",
+            routineSub:   "Klinisch kuratierte Pflegesets — abgestimmt auf Ihre Hautdaten.",
+            routines: [
+                { badge: "3-Step",         title: "Einstieg",              desc: "Reinigen · Feuchtigkeitspflege · Schutz",                        cta: "Routine starten" },
+                { badge: "5-Step",         title: "Vollständiges Protokoll", desc: "Reinigen · Toner · Serum · Augenpflege · Feuchtigkeitspflege", cta: "Routine starten" },
+                { badge: "5-Step + Gerät", title: "Premium Strategie",     desc: "Vollständiges Protokoll + klinisches RF/LED Heimgerät",         cta: "Routine starten" },
+            ],
+            bannerHeadline:       "Bestimmen Sie Ihren Hauttyp",
+            bannerSub:            "Jede Haut ist einzigartig. Unser Algorithmus findet Ihr persönliches Protokoll.",
+            bannerCta:            "Zur kostenlosen Diagnose",
+            newsletterHeadline:   "Exklusiver Newsletter",
+            newsletterSub:        "10 % Rabatt auf Ihre erste Bestellung + klinische Hautpflege-Tipps direkt in Ihr Postfach.",
+            newsletterPlaceholder:"Ihre E-Mail-Adresse",
+            newsletterSubmit:     "Jetzt anmelden",
+            newsletterGdpr:       "Ich stimme den Datenschutzbestimmungen zu.",
+        },
+    },
+    en: {
+        nav: {
+            hautAnalyse:      "Skin Analysis",
+            kMaskLab:         "K-Mask Lab",
+            kMask: { augen: "Eyes", vLinie: "V-Line", gesicht: "Face" },
+            routinenSets:     "Routines & Sets",
+            hautbeduerfnisse: "Skin Needs",
+            bestseller:       "Bestseller",
+            science:          "Science & K-Beauty",
+            signIn:           "Sign In",
+        },
+        concerns: {
+            sebum: "Sebum", sensitivity: "Sensitivity", hydration: "Hydration",
+            aging: "Anti-Aging", pigment: "Pigment", texture: "Texture",
+            barrier: "Barrier", pores: "Pores", neuro: "Neurodermatitis",
+        },
+        home: {
+            hero: [
+                { headline: "End the trial and error.", sub: "Precise skin diagnosis.\nPersonalized K-Beauty routine in 5 minutes.", cta: "Start Diagnosis" },
+                { headline: "Precise. Scientific. Personal.", sub: "Korean Biometric Data Science meets your skin — 10 clinical axes, one unique profile.", cta: "Analyze Now" },
+                { headline: "Your bespoke routine.", sub: "Choose from our curated 3-Step, 5-Step, or 5-Step + Home Device sets.", cta: "Explore Routines" },
+            ],
+            usp: [
+                { label: "Korean Biometric Science" },
+                { label: "Dermatologically Tested" },
+                { label: "Made in Korea" },
+                { label: "Personalized Protocol" },
+            ],
+            concernTitle: "Your Skin Concern",
+            concernSub:   "Select a concern to discover matching products.",
+            noProducts:   "No products found for this category.",
+            routineTitle: "Our Routines",
+            routineSub:   "Clinically curated skincare sets — matched to your skin data.",
+            routines: [
+                { badge: "3-Step",          title: "Entry",           desc: "Cleanse · Moisturize · Protect",                      cta: "Start Routine" },
+                { badge: "5-Step",          title: "Full Protocol",   desc: "Cleanse · Toner · Serum · Eye Cream · Moisturizer",   cta: "Start Routine" },
+                { badge: "5-Step + Device", title: "Premium Strategy",desc: "Full Protocol + clinical RF/LED home device",          cta: "Start Routine" },
+            ],
+            bannerHeadline:       "Determine Your Skin Type",
+            bannerSub:            "Every skin is unique.\nOur algorithm finds your personal protocol.",
+            bannerCta:            "Free Skin Diagnosis",
+            newsletterHeadline:   "Exclusive Newsletter",
+            newsletterSub:        "10% off your first order + clinical skincare tips\ndelivered to your inbox.",
+            newsletterPlaceholder:"Your email address",
+            newsletterSubmit:     "Subscribe",
+            newsletterGdpr:       "I agree to the privacy policy.",
+        },
+    },
+    ko: {
+        nav: {
+            hautAnalyse:      "피부 분석",
+            kMaskLab:         "K-마스크 랩",
+            kMask: { augen: "눈가", vLinie: "V라인", gesicht: "페이스" },
+            routinenSets:     "루틴 & 세트",
+            hautbeduerfnisse: "피부 고민",
+            bestseller:       "베스트셀러",
+            science:          "사이언스 & K-뷰티",
+            signIn:           "로그인",
+        },
+        concerns: {
+            sebum: "피지", sensitivity: "민감성", hydration: "수분",
+            aging: "안티에이징", pigment: "색소", texture: "텍스처",
+            barrier: "장벽", pores: "모공", neuro: "아토피",
+        },
+        home: {
+            hero: [
+                { headline: "시행착오를 끝내세요.", sub: "정밀하게. 과학적으로.\n당신의 피부에 맞게.", cta: "진단 시작" },
+                { headline: "정밀하게. 과학적으로.\n당신의 피부를 위해.", sub: "한국 바이오메트릭 데이터 사이언스가 당신의 피부를 만납니다.", cta: "지금 분석" },
+                { headline: "맞춤형 루틴.", sub: "3단계, 5단계, 또는 5단계 + 홈 디바이스 세트에서 선택하세요.", cta: "루틴 탐색" },
+            ],
+            usp: [
+                { label: "한국 바이오메트릭 사이언스" },
+                { label: "피부과 테스트 완료" },
+                { label: "Made in Korea" },
+                { label: "개인 맞춤 프로토콜" },
+            ],
+            concernTitle: "피부 고민",
+            concernSub:   "고민을 선택하면 맞춤 제품을 확인할 수 있습니다.",
+            noProducts:   "이 카테고리에 해당하는 제품이 없습니다.",
+            routineTitle: "우리의 루틴",
+            routineSub:   "임상적으로 선별된 스킨케어 세트 — 피부 데이터에 맞춤.",
+            routines: [
+                { badge: "3단계",          title: "입문",        desc: "클렌징 · 보습 · 보호",                             cta: "루틴 시작" },
+                { badge: "5단계",          title: "풀 프로토콜", desc: "클렌징 · 토너 · 세럼 · 아이크림 · 보습",          cta: "루틴 시작" },
+                { badge: "5단계 + 디바이스",title: "프리미엄 전략",desc: "풀 프로토콜 + 임상 RF/LED 홈 디바이스",         cta: "루틴 시작" },
+            ],
+            bannerHeadline:       "나의 피부 타입 알아보기",
+            bannerSub:            "모든 피부는 고유합니다.\n알고리즘이 당신만의 프로토콜을 찾아드립니다.",
+            bannerCta:            "무료 피부 진단",
+            newsletterHeadline:   "독점 뉴스레터",
+            newsletterSub:        "첫 주문 10% 할인 + 임상 스킨케어 팁을 받아보세요.",
+            newsletterPlaceholder:"이메일 주소",
+            newsletterSubmit:     "구독하기",
+            newsletterGdpr:       "개인정보 처리방침에 동의합니다.",
+        },
+    },
+} as const;
+
+export type Phase1T = typeof phase1T["de"];

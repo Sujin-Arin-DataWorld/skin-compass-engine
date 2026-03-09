@@ -4,6 +4,9 @@ import { Navigate, Link, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
+import { calculateSkinVector } from "@/engine/skinVectorEngine";
+import { buildRoutine } from "@/engine/routineEngine";
+import type { RoutineOutput } from "@/engine/routineEngine";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 import SlideDiagnosisSummary from "@/components/results/SlideDiagnosisSummary";
@@ -75,7 +78,7 @@ function makeMockResult(products: Product[]): DiagnosisResult {
 }
 
 const ResultsPage = () => {
-  const { result: storeResult } = useDiagnosisStore();
+  const { result: storeResult, axisResponses, lifestyle, implicitFlags } = useDiagnosisStore();
   const { products } = useProductStore();
   const [searchParams] = useSearchParams();
   const isDebug = searchParams.get("debug") === "true";
@@ -87,6 +90,12 @@ const ResultsPage = () => {
     if (import.meta.env.DEV) return makeMockResult(products);
     return null;
   }, [storeResult, products]);
+
+  // B-1 + B-2: compute skin vector + personalised routine (pure, no side-effects)
+  const routineOutput = useMemo<RoutineOutput>(() => {
+    const vector = calculateSkinVector(axisResponses, lifestyle, implicitFlags);
+    return buildRoutine(vector, implicitFlags, axisResponses);
+  }, [axisResponses, lifestyle, implicitFlags]);
 
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
@@ -127,7 +136,7 @@ const ResultsPage = () => {
   const slides = [
     <SlideDiagnosisSummary result={result} />,
     <SlideAxisBreakdown result={result} goToProducts={() => goTo(PRODUCTS_SLIDE)} />,
-    <SlideProtocol result={result} />,
+    <SlideProtocol result={result} routineOutput={routineOutput} />,
     <SlideSubscriptionTable result={result} />,
     <SlideWhyProducts result={result} />,
     <SlideSubscribe result={result} />,

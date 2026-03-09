@@ -4,10 +4,25 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
-export default function GlobalProgressLine() {
+interface GlobalProgressLineProps {
+    /** Override segment count (default 9 for legacy flow, dynamic for axis flow) */
+    totalSegments?: number;
+    /** Override the active segment index (0-based). Falls back to computed value. */
+    activeSegment?: number;
+    /** Override the label shown below the bar */
+    stepLabel?: string;
+}
+
+export default function GlobalProgressLine({
+    totalSegments,
+    activeSegment: activeSegmentOverride,
+    stepLabel,
+}: GlobalProgressLineProps = {}) {
     const store = useDiagnosisStore();
     const { language } = useI18nStore();
     const t = translations[language];
+
+    const segments = totalSegments ?? 9;
 
     // Track the deepest step the user has reached so we allow forward jumps if they go back
     const [maxStepVisited, setMaxStepVisited] = useState(store.currentStep);
@@ -19,45 +34,29 @@ export default function GlobalProgressLine() {
     }, [store.currentStep, maxStepVisited]);
 
     const handleSegmentClick = (segmentIndex: number) => {
-        // segmentIndex 0 = Context (step 1 is technically context 2 of 2, but let's just jump to step 0)
-        // segmentIndex 1 = Category 1 (step 2)
-        // segmentIndex 8 = Category 8 (step 9)
-        const targetStep = segmentIndex === 0 ? 0 : segmentIndex + 1;
-
-        // Only allow clicking if they have visited that step or it is the very next unlocked step
+        const targetStep = segmentIndex;
         if (targetStep <= maxStepVisited) {
             store.setStep(targetStep);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
     };
 
-    // Determine the display step (1 through 8)
-    // Step 0-1: Skin Context/Type
-    // Step 2-9: Categories 1-8
-    // Step 10: Generating
-    // Map 0-10 linear journey strictly to 1-8 visual steps
-    let rawStep = 1;
-    if (store.currentStep >= 2 && store.currentStep <= 9) {
-        rawStep = store.currentStep - 1;
-    } else if (store.currentStep >= 10) {
-        rawStep = 8;
-    }
+    // Active segment: use override if provided, else compute from currentStep
+    const activeSegmentIndex = activeSegmentOverride ?? (store.currentStep <= 1 ? 0 : store.currentStep - 1);
+    const isLastSegment = activeSegmentIndex >= segments - 1;
+    const isFinale = isLastSegment || store.currentStep >= segments + 1;
 
     // Encouragement logic
-    let encouragement = "";
-    if (store.currentStep <= 1) {
-        encouragement = t.diagnosis.progress.enc1;
-    } else if (rawStep <= 4) {
-        encouragement = t.diagnosis.progress.enc2;
-    } else if (rawStep <= 7) {
-        encouragement = t.diagnosis.progress.enc3;
-    } else {
-        encouragement = t.diagnosis.progress.enc4;
-    }
-
-    const isFinale = rawStep === 8 || store.currentStep >= 10;
+    const progress = activeSegmentIndex / Math.max(1, segments - 1);
+    let encouragement = t.diagnosis.progress.enc1;
     if (isFinale) {
         encouragement = t.diagnosis.progress.encFinal;
+    } else if (progress >= 0.75) {
+        encouragement = t.diagnosis.progress.enc4;
+    } else if (progress >= 0.5) {
+        encouragement = t.diagnosis.progress.enc3;
+    } else if (progress >= 0.25) {
+        encouragement = t.diagnosis.progress.enc2;
     }
 
     // Typography logic
@@ -66,10 +65,11 @@ export default function GlobalProgressLine() {
         textColorClass = "text-[#001A33] dark:text-[#E2E8F0] font-semibold text-[13px] md:text-[15px]";
     }
 
-    // Interactive Segment Logic
-    // Total 9 segments: 0 -> Context, 1..8 -> Categories
-    // Currently Active Segment
-    const activeSegmentIndex = store.currentStep <= 1 ? 0 : store.currentStep - 1;
+    const displayLabel = stepLabel ?? (
+        isFinale
+            ? t.diagnosis.progress.processing
+            : `${t.diagnosis.progress.category} ${activeSegmentIndex + 1} ${t.diagnosis.progress.of} ${segments}`
+    );
 
     return (
         <div className="w-full max-w-xl mx-auto mb-4 flex flex-col gap-2 relative">
@@ -80,15 +80,9 @@ export default function GlobalProgressLine() {
 
             {/* Segmented Stepper */}
             <div className="relative w-full h-[4px] flex gap-[2px] overflow-visible">
-                {Array.from({ length: 9 }).map((_, i) => {
-                    const isCompleted = i <= activeSegmentIndex || (i === 0 && store.currentStep > 0);
-                    // Determine the target step to see if it's clickable
-                    const targetStep = i === 0 ? 0 : i + 1;
-                    const isClickable = targetStep <= maxStepVisited;
-
-                    // Base fill colors
-                    // Light Mode: Sage Green (#97A97C)
-                    // Dark Mode: Emerald/Forest Green (#2D5A4C)
+                {Array.from({ length: segments }).map((_, i) => {
+                    const isCompleted = i <= activeSegmentIndex;
+                    const isClickable = i <= maxStepVisited;
                     const fillClass = isCompleted ? "bg-[#97A97C] dark:bg-[#2D5A4C]" : "bg-[#F8FAFC] dark:bg-foreground/10";
                     const isPulse = isFinale && isCompleted;
 
@@ -106,9 +100,7 @@ export default function GlobalProgressLine() {
                                 <>
                                     <motion.div
                                         className="absolute inset-0 rounded-full"
-                                        style={{
-                                            boxShadow: "0 0 20px 4px rgba(151, 169, 124, 0.6)"
-                                        }}
+                                        style={{ boxShadow: "0 0 20px 4px rgba(151, 169, 124, 0.6)" }}
                                         animate={{ opacity: [0.5, 1, 0.5] }}
                                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                                     />
@@ -122,9 +114,9 @@ export default function GlobalProgressLine() {
                 })}
             </div>
 
-            {/* The Target Label */}
+            {/* Step label */}
             <div className="text-[11px] md:text-xs font-bold tracking-widest text-primary uppercase">
-                {rawStep === 8 && store.currentStep >= 10 ? t.diagnosis.progress.processing : (store.currentStep <= 1 ? `${t.diagnosis.progress.context} ${store.currentStep + 1} ${t.diagnosis.progress.of} 2` : `${t.diagnosis.progress.category} ${rawStep} ${t.diagnosis.progress.of} 8`)}
+                {displayLabel}
             </div>
         </div>
     );

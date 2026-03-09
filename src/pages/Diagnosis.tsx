@@ -1,44 +1,95 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigate } from "react-router-dom";
-import { ArrowRight, ArrowLeft, Clock } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
-import { CATEGORY_INFO, META_QUESTIONS } from "@/engine/weights";
 import { runDiagnosis } from "@/engine/runDiagnosisV4";
-import type { SkinType, ContextKey } from "@/engine/types";
+import { computeAxisQueue, AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
+import type { QuestionAnswer } from "@/engine/questionRoutingV5";
+import { convertAxisAnswersToUiSignals } from "@/engine/axisAnswerBridge";
 import { useI18nStore, translations } from "@/store/i18nStore";
+import { X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
-import CategoryInteractive from "@/components/diagnosis/CategoryInteractive";
-import SeveritySelector from "@/components/diagnosis/SeveritySelector";
-import LabCard from "@/components/diagnosis/LabCard";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import GlobalProgressLine from "@/components/GlobalProgressLine";
-import { useProgressPersistence, getSavedProgress, clearSavedProgress, estimateTimeRemaining } from "@/hooks/useProgressPersistence";
+import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
+import { AxisQuestionStep } from "@/components/diagnosis/AxisQuestionStep";
+import { ExposomeStep } from "@/components/diagnosis/ExposomeStep";
+import { useProgressPersistence, getSavedProgress, clearSavedProgress } from "@/hooks/useProgressPersistence";
 import { usePerformanceMode } from "@/hooks/usePerformanceMode";
 import { useDiagnosis } from "@/hooks/useDiagnosis";
 import React from "react";
 
-const CONTEXT_OPTIONS: { key: ContextKey; label: string }[] = [
-  { key: "shaving", label: "I shave regularly" },
-  { key: "makeup", label: "I wear makeup daily" },
-  { key: "hormonal", label: "I experience hormonal fluctuations" },
-  { key: "outdoor_work", label: "I work outdoors frequently" },
-  { key: "skincare_beginner", label: "I'm new to skincare" },
-  { key: "recent_procedure", label: "I've recently had a cosmetic procedure" },
-  { key: "low_water_intake", label: "I don't drink much water" },
-  { key: "reactive_skin", label: "My skin is easily irritated/reactive (Sensitive)" },
-  { key: "high_stress", label: "I experience high stress or lack of sleep" },
-];
+// ─── Mini radar chart (used in retest intercept modal) ────────────────────────
 
-const SKIN_TYPES: { key: SkinType; label: string; desc: string }[] = [
-  { key: "dry", label: "Dry", desc: "Tight, flaky, craves moisture" },
-  { key: "oily", label: "Oily", desc: "Shiny, enlarged pores, breakout-prone" },
-  { key: "combination", label: "Combination", desc: "Oily T-zone, drier cheeks" },
-  { key: "normal", label: "Normal", desc: "Generally balanced" },
-];
+const MINI_AXES = ["seb", "hyd", "bar", "sen", "acne", "pigment", "texture", "aging"] as const;
+type MiniAxis = typeof MINI_AXES[number];
+
+function MiniRadarChart({ scores }: { scores: Record<string, number> }) {
+  const N = MINI_AXES.length;
+  const cx = 54, cy = 54, r = 42;
+  const angleOf = (i: number) => (2 * Math.PI * i) / N - Math.PI / 2;
+  const ptAt = (i: number, s: number) => ({
+    x: cx + r * Math.min(1, Math.max(0, s / 100)) * Math.cos(angleOf(i)),
+    y: cy + r * Math.min(1, Math.max(0, s / 100)) * Math.sin(angleOf(i)),
+  });
+  const pts = MINI_AXES.map((axis, i) => ptAt(i, scores[axis] ?? 0));
+  const polyPts = pts.map((p) => `${p.x},${p.y}`).join(" ");
+
+  return (
+    <svg viewBox="0 0 108 108" width="96" height="96" className="flex-shrink-0">
+      {/* Grid rings */}
+      {[0.3, 0.6, 1.0].map((lvl, gi) => (
+        <polygon
+          key={gi}
+          points={MINI_AXES.map((_, i) => {
+            const a = angleOf(i);
+            return `${cx + r * lvl * Math.cos(a)},${cy + r * lvl * Math.sin(a)}`;
+          }).join(" ")}
+          fill="none"
+          stroke="#C9A96E"
+          strokeWidth="0.6"
+          strokeOpacity="0.2"
+        />
+      ))}
+      {/* Spokes */}
+      {MINI_AXES.map((_, i) => (
+        <line
+          key={i}
+          x1={cx} y1={cy}
+          x2={cx + r * Math.cos(angleOf(i))}
+          y2={cy + r * Math.sin(angleOf(i))}
+          stroke="#C9A96E" strokeWidth="0.5" strokeOpacity="0.22"
+        />
+      ))}
+      {/* Score area */}
+      <polygon points={polyPts} fill="#C9A96E" fillOpacity="0.14" stroke="#C9A96E" strokeWidth="1.5" strokeOpacity="0.8" />
+      {/* High-score accent dots (rose-gold) */}
+      {pts.map((p, i) =>
+        (scores[MINI_AXES[i] as MiniAxis] ?? 0) > 55
+          ? <circle key={`rg-${i}`} cx={p.x} cy={p.y} r="3" fill="#B76E79" fillOpacity="0.55" />
+          : null
+      )}
+      {/* All dots */}
+      {pts.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r="2" fill="#C9A96E" fillOpacity="0.9" />
+      ))}
+    </svg>
+  );
+}
+
+// ─── Date formatter ────────────────────────────────────────────────────────────
+
+function formatDiagnosisDate(isoStr: string, lang: "en" | "de" | "ko"): string {
+  const d = new Date(isoStr);
+  if (lang === "ko") return d.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
+  if (lang === "de") return d.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+}
+
+// ─── Loading messages ──────────────────────────────────────────────────────────
 
 const LOADING_MESSAGES = [
   "Mapping your symptom profile...",
@@ -48,9 +99,7 @@ const LOADING_MESSAGES = [
 ];
 
 const swipeConfidenceThreshold = 10000;
-const swipePower = (offset: number, velocity: number) => {
-  return Math.abs(offset) * velocity;
-};
+const swipePower = (offset: number, velocity: number) => Math.abs(offset) * velocity;
 
 type StepWrapperProps = {
   children: React.ReactNode;
@@ -66,13 +115,10 @@ const StepWrapper = React.forwardRef<HTMLDivElement, StepWrapperProps>(
       drag={onSwipeLeft || onSwipeRight ? "x" : false}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.2}
-      onDragEnd={(e, { offset, velocity }) => {
+      onDragEnd={(_, { offset, velocity }) => {
         const swipe = swipePower(offset.x, velocity.x);
-        if (swipe < -swipeConfidenceThreshold && onSwipeLeft) {
-          onSwipeLeft();
-        } else if (swipe > swipeConfidenceThreshold && onSwipeRight) {
-          onSwipeRight();
-        }
+        if (swipe < -swipeConfidenceThreshold && onSwipeLeft) onSwipeLeft();
+        else if (swipe > swipeConfidenceThreshold && onSwipeRight) onSwipeRight();
       }}
       initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
@@ -96,15 +142,24 @@ const DiagnosisPage = () => {
   const t = translations[language];
 
   const [loadingMsg, setLoadingMsg] = useState(0);
-  const [showMeta, setShowMeta] = useState(false);
-  const [metaCategoryJustCompleted, setMetaCategoryJustCompleted] = useState<number | null>(null);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [showRetestModal, setShowRetestModal] = useState(false);
+
+  // Ensure intercept modal only fires once per page visit
+  const hasCheckedHistory = useRef(false);
 
   const isDebug = searchParams.get("debug") === "true" && import.meta.env.DEV;
   const { reducedMotion } = usePerformanceMode();
-  const { saveDiagnosis } = useDiagnosis();
+  const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
 
-  // Auth Guard: Redirect anonymous users to login before capturing data
+  // Last diagnosis record (from Supabase history)
+  const lastRecord = history[0] ?? null;
+  const radarScores: Record<string, number> | null =
+    lastRecord?.radar_data ?? (store.result ? store.result.axis_scores as Record<string, number> : null);
+  const lastDiagnosedAt: string | null = lastRecord?.diagnosed_at ?? null;
+  const lastTier: string | null = lastRecord?.skin_tier ?? null;
+
+  // Auth Guard
   if (!isLoggedIn) {
     return <Navigate to={`/login?redirect=/diagnosis`} replace />;
   }
@@ -112,19 +167,46 @@ const DiagnosisPage = () => {
   // Progress persistence
   useProgressPersistence();
 
-  // Check for saved progress on mount
+  // ── Axis queue computed from face zone selections ──────────────────────────
+  const axisQueue = useMemo(
+    () => computeAxisQueue(store.interactiveState.faceZones),
+    [store.interactiveState.faceZones]
+  );
+
+  // Step layout:
+  //   0            → FaceMapStep
+  //   1 .. N       → AxisQuestionStep (N = axisQueue.length)
+  //   N + 1        → ExposomeStep (lifestyle block — always shown)
+  //   N + 2        → Loading + runDiagnosis
+  const totalAxisSteps = axisQueue.length;
+  const exposomeStep = totalAxisSteps + 1;
+  const loadingStep  = totalAxisSteps + 2;
+
+  // Current axis index (0-based) for Steps 1..N
+  const currentAxisIndex = store.currentStep - 1;
+  const currentAxisId = axisQueue[currentAxisIndex] ?? axisQueue[0];
+  const currentAxis = AXIS_DEFINITIONS.find((a) => a.id === currentAxisId);
+
+  // Show intercept once history has loaded (or immediately if store.result exists)
   useEffect(() => {
+    if (historyLoading || hasCheckedHistory.current) return;
+    hasCheckedHistory.current = true;
+
+    if (store.result || history.length > 0) {
+      setShowRetestModal(true);
+      return;
+    }
     const saved = getSavedProgress();
-    if (saved && store.currentStep === 0 && !store.result) {
+    if (saved && store.currentStep === 0) {
       setShowResumePrompt(true);
     }
-  }, []);
+  }, [historyLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleResume = () => {
     const saved = getSavedProgress();
     if (saved) {
       store.setStep(saved.currentStep);
-      if (saved.skinType) store.setSkinType(saved.skinType as SkinType);
+      if (saved.skinType) store.setSkinType(saved.skinType as Parameters<typeof store.setSkinType>[0]);
       for (const ctx of saved.contexts) store.addContext(ctx);
       for (const [id, val] of Object.entries(saved.severities)) store.setSeverity(id, val);
       for (const [id, val] of Object.entries(saved.metaAnswers)) store.setMetaAnswer(id, val);
@@ -138,81 +220,52 @@ const DiagnosisPage = () => {
     setShowResumePrompt(false);
   };
 
-  const totalSteps = 10;
-  const progress = ((store.currentStep + 1) / (totalSteps + 1)) * 100;
-  const timeEstimate = estimateTimeRemaining(store.currentStep);
-
-  const currentCategoryNum = store.currentStep >= 2 && store.currentStep <= 9 ? store.currentStep - 1 : 0;
-
-  const metaQuestionsForCategory = useMemo(() => {
-    if (metaCategoryJustCompleted === null) return [];
-    return META_QUESTIONS.filter((q) => {
-      if (q.trigger_after_category !== metaCategoryJustCompleted) return false;
-      if (q.id === "premenstrual_7_10d" || q.id === "jaw_focus") {
-        // only ask hormonal precision questions when context flag is set
-        if (!store.contexts.includes("hormonal")) return false;
-      }
-      return q.trigger_condition(store.severities);
-    });
-  }, [metaCategoryJustCompleted, store.severities, store.contexts]);
-
   const goNext = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    if (store.currentStep >= 2 && store.currentStep <= 9) {
-      const completedCat = store.currentStep - 1;
-      const metaQs = META_QUESTIONS.filter((q) => {
-        if (q.trigger_after_category !== completedCat) return false;
-        if ((q.id === "premenstrual_7_10d" || q.id === "jaw_focus") && !store.contexts.includes("hormonal")) {
-          return false;
-        }
-        return q.trigger_condition(store.severities);
-      });
-      if (metaQs.length > 0 && !showMeta) {
-        setMetaCategoryJustCompleted(completedCat);
-        setShowMeta(true);
-        return;
-      }
-    }
-
-    setShowMeta(false);
-    setMetaCategoryJustCompleted(null);
-
-    if (store.currentStep < 9) {
+    if (store.currentStep < loadingStep) {
       store.setStep(store.currentStep + 1);
-    } else {
-      store.setStep(10);
     }
-  }, [store, showMeta]);
+  }, [store, loadingStep]);
 
-  const goBack = () => {
+  const goBack = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    if (showMeta) {
-      setShowMeta(false);
-      setMetaCategoryJustCompleted(null);
-      return;
-    }
     if (store.currentStep > 0) store.setStep(store.currentStep - 1);
-  };
+  }, [store]);
 
-  // Loading animation
+  const handleAxisAnswer = useCallback(
+    (id: string, value: QuestionAnswer) => {
+      store.setAxisAnswer(id, value);
+    },
+    [store]
+  );
+
+  // Loading animation + diagnosis execution
   useEffect(() => {
-    if (store.currentStep !== 10) return;
+    if (store.currentStep !== loadingStep) return;
     const interval = setInterval(() => {
       setLoadingMsg((prev) => {
         if (prev >= LOADING_MESSAGES.length - 1) {
           clearInterval(interval);
+
+          // Convert V5 axis answers to uiSignals for the existing engine
+          const uiSignals = convertAxisAnswersToUiSignals(store.axisAnswers);
+          const metaAnswers: Record<string, number | boolean> = {
+            ...store.metaAnswers,
+            atopy: store.implicitFlags.atopyFlag,
+          };
+
           const result = runDiagnosis({
             severities: store.severities,
             contexts: store.contexts,
             skinType: store.skinType || "normal",
             tier: store.selectedTier,
-            metaAnswers: store.metaAnswers,
-            uiSignals: store.uiSignals,
+            metaAnswers,
+            uiSignals,
           });
+
           store.setResult(result);
           clearSavedProgress();
 
-          // Persist to Supabase asynchronously (fire-and-forget)
           const TIER_MAP: Record<string, string> = { Entry: "Entry", Full: "Advanced", Premium: "Clinical" };
           const flatProducts = Object.entries(result.product_bundle).flatMap(([phase, prods]) =>
             prods.map((p) => ({ id: p.id, name: p.name.en, phase }))
@@ -226,14 +279,126 @@ const DiagnosisPage = () => {
       });
     }, 800);
     return () => clearInterval(interval);
-  }, [store.currentStep]);
+  }, [store.currentStep, loadingStep]);
 
   return (
     <div className="relative min-h-screen bg-background">
       <SilkBackground />
       <Navbar />
 
-      {/* Removed old fixed top progress bar and time estimate */}
+      {/* ── Retest intercept modal ── */}
+      <AnimatePresence>
+        {showRetestModal && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center px-4"
+            style={{ background: "hsl(var(--background) / 0.6)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={(e) => { if (e.target === e.currentTarget) setShowRetestModal(false); }}
+          >
+            <motion.div
+              className="relative w-full max-w-sm overflow-hidden rounded-3xl shadow-2xl"
+              style={{
+                border: "1px solid #C9A96E55",
+                background: "hsl(var(--card) / 0.96)",
+                backdropFilter: "blur(32px) saturate(180%)",
+                WebkitBackdropFilter: "blur(32px) saturate(180%)",
+              }}
+              initial={{ scale: 0.88, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.92, opacity: 0, y: 8 }}
+              transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            >
+              {/* Gold accent top bar */}
+              <div className="h-[2px] w-full" style={{ background: "linear-gradient(to right, transparent, #C9A96E, transparent)" }} />
+
+              {/* Close */}
+              <button
+                onClick={() => setShowRetestModal(false)}
+                className="absolute top-4 right-4 z-10 p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="px-6 pt-5 pb-6">
+                {/* Eyebrow */}
+                <p className="mb-3 text-[0.6rem] tracking-[0.22em] uppercase font-medium" style={{ color: "#C9A96E" }}>
+                  {language === "ko" ? "피부 분석 기록" : language === "de" ? "Hautanalyse-Verlauf" : "Skin Analysis History"}
+                </p>
+
+                {/* Headline */}
+                <h3
+                  className="text-[1.55rem] font-light leading-snug text-foreground break-keep"
+                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                >
+                  {language === "ko"
+                    ? "당신의 피부는 어떻게 달라졌을까요?"
+                    : language === "de"
+                    ? "Bereit zu sehen, wie sich Ihre Haut verändert hat?"
+                    : "Ready to see how your skin has changed?"}
+                </h3>
+
+                {/* Date subtitle */}
+                {lastDiagnosedAt && (
+                  <p className="mt-1.5 text-xs font-light text-muted-foreground">
+                    {language === "ko"
+                      ? `마지막 분석: ${formatDiagnosisDate(lastDiagnosedAt, "ko")}`
+                      : language === "de"
+                      ? `Letzte Analyse: ${formatDiagnosisDate(lastDiagnosedAt, "de")}`
+                      : `Last analyzed: ${formatDiagnosisDate(lastDiagnosedAt, "en")}`}
+                  </p>
+                )}
+
+                {/* Radar preview card */}
+                {radarScores && (
+                  <div
+                    className="mt-5 mb-5 flex items-center gap-4 rounded-2xl p-4"
+                    style={{ background: "hsl(var(--secondary) / 0.4)", border: "1px solid #C9A96E22" }}
+                  >
+                    <MiniRadarChart scores={radarScores} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[0.65rem] tracking-[0.16em] uppercase text-muted-foreground font-light">
+                        {language === "ko" ? "피부 프로필" : language === "de" ? "Hautprofil" : "Skin Profile"}
+                      </p>
+                      {lastTier && (
+                        <p className="mt-1 text-sm font-medium text-foreground">{lastTier}</p>
+                      )}
+                      <p className="mt-2 text-[11px] font-light text-muted-foreground/70 leading-relaxed break-keep">
+                        {language === "ko"
+                          ? "변화를 추적하면 더 정밀한 맞춤 프로토콜을 만들 수 있습니다."
+                          : language === "de"
+                          ? "Verfolgen Sie Veränderungen für ein präziseres Protokoll."
+                          : "Track changes to refine your personalised protocol."}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex flex-col gap-2.5">
+                  <motion.button
+                    onClick={() => { store.reset(); setShowRetestModal(false); }}
+                    whileTap={{ scale: 0.97 }}
+                    className="w-full rounded-xl py-3.5 text-sm font-medium text-white min-h-[48px] touch-manipulation"
+                    style={{ background: "linear-gradient(135deg, #C9A96E 0%, #947E5C 100%)" }}
+                  >
+                    {language === "ko" ? "새 분석 시작" : language === "de" ? "Neue Analyse starten" : "Start New Analysis"}
+                  </motion.button>
+                  <motion.button
+                    onClick={() => navigate("/profile")}
+                    whileTap={{ scale: 0.97 }}
+                    className="w-full rounded-xl border py-3 text-sm font-light text-foreground min-h-[44px] touch-manipulation transition-colors hover:bg-secondary/40"
+                    style={{ borderColor: "#C9A96E40" }}
+                  >
+                    {language === "ko" ? "내 피부 여정 보기" : language === "de" ? "Meine Hautreise ansehen" : "View My Skin Journey"}
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Resume prompt */}
       <AnimatePresence>
@@ -250,9 +415,7 @@ const DiagnosisPage = () => {
               animate={{ scale: 1, opacity: 1 }}
             >
               <h3 className="font-display text-lg text-foreground">{t.diagnosis.resumeTitle}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t.diagnosis.resumeSub}
-              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{t.diagnosis.resumeSub}</p>
               <div className="mt-5 flex gap-3">
                 <button
                   onClick={handleResume}
@@ -274,149 +437,128 @@ const DiagnosisPage = () => {
 
       <div className="flex min-h-screen flex-col items-center justify-start px-4 sm:px-6 pt-24 pb-12">
         <div className="mx-auto w-full max-w-[640px]">
-          {/* Global persistent line sitting above all changing step content */}
-          {store.currentStep < 10 && <GlobalProgressLine />}
+          {/* Progress line — hidden on Step 0 (FaceMapStep has its own UI) */}
+          {store.currentStep > 0 && store.currentStep <= loadingStep && (
+            <GlobalProgressLine
+              totalSegments={exposomeStep}   /* axis steps + exposome = total visible segments */
+              activeSegment={store.currentStep - 1}
+              stepLabel={
+                store.currentStep >= loadingStep
+                  ? t.diagnosis.progress.processing
+                  : store.currentStep === exposomeStep
+                  ? (language === "ko" ? "라이프스타일 프로필" : language === "de" ? "Lebensstil-Profil" : "Lifestyle Profile")
+                  : currentAxis
+                  ? `${currentAxis.eyebrow[language] ?? currentAxis.eyebrow.en} — ${currentAxisIndex + 1} / ${exposomeStep}`
+                  : undefined
+              }
+            />
+          )}
 
           <AnimatePresence mode="wait">
-            {/* Step 0: Context */}
+            {/* Step 0: Face Map */}
             {store.currentStep === 0 && (
-              <StepWrapper key="context" reducedMotion={reducedMotion} onSwipeLeft={goNext} onSwipeRight={store.currentStep > 0 ? goBack : undefined}>
-                <h2 className="font-display text-3xl text-foreground">
-                  {t.diagnosis.contextTitle}
-                </h2>
-                <p className="mt-2 text-muted-foreground">
-                  {t.diagnosis.contextSub}
-                </p>
-                <div className="mt-8 flex flex-col gap-3">
-                  {CONTEXT_OPTIONS.map((opt) => (
-                    <motion.button
-                      key={opt.key}
-                      onClick={() => store.toggleContext(opt.key)}
-                      className={`rounded-lg border px-5 py-4 text-left text-sm transition-all min-h-[44px] touch-manipulation ${store.contexts.includes(opt.key)
-                        ? "border-primary bg-primary/10 text-foreground"
-                        : "border-border text-muted-foreground hover:border-primary/50"
-                        }`}
-                      whileTap={reducedMotion ? undefined : { scale: 0.98 }}
-                    >
-                      {t.diagnosis.contexts[opt.key as keyof typeof t.diagnosis.contexts]}
-                    </motion.button>
-                  ))}
-                </div>
-              </StepWrapper>
+              <motion.div
+                key="facemap"
+                initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: -30 }}
+                transition={{ duration: reducedMotion ? 0.15 : 0.3, ease: [0.4, 0, 0.2, 1] }}
+                className="w-full"
+              >
+                <FaceMapStep
+                  onNext={() => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    store.setStep(1);
+                  }}
+                />
+              </motion.div>
             )}
 
-            {/* Step 1: Skin Type */}
-            {store.currentStep === 1 && (
-              <StepWrapper key="skintype" reducedMotion={reducedMotion}>
-                <h2 className="font-display text-3xl text-foreground">
-                  {t.diagnosis.skinTypeTitle}
-                </h2>
-                <p className="mt-2 text-muted-foreground">
-                  {t.diagnosis.skinTypeSub}
-                </p>
-                <div className="mt-8 flex flex-col gap-3">
-                  {SKIN_TYPES.map((st) => (
-                    <motion.button
-                      key={st.key}
-                      onClick={() => store.setSkinType(st.key)}
-                      className={`rounded-lg border px-5 py-4 text-left transition-all min-h-[44px] touch-manipulation ${store.skinType === st.key
-                        ? "border-primary bg-primary/10"
-                        : "border-border hover:border-primary/50"
-                        }`}
-                      whileTap={reducedMotion ? undefined : { scale: 0.98 }}
-                    >
-                      <span className="font-medium text-foreground">{t.diagnosis.skinTypes[st.key as keyof typeof t.diagnosis.skinTypes].label}</span>
-                      <span className="ml-3 text-sm text-muted-foreground">— {t.diagnosis.skinTypes[st.key as keyof typeof t.diagnosis.skinTypes].desc}</span>
-                    </motion.button>
-                  ))}
-                </div>
-              </StepWrapper>
-            )}
-
-            {/* Steps 2-9: Interactive Categories */}
-            {store.currentStep >= 2 && store.currentStep <= 9 && !showMeta && (
-              <StepWrapper key={`cat-${currentCategoryNum}`} reducedMotion={reducedMotion}>
-                <CategoryInteractive
-                  category={currentCategoryNum}
-                  severities={store.severities}
-                  onSeverityChange={(id, v) => store.setSeverity(id, v)}
+            {/* Steps 1..N: Dynamic axis questions */}
+            {store.currentStep >= 1 && store.currentStep <= totalAxisSteps && currentAxis && (
+              <StepWrapper
+                key={`axis-${currentAxisId}`}
+                reducedMotion={reducedMotion}
+                onSwipeLeft={goNext}
+                onSwipeRight={goBack}
+              >
+                <AxisQuestionStep
+                  axis={currentAxis}
+                  lang={language}
+                  answers={store.axisAnswers}
+                  onChange={handleAxisAnswer}
+                  onNext={goNext}
+                  onBack={goBack}
                 />
               </StepWrapper>
             )}
 
-            {/* Meta Questions */}
-            {showMeta && metaQuestionsForCategory.length > 0 && (
-              <StepWrapper key="meta" reducedMotion={reducedMotion} onSwipeLeft={goNext} onSwipeRight={store.currentStep > 0 ? goBack : undefined}>
-                <h2 className="font-display text-2xl text-foreground">
-                  {t.diagnosis.metaTitle}
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {t.diagnosis.metaSub}
-                </p>
-                <div className="mt-8 flex flex-col gap-6">
-                  {metaQuestionsForCategory.map((q) => (
-                    <LabCard key={q.id}>
-                      <p className="question-label mb-3">{language === "de" ? q.text_de : q.text_en}</p>
-                      {q.type === "boolean" ? (
-                        <div className="flex gap-2">
-                          {[true, false].map((v) => (
-                            <motion.button
-                              key={String(v)}
-                              onClick={() => store.setMetaAnswer(q.id, v)}
-                              className={`flex-1 rounded-md px-4 py-2 text-sm transition-all min-h-[44px] touch-manipulation border ${store.metaAnswers[q.id] === v
-                                ? "bg-primary/20 text-primary border-primary"
-                                : "bg-secondary/50 text-foreground/70 border-transparent hover:bg-secondary"
-                                }`}
-                              whileTap={reducedMotion ? undefined : { scale: 0.96 }}
-                            >
-                              {v ? t.diagnosis.btnYes : t.diagnosis.btnNo}
-                            </motion.button>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          <SeveritySelector
-                            value={(store.metaAnswers[q.id] as number) ?? 0}
-                            onChange={(v) => store.setMetaAnswer(q.id, v)}
-                          />
-                          {/* "Not applicable" option for hormonal questions */}
-                          {(q.id === "premenstrual_7_10d") && (
-                            <motion.button
-                              onClick={() => store.setMetaAnswer(q.id, -1)}
-                              className={`w-full rounded-md px-4 py-2.5 text-sm transition-all min-h-[44px] touch-manipulation border ${store.metaAnswers[q.id] === -1
-                                ? "bg-muted text-foreground border-border"
-                                : "bg-secondary/30 text-foreground/60 border-transparent hover:bg-secondary/60"
-                                }`}
-                              whileTap={reducedMotion ? undefined : { scale: 0.96 }}
-                            >
-                              {t.diagnosis.btnNotApplicable}
-                            </motion.button>
-                          )}
-                        </div>
-                      )}
-                    </LabCard>
-                  ))}
-                </div>
+            {/* Step N+1: Exposome — lifestyle block (always shown) */}
+            {store.currentStep === exposomeStep && (
+              <StepWrapper key="exposome" reducedMotion={reducedMotion}>
+                <ExposomeStep
+                  lang={language}
+                  answers={store.axisAnswers}
+                  onChange={handleAxisAnswer}
+                  onNext={goNext}
+                  onBack={goBack}
+                />
               </StepWrapper>
             )}
 
             {/* Loading */}
-            {store.currentStep === 10 && (
+            {store.currentStep >= loadingStep && (
               <StepWrapper key="loading" reducedMotion={reducedMotion}>
                 <div className="flex flex-col items-center justify-center py-20">
                   {!reducedMotion ? (
-                    <motion.div
-                      className="h-20 w-20 rounded-full border-2 border-primary"
-                      animate={{ opacity: [0.3, 1, 0.3], scale: [0.95, 1.05, 0.95] }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    />
+                    /* Premium golden analysis orb */
+                    <div className="relative h-28 w-28 mb-2">
+                      {/* Ambient glow halo */}
+                      <motion.div
+                        className="absolute rounded-full pointer-events-none"
+                        style={{ inset: "-20px", background: "radial-gradient(circle, #C9A96E18 0%, transparent 70%)" }}
+                        animate={{ scale: [1, 1.3, 1], opacity: [0.4, 1, 0.4] }}
+                        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                      {/* Gold conic spinner */}
+                      <motion.div
+                        className="absolute rounded-full"
+                        style={{
+                          inset: "6px",
+                          background: "conic-gradient(from 0deg, transparent 0%, #C9A96E 35%, transparent 70%)",
+                        }}
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
+                      />
+                      {/* Mask center of gold spinner */}
+                      <div className="absolute rounded-full bg-background" style={{ inset: "20px" }} />
+                      {/* Rose-gold counter-spinner */}
+                      <motion.div
+                        className="absolute rounded-full"
+                        style={{
+                          inset: "20px",
+                          background: "conic-gradient(from 180deg, transparent 0%, #B76E79 25%, transparent 50%)",
+                        }}
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
+                      />
+                      {/* Mask center of rose spinner */}
+                      <div className="absolute rounded-full bg-background" style={{ inset: "32px" }} />
+                      {/* Core pulse dot */}
+                      <motion.div
+                        className="absolute rounded-full"
+                        style={{ inset: "32px", background: "radial-gradient(circle, #C9A96E, #C9A96E50)" }}
+                        animate={{ scale: [0.6, 1.15, 0.6], opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                    </div>
                   ) : (
-                    <div className="h-20 w-20 rounded-full border-2 border-primary opacity-60" />
+                    <div className="h-28 w-28 rounded-full border border-amber-400/40 opacity-60 mb-2" />
                   )}
                   <AnimatePresence mode="wait">
                     <motion.p
                       key={loadingMsg}
-                      className="mt-8 text-lg text-muted-foreground"
+                      className="mt-8 text-base text-muted-foreground font-light tracking-wide"
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
@@ -429,33 +571,6 @@ const DiagnosisPage = () => {
               </StepWrapper>
             )}
           </AnimatePresence>
-
-          {/* Navigation */}
-          {store.currentStep < 10 && (
-            <motion.div
-              className="mt-8 flex items-center justify-between pb-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <button
-                onClick={goBack}
-                disabled={store.currentStep === 0 && !showMeta}
-                className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30 min-h-[44px] touch-manipulation"
-              >
-                <ArrowLeft className="h-4 w-4" /> {t.diagnosis.btnBack}
-              </button>
-              <motion.button
-                onClick={goNext}
-                disabled={store.currentStep === 1 && !store.skinType}
-                className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 disabled:opacity-30 min-h-[44px] touch-manipulation"
-                whileTap={reducedMotion ? undefined : { scale: 0.96 }}
-              >
-                {store.currentStep === 9 && !showMeta ? t.diagnosis.btnAnalyze : t.diagnosis.btnContinue}
-                <ArrowRight className="h-4 w-4" />
-              </motion.button>
-            </motion.div>
-          )}
         </div>
       </div>
 

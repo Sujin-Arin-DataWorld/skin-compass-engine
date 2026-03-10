@@ -393,7 +393,7 @@ export default function Profile() {
                 {/* Logout */}
                 <div className="text-center mt-10">
                     <button
-                        onClick={() => { logout(); navigate("/"); }}
+                        onClick={async () => { await logout(); navigate("/"); }}
                         className="text-sm text-foreground/30 hover:text-foreground transition-colors"
                     >
                         {t.logout}

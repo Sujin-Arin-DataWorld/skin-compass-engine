@@ -127,8 +127,16 @@ export const useAuthStore = create<AuthState>()(
             },
 
             logout: async () => {
+                // 1. Sign out from Supabase first — invalidates the server session.
                 await supabase.auth.signOut();
+                // 2. Wipe both Zustand persist slices from localStorage so the next
+                //    browser session (or a different user) starts completely clean.
+                localStorage.removeItem("skin-strategy-auth");
+                localStorage.removeItem("skin-diagnosis-store");
+                // 3. Reset in-memory state as a safety net (in case navigation is delayed).
                 set({ isLoggedIn: false, userProfile: null });
+                // 4. Hard redirect — a full page reload guarantees all React state is gone.
+                window.location.href = "/";
             },
 
             updateProfile: (updates) => {

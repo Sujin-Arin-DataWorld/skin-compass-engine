@@ -109,14 +109,16 @@ export const useAuthStore = create<AuthState>()(
             },
 
             loginWithGoogle: async (redirectPath = "/account") => {
-                // Encode the post-auth destination into the redirectTo URL so it
-                // survives the OAuth round-trip. The target page reads ?redirect=.
+                // Encode the post-auth destination so it survives the OAuth round-trip.
+                // We redirect to /auth/callback (unprotected) instead of directly to a
+                // protected route — this prevents ProtectedRoute from bouncing the user
+                // back to /login before Supabase finishes the PKCE code exchange.
                 const encodedRedirect = encodeURIComponent(redirectPath);
                 await supabase.auth.signInWithOAuth({
                     provider: "google",
                     options: {
-                        // NOTE: add <origin>/account to Supabase Auth → Allowed Redirect URLs
-                        redirectTo: `${window.location.origin}/account?redirect=${encodedRedirect}`,
+                        // NOTE: add <origin>/auth/callback to Supabase Auth → Allowed Redirect URLs
+                        redirectTo: `${window.location.origin}/auth/callback?redirect=${encodedRedirect}`,
                         queryParams: {
                             prompt: "select_account",
                             access_type: "offline",

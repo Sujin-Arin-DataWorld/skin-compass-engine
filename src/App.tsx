@@ -25,6 +25,7 @@ import Account from "./pages/Account";
 import Wishlist from "./pages/Wishlist";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import AuthCallback from "./pages/AuthCallback";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BottomNav } from "./components/BottomNav";
 
@@ -166,6 +167,8 @@ function AppInner() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        {/* OAuth callback — must be public (not behind ProtectedRoute) */}
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route
           path="/profile"
           element={

@@ -103,8 +103,10 @@ export const useAuthStore = create<AuthState>()(
             },
 
             login: async (email, password) => {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                // onAuthStateChange in App.tsx handles updating the store on success
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                // Eagerly set session so Zustand isLoggedIn=true before navigate() fires
+                // (onAuthStateChange is async and may arrive after the caller's navigate)
+                if (data.user) get().setSession(data.user);
                 return !error;
             },
 

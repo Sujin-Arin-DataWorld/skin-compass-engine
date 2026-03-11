@@ -3,140 +3,592 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, ChevronRight } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useI18nStore } from "@/store/i18nStore";
-import facemapImg from "@/assets/clean-facemap.png"; // New clean image
+import facemapImg from "@/assets/clean-facemap.png";
 import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
-import type { QuestionDef, AxisDef, LocalizedText, QuestionAnswer } from "@/engine/questionRoutingV5";
+import type { QuestionDef, LocalizedText, QuestionAnswer } from "@/engine/questionRoutingV5";
 import { useTheme } from "next-themes";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-type ZoneId = "forehead" | "eyes" | "cheeks" | "chin_mouth" | "neck";
-type Lang   = "en" | "de" | "ko";
+// ─── 타입 정의 ────────────────────────────────────────────────────────────────
+// 7개의 임상 기능 존 (좌우 대칭 존은 하나로 통합)
+type ZoneId =
+  | "forehead"     // 이마
+  | "t_zone"       // 코 & T존
+  | "eyes"         // 눈가 & 눈밑 (다크서클 통합)
+  | "cheeks"       // 볼 (좌우 통합)
+  | "mouth_chin"   // 입가 & 턱
+  | "jawline"      // 턱선 (좌우 통합)
+  | "neck";        // 목
+
+type Lang = "en" | "de" | "ko";
 
 interface Concern { id: string; label: Record<Lang, string>; axis: string; }
 
-// ─── Phase 03 mappings ────────────────────────────────────────────────────────
+// ─── Axis mappings ────────────────────────────────────────────────────────────
 const CONCERN_AXIS_ID: Record<string, number> = {
   seb: 1, hyd: 2, pores: 3, texture: 4,
   sen: 5, aging: 6, pigment: 7, hormonal: 8,
 };
 
 const AXIS_COLOR: Record<number, string> = {
-  1: "rgba(201,169,110,0.8)",
-  2: "rgba(100,180,220,0.8)",
-  3: "rgba(160,140,120,0.8)",
-  4: "rgba(220,120,120,0.8)",
-  5: "rgba(220,160,160,0.8)",
-  6: "rgba(180,160,200,0.8)",
-  7: "rgba(180,140,100,0.8)",
-  8: "rgba(200,130,170,0.8)",
+  1: "rgba(201,169,110,0.8)", 2: "rgba(100,180,220,0.8)",
+  3: "rgba(160,140,120,0.8)", 4: "rgba(220,120,120,0.8)",
+  5: "rgba(220,160,160,0.8)", 6: "rgba(180,160,200,0.8)",
+  7: "rgba(180,140,100,0.8)", 8: "rgba(200,130,170,0.8)",
 };
 
-const gt = (t: LocalizedText, lang: Lang): string => (t as Record<string, string>)[lang] ?? t.en;
+const gt = (t: LocalizedText, lang: Lang): string =>
+  (t as unknown as Record<string, string>)[lang] ?? (t as unknown as Record<string, string>).en;
 
-function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
+// ─── 존 이름 (7개 임상 존) ────────────────────────────────────────────────────
+const ZONE_LABELS: Record<ZoneId, Record<Lang, string>> = {
+  forehead:   { en: "Forehead",      de: "Stirn",          ko: "이마"         },
+  t_zone:     { en: "Nose & T-Zone", de: "Nase & T-Zone",  ko: "코 & T존"      },
+  eyes:       { en: "Eye Area",      de: "Augenpartie",    ko: "눈가 & 눈밑"   },
+  cheeks:     { en: "Cheeks",        de: "Wangen",         ko: "볼"           },
+  mouth_chin: { en: "Mouth & Chin",  de: "Mund & Kinn",    ko: "입가 & 턱"     },
+  jawline:    { en: "Jawline",       de: "Kieferlinie",    ko: "턱선"         },
+  neck:       { en: "Neck",          de: "Hals",           ko: "목"           },
+};
+
+// ─── 존별 피부 고민 데이터 (7개 임상 존으로 단순화) ───────────────────────────
+// 대칭 존(볼, 턱선)은 좌우 하나로 통합 → 중복 없이 정확한 진단 가중치 산출
+const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
+  // 이마 — 피지·노화·트러블 중심
+  forehead: [
+    { id: "oily_f",      label: { en: "Oily / Shiny",      de: "Ölig / Glänzend",    ko: "유분 / 번들거림" }, axis: "seb"     },
+    { id: "lines_f",     label: { en: "Forehead Lines",    de: "Stirnfalten",         ko: "이마 주름"       }, axis: "aging"   },
+    { id: "breakouts_f", label: { en: "Breakouts",         de: "Unreinheiten",        ko: "트러블"          }, axis: "texture" },
+  ],
+
+  // 코 & T존 — 모공·피지 집중 구역
+  t_zone: [
+    { id: "bh_t",    label: { en: "Blackheads (Nose)", de: "Mitesser (Nase)",   ko: "블랙헤드 / 피지" }, axis: "pores" },
+    { id: "pores_t", label: { en: "Enlarged Pores",    de: "Vergrößerte Poren", ko: "넓은 모공"        }, axis: "pores" },
+  ],
+
+  // 눈가 & 눈밑 통합 — 노화·색소·볼륨 감소 (이전 eyes + dark_circles 통합)
+  eyes: [
+    { id: "dc_e",        label: { en: "Dark Circles",       de: "Dunkle Augenringe",  ko: "다크서클"        }, axis: "pigment" },
+    { id: "finelines_e", label: { en: "Fine Lines",         de: "Feine Linien",       ko: "잔주름"           }, axis: "aging"   },
+    { id: "hollow_e",    label: { en: "Under-Eye Hollows",  de: "Eingefallene Augen", ko: "눈밑 꺼짐"        }, axis: "aging"   },
+  ],
+
+  // 볼 (좌우 통합) — 민감성·수분·색소 중심
+  // SVG에서 좌우 hitPath가 모두 이 존을 가리킴 → 클릭 시 동일 패널 표시
+  cheeks: [
+    { id: "red_c",  label: { en: "Redness / Flushing",   de: "Rötungen",        ko: "홍조 / 붉은기"   }, axis: "sen"     },
+    { id: "dry_c",  label: { en: "Dryness / Tightness",  de: "Trockenheit",     ko: "건조함 / 당김"   }, axis: "hyd"     },
+    { id: "pigm_c", label: { en: "Sun Spots / Pigment",  de: "Pigmentflecken",  ko: "기미 / 색소침착" }, axis: "pigment" },
+  ],
+
+  // 입가 & 턱 — 표정주름(팔자)·호르몬성 트러블·수분 (턱선과 임상적으로 구분)
+  mouth_chin: [
+    { id: "nasolabial", label: { en: "Nasolabial Folds",    de: "Nasolabialfalten",       ko: "팔자주름"        }, axis: "aging"    },
+    { id: "hormonal_m", label: { en: "Chin Breakouts",      de: "Unreinheiten am Kinn",   ko: "턱 주변 트러블"  }, axis: "hormonal" },
+    { id: "dry_m",      label: { en: "Dry Lips / Perioral", de: "Trockene Lippen",        ko: "입가 건조함"     }, axis: "hyd"      },
+  ],
+
+  // 턱선 (좌우 통합) — 중력성 처짐·림프성 여드름 (입/턱 존과 임상적으로 구분)
+  // SVG에서 좌우 hitPath가 모두 이 존을 가리킴 → 클릭 시 동일 패널 표시
+  jawline: [
+    { id: "sag_j",    label: { en: "Loss of Firmness", de: "Konturverlust",  ko: "턱선 탄력 저하" }, axis: "aging"    },
+    { id: "jaw_acne", label: { en: "Jawline Acne",     de: "Akne am Kiefer", ko: "턱선 여드름"    }, axis: "hormonal" },
+  ],
+
+  // 목 — 노화·수분 (목 주름·텍넥 집중)
+  neck: [
+    { id: "neck_lines", label: { en: "Neck Lines",     de: "Halsfalten",  ko: "목 주름"     }, axis: "aging" },
+    { id: "neck_dry",   label: { en: "Rough Texture",  de: "Raue Textur", ko: "거친 피부결" }, axis: "hyd"   },
+  ],
+};
+
+// ─── Copy strings ─────────────────────────────────────────────────────────────
+const COPY: Record<Lang, {
+  title: string; subtitle: string;
+  selected: (n: number) => string;
+  close: string; continue: string; hint: string;
+}> = {
+  en: {
+    title: "Where do you notice concerns?",
+    subtitle: "Tap a clinical zone on the face map to analyse your skin condition.",
+    selected: (n) => n === 1 ? "1 concern selected" : `${n} concerns selected`,
+    close: "Done", continue: "Continue",
+    hint: "Tap a zone on the face map to begin",
+  },
+  de: {
+    title: "Wo bemerken Sie Hautprobleme?",
+    subtitle: "Tippen Sie auf eine klinische Zone für eine Tiefenanalyse.",
+    selected: (n) => `${n} Anliegen ausgewählt`,
+    close: "Fertig", continue: "Weiter",
+    hint: "Tippen Sie auf eine Zone, um zu beginnen",
+  },
+  ko: {
+    title: "어느 부위가 신경 쓰이시나요?",
+    subtitle: "얼굴 지도에서 구역을 탭하여 피부 상태를 분석하세요.",
+    selected: (n) => `${n}개 선택됨`,
+    close: "완료", continue: "계속",
+    hint: "얼굴 지도에서 구역을 탭하여 시작하세요",
+  },
+};
+
+// ─── SVG Geometry ─────────────────────────────────────────────────────────────
+// viewBox "0 0 500 700" — all coordinates are in this space.
+// The container uses aspect-ratio 500/700 with objectFit cover.
+//
+// Dot layout (facemap.jpg portrait, face centered ~250, hairline ~y80):
+//   Forehead    y≈120   eyes y≈215   dark circles y≈255
+//   Nose/T-zone y≈185–310   cheeks y≈290–360
+//   Mouth/chin  y≈390   jawline y≈450  neck y≈530
+//
+// Each zone has:
+//   dots       — clinical dot positions (shown always, gold when active)
+//   connectors — lines connecting dots within/across zone (always faint, gold when active)
+//   annotLine  — callout line pointing outside the face (only when active)
+//   hitPath    — transparent click target
+
+interface ZoneDef {
+  zone: ZoneId;
+  dots: { x: number; y: number }[];
+  connectors?: { x1: number; y1: number; x2: number; y2: number }[];
+  annotLine?: { x1: number; y1: number; x2: number; y2: number };
+  hitPath: string;
+}
+
+// ─── SVG 존 기하 데이터 ───────────────────────────────────────────────────────
+// viewBox "0 0 500 700" 기준 좌표.
+// 대칭 존(볼·턱선)은 단일 항목에 좌우 모든 도트·연결선을 통합:
+//   hitPath에 두 개의 서브패스(M...Z M...Z)를 사용해 좌우 영역을 동시에 커버
+//   → 어느 쪽을 클릭/호버해도 onZoneClick/hoveredZone이 동일 ID로 발동
+const ZONES_DEF: ZoneDef[] = [
+  // ── 이마 (Forehead) ───────────────────────────────────────────────────────
+  {
+    zone: "forehead",
+    dots: [
+      { x: 250, y: 140 },   // 이마 중앙
+      { x: 180, y: 185 },   // 이마 좌측
+      { x: 320, y: 185 },   // 이마 우측
+    ],
+    connectors: [
+      { x1: 180, y1: 185, x2: 320, y2: 185 },   // 이마 가로 연결선
+      { x1: 250, y1: 140, x2: 250, y2: 185 },   // 중앙 수직 연결선
+    ],
+    annotLine: { x1: 250, y1: 160, x2: 220, y2: 160 },
+    hitPath: "M 125 82 L 375 82 L 370 192 L 130 192 Z",
+  },
+
+  // ── 코 & T존 (Nose & T-Zone) — 3개 도트로 T자 세로 축 완성 ───────────────
+  // 미간(Glabella) → 코 브릿지 → 코 끝 3점이 T존의 세로 기둥을 형성
+  {
+    zone: "t_zone",
+    dots: [
+      { x: 250, y: 192 },   // 미간 (Glabella) — T존 상단 기준점
+      { x: 250, y: 248 },   // 코 브릿지 (Nose bridge) — T존 중간
+      { x: 250, y: 305 },   // 코 끝 (Nose tip) — T존 하단
+    ],
+    connectors: [
+      { x1: 250, y1: 192, x2: 250, y2: 248 },   // 미간 → 브릿지 세로선
+      { x1: 250, y1: 248, x2: 250, y2: 305 },   // 브릿지 → 코끝 세로선
+    ],
+    annotLine: { x1: 250, y1: 305, x2: 295, y2: 325 },
+    hitPath: "M 215 178 L 285 178 L 290 332 L 210 332 Z",
+  },
+
+  // ── 눈가 & 눈밑 통합 (Eye Area + Under-Eye) ─────────────────────────────
+  // eyes + dark_circles 통합 — 눈 높이와 눈밑을 사각형 프레임으로 연결
+  {
+    zone: "eyes",
+    dots: [
+      { x: 175, y: 218 },   // 좌안 외측
+      { x: 325, y: 218 },   // 우안 외측
+      { x: 175, y: 270 },   // 좌측 눈밑 (다크서클)
+      { x: 325, y: 270 },   // 우측 눈밑 (다크서클)
+    ],
+    connectors: [
+      { x1: 175, y1: 218, x2: 325, y2: 218 },   // 눈 높이 가로선
+      { x1: 175, y1: 218, x2: 175, y2: 270 },   // 좌측 수직 연결선
+      { x1: 325, y1: 218, x2: 325, y2: 270 },   // 우측 수직 연결선
+      { x1: 175, y1: 270, x2: 325, y2: 270 },   // 눈밑 가로선
+    ],
+    annotLine: { x1: 325, y1: 218, x2: 385, y2: 205 },
+    hitPath: "M 125 195 L 375 195 L 375 282 L 125 282 Z",
+  },
+
+  // ── 볼 통합 (Cheeks — 좌우 각 1개 도트, 라벨 인출선 1개) ──────────────────
+  // 양 볼에 점 하나씩 (2개), 연결선 없음, annotLine 1개로 라벨만 표시
+  // hitPath: M...Z M...Z 두 서브패스 → 좌우 어느 쪽 클릭/호버도 동일 반응
+  {
+    zone: "cheeks",
+    dots: [
+      { x: 148, y: 318 },   // 왼볼 중앙 1개
+      { x: 352, y: 318 },   // 오른볼 중앙 1개
+    ],
+    connectors: [],   // 볼은 연결선 없음 — 점 두 개만 표시
+    annotLine: { x1: 148, y1: 318, x2: 82, y2: 318 },   // 왼쪽으로 라벨 인출
+    hitPath: "M 100 278 L 215 278 L 218 378 L 102 375 Z M 285 278 L 400 278 L 398 375 L 282 378 Z",
+  },
+
+  // ── 입가 & 턱 (Mouth & Chin) ─────────────────────────────────────────────
+  // 팔자주름·호르몬 트러블 중심 — 턱선의 중력성 처짐과 임상적으로 구분
+  {
+    zone: "mouth_chin",
+    dots: [
+      { x: 200, y: 375 },   // 입 왼쪽 코너
+      { x: 300, y: 375 },   // 입 오른쪽 코너
+      { x: 250, y: 418 },   // 턱 중앙
+    ],
+    connectors: [
+      { x1: 200, y1: 375, x2: 300, y2: 375 },   // 입술 가로 연결선
+      { x1: 250, y1: 375, x2: 250, y2: 418 },   // 턱 방향 수직선
+    ],
+    annotLine: { x1: 300, y1: 375, x2: 375, y2: 368 },
+    hitPath: "M 152 358 L 348 358 L 342 452 L 158 452 Z",
+  },
+
+  // ── 턱선 통합 (Jawline — 좌우 단일 항목으로 완전 통합) ───────────────────
+  // 중력성 처짐·림프성 여드름 중심 — 입/턱 존과 임상적으로 구분
+  // hitPath: M...Z M...Z 두 서브패스 → 좌우 어느 쪽 클릭/호버도 동일 반응
+  {
+    zone: "jawline",
+    dots: [
+      { x: 155, y: 370 },   // 왼쪽 턱선 상단
+      { x: 200, y: 415 },   // 왼쪽 턱선 하단
+      { x: 345, y: 452 },   // 오른쪽 턱선 상단
+      { x: 318, y: 478 },   // 오른쪽 턱선 하단
+    ],
+    connectors: [
+      { x1: 155, y1: 452, x2: 182, y2: 478 },   // 왼쪽 턱선 사선
+      { x1: 345, y1: 452, x2: 318, y2: 478 },   // 오른쪽 턱선 사선
+    ],
+    annotLine: { x1: 155, y1: 452, x2: 92, y2: 442 },   // 좌측으로 라벨 인출
+    hitPath: "M 100 440 L 215 452 L 215 502 L 105 488 Z M 285 452 L 400 440 L 395 488 L 285 502 Z",
+  },
+
+  // ── 목 (Neck) — 상부 목 위치로 조정 ──────────────────────────────────────
+  // 이전 y=528은 쇄골 근처로 너무 낮음 → 상부 목(아담의 사과) 위치로 상향 조정
+  {
+    zone: "neck",
+    dots: [
+      { x: 205, y: 495 },   // 왼쪽 상부 목
+      { x: 295, y: 495 },   // 오른쪽 상부 목
+    ],
+    connectors: [
+      { x1: 205, y1: 495, x2: 295, y2: 495 },   // 목 가로 연결선
+    ],
+    annotLine: { x1: 250, y1: 495, x2: 250, y2: 535 },
+    hitPath: "M 168 470 L 332 470 L 345 580 L 155 580 Z",
+  },
+];
+
+// ─── Colour palette (from facemap.jpg: warm cream-white) ─────────────────────
+const PEARL_ACTIVE = "rgba(255, 252, 230, 1)";
+const PEARL_IDLE   = "rgba(255, 252, 228, 1)";
+const LINE_ACTIVE  = "rgba(255, 250, 222, 1)";
+const LINE_IDLE    = "rgba(255, 250, 222, 1)";
+
+
+// ─── 3-level animation keyframes ─────────────────────────────────────────────
+// idle  → always-on gentle hum (never stops)
+// hover → faster, slightly brighter hum (medium glow added)
+// active/selected → full bloom pulse
+const SVG_CSS = `
+
+  /* Idle: dots & lines breathe softly — always running */
+  @keyframes fms-dot-idle {
+    0%, 100% { opacity: 0.32; }
+    50%       { opacity: 0.68; }
+  }
+  @keyframes fms-line-idle {
+    0%, 100% { opacity: 0.16; }
+    50%       { opacity: 0.40; }
+  }
+  /* Hover: faster, brighter pulse */
+  @keyframes fms-dot-hover {
+    0%, 100% { opacity: 0.78; }
+    50%       { opacity: 0.90; }
+  }
+  @keyframes fms-halo-hover {
+    0%, 100% { opacity: 0.10; }
+    50%       { opacity: 0.24; }
+  }
+  /* Active / Selected: full bloom */
+  @keyframes fms-dot-active {
+    0%, 100% { opacity: 0.90; }
+    50%       { opacity: 1.00; }
+  }
+  @keyframes fms-halo-active {
+    0%, 100% { opacity: 0.16; }
+    50%       { opacity: 0.36; }
+  }
+`;
+
+// ─── Helper: text anchor + position from annotation line direction ────────────
+function annotLabelProps(ln: { x1: number; y1: number; x2: number; y2: number }) {
+  const dx = ln.x2 - ln.x1;
+  const dy = ln.y2 - ln.y1;
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    return dx > 0
+      ? { x: ln.x2 + 7,  y: ln.y2 + 4, anchor: "start"  as const }
+      : { x: ln.x2 - 7,  y: ln.y2 + 4, anchor: "end"    as const };
+  }
+  return dy > 0
+    ? { x: ln.x2,      y: ln.y2 + 13, anchor: "middle" as const }
+    : { x: ln.x2,      y: ln.y2 - 6,  anchor: "middle" as const };
+}
+
+// ─── FaceSVG ──────────────────────────────────────────────────────────────────
+// Visual states (in priority order):
+//   dimmed  — another zone is active → low opacity, no interaction
+//   active  — clicked / concern selected → full bloom + hum
+//   hover   — mouse/touch enters zone → medium glow + faster hum
+//   idle    — default → dots & lines visible, gentle breathing animation
+//
+// Dot size is animated via CSS transform: scale() so it transitions smoothly
+// (SVG `r` attribute cannot be CSS-transitioned reliably across all browsers).
+function FaceSVG({
+  activeZone, selectedZones, onZoneClick, lang,
+}: {
+  activeZone: ZoneId | null;
+  selectedZones: Set<ZoneId>;
+  onZoneClick: (z: ZoneId) => void;
+  lang: Lang;
+}) {
+  const [hoveredZone, setHoveredZone] = useState<ZoneId | null>(null);
+
+  return (
+    <svg
+      viewBox="0 0 500 700"
+      style={{
+        position: "absolute", inset: 0,
+        width: "100%", height: "100%",
+        overflow: "visible",
+        willChange: "transform",          // GPU layer hint — smooth on mobile
+      }}
+    >
+      <style>{SVG_CSS}</style>
+      <defs>
+        {/* Full warm bloom — active halos only */}
+        <filter id="fms-glow-warm" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+        {/* Soft glow — hover halos + active dots */}
+        <filter id="fms-glow-soft" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
+      </defs>
+
+
+
+      {/* ── Zones ───────────────────────────────────────────────────────────── */}
+      {ZONES_DEF.map(({ zone, dots, connectors, annotLine, hitPath }, zoneIdx) => {
+        const isSelected = selectedZones.has(zone);
+        const isActive   = activeZone === zone;
+        const isHovered  = hoveredZone === zone;
+
+        // Priority: active > hovered > idle.  Dimmed when another zone is active.
+        const lit    = isActive || isSelected;
+        const dimmed = activeZone !== null && !lit;
+        // Hover state only fires when no zone is in the "selected" active state,
+        // so it doesn't override the focus on a selected zone.
+        const warm   = isHovered && !lit && !dimmed;
+
+        // Line / label intensity driven by the same three levels
+        const lineStroke = (lit || warm) ? LINE_ACTIVE : LINE_IDLE;
+        const lineWidth  = (lit || warm) ? 1.0 : 0.75;
+
+        // Stagger idle anim phases per zone so they don't all pulse in sync
+        const d0 = zoneIdx * 0.38;
+
+        const lp    = annotLine ? annotLabelProps(annotLine) : null;
+        const label = ZONE_LABELS[zone][lang];
+
+        return (
+          <g key={zone} style={{ opacity: dimmed ? 0.13 : 1, transition: "opacity 0.4s ease" }}>
+
+            {/* ── Click / hover target — covers the whole zone area ─────── */}
+            <path
+              d={hitPath}
+              fill="transparent"
+              style={{ pointerEvents: "all", cursor: "pointer" }}
+              onClick={() => onZoneClick(zone)}
+              onMouseEnter={() => setHoveredZone(zone)}
+              onMouseLeave={() => setHoveredZone(null)}
+            />
+
+            {/* ── Connector lines (always visible) ─────────────────────── */}
+            {connectors?.map((ln, i) => (
+              <line
+                key={i}
+                x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
+                stroke={lineStroke}
+                strokeWidth={lineWidth}
+                style={{
+                  pointerEvents: "none",
+                  animation: (lit || warm)
+                    ? "none"
+                    : `fms-line-idle 4.2s ease-in-out ${d0 + i * 0.25}s infinite`,
+                  opacity: (lit || warm) ? (lit ? 0.82 : 0.65) : undefined,
+                  transition: "stroke 0.30s ease, stroke-width 0.30s ease, opacity 0.30s ease",
+                }}
+              />
+            ))}
+
+            {/* ── Annotation callout line (always visible) ─────────────── */}
+            {annotLine && (
+              <line
+                x1={annotLine.x1} y1={annotLine.y1}
+                x2={annotLine.x2} y2={annotLine.y2}
+                stroke={lineStroke}
+                strokeWidth={(lit || warm) ? 0.85 : 0.65}
+                style={{
+                  pointerEvents: "none",
+                  animation: (lit || warm)
+                    ? "none"
+                    : `fms-line-idle 4.2s ease-in-out ${d0 + 0.15}s infinite`,
+                  opacity: (lit || warm) ? (lit ? 0.72 : 0.55) : undefined,
+                  transition: "stroke 0.30s ease, opacity 0.30s ease",
+                }}
+              />
+            )}
+
+            {/* ── Zone label (always visible) ───────────────────────────── */}
+            {lp && (
+              <text
+                x={lp.x} y={lp.y}
+                textAnchor={lp.anchor}
+                fill={(lit || warm) ? PEARL_ACTIVE : PEARL_IDLE}
+                fontSize="13"
+                fontFamily="'DM Sans', system-ui, sans-serif"
+                letterSpacing="0.05em"
+                style={{
+                  pointerEvents: "none",
+                  fontWeight: (lit || warm) ? 500 : 300,
+                  animation: (lit || warm)
+                    ? "none"
+                    : `fms-dot-idle 4s ease-in-out ${d0 + 0.2}s infinite`,
+                  opacity: (lit || warm) ? (lit ? 0.90 : 0.72) : undefined,
+                  transition: "fill 0.30s ease, opacity 0.30s ease",
+                  userSelect: "none",
+                }}
+              >
+                {label}
+              </text>
+            )}
+
+            {/* ── Dots (always visible) ─────────────────────────────────── */}
+            {dots.map((d, i) => {
+              // Dot scale controls visual size without touching `r` attribute,
+              // so CSS transition: scale works smoothly in all browsers.
+              //   idle  → scale 0.45  (effective r ≈ 2.5 from base r=5.5)
+              //   hover → scale 0.73  (effective r ≈ 4.0)
+              //   active→ scale 1.00  (effective r = 5.5)
+              const dotScale = lit ? 1.0 : warm ? 0.73 : 0.45;
+              const dotFill  = (lit || warm) ? PEARL_ACTIVE : PEARL_IDLE;
+              const dotAnim  = lit
+                ? "fms-dot-active 2.4s ease-in-out infinite"
+                : warm
+                  ? `fms-dot-hover 1.8s ease-in-out infinite`
+                  : `fms-dot-idle 4s ease-in-out ${d0 + i * 0.45}s infinite`;
+
+              return (
+                <g key={i} style={{ pointerEvents: "none" }}>
+
+                  {/* Full warm bloom — active only */}
+                  {lit && (
+                    <circle
+                      cx={d.x} cy={d.y} r={14}
+                      fill={PEARL_ACTIVE}
+                      filter="url(#fms-glow-warm)"
+                      style={{ animation: "fms-halo-active 3s ease-in-out infinite" }}
+                    />
+                  )}
+
+                  {/* Medium soft bloom — hover only */}
+                  {warm && (
+                    <circle
+                      cx={d.x} cy={d.y} r={12}
+                      fill={PEARL_ACTIVE}
+                      filter="url(#fms-glow-soft)"
+                      style={{ animation: "fms-halo-hover 2.5s ease-in-out infinite" }}
+                    />
+                  )}
+
+                  {/* Core dot — always rendered.
+                      Size controlled by transform scale (smooth CSS transition).
+                      Glow filter: none in idle, soft in hover, soft in active. */}
+                  <circle
+                    cx={d.x} cy={d.y}
+                    r={5.5}
+                    fill={dotFill}
+                    filter={(lit || warm) ? "url(#fms-glow-soft)" : undefined}
+                    style={{
+                      transform: `scale(${dotScale})`,
+                      transformOrigin: `${d.x}px ${d.y}px`,
+                      animation: dotAnim,
+                      transition: "transform 0.28s ease, fill 0.28s ease",
+                    }}
+                  />
+                </g>
+              );
+            })}
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ─── Question renderer ────────────────────────────────────────────────────────
+function InlineQuestionRenderer({
+  q, value, onChange, lang, allAnswers, isDark,
+}: {
+  q: QuestionDef; value: QuestionAnswer;
+  onChange: (id: string, val: QuestionAnswer) => void;
+  lang: Lang; allAnswers: Record<string, QuestionAnswer>; isDark: boolean;
+}) {
   const GOLD = "#c9a96e";
-  return {
+  const pillSt = (sel: boolean): React.CSSProperties => ({
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
     borderRadius: 24, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
     cursor: "pointer", minHeight: 44, lineHeight: "1.2",
-    border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
-    background: selected ? "rgba(201,169,110,0.15)" : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-    color: selected ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+    border: sel ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
+    background: sel ? "rgba(201,169,110,0.15)" : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+    color: sel ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
     transition: "all 0.3s ease",
-  };
-}
+  });
 
-// ─── Concern data ─────────────────────────────────────────────────────────────
-const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
-  forehead: [
-    { id: "oily_f",       label: { en: "Oily / Shiny",                   de: "Ölig / Glänzend",         ko: "유분 / 번들거림"   }, axis: "seb"     },
-    { id: "bh_f",         label: { en: "Blackheads / Pores",             de: "Mitesser / Poren",        ko: "블랙헤드 / 모공"   }, axis: "pores" },
-    { id: "lines_f",      label: { en: "Forehead Lines / Wrinkles",      de: "Stirnfalten / Runzeln",   ko: "이마 주름"       }, axis: "aging"   },
-    { id: "breakouts_f",  label: { en: "Breakouts / Acne",               de: "Unreinheiten / Akne",     ko: "트러블 / 여드름"  }, axis: "texture" },
-    { id: "dry_f",        label: { en: "Dryness / Tightness",            de: "Trockenheit / Spannung",  ko: "건조함 / 당김"   }, axis: "hyd"     },
-  ],
-  eyes: [
-    { id: "finelines_e",  label: { en: "Fine Lines / Crow's Feet",       de: "Feine Linien / Krähenfüße", ko: "잔주름 / 눈가 주름" }, axis: "aging"   },
-    { id: "dc_e",         label: { en: "Dark Circles",                   de: "Augenringe",              ko: "다크서클"         }, axis: "pigment" },
-    { id: "puff_e",       label: { en: "Puffiness / Swelling",           de: "Schwellungen",            ko: "붓기 / 부종"      }, axis: "aging"   },
-    { id: "dry_e",        label: { en: "Dryness / Flaking",              de: "Trockenheit / Schuppung", ko: "건조함 / 각질"    }, axis: "hyd"     },
-  ],
-  cheeks: [
-    { id: "red_c",        label: { en: "Redness / Sensitivity",          de: "Rötungen / Empfindlichkeit",ko: "홍조 / 민감성"  }, axis: "sen"     },
-    { id: "acne_c",       label: { en: "Breakouts / Acne",               de: "Unreinheiten",            ko: "볼 트러블"       }, axis: "texture" },
-    { id: "dry_c",        label: { en: "Dryness / Tightness",            de: "Trockenheit / Spannung",  ko: "건조함 / 당김"   }, axis: "hyd"     },
-    { id: "pigm_c",       label: { en: "Dark Spots / Hyperpigmentation", de: "Dunkle Flecken",          ko: "기미 / 색소침착"  }, axis: "pigment" },
-    { id: "pores_c",      label: { en: "Visible Pores",                  de: "Sichtbare Poren",         ko: "가시적 모공"     }, axis: "pores"   },
-  ],
-  chin_mouth: [
-    { id: "hormonal_j",   label: { en: "Recurring Breakouts (Jawline)",  de: "Wiederkehrende Unreinheiten", ko: "반복 트러블 (턱선)"  }, axis: "hormonal" },
-    { id: "dry_m",        label: { en: "Dryness around Lips",            de: "Trockenheit um Lippen",   ko: "입술 주변 건조함"    }, axis: "hyd"     },
-    { id: "nasolabial",   label: { en: "Nasolabial Folds / Smile Lines", de: "Nasolabialfalten",        ko: "팔자주름"           }, axis: "aging"   },
-    { id: "pigm_m",       label: { en: "Dark Spots around Mouth",        de: "Dunkle Flecken (Mund)",   ko: "입 주변 색소침착"    }, axis: "pigment" },
-    { id: "jaw_def",      label: { en: "Jawline Definition Loss",        de: "Verlust der Kinnlinie",   ko: "턱선 윤곽 감소"       }, axis: "aging"   },
-  ],
-  neck: [
-    { id: "neck_lines",   label: { en: "Neck Lines / Tech Neck",        de: "Halsfalten / Tech-Neck",   ko: "목 주름 / 텍넥"  }, axis: "aging" },
-    { id: "neck_sag",     label: { en: "Loss of Firmness",              de: "Verlust an Festigkeit",    ko: "탄력 감소"       }, axis: "aging" },
-    { id: "neck_red",     label: { en: "Redness / Irritation",          de: "Rötungen / Reizungen",     ko: "홍조 / 자극"      }, axis: "sen"   },
-    { id: "neck_dry",     label: { en: "Dryness / Rough Texture",       de: "Trockenheit / Raue Textur",ko: "건조함 / 거친 결" }, axis: "hyd"   },
-  ],
-};
-
-const ZONE_LABELS: Record<ZoneId, Record<Lang, string>> = {
-  forehead:   { en: "Forehead",    de: "Stirn",       ko: "이마"   },
-  eyes:       { en: "Eye Area",    de: "Augenpartie", ko: "눈가"   },
-  cheeks:     { en: "Cheeks",      de: "Wangen",      ko: "볼"     },
-  chin_mouth: { en: "Jawline & Lips", de: "Kinn & Lippen", ko: "턱선 & 입술" },
-  neck:       { en: "Neck",        de: "Hals",        ko: "목"     },
-};
-
-const COPY: Record<Lang, { title: string; subtitle: string; selected: (n: number) => string; close: string; continue: string; hint: string }> = {
-  en: { title: "Where do you notice concerns?", subtitle: "Tap a clinical zone on the face map to deep-dive into your skin condition.", selected: (n) => n === 1 ? "1 concern selected" : `${n} concerns selected`, close: "Done", continue: "Continue", hint: "Tap a zone to begin analysis" },
-  de: { title: "Wo bemerken Sie Hautprobleme?", subtitle: "Tippen Sie auf eine klinische Zone der Gesichtskarte für eine Tiefenanalyse.", selected: (n) => `${n} Anliegen ausgewählt`, close: "Fertig", continue: "Weiter", hint: "Tippen Sie auf eine Zone um zu beginnen" },
-  ko: { title: "어느 부위가 신경 쓰이시나요?", subtitle: "얼굴 지도에서 구역을 탭하여 피부 상태를 깊이 있게 분석하세요.", selected: (n) => `${n}개 선택됨`, close: "완료", continue: "계속", hint: "구역을 탭하여 분석을 시작하세요" },
-};
-
-// ─── Inline Question Renderer ─────────────────────────────────────────────────
-function InlineQuestionRenderer({
-  q, value, onChange, lang, allAnswers, isDark,
-}: {
-  q: QuestionDef; value: QuestionAnswer; onChange: (id: string, val: QuestionAnswer) => void;
-  lang: Lang; allAnswers: Record<string, QuestionAnswer>; isDark: boolean;
-}) {
   const showConditional = q.conditional != null && (() => {
-    const triggerVal = allAnswers[q.conditional!.ifQuestionId];
-    if (triggerVal == null) return false;
+    const tv = allAnswers[q.conditional!.ifQuestionId];
+    if (tv == null) return false;
     const vals = q.conditional!.ifValues;
-    return Array.isArray(triggerVal) ? triggerVal.some(v => vals.includes(String(v))) : vals.includes(String(triggerVal));
+    return Array.isArray(tv)
+      ? tv.some(v => vals.includes(String(v)))
+      : vals.includes(String(tv));
   })();
-  const GOLD = "#c9a96e";
 
   return (
     <>
       {(q.type === "single" || q.type === "image") && q.options && (
         <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {q.options.map((opt) => (
-            <div key={opt.id} onClick={() => onChange(q.id, opt.id)} style={pillStyle(value === opt.id, isDark)}>
+          {q.options.map(opt => (
+            <div key={opt.id} onClick={() => onChange(q.id, opt.id)} style={pillSt(value === opt.id)}>
               {opt.icon && <span style={{ marginRight: 6, opacity: 0.8 }}>{opt.icon}</span>}
               {gt(opt.label, lang)}
-              {opt.description && value === opt.id && (
-                <span style={{ display: "block", fontSize: 11, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontStyle: "italic", marginTop: 4 }}>
-                  {gt(opt.description, lang)}
-                </span>
-              )}
             </div>
           ))}
         </div>
       )}
       {q.type === "multi" && q.options && (
         <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {q.options.map((opt) => {
+          {q.options.map(opt => {
             const sel = (value as string[]) ?? [];
-            const isOn = sel.includes(opt.id);
+            const on = sel.includes(opt.id);
             return (
-              <div key={opt.id} onClick={() => { onChange(q.id, isOn ? sel.filter(x => x !== opt.id) : [...sel, opt.id]); }} style={pillStyle(isOn, isDark)}>
+              <div key={opt.id}
+                onClick={() => onChange(q.id, on ? sel.filter(x => x !== opt.id) : [...sel, opt.id])}
+                style={pillSt(on)}>
                 {gt(opt.label, lang)}
               </div>
             );
@@ -145,10 +597,12 @@ function InlineQuestionRenderer({
       )}
       {q.type === "slider" && q.slider && (
         <div style={{ margin: "8px 0 16px" }}>
-          <input type="range" min={q.slider.min} max={q.slider.max} step={q.slider.step}
+          <input
+            type="range" min={q.slider.min} max={q.slider.max} step={q.slider.step}
             value={(value as number) ?? q.slider.defaultValue}
-            onChange={(e) => onChange(q.id, Number(e.target.value))}
-            style={{ width: "100%", accentColor: GOLD, cursor: "pointer" }} />
+            onChange={e => onChange(q.id, Number(e.target.value))}
+            style={{ width: "100%", accentColor: GOLD, cursor: "pointer" }}
+          />
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.5)", fontFamily: "'DM Sans', sans-serif", marginTop: 8 }}>
             <span>{gt(q.slider.labelMin, lang)}</span>
             <span style={{ color: GOLD, fontWeight: 600 }}>{(value as number) ?? q.slider.defaultValue}</span>
@@ -157,127 +611,54 @@ function InlineQuestionRenderer({
         </div>
       )}
       {showConditional && q.conditional && (
-        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ marginTop: 16, paddingLeft: 16, borderLeft: `2px solid \${GOLD}33`, overflow: "hidden" }}>
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          style={{ marginTop: 16, paddingLeft: 16, borderLeft: `2px solid ${GOLD}33`, overflow: "hidden" }}
+        >
           <div style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
             {gt(q.conditional.inject.text, lang)}
           </div>
-          <InlineQuestionRenderer q={q.conditional.inject} value={allAnswers[q.conditional.inject.id]} isDark={isDark} onChange={onChange} lang={lang} allAnswers={allAnswers} />
+          <InlineQuestionRenderer
+            q={q.conditional.inject}
+            value={allAnswers[q.conditional.inject.id]}
+            isDark={isDark} onChange={onChange} lang={lang} allAnswers={allAnswers}
+          />
         </motion.div>
       )}
     </>
   );
 }
 
-// ─── Geometry: Clean dots and lines ───────────────────────────────────────────
-interface ZoneDef {
-  zone: ZoneId;
-  dots: { x: number; y: number }[];
-  line?: { x1: number; y1: number; x2: number; y2: number };
-  hitPath: string;
-}
-
-const ZONES_DEF: ZoneDef[] = [
-  {
-    zone: "forehead",
-    dots: [{ x: 250, y: 140 }, { x: 170, y: 155 }, { x: 330, y: 155 }],
-    hitPath: "M 130 90 L 370 90 L 370 190 L 130 190 Z",
-    line: { x1: 250, y1: 140, x2: 250, y2: 120 }
-  },
-  {
-    zone: "eyes",
-    dots: [{ x: 190, y: 260 }, { x: 310, y: 260 }],
-    hitPath: "M 130 230 L 370 230 L 370 290 L 130 290 Z",
-    line: { x1: 310, y1: 260, x2: 380, y2: 260 }
-  },
-  {
-    zone: "cheeks",
-    dots: [{ x: 160, y: 350 }, { x: 340, y: 350 }],
-    hitPath: "M 120 300 L 380 300 L 370 410 L 130 410 Z",
-    line: { x1: 160, y1: 350, x2: 90, y2: 350 }
-  },
-  {
-    zone: "chin_mouth",
-    dots: [{ x: 250, y: 500 }, { x: 160, y: 440 }, { x: 340, y: 440 }],
-    hitPath: "M 140 420 L 360 420 L 330 540 L 170 540 Z",
-    line: { x1: 340, y1: 440, x2: 380, y2: 440 }
-  },
-  {
-    zone: "neck",
-    dots: [{ x: 250, y: 620 }],
-    hitPath: "M 180 550 L 320 550 L 340 700 L 160 700 Z",
-    line: { x1: 250, y1: 620, x2: 250, y2: 670 }
-  },
-];
-
-const ANIM = `
-  @keyframes pulseDot {
-    0%, 100% { r: 5; opacity: 0.9; }
-    50%       { r: 7; opacity: 1;    }
-  }
-  @keyframes haloSoft {
-    0%, 100% { r: 16; opacity: 0.15; }
-    50%       { r: 24; opacity: 0.3;  }
-  }
-  .dash-line { stroke-dasharray: 4 4; opacity: 0.6; }
-`;
-
-function FaceSVG({ activeZone, selectedZones, onZoneClick, isDark }: {
-  activeZone: ZoneId | null; selectedZones: Set<ZoneId>; onZoneClick: (z: ZoneId) => void; isDark: boolean;
+// ─── Concern item ─────────────────────────────────────────────────────────────
+function ConcernItem({
+  concern, selected, onToggle, lang, isDark,
+}: {
+  concern: Concern; selected: boolean; onToggle: () => void; lang: Lang; isDark: boolean;
 }) {
-  const GOLD = "#D4AF37", GOLD_DIM = "rgba(201,168,76,0.35)", WH = isDark ? "#fff" : "#000";
-
-  return (
-    <svg viewBox="0 0 500 700" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" }}>
-      <defs>
-        <filter id="glow-md"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      </defs>
-      {ZONES_DEF.map(zd => {
-        const { zone, dots, hitPath, line } = zd;
-        const isActive = activeZone === zone;
-        const isSelected = selectedZones.has(zone);
-        const lit = isActive || isSelected;
-        const dimmed = activeZone !== null && !lit;
-        
-        return (
-          <g key={zone}>
-            <path d={hitPath} fill="transparent" style={{ pointerEvents: "all", cursor: "pointer" }} onClick={() => onZoneClick(zone)} />
-            
-            {!dimmed && line && (
-              <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke={WH} strokeWidth="0.8" className="dash-line" style={{ pointerEvents: "none" }} />
-            )}
-
-            {dots.map((d, i) => (
-              <g key={i} style={{ pointerEvents: "none" }}>
-                {lit && <circle cx={d.x} cy={d.y} r={20} fill={GOLD} filter="url(#glow-md)" style={{ opacity: 0.25, animation: "haloSoft 3s infinite" }} />}
-                <circle cx={d.x} cy={d.y} r={lit ? 6 : 4} fill={lit ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} style={{ animation: lit ? "pulseDot 2s infinite" : "none", transition: "all 0.3s ease" }} />
-                {lit && <circle cx={d.x} cy={d.y} r={10} fill="none" stroke={WH} strokeWidth="1" style={{ opacity: 0.5 }} />}
-              </g>
-            ))}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-// ─── Shared UI components ─────────────────────────────────────────────────────
-function ConcernItem({ concern, selected, onToggle, lang, isDark }: { concern: Concern; selected: boolean; onToggle: () => void; lang: Lang; isDark: boolean; }) {
   const GOLD = "#c9a96e";
   return (
     <motion.button onClick={onToggle} whileTap={{ scale: 0.98 }}
       style={{
-        width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "13px 16px", borderRadius: 14, textAlign: "left", cursor: "pointer", transition: "all 0.2s ease",
+        width: "100%", display: "flex", alignItems: "center",
+        justifyContent: "space-between", gap: 12,
+        padding: "13px 16px", borderRadius: 14,
+        textAlign: "left", cursor: "pointer", transition: "all 0.2s ease",
         background: selected ? "rgba(201,169,110,0.12)" : isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
-        border: selected ? `1px solid \${GOLD}` : `1px solid \${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+        border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
         color: selected ? GOLD : isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)",
-        fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: selected ? 500 : 400
+        fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+        fontWeight: selected ? 500 : 400,
       }}>
       <span>{concern.label[lang]}</span>
-      <motion.span animate={{ scale: selected ? [1, 1.25, 1] : 1 }} transition={{ duration: 0.2 }}
+      <motion.span
+        animate={{ scale: selected ? [1, 1, 1] : 1 }}
+        transition={{ duration: 0.2 }}
         style={{
           flexShrink: 0, width: 22, height: 22, borderRadius: "50%",
-          border: selected ? `2px solid \${GOLD}` : `2px solid \${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`,
-          background: selected ? GOLD : "transparent", display: "flex", alignItems: "center", justifyContent: "center",
+          border: selected ? `2px solid ${GOLD}` : `2px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`,
+          background: selected ? GOLD : "transparent",
+          display: "flex", alignItems: "center", justifyContent: "center",
         }}>
         {selected && <Check style={{ width: 14, height: 14, color: isDark ? "#000" : "#fff" }} />}
       </motion.span>
@@ -285,34 +666,19 @@ function ConcernItem({ concern, selected, onToggle, lang, isDark }: { concern: C
   );
 }
 
-function PanelHeader({ zone, lang, onClose, isDark }: { zone: ZoneId; lang: Lang; onClose: () => void; isDark: boolean; }) {
-  const GOLD = "#c9a96e";
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ height: 1.5, background: `linear-gradient(90deg,transparent,\${GOLD},transparent)`, marginBottom: 16 }} />
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-        <div>
-          <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>Clinical Area</p>
-          <h3 style={{ fontSize: 24, fontWeight: 300, color: isDark ? "#fff" : "#111", fontFamily: "'Cormorant Garamond',Georgia,serif", margin: 0, lineHeight: 1.2 }}>
-            {ZONE_LABELS[zone][lang]}
-          </h3>
-        </div>
-        <button onClick={onClose} style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)", border: "none", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: isDark ? "#fff" : "#000", flexShrink: 0 }}>
-          <X style={{ width: 18, height: 18 }} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── The Main Interactive Panel ───────────────────────────────────────────────
-function ConcernAndQuestionPanel({ zone, selectedConcerns, onToggle, onClose, lang, isDark }: { zone: ZoneId; selectedConcerns: Set<string>; onToggle: (id: string) => void; onClose: () => void; lang: Lang; isDark: boolean; }) {
+// ─── Panel ────────────────────────────────────────────────────────────────────
+function ConcernAndQuestionPanel({
+  zone, selectedConcerns, onToggle, onClose, lang, isDark,
+}: {
+  zone: ZoneId; selectedConcerns: Set<string>; onToggle: (id: string) => void;
+  onClose: () => void; lang: Lang; isDark: boolean;
+}) {
   const store = useDiagnosisStore();
   const axisAnswers = store.axisAnswers;
   const onAnswer = (id: string, val: QuestionAnswer) => store.setAxisAnswer(id, val);
   const [editingAxes, setEditingAxes] = useState<Set<number>>(new Set());
+  const GOLD = "#c9a96e";
 
-  // Derive triggered axes based on selected concerns
   const concerns = ZONE_CONCERNS[zone];
   const triggeredAxisIds = Array.from(new Set(
     Array.from(selectedConcerns)
@@ -321,43 +687,60 @@ function ConcernAndQuestionPanel({ zone, selectedConcerns, onToggle, onClose, la
       .map(a => CONCERN_AXIS_ID[a])
   ));
 
-  const GOLD = "#c9a96e";
-
   return (
     <div style={{ padding: "8px 0 16px" }}>
-      <PanelHeader zone={zone} lang={lang} onClose={onClose} isDark={isDark} />
-      
-      {/* Concerns Section */}
+      {/* Panel header */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ height: 1.5, background: `linear-gradient(90deg,transparent,${GOLD},transparent)`, marginBottom: 16 }} />
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div>
+            <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+              Clinical Area
+            </p>
+            <h3 style={{ fontSize: 24, fontWeight: 300, color: isDark ? "#fff" : "#111", fontFamily: "'Cormorant Garamond',Georgia,serif", margin: 0, lineHeight: 1.2 }}>
+              {ZONE_LABELS[zone][lang]}
+            </h3>
+          </div>
+          <button onClick={onClose}
+            style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)", border: "none", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: isDark ? "#fff" : "#000", flexShrink: 0 }}>
+            <X style={{ width: 18, height: 18 }} />
+          </button>
+        </div>
+      </div>
+
+      {/* Concern list */}
       <h4 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>
         {lang === "ko" ? "피부 고민 선택" : lang === "de" ? "Beschwerden auswählen" : "Select Concerns"}
       </h4>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
         {concerns.map(c => (
-          <ConcernItem key={c.id} concern={c} selected={selectedConcerns.has(c.id)} onToggle={() => onToggle(c.id)} lang={lang} isDark={isDark} />
+          <ConcernItem key={c.id} concern={c} selected={selectedConcerns.has(c.id)}
+            onToggle={() => onToggle(c.id)} lang={lang} isDark={isDark} />
         ))}
       </div>
 
-      {/* Deep-Dive Questions Section */}
+      {/* Deep-dive questions */}
       {triggeredAxisIds.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h4 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", color: GOLD, marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>
             {lang === "ko" ? "정밀 분석" : lang === "de" ? "Tiefenanalyse" : "Deep-Dive Analysis"}
           </h4>
-          
           {triggeredAxisIds.map(axisId => {
             const axisDef = AXIS_DEFINITIONS.find(a => a.id === axisId);
             if (!axisDef) return null;
-            const requiredQs = axisDef.questions.filter(q => q.required);
-            const isAnswered = requiredQs.length > 0 && requiredQs.every(q => axisAnswers[q.id] !== undefined);
-            const isEditing = editingAxes.has(axisId);
-            const showQuestions = !isAnswered || isEditing;
+            const reqQs = axisDef.questions.filter(q => q.required);
+            const isAnswered = reqQs.length > 0 && reqQs.every(q => axisAnswers[q.id] !== undefined);
+            const isEditing  = editingAxes.has(axisId);
+            const showQs     = !isAnswered || isEditing;
 
             const visibleQs: QuestionDef[] = [];
             for (const q of axisDef.questions) {
               if (q.hideIf) {
-                const hAns = axisAnswers[q.hideIf.questionId];
-                if (hAns !== undefined) {
-                  const m = Array.isArray(hAns) ? hAns.some(v => q.hideIf!.values.includes(String(v))) : q.hideIf.values.includes(String(hAns));
+                const ha = axisAnswers[q.hideIf.questionId];
+                if (ha !== undefined) {
+                  const m = Array.isArray(ha)
+                    ? ha.some(v => q.hideIf!.values.includes(String(v)))
+                    : q.hideIf.values.includes(String(ha));
                   if (m) continue;
                 }
               }
@@ -365,29 +748,36 @@ function ConcernAndQuestionPanel({ zone, selectedConcerns, onToggle, onClose, la
             }
 
             return (
-              <div key={axisId} style={{ marginBottom: 20, padding: 16, borderRadius: 16, background: isDark ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.5)", border: `1px solid \${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}` }}>
+              <div key={axisId} style={{
+                marginBottom: 20, padding: 16, borderRadius: 16,
+                background: isDark ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.5)",
+                border: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}`,
+              }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: isAnswered && !isEditing ? 0 : 16 }}>
                   <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: AXIS_COLOR[axisId] }}>
-                    {gt(axisDef.name, lang)} {isAnswered && !isEditing && " ✓"}
+                    {gt(axisDef.name, lang)} {isAnswered && !isEditing && "✓"}
                   </span>
                   {isAnswered && (
-                    <button onClick={() => setEditingAxes(p => { const n = new Set(p); n.has(axisId) ? n.delete(axisId) : n.add(axisId); return n; })}
+                    <button
+                      onClick={() => setEditingAxes(p => { const n = new Set(p); if (n.has(axisId)) { n.delete(axisId); } else { n.add(axisId); } return n; })}
                       style={{ background: "none", border: "none", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", cursor: "pointer", fontSize: 12, textDecoration: "underline" }}>
-                      {isEditing ? (lang === "ko" ? "완료" : "Done") : (lang === "ko" ? "수정" : "Edit")}
+                      {isEditing
+                        ? (lang === "ko" ? "완료" : "Done")
+                        : (lang === "ko" ? "수정" : "Edit")}
                     </button>
                   )}
                 </div>
-
-                {isAnswered && !isEditing ? null : (
-                  visibleQs.map(q => (
-                    <div key={q.id} style={{ marginBottom: 24 }}>
-                      <div style={{ fontSize: 16, color: isDark ? "#fff" : "#111", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>
-                        {gt(q.text, lang)}
-                      </div>
-                      <InlineQuestionRenderer isDark={isDark} q={q} value={axisAnswers[q.id]} onChange={onAnswer} lang={lang} allAnswers={axisAnswers} />
+                {showQs && visibleQs.map(q => (
+                  <div key={q.id} style={{ marginBottom: 24 }}>
+                    <div style={{ fontSize: 16, color: isDark ? "#fff" : "#111", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>
+                      {gt(q.text, lang)}
                     </div>
-                  ))
-                )}
+                    <InlineQuestionRenderer
+                      isDark={isDark} q={q} value={axisAnswers[q.id]}
+                      onChange={onAnswer} lang={lang} allAnswers={axisAnswers}
+                    />
+                  </div>
+                ))}
               </div>
             );
           })}
@@ -397,41 +787,60 @@ function ConcernAndQuestionPanel({ zone, selectedConcerns, onToggle, onClose, la
   );
 }
 
+// ─── Panel style ──────────────────────────────────────────────────────────────
 const PANEL_S = (isDark: boolean): React.CSSProperties => ({
   width: "min(400px, 90vw)", flexShrink: 0, borderRadius: 24,
-  border: `1px solid \${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
-  background: isDark ? "rgba(20,20,25,0.85)" : "rgba(255,255,255,0.92)",
+  border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
+  background: isDark ? "rgba(20,20,25,0.88)" : "rgba(255,255,255,0.93)",
   backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)",
   boxShadow: isDark ? "0 24px 68px rgba(0,0,0,0.65)" : "0 24px 68px rgba(0,0,0,0.15)",
   padding: "20px 24px", display: "flex", flexDirection: "column",
   maxHeight: "80vh", overflowY: "auto",
 });
 
+// ─── Main export ──────────────────────────────────────────────────────────────
 export function FaceMapStep({ onNext }: { onNext: () => void }) {
-  const { language } = useI18nStore();
-  const lang = language as Lang;
-  const store = useDiagnosisStore();
-  const copy = COPY[lang];
+  const { language }      = useI18nStore();
+  const lang              = language as Lang;
+  const store             = useDiagnosisStore();
+  const copy              = COPY[lang];
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark" || resolvedTheme === "system";
+  const isDark = resolvedTheme === "dark";
 
   const [selectedConcerns, setSelectedConcerns] = useState<Set<string>>(new Set());
-  const [activeZone, setActiveZone] = useState<ZoneId | null>(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [activeZone, setActiveZone]             = useState<ZoneId | null>(null);
+  const [isMobile, setIsMobile]                 = useState(false);
 
-  useEffect(() => { const fn = () => setIsMobile(window.innerWidth < 768); fn(); window.addEventListener("resize", fn); return () => window.removeEventListener("resize", fn); }, []);
+  useEffect(() => {
+    const fn = () => setIsMobile(window.innerWidth < 768);
+    fn();
+    window.addEventListener("resize", fn);
+    return () => window.removeEventListener("resize", fn);
+  }, []);
 
+  // Derive which zones have ≥1 selected concern (for dot highlighting)
   const selectedZones = useMemo(() => {
     const out = new Set<ZoneId>();
-    for (const [z, arr] of Object.entries(ZONE_CONCERNS)) if (arr.some(c => selectedConcerns.has(c.id))) out.add(z as ZoneId);
+    for (const [z, arr] of Object.entries(ZONE_CONCERNS)) {
+      if (arr.some(c => selectedConcerns.has(c.id))) out.add(z as ZoneId);
+    }
     return out;
   }, [selectedConcerns]);
 
   const toggleConcern = useCallback((id: string) => {
-    setSelectedConcerns(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setSelectedConcerns(prev => {
+      const n = new Set(prev);
+      if (n.has(id)) { n.delete(id); } else { n.add(id); }
+      return n;
+    });
+  }, []);
+
+  const handleZoneClick = useCallback((id: ZoneId) => {
+    setActiveZone(prev => (prev === id ? null : id));
   }, []);
 
   const handleNext = useCallback(() => {
+    // Build axis weight map
     const axisMap: Record<string, number> = {};
     for (const cid of selectedConcerns) {
       for (const arr of Object.values(ZONE_CONCERNS)) {
@@ -439,6 +848,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
         if (f) axisMap[f.axis] = (axisMap[f.axis] ?? 0) + 1;
       }
     }
+    // Build zone map
     const zoneMap: Record<string, { concerns: string[] }> = {};
     for (const [zid, arr] of Object.entries(ZONE_CONCERNS)) {
       const sel = arr.filter(c => selectedConcerns.has(c.id)).map(c => c.id);
@@ -449,64 +859,166 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
     onNext();
   }, [selectedConcerns, store, onNext]);
 
+  const totalSelected = selectedConcerns.size;
+
   return (
     <div style={{ width: "100%" }}>
-      <style>{ANIM}</style>
-
       {/* Header */}
-      <h2 style={{ fontSize: isMobile ? 26 : 30, fontWeight: 300, fontFamily: "'Cormorant Garamond',Georgia,serif", color: isDark ? "#fff" : "#111", marginBottom: 8 }}>{copy.title}</h2>
-      <p style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)", marginBottom: 32, fontFamily: "'DM Sans',sans-serif" }}>{copy.subtitle}</p>
+      <h2 style={{
+        fontSize: isMobile ? 26 : 30, fontWeight: 300,
+        fontFamily: "'Cormorant Garamond',Georgia,serif",
+        color: isDark ? "#fff" : "#111", marginBottom: 8,
+      }}>
+        {copy.title}
+      </h2>
+      <p style={{
+        fontSize: 14, marginBottom: 32,
+        color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
+        fontFamily: "'DM Sans',sans-serif",
+      }}>
+        {copy.subtitle}
+      </p>
 
       {/* Main layout */}
-      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "center" : "flex-start", gap: 28 }}>
-        
+      <div style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        alignItems: isMobile ? "center" : "flex-start",
+        gap: 28,
+      }}>
         {/* Face Image Card */}
-        <div style={{ position: "relative", width: isMobile ? "min(90vw,400px)" : "min(40vw,480px)", aspectRatio: "500/700", flexShrink: 0, borderRadius: 28, overflow: "hidden", boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.1)", border: `1px solid \${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}` }}>
-          <img src={facemapImg} alt="Face map" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          <div style={{ position: "absolute", inset: 0, background: isDark ? "radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,0.4) 100%)" : "radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(0,0,0,0.1) 100%)", pointerEvents: "none" }} />
-          <FaceSVG activeZone={activeZone} selectedZones={selectedZones} onZoneClick={(id) => setActiveZone(p => p === id ? null : id)} isDark={isDark} />
+        <div style={{
+          position: "relative",
+          width: isMobile ? "min(88vw, 380px)" : "min(38vw, 460px)",
+          aspectRatio: "500/700",
+          flexShrink: 0, borderRadius: 28, overflow: "hidden",
+          boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"}`,
+        }}>
+          <img
+            src={facemapImg}
+            alt="Clinical face map"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+          {/* Subtle vignette overlay */}
+          <div style={{
+            position: "absolute", inset: 0, pointerEvents: "none",
+            background: isDark
+              ? "radial-gradient(ellipse at 50% 42%, transparent 38%, rgba(0,0,0,0.38) 100%)"
+              : "radial-gradient(ellipse at 50% 42%, transparent 45%, rgba(0,0,0,0.08) 100%)",
+          }} />
+          <FaceSVG
+            activeZone={activeZone}
+            selectedZones={selectedZones}
+            onZoneClick={handleZoneClick}
+            lang={lang}
+          />
         </div>
 
-        {/* Desktop Panel */}
+        {/* Desktop concern panel */}
         {!isMobile && (
           <AnimatePresence mode="wait">
             {activeZone ? (
-              <motion.div key={activeZone} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} style={PANEL_S(isDark)}>
-                <ConcernAndQuestionPanel zone={activeZone} selectedConcerns={selectedConcerns} onToggle={toggleConcern} onClose={() => setActiveZone(null)} lang={lang} isDark={isDark} />
+              <motion.div
+                key={activeZone}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                style={PANEL_S(isDark)}
+              >
+                <ConcernAndQuestionPanel
+                  zone={activeZone}
+                  selectedConcerns={selectedConcerns}
+                  onToggle={toggleConcern}
+                  onClose={() => setActiveZone(null)}
+                  lang={lang}
+                  isDark={isDark}
+                />
               </motion.div>
             ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "min(380px, 40vw)", height: 300, display: "flex", alignItems: "center", justifyContent: "center", border: `1px dashed \${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`, borderRadius: 24, padding: 32, textAlign: "center" }}>
-                <p style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif" }}>{copy.hint}</p>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                style={{
+                  width: "min(380px, 40vw)", height: 300,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  border: `1px dashed ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
+                  borderRadius: 24, padding: 32, textAlign: "center",
+                }}>
+                <p style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif" }}>
+                  {copy.hint}
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
         )}
       </div>
 
-      {/* Mobile Bottom Sheet Drawer */}
+      {/* Mobile bottom-sheet drawer */}
       <AnimatePresence>
         {isMobile && activeZone && (
           <div className="fixed inset-0 z-50 flex flex-col justify-end">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setActiveZone(null)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} />
-            <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", damping: 28, stiffness: 300 }} drag="y" dragConstraints={{ top: 0 }} onDragEnd={(_, i) => { if (i.offset.y > 100) setActiveZone(null); }}
-              style={{ position: "relative", background: isDark ? "#14141a" : "#ffffff", borderRadius: "28px 28px 0 0", padding: "12px 20px 40px", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 -20px 60px rgba(0,0,0,0.3)" }}>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setActiveZone(null)}
+              style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+            />
+            <motion.div
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 28, stiffness: 300 }}
+              drag="y" dragConstraints={{ top: 0 }}
+              onDragEnd={(_, info) => { if (info.offset.y > 100) setActiveZone(null); }}
+              style={{
+                position: "relative",
+                background: isDark ? "#14141a" : "#ffffff",
+                borderRadius: "28px 28px 0 0",
+                padding: "12px 20px 40px",
+                maxHeight: "85vh", overflowY: "auto",
+                boxShadow: "0 -20px 60px rgba(0,0,0,0.3)",
+              }}>
               <div style={{ width: 44, height: 4, borderRadius: 2, background: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)", margin: "0 auto 16px" }} />
-              <ConcernAndQuestionPanel zone={activeZone} selectedConcerns={selectedConcerns} onToggle={toggleConcern} onClose={() => setActiveZone(null)} lang={lang} isDark={isDark} />
+              <ConcernAndQuestionPanel
+                zone={activeZone}
+                selectedConcerns={selectedConcerns}
+                onToggle={toggleConcern}
+                onClose={() => setActiveZone(null)}
+                lang={lang}
+                isDark={isDark}
+              />
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* Submit Button */}
-      <div style={{ marginTop: 40, display: "flex", justifyContent: "flex-end" }}>
-        <button onClick={handleNext} disabled={selectedConcerns.size === 0}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 32px", borderRadius: 32, fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", border: "none",
-            background: selectedConcerns.size > 0 ? "linear-gradient(135deg, #c9a96e, #a38555)" : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
-            color: selectedConcerns.size > 0 ? "#fff" : isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
-            cursor: selectedConcerns.size > 0 ? "pointer" : "not-allowed", transition: "all 0.3s ease",
-            boxShadow: selectedConcerns.size > 0 ? "0 8px 24px rgba(201,169,110,0.3)" : "none" }}>
-          {copy.continue} <ChevronRight size={18} />
-        </button>
+      {/* Submit button */}
+      <div style={{ marginTop: 40, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        {totalSelected > 0 && (
+          <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'DM Sans', sans-serif" }}>
+            {copy.selected(totalSelected)}
+          </p>
+        )}
+        <div style={{ marginLeft: "auto" }}>
+          <button
+            onClick={handleNext}
+            disabled={totalSelected === 0}
+            style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "14px 32px", borderRadius: 32,
+              fontSize: 14, fontWeight: 600,
+              fontFamily: "'DM Sans', sans-serif", border: "none",
+              background: totalSelected > 0
+                ? "linear-gradient(135deg, #c9a96e, #a38555)"
+                : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+              color: totalSelected > 0
+                ? "#fff"
+                : isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+              cursor: totalSelected > 0 ? "pointer" : "not-allowed",
+              transition: "all 0.3s ease",
+              boxShadow: totalSelected > 0 ? "0 8px 24px rgba(201,169,110,0.3)" : "none",
+            }}>
+            {copy.continue} <ChevronRight size={18} />
+          </button>
+        </div>
       </div>
     </div>
   );

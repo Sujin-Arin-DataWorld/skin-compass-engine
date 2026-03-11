@@ -145,14 +145,8 @@ function AppInner() {
     <>
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route
-          path="/diagnosis"
-          element={
-            <ProtectedRoute>
-              <Diagnosis />
-            </ProtectedRoute>
-          }
-        />
+        {/* ProtectedRoute temporarily removed for local dev */}
+        <Route path="/diagnosis" element={<Diagnosis />} />
         <Route path="/results" element={<Results />} />
         <Route path="/formula/:id" element={<FormulaDetail />} />
         <Route path="/cart" element={<Cart />} />

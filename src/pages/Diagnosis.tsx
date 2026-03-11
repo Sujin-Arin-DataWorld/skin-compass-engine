@@ -59,7 +59,7 @@ const CONCERN_AXIS_ID: Record<string, number> = {
 
 // Localized text extractor — matches getText() in AxisQuestionStep.tsx
 const gt = (t: LocalizedText, lang: Lang): string =>
-  (t as Record<string, string>)[lang] ?? t.en;
+  (t as unknown as Record<string, string>)[lang] ?? (t as unknown as Record<string, string>).en;
 
 // Axis accent colors
 const AXIS_COLOR: Record<number, string> = {
@@ -687,8 +687,8 @@ const DiagnosisPage: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const hasCheckedHistory = useRef(false);
 
-  // Auth guard
-  if (!isLoggedIn) return <Navigate to="/login?redirect=/diagnosis" replace />;
+  // Auth guard — temporarily disabled for local dev
+  // if (!isLoggedIn) return <Navigate to="/login?redirect=/diagnosis" replace />;
 
   // Mobile detection
   useEffect(() => {

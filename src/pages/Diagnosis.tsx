@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTheme } from "next-themes";
 import { X } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
@@ -15,15 +16,13 @@ import Navbar from "@/components/Navbar";
 import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
 import type { QuestionDef, AxisDef, LocalizedText } from "@/engine/questionRoutingV5";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
+import faceIllustration from "@/assets/face-illustration.png";
 import { convertAxisAnswersToUiSignals } from "@/engine/axisAnswerBridge";
 import { runDiagnosis } from "@/engine/runDiagnosisV4";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const GOLD    = "#c9a96e";
 const ROSE    = "#b76e79";
-const PAGE_BG = "linear-gradient(160deg, #0d0d12 0%, #141420 40%, #1a1528 100%)";
-const GLASS_BG     = "rgba(255,255,255,0.03)";
-const GLASS_BORDER = "rgba(201,169,110,0.12)";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ZoneId = "forehead" | "eyes" | "nose" | "cheeks" | "chin" | "neck";
@@ -74,15 +73,15 @@ const AXIS_COLOR: Record<number, string> = {
 };
 
 // Module-level pill style — used in Foundation, InlineQuestionRenderer, atopy banner
-function pillStyle(selected: boolean): React.CSSProperties {
+function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
   return {
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
     borderRadius: 24, fontSize: 14, fontFamily: "'DM Sans', sans-serif",
     cursor: "pointer", minHeight: 44, lineHeight: "1",
-    border: selected ? `1px solid ${GOLD}` : "1px solid rgba(255,255,255,0.1)",
+    border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
     background: selected ? "rgba(201,169,110,0.15)" : "transparent",
-    color: selected ? GOLD : "rgba(255,255,255,0.5)",
+    color: selected ? GOLD : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)",
     transition: "all 0.3s ease",
   };
 }
@@ -103,25 +102,15 @@ const ZONES: ZoneConfig[] = [
     labelShort: "Neck",                     labelShortDE: "Hals",      labelShortKO: "목" },
 ];
 
-// Zone SVG rect positions — coordinates within the 320×440 viewBox.
-// Used directly as SVG <rect> elements inside FaceSVG (replaces old div overlays).
-const ZONE_SVG_RECT: Record<ZoneId, { x: number; y: number; w: number; h: number; rx: number }> = {
-  forehead: { x: 84,  y: 80,  w: 152, h: 60,  rx: 22 },
-  eyes:     { x: 64,  y: 140, w: 192, h: 46,  rx: 18 },
-  nose:     { x: 130, y: 164, w: 60,  h: 70,  rx: 18 },
-  cheeks:   { x: 60,  y: 186, w: 200, h: 74,  rx: 22 },
-  chin:     { x: 94,  y: 254, w: 132, h: 60,  rx: 20 },
-  neck:     { x: 112, y: 320, w: 96,  h: 52,  rx: 16 },
-};
-
-// Zone glow ellipse positions — updated for 320×440 viewBox
-const ZONE_GLOW: Record<ZoneId, { cx: number; cy: number; rx: number; ry: number }> = {
-  forehead: { cx: 160, cy: 110, rx: 92,  ry: 38 },
-  eyes:     { cx: 160, cy: 164, rx: 116, ry: 30 },
-  nose:     { cx: 160, cy: 200, rx: 48,  ry: 46 },
-  cheeks:   { cx: 160, cy: 224, rx: 128, ry: 54 },
-  chin:     { cx: 160, cy: 284, rx: 80,  ry: 38 },
-  neck:     { cx: 160, cy: 346, rx: 58,  ry: 30 },
+// Zone positions — percentage-based for the new face illustration image.
+// { top, left, width, height } in % of image dimensions.
+const ZONE_PCT: Record<ZoneId, { top: number; left: number; width: number; height: number }> = {
+  forehead: { top: 16, left: 25, width: 50, height: 14 },
+  eyes:     { top: 32, left: 20, width: 60, height: 10 },
+  nose:     { top: 42, left: 35, width: 30, height: 14 },
+  cheeks:   { top: 44, left: 15, width: 70, height: 16 },
+  chin:     { top: 62, left: 28, width: 44, height: 12 },
+  neck:     { top: 76, left: 30, width: 40, height: 10 },
 };
 
 // ─── Concern data ─────────────────────────────────────────────────────────────
@@ -256,13 +245,14 @@ function MiniRadarChart({ scores }: { scores: Record<string, number> }) {
 // Handles: single, multi, image (as single), slider.
 // Conditionally injects follow-up question from q.conditional.
 function InlineQuestionRenderer({
-  q, value, onChange, lang, allAnswers,
+  q, value, onChange, lang, allAnswers, isDark,
 }: {
   q: QuestionDef;
   value: QuestionAnswer;
   onChange: (id: string, val: QuestionAnswer) => void;
   lang: Lang;
   allAnswers: Record<string, QuestionAnswer>;
+  isDark: boolean;
 }) {
   // Check if a conditional follow-up should show after this question
   const showConditional = q.conditional != null &&
@@ -281,11 +271,11 @@ function InlineQuestionRenderer({
       {(q.type === "single" || q.type === "image") && q.options && (
         <div style={{ display: "flex", flexWrap: "wrap" }}>
           {q.options.map((opt) => (
-            <div key={opt.id} onClick={() => onChange(q.id, opt.id)} style={pillStyle(value === opt.id)}>
+            <div key={opt.id} onClick={() => onChange(q.id, opt.id)} style={pillStyle(value === opt.id, isDark)}>
               {opt.icon && <span style={{ marginRight: 4 }}>{opt.icon}</span>}
               {gt(opt.label, lang)}
               {opt.description && value === opt.id && (
-                <span style={{ display: "block", fontSize: 10, color: "rgba(255,255,255,0.4)",
+                <span style={{ display: "block", fontSize: 10, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)",
                   fontStyle: "italic", marginTop: 2, letterSpacing: 0 }}>
                   {gt(opt.description, lang)}
                 </span>
@@ -305,7 +295,7 @@ function InlineQuestionRenderer({
               <div key={opt.id} onClick={() => {
                 const next = isOn ? sel.filter(x => x !== opt.id) : [...sel, opt.id];
                 onChange(q.id, next);
-              }} style={pillStyle(isOn)}>
+              }} style={pillStyle(isOn, isDark)}>
                 {gt(opt.label, lang)}
               </div>
             );
@@ -324,7 +314,7 @@ function InlineQuestionRenderer({
             style={{ width: "100%", accentColor: GOLD, cursor: "pointer" }}
           />
           <div style={{ display: "flex", justifyContent: "space-between",
-            fontSize: 12, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif",
+            fontSize: 12, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif",
             marginTop: 4 }}>
             <span>{gt(q.slider.labelMin, lang)}</span>
             <span style={{ color: GOLD, fontWeight: 600 }}>{(value as number) ?? q.slider.defaultValue}</span>
@@ -340,13 +330,14 @@ function InlineQuestionRenderer({
           transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
           style={{ marginTop: 12, paddingLeft: 12,
             borderLeft: `2px solid ${GOLD}33` }}>
-          <div style={{ fontSize: 15, color: "rgba(255,255,255,0.72)", marginBottom: 10,
+          <div style={{ fontSize: 15, color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.6)", marginBottom: 10,
             fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
             {gt(q.conditional.inject.text, lang)}
           </div>
           <InlineQuestionRenderer
             q={q.conditional.inject}
             value={allAnswers[q.conditional.inject.id]}
+            isDark={isDark}
             onChange={onChange}
             lang={lang}
             allAnswers={allAnswers}
@@ -357,229 +348,97 @@ function InlineQuestionRenderer({
   );
 }
 
-// ─── Face SVG ─────────────────────────────────────────────────────────────────
-function FaceSVG({
-  activeZone, zoneData, onZoneClick, lang, isMobile,
+// ─── Face Map (image-based) ───────────────────────────────────────────────────
+function FaceMap({
+  activeZone, zoneData, onZoneClick, lang, isMobile, isDark,
 }: {
   activeZone: ZoneId | null;
   zoneData: Partial<Record<ZoneId, string[]>>;
   onZoneClick: (id: ZoneId) => void;
   lang: Lang;
   isMobile: boolean;
+  isDark: boolean;
 }) {
-  const svgW   = isMobile ? 240 : 320;
-  const svgH   = Math.round(svgW * (440 / 320));
+  const imgW = isMobile ? 240 : 320;
 
   return (
-    <div style={{ width: svgW, margin: "0 auto" }}>
-      <svg viewBox="0 0 320 440" width={svgW} height={svgH} style={{ display: "block", overflow: "visible" }}>
-        <defs>
-          {/* Skin — linear gradient top-light → bottom-warm */}
-          <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#E8C5A0" />
-            <stop offset="55%"  stopColor="#D4A574" />
-            <stop offset="100%" stopColor="#C4916A" />
-          </linearGradient>
-          {/* Hair — dark brown gradient */}
-          <linearGradient id="hairGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%"   stopColor="#5C3D2E" />
-            <stop offset="100%" stopColor="#3D2B1F" />
-          </linearGradient>
-          {/* Shoulder skin tone */}
-          <linearGradient id="shoulderGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor="#D4A574" />
-            <stop offset="100%" stopColor="#C4916A" />
-          </linearGradient>
-          {/* Face highlight — soft upper glow */}
-          <radialGradient id="faceHL" cx="44%" cy="28%" r="50%">
-            <stop offset="0%"   stopColor="rgba(255,235,200,0.25)" />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
-          {/* Zone glow / bloom filter */}
-          <filter id="zoneBloom" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="14" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-        </defs>
+    <div style={{ width: imgW, margin: "0 auto", position: "relative", userSelect: "none" }}>
+      {/* Face illustration image */}
+      <img
+        src={faceIllustration}
+        alt="Face zone map"
+        draggable={false}
+        style={{
+          width: "100%", height: "auto", display: "block",
+          borderRadius: 20,
+        }}
+      />
 
-        {/* ── Layer 1: Hair back mass (behind everything) ── */}
-        <path
-          d="M160 50 C196 48 234 58 262 80 C298 106 310 154 308 210 C306 274 286 356 268 420 L240 440 L80 440 L52 420 C34 356 14 274 12 210 C10 154 22 106 58 80 C86 58 124 48 160 50 Z"
-          fill="url(#hairGrad)"
-        />
+      {/* Zone overlays — positioned with percentage coordinates */}
+      {ZONES.map((zone) => {
+        const pct       = ZONE_PCT[zone.id];
+        const isActive  = activeZone === zone.id;
+        const concerns  = zoneData[zone.id] ?? [];
+        const hasData   = concerns.length > 0;
+        const label     = zoneLabel(zone, lang, true);
 
-        {/* ── Layer 2: Shoulders ── */}
-        <path
-          d="M10 440 C10 420 22 404 44 392 C80 376 120 368 160 368 C200 368 240 376 276 392 C298 404 310 420 310 440 Z"
-          fill="url(#shoulderGrad)"
-        />
+        return (
+          <div
+            key={zone.id}
+            onClick={() => onZoneClick(zone.id)}
+            style={{
+              position: "absolute",
+              top: `${pct.top}%`, left: `${pct.left}%`,
+              width: `${pct.width}%`, height: `${pct.height}%`,
+              borderRadius: 14,
+              border: isActive
+                ? "2px solid rgba(164,213,200,0.72)"
+                : hasData
+                  ? "1.5px solid rgba(164,213,200,0.38)"
+                  : "1px solid transparent",
+              background: isActive
+                ? "rgba(164,213,200,0.22)"
+                : hasData
+                  ? "rgba(164,213,200,0.10)"
+                  : "transparent",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}
+          >
+            {/* Zone label — visible when active or has data */}
+            {(isActive || hasData) && (
+              <span style={{
+                fontSize: isMobile ? 10 : 11,
+                fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                fontWeight: 500,
+                color: isActive ? "rgba(255,255,255,0.95)" : isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.55)",
+                textShadow: isDark ? "0 1px 4px rgba(0,0,0,0.6)" : "0 1px 3px rgba(255,255,255,0.8)",
+                pointerEvents: "none",
+              }}>
+                {label}
+              </span>
+            )}
 
-        {/* ── Layer 3: Neck ── */}
-        <path
-          d="M128 320 C122 336 120 356 122 374 L198 374 C200 356 198 336 192 320 Z"
-          fill="#D4A574"
-        />
-
-        {/* ── Layer 4: Face oval (skin) ── */}
-        <path
-          d="M160 72 C202 72 252 112 252 186 C252 260 212 322 160 330 C108 322 68 260 68 186 C68 112 118 72 160 72 Z"
-          fill="url(#skinGrad)"
-        />
-        {/* Face highlight */}
-        <path
-          d="M160 72 C202 72 252 112 252 186 C252 260 212 322 160 330 C108 322 68 260 68 186 C68 112 118 72 160 72 Z"
-          fill="url(#faceHL)"
-        />
-
-        {/* ── Layer 5: Ears (peeking at face sides) ── */}
-        <path d="M68 186 C60 194 58 210 60 224 C62 232 66 236 70 234"
-          fill="#C4916A" stroke="none" />
-        <path d="M252 186 C260 194 262 210 260 224 C258 232 254 236 250 234"
-          fill="#C4916A" stroke="none" />
-
-        {/* ── Layer 6: Front side hair strands (over shoulders) ── */}
-        <path
-          d="M76 120 C58 158 46 220 44 280 C42 330 50 380 62 420 L82 420 C68 380 60 330 62 280 C64 228 74 174 90 144 Z"
-          fill="url(#hairGrad)"
-        />
-        <path
-          d="M244 120 C262 158 274 220 276 280 C278 330 270 380 258 420 L238 420 C252 380 260 330 258 280 C256 228 246 174 230 144 Z"
-          fill="url(#hairGrad)"
-        />
-        {/* Hair front overlap at forehead */}
-        <path
-          d="M160 52 C178 50 196 56 212 68 C222 76 226 88 220 94 C206 80 184 74 160 74 C136 74 114 80 100 94 C94 88 98 76 108 68 C124 56 142 50 160 52 Z"
-          fill="url(#hairGrad)"
-        />
-
-        {/* ── Zone glow highlights (mint/teal for active/data zones) ── */}
-        {(Object.keys(ZONE_GLOW) as ZoneId[]).map((zid) => {
-          const concerns = zoneData[zid] ?? [];
-          if (concerns.length === 0 && activeZone !== zid) return null;
-          const g = ZONE_GLOW[zid];
-          const isActive = activeZone === zid;
-          const alpha = Math.min(0.30, concerns.length * 0.06 + (isActive ? 0.10 : 0.04));
-          const col = isActive
-            ? `rgba(164,213,200,${alpha + 0.06})`
-            : `rgba(164,213,200,${alpha * 0.55})`;
-          return (
-            <ellipse key={zid} cx={g.cx} cy={g.cy} rx={g.rx} ry={g.ry}
-              fill={col} filter="url(#zoneBloom)"
-              style={{ transition: "all 0.45s ease" }} />
-          );
-        })}
-
-        {/* ── Facial features ── */}
-
-        {/* Eyebrows — soft neutral arch */}
-        <path d="M95 152 C107 144 121 142 136 147 C142 149 146 153 146 157"
-          fill="none" stroke="#5C3D2E" strokeWidth="2.2" strokeLinecap="round" />
-        <path d="M225 152 C213 144 199 142 184 147 C178 149 174 153 174 157"
-          fill="none" stroke="#5C3D2E" strokeWidth="2.2" strokeLinecap="round" />
-
-        {/* Eyes — closed, peaceful almond */}
-        {/* Left eye fill */}
-        <path d="M88 170 C98 162 118 160 138 167 C118 174 98 174 88 170 Z"
-          fill="rgba(160,112,62,0.20)" />
-        {/* Left upper lid / lash line */}
-        <path d="M88 170 C98 162 118 160 138 167"
-          fill="none" stroke="#5C3D2E" strokeWidth="1.5" strokeLinecap="round" />
-        {/* Left lower lid */}
-        <path d="M90 173 C100 177 120 177 136 173"
-          fill="none" stroke="#B8896A" strokeWidth="0.7" strokeLinecap="round" />
-        {/* Right eye fill */}
-        <path d="M182 167 C202 160 222 162 232 170 C222 174 202 174 182 167 Z"
-          fill="rgba(160,112,62,0.20)" />
-        {/* Right upper lid / lash line */}
-        <path d="M182 167 C202 160 222 162 232 170"
-          fill="none" stroke="#5C3D2E" strokeWidth="1.5" strokeLinecap="round" />
-        {/* Right lower lid */}
-        <path d="M184 173 C200 177 220 177 230 173"
-          fill="none" stroke="#B8896A" strokeWidth="0.7" strokeLinecap="round" />
-
-        {/* Nose — minimal tip + soft ala */}
-        <path d="M150 208 Q154 216 160 218 Q166 216 170 208"
-          fill="none" stroke="#B8896A" strokeWidth="1.0" strokeLinecap="round" />
-        <path d="M138 206 Q142 216 150 215"
-          fill="none" stroke="#B8896A" strokeWidth="0.8" strokeLinecap="round" opacity="0.55" />
-        <path d="M182 206 Q178 216 170 215"
-          fill="none" stroke="#B8896A" strokeWidth="0.8" strokeLinecap="round" opacity="0.55" />
-
-        {/* Lips — soft rose, neutral shape */}
-        {/* Lower lip fill */}
-        <path d="M136 240 C144 250 152 254 160 252 C168 254 176 250 184 240"
-          fill="#C4756E" fillOpacity="0.48" />
-        {/* Upper lip arc */}
-        <path d="M136 240 C144 232 152 230 160 233 C168 230 176 232 184 240"
-          fill="none" stroke="#C4756E" strokeWidth="1.3" strokeLinecap="round" strokeOpacity="0.78" />
-        {/* Center mouth line */}
-        <path d="M142 240 C151 242 169 242 178 240"
-          fill="none" stroke="#B8896A" strokeWidth="0.6" strokeLinecap="round" strokeOpacity="0.55" />
-
-        {/* ── Zone interactive overlays (SVG rects — invisible by default) ── */}
-        {ZONES.map((zone) => {
-          const r        = ZONE_SVG_RECT[zone.id];
-          const isActive = activeZone === zone.id;
-          const concerns = zoneData[zone.id] ?? [];
-          const hasData  = concerns.length > 0;
-          const label    = zoneLabel(zone, lang, true);
-          const cx       = r.x + r.w / 2;
-          const cy       = r.y + r.h / 2;
-          return (
-            <g key={zone.id} onClick={() => onZoneClick(zone.id)}
-              style={{ cursor: "pointer" }}>
-              <rect
-                x={r.x} y={r.y} width={r.w} height={r.h} rx={r.rx}
-                fill={
-                  isActive ? "rgba(164,213,200,0.22)" :
-                  hasData  ? "rgba(164,213,200,0.10)" :
-                             "transparent"
-                }
-                stroke={
-                  isActive ? "rgba(164,213,200,0.72)" :
-                  hasData  ? "rgba(164,213,200,0.38)" :
-                             "rgba(255,255,255,0.06)"
-                }
-                strokeWidth={isActive ? 1.8 : hasData ? 1.4 : 1}
-                style={{ transition: "all 0.3s ease" }}
-              />
-              {/* Zone label — visible when active or has data */}
-              {(isActive || hasData) && (
-                <text
-                  x={cx} y={cy + 1}
-                  textAnchor="middle" dominantBaseline="middle"
-                  fontSize={isMobile ? 11 : 12}
-                  fontFamily="'DM Sans', sans-serif"
-                  letterSpacing="2"
-                  fill={isActive ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.72)"}
-                  fontWeight="500"
-                  style={{ textTransform: "uppercase", userSelect: "none" }}
-                >
-                  {label}
-                </text>
-              )}
-              {/* Concern count badge */}
-              {hasData && (
-                <>
-                  <circle
-                    cx={r.x + r.w - 12} cy={r.y + 12} r={10}
-                    fill={isActive ? "rgba(164,213,200,0.40)" : "rgba(164,213,200,0.25)"}
-                  />
-                  <text
-                    x={r.x + r.w - 12} y={r.y + 12 + 1}
-                    textAnchor="middle" dominantBaseline="middle"
-                    fontSize="10" fontFamily="'DM Sans', sans-serif"
-                    fill="rgba(255,255,255,0.92)" fontWeight="700"
-                    style={{ userSelect: "none" }}
-                  >
-                    {concerns.length}
-                  </text>
-                </>
-              )}
-            </g>
-          );
-        })}
-      </svg>
+            {/* Concern count badge */}
+            {hasData && (
+              <span style={{
+                position: "absolute", top: 2, right: 2,
+                width: 18, height: 18, borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: isActive ? "rgba(164,213,200,0.55)" : "rgba(164,213,200,0.35)",
+                fontSize: 10, fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 700, color: "rgba(255,255,255,0.95)",
+                pointerEvents: "none",
+              }}>
+                {concerns.length}
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -587,7 +446,7 @@ function FaceSVG({
 // ─── Phase 03: ConcernPanel (updated with deep-dive questions) ────────────────
 function ConcernPanel({
   activeZone, zoneData, onToggle, lang,
-  axisAnswers, onAnswer, editingAxes, onToggleEdit,
+  axisAnswers, onAnswer, editingAxes, onToggleEdit, isDark,
 }: {
   activeZone: ZoneId | null;
   zoneData: Partial<Record<ZoneId, string[]>>;
@@ -597,10 +456,11 @@ function ConcernPanel({
   onAnswer: (id: string, val: QuestionAnswer) => void;
   editingAxes: Set<number>;
   onToggleEdit: (axisId: number) => void;
+  isDark: boolean;
 }) {
   if (!activeZone) {
     return (
-      <div style={{ color: "rgba(255,255,255,0.2)", fontSize: 14,
+      <div style={{ color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 14,
         fontFamily: "'DM Sans', sans-serif", textAlign: "center",
         padding: "56px 20px", fontStyle: "italic" }}>
         {lang === "de" ? "← Tippen Sie auf eine Zone im Gesicht"
@@ -642,9 +502,9 @@ function ConcernPanel({
                 display: "inline-flex", alignItems: "center", gap: 6,
                 padding: "10px 18px", borderRadius: 24, fontSize: 14, minHeight: 44,
                 fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
-                border: isOn ? `1px solid ${GOLD}` : "1px solid rgba(255,255,255,0.08)",
-                background: isOn ? "rgba(201,169,110,0.12)" : "rgba(255,255,255,0.02)",
-                color: isOn ? GOLD : "rgba(255,255,255,0.5)",
+                border: isOn ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
+                background: isOn ? "rgba(201,169,110,0.12)" : isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+                color: isOn ? GOLD : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)",
                 transition: "all 0.3s ease",
               }}>
               <span>{c.icon}</span>
@@ -655,7 +515,7 @@ function ConcernPanel({
       </div>
 
       {selected.length === 0 && (
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.2)", fontFamily: "'DM Sans', sans-serif",
+        <div style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontFamily: "'DM Sans', sans-serif",
           fontStyle: "italic", marginTop: 4 }}>
           {lang === "de" ? "Alle zutreffenden Beschwerden auswählen"
             : lang === "ko" ? "해당하는 피부 고민을 선택하세요"
@@ -709,7 +569,7 @@ function ConcernPanel({
                 display: "inline-block", fontSize: 10, letterSpacing: "0.18em",
                 textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif",
                 background: color.replace("0.8)", "0.08)"),
-                borderRadius: 12, padding: "3px 10px", color,
+                borderRadius: 12, padding: "3px 10px", color: color,
               }}>
                 {gt(axisDef.name, lang)}
                 {isAnswered && !isEditing && (
@@ -719,7 +579,7 @@ function ConcernPanel({
               {isAnswered && (
                 <button onClick={() => onToggleEdit(axisId)}
                   style={{ background: "none", border: "none", cursor: "pointer",
-                    fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 11, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif",
                     padding: "2px 6px", textDecoration: "underline" }}>
                   {isEditing
                     ? (lang === "de" ? "Fertig" : lang === "ko" ? "완료" : "Done")
@@ -730,7 +590,7 @@ function ConcernPanel({
 
             {/* Questions (or "already answered" summary) */}
             {isAnswered && !isEditing ? (
-              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.35)",
+              <div style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)",
                 fontFamily: "'DM Sans', sans-serif", fontStyle: "italic" }}>
                 {lang === "de" ? "Bereits beantwortet"
                   : lang === "ko" ? "이미 답변 완료"
@@ -739,7 +599,7 @@ function ConcernPanel({
             ) : (
               showQuestions && visibleQs.map((q) => (
                 <div key={q.id} style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 16, color: "rgba(255,255,255,0.78)", marginBottom: 10,
+                  <div style={{ fontSize: 16, color: isDark ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.65)", marginBottom: 10,
                     fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
                     {gt(q.text, lang)}
                     {q.hint && (
@@ -750,6 +610,7 @@ function ConcernPanel({
                     )}
                   </div>
                   <InlineQuestionRenderer
+                    isDark={isDark}
                     q={q}
                     value={axisAnswers[q.id]}
                     onChange={onAnswer}
@@ -773,6 +634,8 @@ const DiagnosisPage: React.FC = () => {
   const isLoggedIn   = useAuthStore((s) => s.isLoggedIn);
   const { language } = useI18nStore();
   const lang         = language as Lang;
+  const { resolvedTheme } = useTheme();
+  const isDark       = resolvedTheme === "dark";
   const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
 
   // ── Local state ──
@@ -924,8 +787,9 @@ const DiagnosisPage: React.FC = () => {
     lang === "de" ? opt.labelDE : lang === "ko" ? opt.labelKO : opt.label;
 
   return (
-    <div style={{ minHeight: "100vh", background: PAGE_BG, color: "#e8e4df",
-      fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+    <div style={{ minHeight: "100vh", color: isDark ? "#e8e4df" : "hsl(210,30%,24%)",
+      fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+      className={isDark ? "" : "bg-background"}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap');
         *{box-sizing:border-box}
@@ -946,7 +810,8 @@ const DiagnosisPage: React.FC = () => {
             onClick={(e) => { if (e.target === e.currentTarget) setShowRetestModal(false); }}>
             <motion.div
               style={{ position: "relative", width: "100%", maxWidth: 380, borderRadius: 24, overflow: "hidden",
-                border: "1px solid rgba(201,169,110,0.3)", background: "rgba(20,20,32,0.97)",
+                border: "1px solid rgba(201,169,110,0.3)",
+                background: isDark ? "rgba(20,20,32,0.97)" : "rgba(255,255,255,0.97)",
                 backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)" }}
               initial={{ scale: 0.88, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.92, opacity: 0, y: 8 }}
@@ -954,7 +819,7 @@ const DiagnosisPage: React.FC = () => {
               <div style={{ height: 2, background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
               <button onClick={() => setShowRetestModal(false)}
                 style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none",
-                  cursor: "pointer", color: "rgba(255,255,255,0.4)", padding: 6, borderRadius: "50%" }}>
+                  cursor: "pointer", color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)", padding: 6, borderRadius: "50%" }}>
                 <X size={16} />
               </button>
               <div style={{ padding: "20px 24px 24px" }}>
@@ -968,7 +833,7 @@ const DiagnosisPage: React.FC = () => {
                     : "Ready to see how your skin has changed?"}
                 </h3>
                 {lastDiagnosedAt && (
-                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 16,
+                  <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", marginBottom: 16,
                     fontFamily: "'DM Sans', sans-serif", fontWeight: 300 }}>
                     {lang === "de" ? `Letzte Analyse: ${formatDiagnosisDate(lastDiagnosedAt, "de")}`
                       : lang === "ko" ? `마지막 분석: ${formatDiagnosisDate(lastDiagnosedAt, "ko")}`
@@ -977,16 +842,16 @@ const DiagnosisPage: React.FC = () => {
                 )}
                 {radarScores && (
                   <div style={{ display: "flex", alignItems: "center", gap: 16, borderRadius: 16,
-                    padding: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(201,169,110,0.15)",
-                    marginBottom: 20 }}>
+                    padding: 16, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+                    border: "1px solid rgba(201,169,110,0.15)", marginBottom: 20 }}>
                     <MiniRadarChart scores={radarScores} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: "0.6rem", letterSpacing: "0.16em", textTransform: "uppercase",
-                        color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>
+                        color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif", marginBottom: 4 }}>
                         {lang === "ko" ? "피부 프로필" : lang === "de" ? "Hautprofil" : "Skin Profile"}
                       </p>
-                      {lastTier && <p style={{ fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: "#e8e4df", marginBottom: 6 }}>{lastTier}</p>}
-                      <p style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontFamily: "'DM Sans', sans-serif",
+                      {lastTier && <p style={{ fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: isDark ? "#e8e4df" : "#1a1a1a", marginBottom: 6 }}>{lastTier}</p>}
+                      <p style={{ fontSize: 11, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif",
                         lineHeight: 1.5, fontWeight: 300 }}>
                         {lang === "ko" ? "변화를 추적하면 더 정밀한 맞춤 프로토콜이 가능합니다."
                           : lang === "de" ? "Verfolgen Sie Veränderungen für ein präziseres Protokoll."
@@ -1009,7 +874,7 @@ const DiagnosisPage: React.FC = () => {
                     onClick={() => navigate("/profile")}
                     style={{ width: "100%", padding: "12px 24px", borderRadius: 14,
                       border: "1px solid rgba(201,169,110,0.3)", background: "transparent",
-                      color: "rgba(255,255,255,0.7)", fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                      color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)", fontSize: 13, fontFamily: "'DM Sans', sans-serif",
                       letterSpacing: "0.06em", cursor: "pointer" }}>
                     {lang === "ko" ? "내 피부 여정 보기" : lang === "de" ? "Meine Hautreise ansehen" : "View My Skin Journey"}
                   </motion.button>
@@ -1036,7 +901,7 @@ const DiagnosisPage: React.FC = () => {
               <div key={p} style={{
                 flex: 1, height: 3, borderRadius: 2,
                 background: isActive ? `linear-gradient(90deg, ${GOLD}, ${ROSE})`
-                  : isDone ? GOLD : "rgba(255,255,255,0.06)",
+                  : isDone ? GOLD : isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
                 transition: "all 0.6s ease",
               }} />
             );
@@ -1059,7 +924,7 @@ const DiagnosisPage: React.FC = () => {
               <h1 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 300, color: GOLD, marginBottom: 6 }}>
                 {lang === "de" ? "Ihr Alltag & Ihre Haut" : lang === "ko" ? "일상 생활과 피부" : "Your Daily Life & Skin"}
               </h1>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", marginBottom: 36,
+              <p style={{ fontSize: 15, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.45)", marginBottom: 36,
                 fontFamily: "'DM Sans', sans-serif", maxWidth: 480, lineHeight: 1.6 }}>
                 {lang === "de" ? "Wir beginnen mit Ihrem Lebensstil — dem Fundament, das Ihre Haut täglich prägt."
                   : lang === "ko" ? "피부를 형성하는 가장 기본적인 생활 습관부터 시작합니다."
@@ -1072,17 +937,17 @@ const DiagnosisPage: React.FC = () => {
                   <motion.div key={fq.id}
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                    style={{ background: GLASS_BG, border: `1px solid ${GLASS_BORDER}`,
+                    style={{ background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
                       borderRadius: 16, padding: "20px 16px",
                       backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }}>
                     <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
-                    <div style={{ fontSize: 15, color: "rgba(255,255,255,0.75)", marginBottom: 14,
+                    <div style={{ fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 14,
                       fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>{fqText(fq, lang)}</div>
                     <div style={{ display: "flex", flexWrap: "wrap" }}>
                       {fq.options.map(opt => (
                         <div key={opt.value}
                           onClick={() => setFounds(p => ({ ...p, [fq.id]: opt.value }))}
-                          style={pillStyle(foundationAnswers[fq.id] === opt.value)}>
+                          style={pillStyle(foundationAnswers[fq.id] === opt.value, isDark)}>
                           {opt.label}
                         </div>
                       ))}
@@ -1095,8 +960,8 @@ const DiagnosisPage: React.FC = () => {
                   whileTap={foundationComplete ? { scale: 0.97 } : {}}
                   style={{
                     display: "inline-block", padding: "16px 40px", borderRadius: 32, border: "none",
-                    background: foundationComplete ? `linear-gradient(135deg, ${GOLD}, ${ROSE})` : "rgba(255,255,255,0.05)",
-                    color: foundationComplete ? "#0d0d12" : "rgba(255,255,255,0.2)",
+                    background: foundationComplete ? `linear-gradient(135deg, ${GOLD}, ${ROSE})` : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                    color: foundationComplete ? "#0d0d12" : isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
                     fontSize: 15, fontFamily: "'DM Sans', sans-serif",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: foundationComplete ? "pointer" : "default",
@@ -1106,7 +971,7 @@ const DiagnosisPage: React.FC = () => {
                   {lang === "de" ? "Gesichts-Mapping beginnen →" : lang === "ko" ? "얼굴 매핑 시작 →" : "Begin Face Mapping →"}
                 </motion.button>
                 {!foundationComplete && (
-                  <p style={{ marginTop: 10, fontSize: 12, color: "rgba(255,255,255,0.25)",
+                  <p style={{ marginTop: 10, fontSize: 12, color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)",
                     fontFamily: "'DM Sans', sans-serif" }}>
                     {lang === "de" ? "Bitte alle 4 Fragen beantworten" : lang === "ko" ? "4개 질문을 모두 답해주세요" : "Answer all 4 questions to continue"}
                   </p>
@@ -1148,7 +1013,7 @@ const DiagnosisPage: React.FC = () => {
                 transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
                 {lang === "de" ? "Haut-Scan wird initialisiert…" : lang === "ko" ? "피부 스캔 초기화 중…" : "Initiating Skin Scan…"}
               </motion.p>
-              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.2)", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.12em" }}>
+              <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.12em" }}>
                 {lang === "de" ? "Biometrische Gesichtsanalyse wird vorbereitet" : lang === "ko" ? "생체 인식 얼굴 분석 준비 중" : "Preparing biometric facial analysis"}
               </p>
             </motion.div>
@@ -1162,16 +1027,16 @@ const DiagnosisPage: React.FC = () => {
 
               {/* Stats bar */}
               <div style={{ display: "flex", gap: 20, flexWrap: "wrap", padding: "12px 20px",
-                background: "rgba(255,255,255,0.02)", borderRadius: 14,
+                background: isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)", borderRadius: 14,
                 border: "1px solid rgba(201,169,110,0.08)", marginBottom: 20,
-                fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+                fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}>
                 <span>{lang === "de" ? "Zonen" : lang === "ko" ? "부위" : "Zones"}:{" "}
                   <strong style={{ color: GOLD }}>{zonesWithData}</strong> / 6</span>
                 <span>{lang === "de" ? "Beschwerden" : lang === "ko" ? "고민" : "Concerns"}:{" "}
                   <strong style={{ color: GOLD }}>{totalConcerns}</strong></span>
-                <span style={{ color: store.implicitFlags.atopyFlag ? ROSE : "rgba(255,255,255,0.4)" }}>
+                <span style={{ color: store.implicitFlags.atopyFlag ? ROSE : isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}>
                   {lang === "de" ? "Atopie" : lang === "ko" ? "아토피" : "Atopy"}:{" "}
-                  <strong style={{ color: store.implicitFlags.atopyFlag ? ROSE : "rgba(255,255,255,0.4)" }}>
+                  <strong style={{ color: store.implicitFlags.atopyFlag ? ROSE : isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}>
                     {store.implicitFlags.atopyFlag
                       ? (lang === "de" ? "Ja" : lang === "ko" ? "예" : "Yes")
                       : atopyStoreVal
@@ -1190,7 +1055,7 @@ const DiagnosisPage: React.FC = () => {
                     : lang === "ko" ? "글로벌 체크 · 아토피 & 건선"
                     : "Global Check · Neurodermatitis & Psoriasis"}
                 </p>
-                <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", marginBottom: 12,
+                <p style={{ fontSize: 16, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)", marginBottom: 12,
                   fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
                   {lang === "de"
                     ? "Wurden Sie mit Atopischer Dermatitis (Neurodermitis) oder Psoriasis diagnostiziert?"
@@ -1200,7 +1065,7 @@ const DiagnosisPage: React.FC = () => {
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: showItching ? 14 : 0 }}>
                   {AX9_OPTIONS.map(opt => (
                     <div key={opt.val} onClick={() => store.setAxisAnswer("AX9_Q2", opt.val)}
-                      style={pillStyle(atopyStoreVal === opt.val)}>
+                      style={pillStyle(atopyStoreVal === opt.val, isDark)}>
                       {ax9Label(opt)}
                     </div>
                   ))}
@@ -1211,7 +1076,7 @@ const DiagnosisPage: React.FC = () => {
                     <motion.div
                       initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }}>
-                      <p style={{ fontSize: 16, color: "rgba(255,255,255,0.75)", marginBottom: 10,
+                      <p style={{ fontSize: 16, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.65)", marginBottom: 10,
                         fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
                         {lang === "de" ? "Leiden Sie unter chronischem, starkem Juckreiz, der den Alltag beeinträchtigt?"
                           : lang === "ko" ? "일상생활을 방해하는 만성적이고 심한 가려움증이 있으신가요?"
@@ -1220,7 +1085,7 @@ const DiagnosisPage: React.FC = () => {
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                         {ITCH_OPTIONS.map(opt => (
                           <div key={opt.val} onClick={() => store.setAxisAnswer("AX9_Q1", opt.val)}
-                            style={pillStyle(itchingVal === opt.val)}>
+                            style={pillStyle(itchingVal === opt.val, isDark)}>
                             {itchLabel(opt)}
                           </div>
                         ))}
@@ -1232,12 +1097,12 @@ const DiagnosisPage: React.FC = () => {
 
               {/* Main layout */}
               <div style={{ display: isMobile ? "block" : "flex", gap: 32, alignItems: "flex-start" }}>
-                {/* Face SVG */}
+                {/* Face image map */}
                 <div style={{ flexShrink: 0 }}>
-                  <FaceSVG activeZone={activeZone} zoneData={zoneData} onZoneClick={handleZoneClick}
-                    lang={lang} isMobile={isMobile} />
+                  <FaceMap activeZone={activeZone} zoneData={zoneData} onZoneClick={handleZoneClick}
+                    lang={lang} isMobile={isMobile} isDark={isDark} />
                   {isMobile && (
-                    <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.25)",
+                    <p style={{ textAlign: "center", fontSize: 12, color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)",
                       fontFamily: "'DM Sans', sans-serif", marginTop: 10, letterSpacing: "0.1em" }}>
                       {lang === "de" ? "Tippen Sie auf eine Zone" : lang === "ko" ? "부위를 탭하세요" : "Tap a zone to select concerns"}
                     </p>
@@ -1251,7 +1116,7 @@ const DiagnosisPage: React.FC = () => {
                       <motion.div key={activeZone ?? "empty"}
                         initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+                        style={{ background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.02)", border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
                           borderRadius: 20, padding: 24,
                           backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
                           minHeight: 240, maxHeight: "70vh", overflowY: "auto" }}>
@@ -1259,6 +1124,7 @@ const DiagnosisPage: React.FC = () => {
                           activeZone={activeZone} zoneData={zoneData} onToggle={toggleConcern} lang={lang}
                           axisAnswers={axisAnswers} onAnswer={onAnswer}
                           editingAxes={editingAxes} onToggleEdit={handleToggleEdit}
+                          isDark={isDark}
                         />
                       </motion.div>
                     </AnimatePresence>
@@ -1276,8 +1142,8 @@ const DiagnosisPage: React.FC = () => {
                     padding: "16px 40px", borderRadius: 32, border: "none",
                     background: totalConcerns > 0 && !analyzing
                       ? `linear-gradient(135deg, ${GOLD}, ${ROSE})`
-                      : "rgba(255,255,255,0.05)",
-                    color: totalConcerns > 0 && !analyzing ? "#0d0d12" : "rgba(255,255,255,0.2)",
+                      : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
+                    color: totalConcerns > 0 && !analyzing ? "#0d0d12" : isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
                     fontSize: 15, fontFamily: "'DM Sans', sans-serif",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: totalConcerns > 0 && !analyzing ? "pointer" : "default",
@@ -1294,7 +1160,7 @@ const DiagnosisPage: React.FC = () => {
                     : "Complete Analysis & View Results →"}
                 </motion.button>
                 {totalConcerns === 0 && (
-                  <p style={{ marginTop: 10, fontSize: 12, color: "rgba(255,255,255,0.2)",
+                  <p style={{ marginTop: 10, fontSize: 12, color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
                     fontFamily: "'DM Sans', sans-serif" }}>
                     {lang === "de" ? "Wählen Sie mindestens eine Beschwerde aus"
                       : lang === "ko" ? "최소 1개의 고민을 선택하세요"
@@ -1326,7 +1192,7 @@ const DiagnosisPage: React.FC = () => {
                 style={{
                   position: "fixed", bottom: 0, left: 0, right: 0,
                   maxHeight: "75vh", overflowY: "auto", zIndex: 50,
-                  background: "rgba(20,20,32,0.98)",
+                  background: isDark ? "rgba(20,20,32,0.98)" : "rgba(255,255,255,0.98)",
                   backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)",
                   borderRadius: "24px 24px 0 0",
                   borderTop: `1px solid rgba(201,169,110,0.2)`,
@@ -1339,6 +1205,7 @@ const DiagnosisPage: React.FC = () => {
                   activeZone={activeZone} zoneData={zoneData} onToggle={toggleConcern} lang={lang}
                   axisAnswers={axisAnswers} onAnswer={onAnswer}
                   editingAxes={editingAxes} onToggleEdit={handleToggleEdit}
+                  isDark={isDark}
                 />
               </motion.div>
             )}

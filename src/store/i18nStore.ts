@@ -723,9 +723,9 @@ export const phase1T = {
         },
         home: {
             hero: [
-                { headline: "Die Routine für Ihre Haut,\njetzt in greifbarer Nähe.", sub: "Entdecken Sie Ihr maßgeschneidertes Protokoll\nmit einer 60-Sekunden-KI-Analyse.", cta: "Hautdiagnose starten" },
-                { headline: "Hautpflege, die Sie versteht.", sub: "Wir analysieren den Zustand Ihrer Haut,\num die perfekte Routine für Sie zu entwickeln.", cta: "Hautanalyse beginnen" },
-                { headline: "Ein Protokoll, abgestimmt auf Ihre Haut.", sub: "Starten Sie sofort mit kuratierten Formeln\nund klinischen Heimgeräten.", cta: "Meine Routine finden" },
+                { headline: "Ihre perfekte Routine,\njetzt finden.", sub: "Entdecken Sie Ihr maßgeschneidertes Protokoll\nmit einer 60-Sekunden-KI-Analyse.", cta: "Hautdiagnose starten" },
+                { headline: "Hautpflege,\n die Sie versteht.", sub: "Wir analysieren den Zustand Ihrer Haut,\num die perfekte Routine zu kreieren.", cta: "Hautanalyse beginnen" },
+                { headline: "Kuratiert für Ihre Haut.", sub: "Starten Sie direkt mit ausgewählter Pflege\nund klinischen Home-Devices.", cta: "Meine Routine finden" },
             ],
             usp: [
                 { label: "Korean Biometric Science" },
@@ -771,9 +771,9 @@ export const phase1T = {
         },
         home: {
             hero: [
-                { headline: "The routine crafted for your skin,\nnow within reach.", sub: "Discover your bespoke skincare protocol\nwith a 60-second AI analysis.", cta: "Start My Skin Diagnosis" },
-                { headline: "Skincare that understands you.", sub: "We analyze your skin state and concerns\nto engineer the perfect routine for you.", cta: "Begin Skin Analysis" },
-                { headline: "A protocol tailored to your skin.", sub: "Start instantly with curated formulas\nand clinical home devices.", cta: "Find My Routine" },
+                { headline: "Your perfect routine,\nfind it now.", sub: "Discover your bespoke skincare protocol\nwith a 60-second AI analysis.", cta: "Start My Diagnosis" },
+                { headline: "Skincare that understands you.", sub: "We analyze your skin state and concerns\nto build your perfect routine.", cta: "Begin Analysis" },
+                { headline: "Curated for your skin.", sub: "Start instantly with selected skincare\nand clinical home devices.", cta: "Find My Routine" },
             ],
             usp: [
                 { label: "Korean Biometric Science" },
@@ -837,7 +837,7 @@ export const phase1T = {
             routines: [
                 { badge: "3단계",          title: "입문",        desc: "클렌징 · 보습 · 보호",                             cta: "루틴 시작" },
                 { badge: "5단계",          title: "풀 프로토콜", desc: "클렌징 · 토너 · 세럼 · 아이크림 · 보습",          cta: "루틴 시작" },
-                { badge: "5단계 + 디바이스",title: "프리미엄 전략",desc: "풀 프로토콜 + 임상 RF/LED 홈 디바이스",         cta: "루틴 시작" },
+                { badge: "5단계 + 디바이스",title: "프리미엄 전략",desc: "풀 프로토콜 +\n임상 RF/LED 홈 디바이스",         cta: "루틴 시작" },
             ],
             bannerHeadline:       "나의 피부 타입 알아보기",
             bannerSub:            "모든 피부는 고유합니다.\n알고리즘이 당신만의 프로토콜을 찾아드립니다.",

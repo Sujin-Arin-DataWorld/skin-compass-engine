@@ -408,8 +408,8 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                   />
                   <div className="absolute bottom-0 left-0 p-6 md:p-8">
                     <span
-                      className="text-[0.6rem] tracking-[0.3em] uppercase font-medium block mb-2"
-                      style={{ color: GOLD }}
+                      className="text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase font-semibold block mb-2 drop-shadow-md"
+                      style={{ color: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                     >
                       {card.badge}
                     </span>
@@ -419,11 +419,11 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                     >
                       {card.title}
                     </h3>
-                    <p className="text-white/60 text-sm mt-2 leading-relaxed max-w-[200px]">{card.desc}</p>
+                    <p className="text-white/60 text-sm mt-2 leading-relaxed max-w-[200px] whitespace-pre-line">{card.desc}</p>
                     <Link
                       to="/diagnosis"
-                      className="inline-flex items-center mt-4 text-xs font-medium tracking-wide hover:opacity-75 transition-opacity"
-                      style={{ color: GOLD }}
+                      className="inline-flex items-center mt-5 text-sm md:text-base font-medium tracking-wide hover:opacity-75 transition-opacity drop-shadow-md"
+                      style={{ color: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                     >
                       {card.cta} →
                     </Link>

@@ -770,7 +770,12 @@ const DiagnosisPage: React.FC = () => {
 
   // Phase 03: Complete Analysis → runDiagnosis → /results
   const handleCompleteAnalysis = useCallback(async () => {
-    if (totalConcerns === 0 || analyzing) return;
+    // Support both legacy zoneData flow (Phase 02) and new FaceMapStep flow (store.selectedZones).
+    // Use getState() for selectedZones because setAllZones is called synchronously just before onNext().
+    const { selectedZones } = useDiagnosisStore.getState();
+    const facemapConcerns = Object.values(selectedZones)
+      .reduce((sum, z) => sum + (z?.concerns?.length ?? 0), 0);
+    if ((totalConcerns === 0 && facemapConcerns === 0) || analyzing) return;
     setAnalyzing(true);
 
     await new Promise(r => setTimeout(r, 400));

@@ -697,7 +697,7 @@ function ConcernAndQuestionPanel({
             <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
               Clinical Area
             </p>
-            <h3 style={{ fontSize: 24, fontWeight: 300, color: isDark ? "#fff" : "#111", fontFamily: "'Cormorant Garamond',Georgia,serif", margin: 0, lineHeight: 1.2 }}>
+            <h3 style={{ fontSize: 22, fontWeight: 400, color: isDark ? "#fff" : "#111", fontFamily: "'DM Sans', system-ui, sans-serif", margin: 0, lineHeight: 1.2 }}>
               {ZONE_LABELS[zone][lang]}
             </h3>
           </div>
@@ -754,7 +754,7 @@ function ConcernAndQuestionPanel({
                 border: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}`,
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: isAnswered && !isEditing ? 0 : 16 }}>
-                  <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: AXIS_COLOR[axisId] }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: AXIS_COLOR[axisId], fontFamily: "'DM Sans', system-ui, sans-serif" }}>
                     {gt(axisDef.name, lang)} {isAnswered && !isEditing && "✓"}
                   </span>
                   {isAnswered && (
@@ -817,6 +817,15 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
     window.addEventListener("resize", fn);
     return () => window.removeEventListener("resize", fn);
   }, []);
+
+  // 이전 세션의 stale AX* 답변을 초기화해 Deep Dive auto-✓ 버그 방지
+  // EXP_* 기반 질문(Phase 01 라이프스타일) 값은 유지
+  useEffect(() => {
+    const cur = store.axisAnswers;
+    const expEntries = Object.entries(cur).filter(([k]) => k.startsWith("EXP_"));
+    store.clearAxisAnswers();
+    expEntries.forEach(([id, val]) => store.setAxisAnswer(id, val));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Derive which zones have ≥1 selected concern (for dot highlighting)
   const selectedZones = useMemo(() => {

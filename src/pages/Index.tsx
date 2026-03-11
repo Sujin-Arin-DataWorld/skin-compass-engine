@@ -48,7 +48,7 @@ const HERO_IMAGES = [
 type CartBtnState = "idle" | "adding" | "added";
 
 // ── Hero Slider ───────────────────────────────────────────────────────────────
-function HeroSlider({ slides }: { slides: { headline: string; sub: string; cta: string }[] }) {
+function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string; cta: string }[], lang: string }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [current, setCurrent] = useState(0);
 
@@ -94,7 +94,7 @@ function HeroSlider({ slides }: { slides: { headline: string; sub: string; cta: 
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
                   transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
                   className="text-white text-4xl md:text-5xl lg:text-6xl leading-tight mb-5 font-light whitespace-pre-line break-keep"
-                  style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                  style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
                 >
                   {slides[i]?.headline}
                 </motion.h1>
@@ -185,7 +185,7 @@ function UspStrip({ items }: { items: { label: string }[] }) {
 
 // ── 9 Skin Concerns ───────────────────────────────────────────────────────────
 function ConcernSection({
-  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart,
+  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart, lang,
 }: {
   title: string; sub: string;
   concernLabels: Record<ConcernKey, string>;
@@ -193,6 +193,7 @@ function ConcernSection({
   products: Product[];
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
+  lang: string;
 }) {
   const [active, setActive] = useState<ConcernKey | null>(null);
 
@@ -209,7 +210,7 @@ function ConcernSection({
           </p>
           <h2
             className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
           >
             {title}
           </h2>
@@ -327,12 +328,13 @@ const ROUTINE_MOOD_IMAGES = [
   "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&w=800&q=80",
 ];
 
-function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart }: {
+function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, lang }: {
   title: string; sub: string;
   cards: { badge: string; title: string; desc: string; cta: string }[];
   products: Product[];
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
+  lang: string;
 }) {
   const routineSlices = [
     products.slice(0, Math.min(products.length, 6)),
@@ -349,7 +351,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart 
           </p>
           <h2
             className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
-            style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
           >
             {title}
           </h2>
@@ -392,7 +394,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart 
                     </span>
                     <h3
                       className="text-3xl lg:text-4xl font-light text-white whitespace-nowrap"
-                      style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+                      style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
                     >
                       {card.title}
                     </h3>
@@ -477,7 +479,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart 
 }
 
 // ── Diagnosis Banner ──────────────────────────────────────────────────────────
-function DiagnosisBanner({ headline, sub, cta }: { headline: string; sub: string; cta: string }) {
+function DiagnosisBanner({ headline, sub, cta, lang }: { headline: string; sub: string; cta: string, lang: string }) {
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "420px" }}>
       <img
@@ -507,7 +509,7 @@ function DiagnosisBanner({ headline, sub, cta }: { headline: string; sub: string
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           className="text-white text-4xl md:text-5xl font-light mb-5 leading-tight whitespace-nowrap break-keep"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
         >
           {headline}
         </motion.h2>
@@ -547,9 +549,9 @@ function DiagnosisBanner({ headline, sub, cta }: { headline: string; sub: string
 
 // ── Newsletter ────────────────────────────────────────────────────────────────
 function Newsletter({
-  headline, sub, placeholder, submit, gdprText,
+  headline, sub, placeholder, submit, gdprText, lang,
 }: {
-  headline: string; sub: string; placeholder: string; submit: string; gdprText: string;
+  headline: string; sub: string; placeholder: string; submit: string; gdprText: string; lang: string;
 }) {
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -576,7 +578,7 @@ function Newsletter({
         </p>
         <h2
           className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
         >
           {headline}
         </h2>
@@ -653,7 +655,7 @@ export default function Index() {
       <div className="h-16" />
 
       <main>
-        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} />
+        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} lang={language} />
         <UspStrip items={p1.home.usp as unknown as { label: string }[]} />
         <ConcernSection
           title={p1.home.concernTitle}
@@ -663,6 +665,7 @@ export default function Index() {
           products={products}
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
+          lang={language}
         />
         <RoutineShowcase
           title={p1.home.routineTitle}
@@ -671,11 +674,13 @@ export default function Index() {
           products={products}
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
+          lang={language}
         />
         <DiagnosisBanner
           headline={p1.home.bannerHeadline}
           sub={p1.home.bannerSub}
           cta={p1.home.bannerCta}
+          lang={language}
         />
         <Newsletter
           headline={p1.home.newsletterHeadline}
@@ -683,6 +688,7 @@ export default function Index() {
           placeholder={p1.home.newsletterPlaceholder}
           submit={p1.home.newsletterSubmit}
           gdprText={p1.home.newsletterGdpr}
+          lang={language}
         />
       </main>
 

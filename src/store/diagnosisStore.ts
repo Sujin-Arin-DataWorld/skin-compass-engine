@@ -301,6 +301,7 @@ interface DiagnosisState {
   setMetaAnswer: (id: string, value: number | boolean) => void;
   setTier: (tier: Tier) => void;
   setAxisAnswer: (id: string, value: QuestionAnswer) => void;
+  clearAxisAnswers: () => void;
   setResult: (result: DiagnosisResult) => void;
   setUiSignals: (category: string, data: Record<string, unknown>) => void;
   setInteractive: <K extends keyof InteractiveState>(key: K, value: InteractiveState[K]) => void;
@@ -390,6 +391,7 @@ export const useDiagnosisStore = create<DiagnosisState>()(
         }),
 
       setTier: (tier) => set({ selectedTier: tier }),
+      clearAxisAnswers: () => set({ axisAnswers: {} as Record<string, QuestionAnswer> }),
       setResult: (result) => set({ result }),
 
       setUiSignals: (category, data) =>

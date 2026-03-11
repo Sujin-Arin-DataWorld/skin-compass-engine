@@ -17,6 +17,16 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'RIDIBatang';
+  src: url('./assets/fonts/RIDIBatang.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F;
+}
+
+
 
 @layer base {
   :root {
@@ -89,7 +99,7 @@
     --glow-sand: 0 0 24px hsla(34, 44%, 69%, 0.15);
     --glow-champagne: 0 0 20px hsla(76, 26%, 48%, 0.1);
 
-    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-display: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
 
     --sidebar-background: 210 8% 93%;
@@ -123,7 +133,7 @@
     --chart-5: 210 10% 55%;
     --sidebar: 0 0% 98%;
     --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --font-serif: 'Libre Caslon Text', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+    --font-serif: 'RIDIBatang', 'Libre Caslon Text', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
@@ -341,7 +351,7 @@
 
 /* ── Landing page — Hero Serif (Playfair Display) ── */
 .hero-serif {
-  font-family: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-family: 'RIDIBatang', 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
 }
 
 .hero-headline {
@@ -363,7 +373,7 @@
 
 /* ── Landing page — Brand seal ── */
 .brand-seal-text {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
   font-size: 0.875rem;
   font-weight: 400;
   letter-spacing: 0.12em;
@@ -481,7 +491,7 @@
 /* ── Diagnosis page contrast classes ── */
 
 .category-title {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 500;
   line-height: 1.2;
@@ -560,7 +570,7 @@
 .results-slide h1,
 .results-slide h2,
 .results-slide h3 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
 }
 
 .slide-eyebrow {

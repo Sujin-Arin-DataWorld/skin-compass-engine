@@ -83,7 +83,7 @@ const Checkout = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
               style={{
-                fontFamily: "'Georgia', 'Times New Roman', serif",
+                fontFamily: "'RIDIBatang', 'Georgia', 'Times New Roman', serif",
                 fontStyle: "italic",
                 fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
                 fontWeight: 400,

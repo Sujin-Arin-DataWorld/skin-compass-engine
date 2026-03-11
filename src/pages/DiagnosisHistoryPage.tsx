@@ -103,7 +103,6 @@ function MiniRadar({ data }: { data: { axis: string; score: number }[] }) {
                     fill={GOLD}
                     fillOpacity={0.18}
                     strokeWidth={1.2}
-                    // @ts-expect-error recharts type mismatch
                     dot={false}
                     isAnimationActive={false}
                 />
@@ -129,7 +128,6 @@ function FullRadar({ data }: { data: { axis: string; score: number }[] }) {
                     fill={GOLD}
                     fillOpacity={0.1}
                     strokeWidth={1.5}
-                    // @ts-expect-error recharts type mismatch
                     dot={{ fill: GOLD, r: 2.5, strokeWidth: 0 }}
                 />
             </RadarChart>
@@ -205,7 +203,7 @@ function EmptyState({ de }: { de: boolean }) {
                 <FlaskConical className="w-7 h-7" style={{ color: GOLD }} strokeWidth={1} />
             </div>
             <p style={{
-                fontFamily: "'Georgia', serif",
+                fontFamily: "'RIDIBatang', 'Georgia', serif",
                 fontSize: "1.15rem",
                 color: "#e8e8e8",
                 marginBottom: "0.5rem",

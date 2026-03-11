@@ -831,7 +831,7 @@ const DiagnosisPage: React.FC = () => {
   return (
     <div style={{
       minHeight: "100vh", color: isDark ? "#e8e4df" : "hsl(210,30%,24%)",
-      fontFamily: "'Cormorant Garamond', Georgia, serif"
+      fontFamily: "'RIDIBatang', 'Cormorant Garamond', Georgia, serif"
     }}
       className={isDark ? "" : "bg-background"}>
       <style>{`

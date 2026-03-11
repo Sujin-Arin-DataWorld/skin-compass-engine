@@ -129,7 +129,7 @@ export default function AuthCallback() {
 
       <div style={{ textAlign: "center" }}>
         <p style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: "'RIDIBatang', 'Cormorant Garamond', serif",
           fontSize: 20, fontWeight: 300, color: GOLD,
           letterSpacing: "0.06em", marginBottom: 8,
         }}>

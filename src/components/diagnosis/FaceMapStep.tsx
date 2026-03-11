@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, ChevronRight } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useI18nStore } from "@/store/i18nStore";
-import facemapImg from "@/assets/clean-facemap.png";
 import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
 import type { QuestionDef, LocalizedText, QuestionAnswer } from "@/engine/questionRoutingV5";
 import { useTheme } from "next-themes";
@@ -595,21 +594,26 @@ function InlineQuestionRenderer({
           })}
         </div>
       )}
-      {q.type === "slider" && q.slider && (
-        <div style={{ margin: "8px 0 16px" }}>
-          <input
-            type="range" min={q.slider.min} max={q.slider.max} step={q.slider.step}
-            value={(value as number) ?? q.slider.defaultValue}
-            onChange={e => onChange(q.id, Number(e.target.value))}
-            style={{ width: "100%", accentColor: GOLD, cursor: "pointer" }}
-          />
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.5)", fontFamily: "'DM Sans', sans-serif", marginTop: 8 }}>
-            <span>{gt(q.slider.labelMin, lang)}</span>
-            <span style={{ color: GOLD, fontWeight: 600 }}>{(value as number) ?? q.slider.defaultValue}</span>
-            <span>{gt(q.slider.labelMax, lang)}</span>
+      {q.type === "slider" && q.slider && (() => {
+        const isTouched = value !== undefined;
+        const currentVal = (value as number) ?? q.slider.defaultValue;
+        const trackColor = isTouched ? GOLD : (isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.3)");
+        return (
+          <div style={{ margin: "8px 0 16px" }}>
+            <input
+              type="range" min={q.slider.min} max={q.slider.max} step={q.slider.step}
+              value={currentVal}
+              onChange={e => onChange(q.id, Number(e.target.value))}
+              style={{ width: "100%", accentColor: trackColor, cursor: "pointer" }}
+            />
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.5)", fontFamily: "'DM Sans', sans-serif", marginTop: 8 }}>
+              <span>{gt(q.slider.labelMin, lang)}</span>
+              <span style={{ color: trackColor, fontWeight: isTouched ? 600 : 400 }}>{currentVal}</span>
+              <span>{gt(q.slider.labelMax, lang)}</span>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
       {showConditional && q.conditional && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -905,7 +909,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
           border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"}`,
         }}>
           <img
-            src={facemapImg}
+            src="/assets/hero-face.png"
             alt="Clinical face map"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />

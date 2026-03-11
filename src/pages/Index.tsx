@@ -85,7 +85,7 @@ function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string;
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4"
-                  style={{ color: GOLD }}
+                  style={{ color: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                 >
                   Skin Strategy Lab
                 </motion.p>
@@ -93,18 +93,39 @@ function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string;
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
                   transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-white text-4xl md:text-5xl lg:text-6xl leading-tight mb-5 font-light whitespace-pre-line break-keep"
-                  style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
+                  className="text-white text-4xl md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] mb-5 font-light break-keep"
+                  style={{ fontFamily: lang === 'ko' ? "'RIDIBatang', serif" : "'Cormorant Garamond', Georgia, serif" }}
                 >
-                  {slides[i]?.headline}
+                  {slides[i]?.headline?.split('\n').map((line, idx, arr) => (
+                    <span key={idx}>
+                      {line}
+                      {idx < arr.length - 1 && (
+                        <>
+                          <br className="hidden md:block" />
+                          <span className="md:hidden"> </span>
+                        </>
+                      )}
+                    </span>
+                  ))}
                 </motion.h1>
                 <motion.p
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-white/75 text-base md:text-lg leading-relaxed mb-8 max-w-lg whitespace-pre-line break-keep"
+                  className="text-white/80 text-base md:text-lg leading-relaxed mb-8 max-w-lg break-keep"
+                  style={{ fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                 >
-                  {slides[i]?.sub}
+                  {slides[i]?.sub?.split('\n').map((line, idx, arr) => (
+                    <span key={idx}>
+                      {line}
+                      {idx < arr.length - 1 && (
+                        <>
+                          <br className="hidden md:block" />
+                          <span className="md:hidden"> </span>
+                        </>
+                      )}
+                    </span>
+                  ))}
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -114,7 +135,7 @@ function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string;
                   <Link
                     to="/diagnosis"
                     className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-medium tracking-wide text-[#0a0a0a] transition-opacity hover:opacity-85"
-                    style={{ background: GOLD }}
+                    style={{ background: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                   >
                     {slides[i]?.cta}
                   </Link>

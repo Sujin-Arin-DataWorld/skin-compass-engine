@@ -723,9 +723,9 @@ export const phase1T = {
         },
         home: {
             hero: [
-                { headline: "Beenden Sie das Rätselraten.", sub: "Präzise Hautdiagnose.\nPersonalisierte K-Beauty Routine in 5 Minuten.", cta: "Diagnose starten" },
-                { headline: "Präzise. Wissenschaftlich. Persönlich.", sub: "Korean Biometric Data Science trifft auf Ihre Haut — 10 klinische Achsen, ein einzigartiges Profil.", cta: "Jetzt analysieren" },
-                { headline: "Ihre maßgeschneiderte Routine.", sub: "Wählen Sie aus unserem kuratieren 3-Step, 5-Step oder 5-Step + Heimgerät Set.", cta: "Routinen entdecken" },
+                { headline: "Die Routine für Ihre Haut,\njetzt in greifbarer Nähe.", sub: "Entdecken Sie Ihr maßgeschneidertes Protokoll\nmit einer 60-Sekunden-KI-Analyse.", cta: "Hautdiagnose starten" },
+                { headline: "Hautpflege, die Sie versteht.", sub: "Wir analysieren den Zustand Ihrer Haut,\num die perfekte Routine für Sie zu entwickeln.", cta: "Hautanalyse beginnen" },
+                { headline: "Ein Protokoll, abgestimmt auf Ihre Haut.", sub: "Starten Sie sofort mit kuratierten Formeln\nund klinischen Heimgeräten.", cta: "Meine Routine finden" },
             ],
             usp: [
                 { label: "Korean Biometric Science" },
@@ -771,9 +771,9 @@ export const phase1T = {
         },
         home: {
             hero: [
-                { headline: "End the trial and error.", sub: "Precise skin diagnosis.\nPersonalized K-Beauty routine in 5 minutes.", cta: "Start Diagnosis" },
-                { headline: "Precise. Scientific. Personal.", sub: "Korean Biometric Data Science meets your skin — 10 clinical axes, one unique profile.", cta: "Analyze Now" },
-                { headline: "Your bespoke routine.", sub: "Choose from our curated 3-Step, 5-Step, or 5-Step + Home Device sets.", cta: "Explore Routines" },
+                { headline: "The routine crafted for your skin,\nnow within reach.", sub: "Discover your bespoke skincare protocol\nwith a 60-second AI analysis.", cta: "Start My Skin Diagnosis" },
+                { headline: "Skincare that understands you.", sub: "We analyze your skin state and concerns\nto engineer the perfect routine for you.", cta: "Begin Skin Analysis" },
+                { headline: "A protocol tailored to your skin.", sub: "Start instantly with curated formulas\nand clinical home devices.", cta: "Find My Routine" },
             ],
             usp: [
                 { label: "Korean Biometric Science" },
@@ -819,9 +819,9 @@ export const phase1T = {
         },
         home: {
             hero: [
-                { headline: "시행착오를 끝내세요.", sub: "정밀하게. 과학적으로.\n당신의 피부에 맞게.", cta: "진단 시작" },
-                { headline: "정밀하게. 과학적으로.\n당신의 피부를 위해.", sub: "한국 바이오메트릭 데이터 사이언스가 당신의 피부를 만납니다.", cta: "지금 분석" },
-                { headline: "맞춤형 루틴.", sub: "3단계, 5단계, 또는 5단계 + 홈 디바이스 세트에서 선택하세요.", cta: "루틴 탐색" },
+                { headline: "내 피부에 맞는 루틴,\n이제 찾으세요", sub: "60초 AI 피부 분석으로\n당신만의 스킨케어 루틴을 확인하세요.", cta: "내 피부 진단하기" },
+                { headline: "피부를 이해하는 스킨케어", sub: "피부 상태와 고민을 분석해\n당신에게 맞는 루틴을 설계합니다.", cta: "피부 분석 시작하기" },
+                { headline: "당신의 피부에 맞는 루틴", sub: "선별된 제품과\n홈 디바이스까지 한 번에 시작하세요.", cta: "나만의 루틴 찾기" },
             ],
             usp: [
                 { label: "한국 바이오메트릭 사이언스" },

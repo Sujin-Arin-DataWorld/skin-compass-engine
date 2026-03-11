@@ -1,635 +1,448 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, ChevronRight } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useI18nStore } from "@/store/i18nStore";
+import facemapImg from "@/assets/clean-facemap.png"; // New clean image
+import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
+import type { QuestionDef, AxisDef, LocalizedText, QuestionAnswer } from "@/engine/questionRoutingV5";
+import { useTheme } from "next-themes";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+type ZoneId = "forehead" | "eyes" | "cheeks" | "chin_mouth" | "neck";
+type Lang   = "en" | "de" | "ko";
 
-type ZoneId = "forehead" | "nose" | "eyes" | "cheeks" | "chin_mouth" | "neck";
-type Lang = "en" | "de" | "ko";
+interface Concern { id: string; label: Record<Lang, string>; axis: string; }
 
-interface Concern {
-  id: string;
-  label: Record<Lang, string>;
-  axis: string;
+// ─── Phase 03 mappings ────────────────────────────────────────────────────────
+const CONCERN_AXIS_ID: Record<string, number> = {
+  seb: 1, hyd: 2, pores: 3, texture: 4,
+  sen: 5, aging: 6, pigment: 7, hormonal: 8,
+};
+
+const AXIS_COLOR: Record<number, string> = {
+  1: "rgba(201,169,110,0.8)",
+  2: "rgba(100,180,220,0.8)",
+  3: "rgba(160,140,120,0.8)",
+  4: "rgba(220,120,120,0.8)",
+  5: "rgba(220,160,160,0.8)",
+  6: "rgba(180,160,200,0.8)",
+  7: "rgba(180,140,100,0.8)",
+  8: "rgba(200,130,170,0.8)",
+};
+
+const gt = (t: LocalizedText, lang: Lang): string => (t as Record<string, string>)[lang] ?? t.en;
+
+function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
+  const GOLD = "#c9a96e";
+  return {
+    display: "inline-flex", alignItems: "center",
+    padding: "10px 18px", margin: "4px 5px 4px 0",
+    borderRadius: 24, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+    cursor: "pointer", minHeight: 44, lineHeight: "1.2",
+    border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
+    background: selected ? "rgba(201,169,110,0.15)" : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+    color: selected ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
+    transition: "all 0.3s ease",
+  };
 }
 
-// ─── Zone concern data ────────────────────────────────────────────────────────
-
+// ─── Concern data ─────────────────────────────────────────────────────────────
 const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
   forehead: [
-    { id: "oily_tzone",          label: { en: "Oily / Shiny",                    de: "Ölig / Glänzend",                         ko: "유분 / 번들거림"           }, axis: "seb"     },
-    { id: "blackheads_forehead", label: { en: "Blackheads",                       de: "Mitesser",                                ko: "블랙헤드"                 }, axis: "texture" },
-    { id: "whiteheads_forehead", label: { en: "Whiteheads / Closed Comedones",    de: "Weiße Mitesser / Komedonen",              ko: "화이트헤드 / 폐쇄면포"    }, axis: "texture" },
-    { id: "forehead_lines",      label: { en: "Forehead Lines / Wrinkles",        de: "Stirnfalten / Runzeln",                   ko: "이마 주름"                }, axis: "aging"   },
-    { id: "forehead_breakouts",  label: { en: "Breakouts / Acne",                 de: "Unreinheiten / Akne",                     ko: "트러블 / 여드름"          }, axis: "acne"    },
-  ],
-  nose: [
-    { id: "large_pores_nose",    label: { en: "Enlarged Pores",                   de: "Vergrößerte Poren",                       ko: "모공 확장"                }, axis: "texture" },
-    { id: "blackheads_nose",     label: { en: "Blackheads / Sebaceous Filaments", de: "Mitesser / Talgfilamente",                ko: "블랙헤드 / 피지막"        }, axis: "texture" },
-    { id: "oily_nose",           label: { en: "Excessive Oil / Shine",            de: "Übermäßiger Glanz / Öl",                  ko: "과도한 유분 / 광택"       }, axis: "seb"     },
-    { id: "redness_nose",        label: { en: "Redness around Nose",              de: "Rötungen um die Nase",                    ko: "코 주변 홍조"             }, axis: "sen"     },
+    { id: "oily_f",       label: { en: "Oily / Shiny",                   de: "Ölig / Glänzend",         ko: "유분 / 번들거림"   }, axis: "seb"     },
+    { id: "bh_f",         label: { en: "Blackheads / Pores",             de: "Mitesser / Poren",        ko: "블랙헤드 / 모공"   }, axis: "pores" },
+    { id: "lines_f",      label: { en: "Forehead Lines / Wrinkles",      de: "Stirnfalten / Runzeln",   ko: "이마 주름"       }, axis: "aging"   },
+    { id: "breakouts_f",  label: { en: "Breakouts / Acne",               de: "Unreinheiten / Akne",     ko: "트러블 / 여드름"  }, axis: "texture" },
+    { id: "dry_f",        label: { en: "Dryness / Tightness",            de: "Trockenheit / Spannung",  ko: "건조함 / 당김"   }, axis: "hyd"     },
   ],
   eyes: [
-    { id: "fine_lines_eyes",     label: { en: "Fine Lines / Crow's Feet",         de: "Feine Linien / Krähenfüße",               ko: "잔주름 / 눈가 주름"       }, axis: "aging"   },
-    { id: "dark_circles",        label: { en: "Dark Circles",                     de: "Augenringe",                              ko: "다크서클"                 }, axis: "pigment" },
-    { id: "puffiness",           label: { en: "Puffiness / Swelling",             de: "Schwellungen / Tränensäcke",              ko: "붓기 / 부종"              }, axis: "aging"   },
-    { id: "dryness_eyes",        label: { en: "Dryness / Flaking",                de: "Trockenheit / Schuppung",                 ko: "건조함 / 각질"            }, axis: "hyd"     },
+    { id: "finelines_e",  label: { en: "Fine Lines / Crow's Feet",       de: "Feine Linien / Krähenfüße", ko: "잔주름 / 눈가 주름" }, axis: "aging"   },
+    { id: "dc_e",         label: { en: "Dark Circles",                   de: "Augenringe",              ko: "다크서클"         }, axis: "pigment" },
+    { id: "puff_e",       label: { en: "Puffiness / Swelling",           de: "Schwellungen",            ko: "붓기 / 부종"      }, axis: "aging"   },
+    { id: "dry_e",        label: { en: "Dryness / Flaking",              de: "Trockenheit / Schuppung", ko: "건조함 / 각질"    }, axis: "hyd"     },
   ],
   cheeks: [
-    { id: "redness_cheeks",      label: { en: "Redness / Rosacea / Couperose",    de: "Rötungen / Rosacea / Couperose",          ko: "홍조 / 로사세아 / 쿠페로제"}, axis: "sen"     },
-    { id: "cheek_acne",          label: { en: "Breakouts / Acne on Cheeks",       de: "Unreinheiten auf den Wangen",             ko: "볼 트러블 / 여드름"       }, axis: "acne"    },
-    { id: "dryness_cheeks",      label: { en: "Dryness / Tightness",              de: "Trockenheit / Spannungsgefühl",           ko: "건조함 / 당김"            }, axis: "hyd"     },
-    { id: "pigmentation_cheeks", label: { en: "Dark Spots / Hyperpigmentation",   de: "Dunkle Flecken / Hyperpigmentierung",     ko: "기미 / 색소침착"          }, axis: "pigment" },
-    { id: "large_pores_cheeks",  label: { en: "Visible Pores",                    de: "Sichtbare Poren",                         ko: "가시적 모공"              }, axis: "texture" },
+    { id: "red_c",        label: { en: "Redness / Sensitivity",          de: "Rötungen / Empfindlichkeit",ko: "홍조 / 민감성"  }, axis: "sen"     },
+    { id: "acne_c",       label: { en: "Breakouts / Acne",               de: "Unreinheiten",            ko: "볼 트러블"       }, axis: "texture" },
+    { id: "dry_c",        label: { en: "Dryness / Tightness",            de: "Trockenheit / Spannung",  ko: "건조함 / 당김"   }, axis: "hyd"     },
+    { id: "pigm_c",       label: { en: "Dark Spots / Hyperpigmentation", de: "Dunkle Flecken",          ko: "기미 / 색소침착"  }, axis: "pigment" },
+    { id: "pores_c",      label: { en: "Visible Pores",                  de: "Sichtbare Poren",         ko: "가시적 모공"     }, axis: "pores"   },
   ],
   chin_mouth: [
-    { id: "hormonal_breakouts",  label: { en: "Recurring Breakouts (Jawline/Chin)", de: "Wiederkehrende Unreinheiten (Kiefer/Kinn)", ko: "반복 트러블 (턱선/턱)"  }, axis: "acne"    },
-    { id: "dryness_lips",        label: { en: "Dryness around Mouth",             de: "Trockenheit um den Mund",                 ko: "입 주변 건조함"           }, axis: "hyd"     },
-    { id: "nasolabial",          label: { en: "Nasolabial Folds / Smile Lines",   de: "Nasolabialfalten / Lachfalten",           ko: "팔자주름 / 미소 주름"     }, axis: "aging"   },
-    { id: "pigmentation_mouth",  label: { en: "Dark Spots around Mouth",          de: "Dunkle Flecken um den Mund",              ko: "입 주변 색소침착"         }, axis: "pigment" },
+    { id: "hormonal_j",   label: { en: "Recurring Breakouts (Jawline)",  de: "Wiederkehrende Unreinheiten", ko: "반복 트러블 (턱선)"  }, axis: "hormonal" },
+    { id: "dry_m",        label: { en: "Dryness around Lips",            de: "Trockenheit um Lippen",   ko: "입술 주변 건조함"    }, axis: "hyd"     },
+    { id: "nasolabial",   label: { en: "Nasolabial Folds / Smile Lines", de: "Nasolabialfalten",        ko: "팔자주름"           }, axis: "aging"   },
+    { id: "pigm_m",       label: { en: "Dark Spots around Mouth",        de: "Dunkle Flecken (Mund)",   ko: "입 주변 색소침착"    }, axis: "pigment" },
+    { id: "jaw_def",      label: { en: "Jawline Definition Loss",        de: "Verlust der Kinnlinie",   ko: "턱선 윤곽 감소"       }, axis: "aging"   },
   ],
   neck: [
-    { id: "neck_wrinkles",       label: { en: "Neck Lines / Tech Neck",           de: "Halsfalten / Tech-Neck",                  ko: "목 주름 / 텍넥"           }, axis: "aging"   },
-    { id: "neck_sagging",        label: { en: "Loss of Firmness",                 de: "Verlust an Festigkeit",                   ko: "탄력 감소"                }, axis: "aging"   },
-    { id: "neck_sensitivity",    label: { en: "Redness / Irritation",             de: "Rötungen / Reizungen",                    ko: "홍조 / 자극"              }, axis: "sen"     },
-    { id: "neck_dryness",        label: { en: "Dryness / Rough Texture",          de: "Trockenheit / Raue Textur",               ko: "건조함 / 거친 결"         }, axis: "hyd"     },
+    { id: "neck_lines",   label: { en: "Neck Lines / Tech Neck",        de: "Halsfalten / Tech-Neck",   ko: "목 주름 / 텍넥"  }, axis: "aging" },
+    { id: "neck_sag",     label: { en: "Loss of Firmness",              de: "Verlust an Festigkeit",    ko: "탄력 감소"       }, axis: "aging" },
+    { id: "neck_red",     label: { en: "Redness / Irritation",          de: "Rötungen / Reizungen",     ko: "홍조 / 자극"      }, axis: "sen"   },
+    { id: "neck_dry",     label: { en: "Dryness / Rough Texture",       de: "Trockenheit / Raue Textur",ko: "건조함 / 거친 결" }, axis: "hyd"   },
   ],
 };
 
-// ─── Zone display labels ──────────────────────────────────────────────────────
-
 const ZONE_LABELS: Record<ZoneId, Record<Lang, string>> = {
-  forehead:  { en: "Forehead",        de: "Stirn",           ko: "이마"      },
-  nose:      { en: "Nose / T-Zone",   de: "Nase / T-Zone",   ko: "코 / T존"  },
-  eyes:      { en: "Eye Area",        de: "Augenpartie",     ko: "눈 주위"   },
-  cheeks:    { en: "Cheeks",          de: "Wangen",          ko: "볼"        },
-  chin_mouth:{ en: "Chin & Mouth",    de: "Kinn & Mund",     ko: "턱 & 입"   },
-  neck:      { en: "Neck",            de: "Hals",            ko: "목"        },
+  forehead:   { en: "Forehead",    de: "Stirn",       ko: "이마"   },
+  eyes:       { en: "Eye Area",    de: "Augenpartie", ko: "눈가"   },
+  cheeks:     { en: "Cheeks",      de: "Wangen",      ko: "볼"     },
+  chin_mouth: { en: "Jawline & Lips", de: "Kinn & Lippen", ko: "턱선 & 입술" },
+  neck:       { en: "Neck",        de: "Hals",        ko: "목"     },
 };
 
-// ─── UI copy ──────────────────────────────────────────────────────────────────
-
-const COPY: Record<Lang, {
-  title: string; subtitle: string;
-  selected: (n: number) => string;
-  close: string; continue: string;
-  placeholderHint: string;
-}> = {
-  en: {
-    title:           "Where do you notice concerns?",
-    subtitle:        "Tap a zone on the face map to select specific skin concerns.",
-    selected:        (n) => n === 1 ? "1 concern selected" : `${n} concerns selected`,
-    close:           "Done",
-    continue:        "Continue",
-    placeholderHint: "Tap a zone on the face to get started",
-  },
-  de: {
-    title:           "Wo bemerken Sie Hautprobleme?",
-    subtitle:        "Tippen Sie auf eine Zone, um spezifische Hautanliegen auszuwählen.",
-    selected:        (n) => `${n} ${n === 1 ? "Anliegen" : "Anliegen"} ausgewählt`,
-    close:           "Fertig",
-    continue:        "Weiter",
-    placeholderHint: "Tippen Sie auf eine Zone der Gesichtskarte",
-  },
-  ko: {
-    title:           "어느 부위가 걱정되시나요?",
-    subtitle:        "얼굴 지도에서 구역을 탭하여 피부 고민을 선택하세요.",
-    selected:        (n) => `${n}개 선택됨`,
-    close:           "완료",
-    continue:        "계속",
-    placeholderHint: "얼굴 지도에서 구역을 탭하여 시작하세요",
-  },
+const COPY: Record<Lang, { title: string; subtitle: string; selected: (n: number) => string; close: string; continue: string; hint: string }> = {
+  en: { title: "Where do you notice concerns?", subtitle: "Tap a clinical zone on the face map to deep-dive into your skin condition.", selected: (n) => n === 1 ? "1 concern selected" : `${n} concerns selected`, close: "Done", continue: "Continue", hint: "Tap a zone to begin analysis" },
+  de: { title: "Wo bemerken Sie Hautprobleme?", subtitle: "Tippen Sie auf eine klinische Zone der Gesichtskarte für eine Tiefenanalyse.", selected: (n) => `${n} Anliegen ausgewählt`, close: "Fertig", continue: "Weiter", hint: "Tippen Sie auf eine Zone um zu beginnen" },
+  ko: { title: "어느 부위가 신경 쓰이시나요?", subtitle: "얼굴 지도에서 구역을 탭하여 피부 상태를 깊이 있게 분석하세요.", selected: (n) => `${n}개 선택됨`, close: "완료", continue: "계속", hint: "구역을 탭하여 분석을 시작하세요" },
 };
 
-// ─── Zone glow ellipse positions ─────────────────────────────────────────────
-// Coordinate space: SVG viewBox "20 0 160 235"
-// Face ellipse: cx=100, cy=100, rx=48, ry=65 → top Y=35, bottom Y=165
-
-const GLOW_SHAPES: Record<ZoneId, { cx: number; cy: number; rx: number; ry: number }> = {
-  forehead:  { cx: 100, cy: 60,  rx: 32, ry: 20 },
-  eyes:      { cx: 100, cy: 83,  rx: 44, ry: 10 },
-  nose:      { cx: 100, cy: 107, rx: 14, ry: 16 },
-  cheeks:    { cx: 100, cy: 118, rx: 46, ry: 26 },
-  chin_mouth:{ cx: 100, cy: 140, rx: 28, ry: 18 },
-  neck:      { cx: 100, cy: 193, rx: 18, ry: 28 },
-};
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
-
-function zonesWithSelections(selectedConcerns: Set<string>): Set<ZoneId> {
-  const zones = new Set<ZoneId>();
-  for (const [zoneId, concerns] of Object.entries(ZONE_CONCERNS)) {
-    if (concerns.some((c) => selectedConcerns.has(c.id))) {
-      zones.add(zoneId as ZoneId);
-    }
-  }
-  return zones;
-}
-
-// ─── Face SVG ─────────────────────────────────────────────────────────────────
-
-interface FaceSVGProps {
-  selectedZones: Set<ZoneId>;
-  activeZone: ZoneId | null;
-  hoveredZone: ZoneId | null;
-  onZoneClick: (zone: ZoneId) => void;
-  onZoneHover: (zone: ZoneId | null) => void;
-}
-
-const ALL_ZONES: ZoneId[] = ["forehead", "eyes", "nose", "cheeks", "chin_mouth", "neck"];
-
-function FaceSVG({ selectedZones, activeZone, hoveredZone, onZoneClick, onZoneHover }: FaceSVGProps) {
-  const getGlowOpacity = (zone: ZoneId) => {
-    if (activeZone === zone) return 0.65;
-    if (selectedZones.has(zone)) return 0.42;
-    if (hoveredZone === zone) return 0.34;
-    return 0;
-  };
+// ─── Inline Question Renderer ─────────────────────────────────────────────────
+function InlineQuestionRenderer({
+  q, value, onChange, lang, allAnswers, isDark,
+}: {
+  q: QuestionDef; value: QuestionAnswer; onChange: (id: string, val: QuestionAnswer) => void;
+  lang: Lang; allAnswers: Record<string, QuestionAnswer>; isDark: boolean;
+}) {
+  const showConditional = q.conditional != null && (() => {
+    const triggerVal = allAnswers[q.conditional!.ifQuestionId];
+    if (triggerVal == null) return false;
+    const vals = q.conditional!.ifValues;
+    return Array.isArray(triggerVal) ? triggerVal.some(v => vals.includes(String(v))) : vals.includes(String(triggerVal));
+  })();
+  const GOLD = "#c9a96e";
 
   return (
-    <svg
-      viewBox="20 0 160 235"
-      className="w-full max-w-[210px] h-auto mx-auto select-none touch-manipulation"
-      style={{ overflow: "visible" }}
-    >
+    <>
+      {(q.type === "single" || q.type === "image") && q.options && (
+        <div style={{ display: "flex", flexWrap: "wrap" }}>
+          {q.options.map((opt) => (
+            <div key={opt.id} onClick={() => onChange(q.id, opt.id)} style={pillStyle(value === opt.id, isDark)}>
+              {opt.icon && <span style={{ marginRight: 6, opacity: 0.8 }}>{opt.icon}</span>}
+              {gt(opt.label, lang)}
+              {opt.description && value === opt.id && (
+                <span style={{ display: "block", fontSize: 11, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontStyle: "italic", marginTop: 4 }}>
+                  {gt(opt.description, lang)}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {q.type === "multi" && q.options && (
+        <div style={{ display: "flex", flexWrap: "wrap" }}>
+          {q.options.map((opt) => {
+            const sel = (value as string[]) ?? [];
+            const isOn = sel.includes(opt.id);
+            return (
+              <div key={opt.id} onClick={() => { onChange(q.id, isOn ? sel.filter(x => x !== opt.id) : [...sel, opt.id]); }} style={pillStyle(isOn, isDark)}>
+                {gt(opt.label, lang)}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {q.type === "slider" && q.slider && (
+        <div style={{ margin: "8px 0 16px" }}>
+          <input type="range" min={q.slider.min} max={q.slider.max} step={q.slider.step}
+            value={(value as number) ?? q.slider.defaultValue}
+            onChange={(e) => onChange(q.id, Number(e.target.value))}
+            style={{ width: "100%", accentColor: GOLD, cursor: "pointer" }} />
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.5)", fontFamily: "'DM Sans', sans-serif", marginTop: 8 }}>
+            <span>{gt(q.slider.labelMin, lang)}</span>
+            <span style={{ color: GOLD, fontWeight: 600 }}>{(value as number) ?? q.slider.defaultValue}</span>
+            <span>{gt(q.slider.labelMax, lang)}</span>
+          </div>
+        </div>
+      )}
+      {showConditional && q.conditional && (
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ marginTop: 16, paddingLeft: 16, borderLeft: `2px solid \${GOLD}33`, overflow: "hidden" }}>
+          <div style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
+            {gt(q.conditional.inject.text, lang)}
+          </div>
+          <InlineQuestionRenderer q={q.conditional.inject} value={allAnswers[q.conditional.inject.id]} isDark={isDark} onChange={onChange} lang={lang} allAnswers={allAnswers} />
+        </motion.div>
+      )}
+    </>
+  );
+}
+
+// ─── Geometry: Clean dots and lines ───────────────────────────────────────────
+interface ZoneDef {
+  zone: ZoneId;
+  dots: { x: number; y: number }[];
+  line?: { x1: number; y1: number; x2: number; y2: number };
+  hitPath: string;
+}
+
+const ZONES_DEF: ZoneDef[] = [
+  {
+    zone: "forehead",
+    dots: [{ x: 250, y: 140 }, { x: 170, y: 155 }, { x: 330, y: 155 }],
+    hitPath: "M 130 90 L 370 90 L 370 190 L 130 190 Z",
+    line: { x1: 250, y1: 140, x2: 250, y2: 120 }
+  },
+  {
+    zone: "eyes",
+    dots: [{ x: 190, y: 260 }, { x: 310, y: 260 }],
+    hitPath: "M 130 230 L 370 230 L 370 290 L 130 290 Z",
+    line: { x1: 310, y1: 260, x2: 380, y2: 260 }
+  },
+  {
+    zone: "cheeks",
+    dots: [{ x: 160, y: 350 }, { x: 340, y: 350 }],
+    hitPath: "M 120 300 L 380 300 L 370 410 L 130 410 Z",
+    line: { x1: 160, y1: 350, x2: 90, y2: 350 }
+  },
+  {
+    zone: "chin_mouth",
+    dots: [{ x: 250, y: 500 }, { x: 160, y: 440 }, { x: 340, y: 440 }],
+    hitPath: "M 140 420 L 360 420 L 330 540 L 170 540 Z",
+    line: { x1: 340, y1: 440, x2: 380, y2: 440 }
+  },
+  {
+    zone: "neck",
+    dots: [{ x: 250, y: 620 }],
+    hitPath: "M 180 550 L 320 550 L 340 700 L 160 700 Z",
+    line: { x1: 250, y1: 620, x2: 250, y2: 670 }
+  },
+];
+
+const ANIM = `
+  @keyframes pulseDot {
+    0%, 100% { r: 5; opacity: 0.9; }
+    50%       { r: 7; opacity: 1;    }
+  }
+  @keyframes haloSoft {
+    0%, 100% { r: 16; opacity: 0.15; }
+    50%       { r: 24; opacity: 0.3;  }
+  }
+  .dash-line { stroke-dasharray: 4 4; opacity: 0.6; }
+`;
+
+function FaceSVG({ activeZone, selectedZones, onZoneClick, isDark }: {
+  activeZone: ZoneId | null; selectedZones: Set<ZoneId>; onZoneClick: (z: ZoneId) => void; isDark: boolean;
+}) {
+  const GOLD = "#D4AF37", GOLD_DIM = "rgba(201,168,76,0.35)", WH = isDark ? "#fff" : "#000";
+
+  return (
+    <svg viewBox="0 0 500 700" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" }}>
       <defs>
-        <filter id="fm-glow" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur stdDeviation="7" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
+        <filter id="glow-md"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
-
-      {/* ── Glow overlays (below face lines) ── */}
-      {ALL_ZONES.map((zone) => {
-        const opacity = getGlowOpacity(zone);
-        if (opacity <= 0) return null;
-        const s = GLOW_SHAPES[zone];
+      {ZONES_DEF.map(zd => {
+        const { zone, dots, hitPath, line } = zd;
+        const isActive = activeZone === zone;
+        const isSelected = selectedZones.has(zone);
+        const lit = isActive || isSelected;
+        const dimmed = activeZone !== null && !lit;
+        
         return (
-          <motion.ellipse
-            key={`glow-${zone}`}
-            cx={s.cx} cy={s.cy} rx={s.rx} ry={s.ry}
-            fill="#C9A96E"
-            filter="url(#fm-glow)"
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: selectedZones.has(zone)
-                ? [opacity - 0.12, opacity, opacity - 0.12]
-                : hoveredZone === zone
-                ? [opacity - 0.1, opacity, opacity - 0.1]
-                : opacity,
-            }}
-            transition={
-              selectedZones.has(zone)
-                ? { duration: 2.8, repeat: Infinity, ease: "easeInOut" }
-                : hoveredZone === zone
-                ? { duration: 1.4, repeat: Infinity, ease: "easeInOut" }
-                : { duration: 0.18 }
-            }
-          />
+          <g key={zone}>
+            <path d={hitPath} fill="transparent" style={{ pointerEvents: "all", cursor: "pointer" }} onClick={() => onZoneClick(zone)} />
+            
+            {!dimmed && line && (
+              <line x1={line.x1} y1={line.y1} x2={line.x2} y2={line.y2} stroke={WH} strokeWidth="0.8" className="dash-line" style={{ pointerEvents: "none" }} />
+            )}
+
+            {dots.map((d, i) => (
+              <g key={i} style={{ pointerEvents: "none" }}>
+                {lit && <circle cx={d.x} cy={d.y} r={20} fill={GOLD} filter="url(#glow-md)" style={{ opacity: 0.25, animation: "haloSoft 3s infinite" }} />}
+                <circle cx={d.x} cy={d.y} r={lit ? 6 : 4} fill={lit ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)"} style={{ animation: lit ? "pulseDot 2s infinite" : "none", transition: "all 0.3s ease" }} />
+                {lit && <circle cx={d.x} cy={d.y} r={10} fill="none" stroke={WH} strokeWidth="1" style={{ opacity: 0.5 }} />}
+              </g>
+            ))}
+          </g>
         );
-      })}
-
-      {/* ── Decorative face lines ── */}
-
-      {/* Face oval */}
-      <ellipse
-        cx="100" cy="100" rx="48" ry="65"
-        fill="none"
-        stroke="hsl(var(--face-stroke))"
-        strokeWidth="1.5"
-      />
-
-      {/* Hairline */}
-      <path
-        d="M 57,65 Q 62,28 100,23 Q 138,28 143,65"
-        fill="none"
-        stroke="hsl(var(--face-detail) / 0.4)"
-        strokeWidth="0.9"
-      />
-
-      {/* Left eyebrow */}
-      <path
-        d="M 69,78 Q 79,71 92,74"
-        fill="none"
-        stroke="hsl(var(--face-detail))"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-      />
-      {/* Right eyebrow */}
-      <path
-        d="M 108,74 Q 121,71 131,78"
-        fill="none"
-        stroke="hsl(var(--face-detail))"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-      />
-
-      {/* Left eye (almond) */}
-      <path
-        d="M 69,85 Q 80,79 91,85 Q 80,91 69,85 Z"
-        fill="none"
-        stroke="hsl(var(--face-detail))"
-        strokeWidth="0.9"
-      />
-      {/* Right eye (almond) */}
-      <path
-        d="M 109,85 Q 120,79 131,85 Q 120,91 109,85 Z"
-        fill="none"
-        stroke="hsl(var(--face-detail))"
-        strokeWidth="0.9"
-      />
-
-      {/* Nose bridge + tip */}
-      <path
-        d="M 97,94 L 96,116 Q 100,121 104,116 L 103,94"
-        fill="none"
-        stroke="hsl(var(--face-detail) / 0.5)"
-        strokeWidth="0.8"
-        strokeLinecap="round"
-      />
-
-      {/* Upper lip bow */}
-      <path
-        d="M 88,132 Q 94,128 100,131 Q 106,128 112,132"
-        fill="none"
-        stroke="hsl(var(--face-detail))"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-      />
-      {/* Lower lip */}
-      <path
-        d="M 88,132 Q 100,140 112,132"
-        fill="none"
-        stroke="hsl(var(--face-detail))"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-      />
-
-      {/* Chin cleft suggestion */}
-      <path
-        d="M 97,156 Q 100,160 103,156"
-        fill="none"
-        stroke="hsl(var(--face-detail) / 0.35)"
-        strokeWidth="0.7"
-        strokeLinecap="round"
-      />
-
-      {/* Neck lines */}
-      <path
-        d="M 84,165 C 82,183 80,198 78,213"
-        fill="none"
-        stroke="hsl(var(--face-detail) / 0.55)"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-      />
-      <path
-        d="M 116,165 C 118,183 120,198 122,213"
-        fill="none"
-        stroke="hsl(var(--face-detail) / 0.55)"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-      />
-
-      {/* Collarbone hint */}
-      <path
-        d="M 55,220 C 72,212 90,208 100,208 C 110,208 128,212 145,220"
-        fill="none"
-        stroke="hsl(var(--face-detail) / 0.3)"
-        strokeWidth="0.9"
-        strokeLinecap="round"
-      />
-
-      {/* ── Zone hit areas (transparent, pointer-events:all) ── */}
-
-      {/* Forehead */}
-      <path
-        d="M 56,75 C 59,50 73,37 100,36 C 127,37 141,50 144,75 Z"
-        fill="transparent"
-        style={{ pointerEvents: "all", cursor: "pointer" }}
-        onClick={() => onZoneClick("forehead")}
-        onMouseEnter={() => onZoneHover("forehead")}
-        onMouseLeave={() => onZoneHover(null)}
-      />
-
-      {/* Eyes row */}
-      <rect
-        x="52" y="72" width="96" height="24"
-        fill="transparent"
-        style={{ pointerEvents: "all", cursor: "pointer" }}
-        onClick={() => onZoneClick("eyes")}
-        onMouseEnter={() => onZoneHover("eyes")}
-        onMouseLeave={() => onZoneHover(null)}
-      />
-
-      {/* Nose */}
-      <rect
-        x="87" y="92" width="26" height="32"
-        fill="transparent"
-        style={{ pointerEvents: "all", cursor: "pointer" }}
-        onClick={() => onZoneClick("nose")}
-        onMouseEnter={() => onZoneHover("nose")}
-        onMouseLeave={() => onZoneHover(null)}
-      />
-
-      {/* Left cheek */}
-      <path
-        d="M 52,80 L 85,80 L 83,155 C 63,150 52,128 52,95 Z"
-        fill="transparent"
-        style={{ pointerEvents: "all", cursor: "pointer" }}
-        onClick={() => onZoneClick("cheeks")}
-        onMouseEnter={() => onZoneHover("cheeks")}
-        onMouseLeave={() => onZoneHover(null)}
-      />
-
-      {/* Right cheek */}
-      <path
-        d="M 115,80 L 148,80 C 148,128 137,150 117,155 Z"
-        fill="transparent"
-        style={{ pointerEvents: "all", cursor: "pointer" }}
-        onClick={() => onZoneClick("cheeks")}
-        onMouseEnter={() => onZoneHover("cheeks")}
-        onMouseLeave={() => onZoneHover(null)}
-      />
-
-      {/* Chin & Mouth */}
-      <path
-        d="M 60,120 L 140,120 L 128,165 C 116,170 84,170 72,165 Z"
-        fill="transparent"
-        style={{ pointerEvents: "all", cursor: "pointer" }}
-        onClick={() => onZoneClick("chin_mouth")}
-        onMouseEnter={() => onZoneHover("chin_mouth")}
-        onMouseLeave={() => onZoneHover(null)}
-      />
-
-      {/* Neck */}
-      <path
-        d="M 80,165 L 120,165 L 118,220 L 82,220 Z"
-        fill="transparent"
-        style={{ pointerEvents: "all", cursor: "pointer" }}
-        onClick={() => onZoneClick("neck")}
-        onMouseEnter={() => onZoneHover("neck")}
-        onMouseLeave={() => onZoneHover(null)}
-      />
-
-      {/* ── Zone indicator dots ── */}
-      {ALL_ZONES.map((zone) => {
-        const s = GLOW_SHAPES[zone];
-        const active = selectedZones.has(zone) || activeZone === zone;
-        return (
-          <motion.circle
-            key={`dot-${zone}`}
-            cx={s.cx} cy={s.cy} r={active ? 3.5 : 2.5}
-            fill={active ? "#C9A96E" : "hsl(var(--muted-foreground) / 0.3)"}
-            style={{ pointerEvents: "none" }}
-            animate={active
-              ? { r: [3.5, 4.5, 3.5], opacity: [0.9, 1, 0.9] }
-              : { r: 2.5, opacity: 0.5 }
-            }
-            transition={active
-              ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
-              : {}
-            }
-          />
-        );
-      })}
-
-      {/* Cheeks gets two dots */}
-      {(["cheeks"] as ZoneId[]).map(() => {
-        const active = selectedZones.has("cheeks") || activeZone === "cheeks";
-        return [
-          <motion.circle key="dot-cheek-l" cx={66} cy={118} r={active ? 3.5 : 2.5}
-            fill={active ? "#C9A96E" : "hsl(var(--muted-foreground) / 0.3)"}
-            style={{ pointerEvents: "none" }}
-            animate={active ? { r: [3.5, 4.5, 3.5] } : { r: 2.5 }}
-            transition={active ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" } : {}}
-          />,
-          <motion.circle key="dot-cheek-r" cx={134} cy={118} r={active ? 3.5 : 2.5}
-            fill={active ? "#C9A96E" : "hsl(var(--muted-foreground) / 0.3)"}
-            style={{ pointerEvents: "none" }}
-            animate={active ? { r: [3.5, 4.5, 3.5] } : { r: 2.5 }}
-            transition={active ? { duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.3 } : {}}
-          />,
-        ];
       })}
     </svg>
   );
 }
 
-// ─── Concern item ─────────────────────────────────────────────────────────────
-
-function ConcernItem({
-  concern, selected, onToggle, lang,
-}: {
-  concern: Concern; selected: boolean; onToggle: () => void; lang: Lang;
-}) {
+// ─── Shared UI components ─────────────────────────────────────────────────────
+function ConcernItem({ concern, selected, onToggle, lang, isDark }: { concern: Concern; selected: boolean; onToggle: () => void; lang: Lang; isDark: boolean; }) {
+  const GOLD = "#c9a96e";
   return (
-    <motion.button
-      onClick={onToggle}
-      className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm text-left transition-all min-h-[44px] touch-manipulation border ${
-        selected
-          ? "bg-amber-500/12 border-amber-500/40 text-foreground"
-          : "bg-secondary/30 border-transparent hover:border-border/60 text-muted-foreground hover:text-foreground"
-      }`}
-      whileTap={{ scale: 0.98 }}
-    >
-      <span className="leading-snug">{concern.label[lang]}</span>
-      <motion.span
-        className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-          selected ? "bg-amber-500 border-amber-500" : "border-muted-foreground/40"
-        }`}
-        animate={{ scale: selected ? [1, 1.2, 1] : 1 }}
-        transition={{ duration: 0.2 }}
-      >
-        {selected && <Check className="w-3 h-3 text-white" />}
+    <motion.button onClick={onToggle} whileTap={{ scale: 0.98 }}
+      style={{
+        width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "13px 16px", borderRadius: 14, textAlign: "left", cursor: "pointer", transition: "all 0.2s ease",
+        background: selected ? "rgba(201,169,110,0.12)" : isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+        border: selected ? `1px solid \${GOLD}` : `1px solid \${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
+        color: selected ? GOLD : isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)",
+        fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: selected ? 500 : 400
+      }}>
+      <span>{concern.label[lang]}</span>
+      <motion.span animate={{ scale: selected ? [1, 1.25, 1] : 1 }} transition={{ duration: 0.2 }}
+        style={{
+          flexShrink: 0, width: 22, height: 22, borderRadius: "50%",
+          border: selected ? `2px solid \${GOLD}` : `2px solid \${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)"}`,
+          background: selected ? GOLD : "transparent", display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+        {selected && <Check style={{ width: 14, height: 14, color: isDark ? "#000" : "#fff" }} />}
       </motion.span>
     </motion.button>
   );
 }
 
-// ─── Desktop side panel ───────────────────────────────────────────────────────
-
-function ZoneConcernPanel({
-  zone, selectedConcerns, onToggle, onClose, lang,
-}: {
-  zone: ZoneId; selectedConcerns: Set<string>; onToggle: (id: string) => void;
-  onClose: () => void; lang: Lang;
-}) {
+function PanelHeader({ zone, lang, onClose, isDark }: { zone: ZoneId; lang: Lang; onClose: () => void; isDark: boolean; }) {
+  const GOLD = "#c9a96e";
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 18 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 18 }}
-      transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-      className="w-72 flex-shrink-0 rounded-2xl border border-border bg-card/80 backdrop-blur-md shadow-xl p-5"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <h3
-          className="text-[0.7rem] tracking-[0.18em] uppercase text-amber-600 dark:text-amber-400 font-medium"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-        >
-          {ZONE_LABELS[zone][lang]}
-        </h3>
-        <button
-          onClick={onClose}
-          className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-secondary"
-        >
-          <X className="w-4 h-4" />
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ height: 1.5, background: `linear-gradient(90deg,transparent,\${GOLD},transparent)`, marginBottom: 16 }} />
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <div>
+          <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>Clinical Area</p>
+          <h3 style={{ fontSize: 24, fontWeight: 300, color: isDark ? "#fff" : "#111", fontFamily: "'Cormorant Garamond',Georgia,serif", margin: 0, lineHeight: 1.2 }}>
+            {ZONE_LABELS[zone][lang]}
+          </h3>
+        </div>
+        <button onClick={onClose} style={{ background: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.05)", border: "none", borderRadius: "50%", width: 36, height: 36, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: isDark ? "#fff" : "#000", flexShrink: 0 }}>
+          <X style={{ width: 18, height: 18 }} />
         </button>
       </div>
+    </div>
+  );
+}
 
-      <div className="flex flex-col gap-2">
-        {ZONE_CONCERNS[zone].map((concern) => (
-          <ConcernItem
-            key={concern.id}
-            concern={concern}
-            selected={selectedConcerns.has(concern.id)}
-            onToggle={() => onToggle(concern.id)}
-            lang={lang}
-          />
+// ─── The Main Interactive Panel ───────────────────────────────────────────────
+function ConcernAndQuestionPanel({ zone, selectedConcerns, onToggle, onClose, lang, isDark }: { zone: ZoneId; selectedConcerns: Set<string>; onToggle: (id: string) => void; onClose: () => void; lang: Lang; isDark: boolean; }) {
+  const store = useDiagnosisStore();
+  const axisAnswers = store.axisAnswers;
+  const onAnswer = (id: string, val: QuestionAnswer) => store.setAxisAnswer(id, val);
+  const [editingAxes, setEditingAxes] = useState<Set<number>>(new Set());
+
+  // Derive triggered axes based on selected concerns
+  const concerns = ZONE_CONCERNS[zone];
+  const triggeredAxisIds = Array.from(new Set(
+    Array.from(selectedConcerns)
+      .map(cId => concerns.find(c => c.id === cId)?.axis)
+      .filter((a): a is string => a !== undefined && CONCERN_AXIS_ID[a] !== undefined)
+      .map(a => CONCERN_AXIS_ID[a])
+  ));
+
+  const GOLD = "#c9a96e";
+
+  return (
+    <div style={{ padding: "8px 0 16px" }}>
+      <PanelHeader zone={zone} lang={lang} onClose={onClose} isDark={isDark} />
+      
+      {/* Concerns Section */}
+      <h4 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>
+        {lang === "ko" ? "피부 고민 선택" : lang === "de" ? "Beschwerden auswählen" : "Select Concerns"}
+      </h4>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+        {concerns.map(c => (
+          <ConcernItem key={c.id} concern={c} selected={selectedConcerns.has(c.id)} onToggle={() => onToggle(c.id)} lang={lang} isDark={isDark} />
         ))}
       </div>
-    </motion.div>
+
+      {/* Deep-Dive Questions Section */}
+      {triggeredAxisIds.length > 0 && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <h4 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", color: GOLD, marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>
+            {lang === "ko" ? "정밀 분석" : lang === "de" ? "Tiefenanalyse" : "Deep-Dive Analysis"}
+          </h4>
+          
+          {triggeredAxisIds.map(axisId => {
+            const axisDef = AXIS_DEFINITIONS.find(a => a.id === axisId);
+            if (!axisDef) return null;
+            const requiredQs = axisDef.questions.filter(q => q.required);
+            const isAnswered = requiredQs.length > 0 && requiredQs.every(q => axisAnswers[q.id] !== undefined);
+            const isEditing = editingAxes.has(axisId);
+            const showQuestions = !isAnswered || isEditing;
+
+            const visibleQs: QuestionDef[] = [];
+            for (const q of axisDef.questions) {
+              if (q.hideIf) {
+                const hAns = axisAnswers[q.hideIf.questionId];
+                if (hAns !== undefined) {
+                  const m = Array.isArray(hAns) ? hAns.some(v => q.hideIf!.values.includes(String(v))) : q.hideIf.values.includes(String(hAns));
+                  if (m) continue;
+                }
+              }
+              visibleQs.push(q);
+            }
+
+            return (
+              <div key={axisId} style={{ marginBottom: 20, padding: 16, borderRadius: 16, background: isDark ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.5)", border: `1px solid \${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: isAnswered && !isEditing ? 0 : 16 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.15em", textTransform: "uppercase", color: AXIS_COLOR[axisId] }}>
+                    {gt(axisDef.name, lang)} {isAnswered && !isEditing && " ✓"}
+                  </span>
+                  {isAnswered && (
+                    <button onClick={() => setEditingAxes(p => { const n = new Set(p); n.has(axisId) ? n.delete(axisId) : n.add(axisId); return n; })}
+                      style={{ background: "none", border: "none", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", cursor: "pointer", fontSize: 12, textDecoration: "underline" }}>
+                      {isEditing ? (lang === "ko" ? "완료" : "Done") : (lang === "ko" ? "수정" : "Edit")}
+                    </button>
+                  )}
+                </div>
+
+                {isAnswered && !isEditing ? null : (
+                  visibleQs.map(q => (
+                    <div key={q.id} style={{ marginBottom: 24 }}>
+                      <div style={{ fontSize: 16, color: isDark ? "#fff" : "#111", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>
+                        {gt(q.text, lang)}
+                      </div>
+                      <InlineQuestionRenderer isDark={isDark} q={q} value={axisAnswers[q.id]} onChange={onAnswer} lang={lang} allAnswers={axisAnswers} />
+                    </div>
+                  ))
+                )}
+              </div>
+            );
+          })}
+        </motion.div>
+      )}
+    </div>
   );
 }
 
-// ─── Mobile bottom drawer ─────────────────────────────────────────────────────
+const PANEL_S = (isDark: boolean): React.CSSProperties => ({
+  width: "min(400px, 90vw)", flexShrink: 0, borderRadius: 24,
+  border: `1px solid \${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
+  background: isDark ? "rgba(20,20,25,0.85)" : "rgba(255,255,255,0.92)",
+  backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)",
+  boxShadow: isDark ? "0 24px 68px rgba(0,0,0,0.65)" : "0 24px 68px rgba(0,0,0,0.15)",
+  padding: "20px 24px", display: "flex", flexDirection: "column",
+  maxHeight: "80vh", overflowY: "auto",
+});
 
-function ZoneConcernDrawer({
-  zone, selectedConcerns, onToggle, onClose, lang,
-}: {
-  zone: ZoneId; selectedConcerns: Set<string>; onToggle: (id: string) => void;
-  onClose: () => void; lang: Lang;
-}) {
-  const copy = COPY[lang];
-  return (
-    <>
-      {/* Backdrop */}
-      <motion.div
-        className="fixed inset-0 z-40 bg-background/60 backdrop-blur-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-      />
-
-      {/* Sheet */}
-      <motion.div
-        className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-background border-t border-border shadow-2xl"
-        initial={{ y: "100%" }}
-        animate={{ y: 0 }}
-        exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 340 }}
-        drag="y"
-        dragConstraints={{ top: 0 }}
-        dragElastic={{ top: 0, bottom: 0.5 }}
-        onDragEnd={(_, info) => { if (info.offset.y > 90) onClose(); }}
-      >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-2">
-          <div className="w-10 h-1 rounded-full bg-border" />
-        </div>
-
-        <div className="px-5 pt-1 pb-8">
-          <div className="flex items-center justify-between mb-5">
-            <h3
-              className="text-base font-light tracking-[0.15em] uppercase text-amber-600 dark:text-amber-400"
-              style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-            >
-              {ZONE_LABELS[zone][lang]}
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-muted-foreground hover:text-foreground p-2 rounded-xl hover:bg-secondary transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="flex flex-col gap-2.5 max-h-[55vh] overflow-y-auto pb-1">
-            {ZONE_CONCERNS[zone].map((concern) => (
-              <ConcernItem
-                key={concern.id}
-                concern={concern}
-                selected={selectedConcerns.has(concern.id)}
-                onToggle={() => onToggle(concern.id)}
-                lang={lang}
-              />
-            ))}
-          </div>
-
-          <button
-            onClick={onClose}
-            className="mt-5 w-full rounded-xl bg-secondary/80 px-4 py-3.5 text-sm font-medium text-foreground hover:bg-secondary transition-colors min-h-[50px] touch-manipulation"
-          >
-            {copy.close}
-          </button>
-        </div>
-      </motion.div>
-    </>
-  );
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
-
-interface FaceMapStepProps {
-  onNext: () => void;
-}
-
-export function FaceMapStep({ onNext }: FaceMapStepProps) {
+export function FaceMapStep({ onNext }: { onNext: () => void }) {
   const { language } = useI18nStore();
   const lang = language as Lang;
   const store = useDiagnosisStore();
   const copy = COPY[lang];
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark" || resolvedTheme === "system";
 
   const [selectedConcerns, setSelectedConcerns] = useState<Set<string>>(new Set());
   const [activeZone, setActiveZone] = useState<ZoneId | null>(null);
-  const [hoveredZone, setHoveredZone] = useState<ZoneId | null>(null);
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" && window.innerWidth < 768
-  );
+  const [isMobile, setIsMobile] = useState(false);
 
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
+  useEffect(() => { const fn = () => setIsMobile(window.innerWidth < 768); fn(); window.addEventListener("resize", fn); return () => window.removeEventListener("resize", fn); }, []);
 
-  const selectedZones = useMemo(() => zonesWithSelections(selectedConcerns), [selectedConcerns]);
+  const selectedZones = useMemo(() => {
+    const out = new Set<ZoneId>();
+    for (const [z, arr] of Object.entries(ZONE_CONCERNS)) if (arr.some(c => selectedConcerns.has(c.id))) out.add(z as ZoneId);
+    return out;
+  }, [selectedConcerns]);
 
   const toggleConcern = useCallback((id: string) => {
-    setSelectedConcerns((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const handleZoneClick = useCallback((zone: ZoneId) => {
-    setActiveZone((prev) => (prev === zone ? null : zone));
+    setSelectedConcerns(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }, []);
 
   const handleNext = useCallback(() => {
-    // Map concerns → axis weight hints for the engine
     const axisMap: Record<string, number> = {};
-    for (const concernId of selectedConcerns) {
-      for (const concerns of Object.values(ZONE_CONCERNS)) {
-        const found = concerns.find((c) => c.id === concernId);
-        if (found) {
-          axisMap[found.axis] = (axisMap[found.axis] ?? 0) + 1;
-        }
+    for (const cid of selectedConcerns) {
+      for (const arr of Object.values(ZONE_CONCERNS)) {
+        const f = arr.find(c => c.id === cid);
+        if (f) axisMap[f.axis] = (axisMap[f.axis] ?? 0) + 1;
       }
     }
-    // Build typed SelectedZones (zoneId → concern IDs) and sync via setAllZones
     const zoneMap: Record<string, { concerns: string[] }> = {};
-    for (const [zoneId, concerns] of Object.entries(ZONE_CONCERNS)) {
-      const selected = concerns.filter((c) => selectedConcerns.has(c.id)).map((c) => c.id);
-      if (selected.length > 0) zoneMap[zoneId] = { concerns: selected };
+    for (const [zid, arr] of Object.entries(ZONE_CONCERNS)) {
+      const sel = arr.filter(c => selectedConcerns.has(c.id)).map(c => c.id);
+      if (sel.length) zoneMap[zid] = { concerns: sel };
     }
     store.actions.setAllZones(zoneMap);
     store.setUiSignals("faceMap", axisMap as Record<string, unknown>);
@@ -637,127 +450,63 @@ export function FaceMapStep({ onNext }: FaceMapStepProps) {
   }, [selectedConcerns, store, onNext]);
 
   return (
-    <div className="w-full">
+    <div style={{ width: "100%" }}>
+      <style>{ANIM}</style>
+
       {/* Header */}
-      <h2
-        className="text-3xl text-foreground font-light mb-2 leading-tight"
-        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-      >
-        {copy.title}
-      </h2>
-      <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
-        {copy.subtitle}
-      </p>
+      <h2 style={{ fontSize: isMobile ? 26 : 30, fontWeight: 300, fontFamily: "'Cormorant Garamond',Georgia,serif", color: isDark ? "#fff" : "#111", marginBottom: 8 }}>{copy.title}</h2>
+      <p style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)", marginBottom: 32, fontFamily: "'DM Sans',sans-serif" }}>{copy.subtitle}</p>
 
-      {/* Layout */}
-      <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8">
-
-        {/* Left: SVG + zone pills */}
-        <div className="flex-shrink-0 flex flex-col items-center md:items-start">
-          <FaceSVG
-            selectedZones={selectedZones}
-            activeZone={activeZone}
-            hoveredZone={hoveredZone}
-            onZoneClick={handleZoneClick}
-            onZoneHover={setHoveredZone}
-          />
-
-          {/* Zone label pills */}
-          <div className="mt-4 flex flex-wrap gap-1.5 justify-center md:justify-start max-w-[210px]">
-            {(Object.keys(ZONE_LABELS) as ZoneId[]).map((zone) => (
-              <button
-                key={zone}
-                onClick={() => handleZoneClick(zone)}
-                className={`text-[0.6rem] px-2.5 py-1 rounded-full border transition-all min-h-[26px] touch-manipulation leading-none ${
-                  selectedZones.has(zone)
-                    ? "border-amber-500/60 bg-amber-500/12 text-amber-600 dark:text-amber-400"
-                    : activeZone === zone
-                    ? "border-border bg-secondary text-foreground"
-                    : "border-border/50 text-muted-foreground hover:border-border hover:text-foreground"
-                }`}
-              >
-                {ZONE_LABELS[zone][lang]}
-              </button>
-            ))}
-          </div>
+      {/* Main layout */}
+      <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "center" : "flex-start", gap: 28 }}>
+        
+        {/* Face Image Card */}
+        <div style={{ position: "relative", width: isMobile ? "min(90vw,400px)" : "min(40vw,480px)", aspectRatio: "500/700", flexShrink: 0, borderRadius: 28, overflow: "hidden", boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.1)", border: `1px solid \${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}` }}>
+          <img src={facemapImg} alt="Face map" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <div style={{ position: "absolute", inset: 0, background: isDark ? "radial-gradient(ellipse at 50% 45%, transparent 40%, rgba(0,0,0,0.4) 100%)" : "radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(0,0,0,0.1) 100%)", pointerEvents: "none" }} />
+          <FaceSVG activeZone={activeZone} selectedZones={selectedZones} onZoneClick={(id) => setActiveZone(p => p === id ? null : id)} isDark={isDark} />
         </div>
 
-        {/* Right: Desktop concern panel / placeholder */}
-        <AnimatePresence mode="wait">
-          {!isMobile && activeZone && (
-            <ZoneConcernPanel
-              key={activeZone}
-              zone={activeZone}
-              selectedConcerns={selectedConcerns}
-              onToggle={toggleConcern}
-              onClose={() => setActiveZone(null)}
-              lang={lang}
-            />
-          )}
-          {!isMobile && !activeZone && (
-            <motion.div
-              key="placeholder"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="hidden md:flex flex-col items-center justify-center w-72 min-h-[200px] rounded-2xl border border-dashed border-border/40 text-muted-foreground"
-            >
-              <div className="text-center px-8">
-                <svg viewBox="0 0 24 24" className="w-7 h-7 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" strokeWidth="1">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 8v4M12 16h.01" />
-                </svg>
-                <p className="text-xs leading-relaxed opacity-60">{copy.placeholderHint}</p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Desktop Panel */}
+        {!isMobile && (
+          <AnimatePresence mode="wait">
+            {activeZone ? (
+              <motion.div key={activeZone} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} style={PANEL_S(isDark)}>
+                <ConcernAndQuestionPanel zone={activeZone} selectedConcerns={selectedConcerns} onToggle={toggleConcern} onClose={() => setActiveZone(null)} lang={lang} isDark={isDark} />
+              </motion.div>
+            ) : (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "min(380px, 40vw)", height: 300, display: "flex", alignItems: "center", justifyContent: "center", border: `1px dashed \${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`, borderRadius: 24, padding: 32, textAlign: "center" }}>
+                <p style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif" }}>{copy.hint}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
       </div>
 
-      {/* Mobile: Bottom drawer */}
+      {/* Mobile Bottom Sheet Drawer */}
       <AnimatePresence>
         {isMobile && activeZone && (
-          <ZoneConcernDrawer
-            zone={activeZone}
-            selectedConcerns={selectedConcerns}
-            onToggle={toggleConcern}
-            onClose={() => setActiveZone(null)}
-            lang={lang}
-          />
+          <div className="fixed inset-0 z-50 flex flex-col justify-end">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setActiveZone(null)} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} />
+            <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", damping: 28, stiffness: 300 }} drag="y" dragConstraints={{ top: 0 }} onDragEnd={(_, i) => { if (i.offset.y > 100) setActiveZone(null); }}
+              style={{ position: "relative", background: isDark ? "#14141a" : "#ffffff", borderRadius: "28px 28px 0 0", padding: "12px 20px 40px", maxHeight: "85vh", overflowY: "auto", boxShadow: "0 -20px 60px rgba(0,0,0,0.3)" }}>
+              <div style={{ width: 44, height: 4, borderRadius: 2, background: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)", margin: "0 auto 16px" }} />
+              <ConcernAndQuestionPanel zone={activeZone} selectedConcerns={selectedConcerns} onToggle={toggleConcern} onClose={() => setActiveZone(null)} lang={lang} isDark={isDark} />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
-      {/* Floating selection pill */}
-      <AnimatePresence>
-        {selectedConcerns.size > 0 && (
-          <motion.div
-            className="fixed bottom-28 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 rounded-full border border-amber-500/25 bg-background/92 px-5 py-2.5 text-sm shadow-lg backdrop-blur-md"
-            initial={{ opacity: 0, y: 14, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 14, scale: 0.9 }}
-            transition={{ type: "spring", damping: 24, stiffness: 300 }}
-          >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[0.62rem] font-medium text-white flex-shrink-0">
-              {selectedConcerns.size}
-            </span>
-            <span className="text-foreground whitespace-nowrap">{copy.selected(selectedConcerns.size)}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Continue button */}
-      <div className="mt-10 flex items-center justify-between">
-        {/* Empty left side to mirror shared nav layout */}
-        <div />
-        <motion.button
-          onClick={handleNext}
-          disabled={selectedConcerns.size === 0}
-          className="flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 disabled:opacity-30 min-h-[44px] touch-manipulation"
-          whileTap={{ scale: 0.97 }}
-        >
-          {copy.continue}
-          <ChevronRight className="w-4 h-4" />
-        </motion.button>
+      {/* Submit Button */}
+      <div style={{ marginTop: 40, display: "flex", justifyContent: "flex-end" }}>
+        <button onClick={handleNext} disabled={selectedConcerns.size === 0}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 32px", borderRadius: 32, fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", border: "none",
+            background: selectedConcerns.size > 0 ? "linear-gradient(135deg, #c9a96e, #a38555)" : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+            color: selectedConcerns.size > 0 ? "#fff" : isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+            cursor: selectedConcerns.size > 0 ? "pointer" : "not-allowed", transition: "all 0.3s ease",
+            boxShadow: selectedConcerns.size > 0 ? "0 8px 24px rgba(201,169,110,0.3)" : "none" }}>
+          {copy.continue} <ChevronRight size={18} />
+        </button>
       </div>
     </div>
   );

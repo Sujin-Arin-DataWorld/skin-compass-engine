@@ -238,7 +238,7 @@ export default function Login() {
     const navigate = useNavigate();
     const { isLoggedIn, loginWithGoogle } = useAuthStore();
     const { language } = useI18nStore();
-    const t = translations[language];
+    const t = translations[language as keyof typeof translations] || translations["en"];
 
     const tabParam = searchParams.get("tab");
     const redirectTo = searchParams.get("redirect") || "/account";
@@ -249,14 +249,14 @@ export default function Login() {
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     // If already logged in, skip the page
     if (isLoggedIn) {
         return <Navigate to={redirectTo} replace />;
     }
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     const executeRedirect = () => {
         setIsRedirecting(true);

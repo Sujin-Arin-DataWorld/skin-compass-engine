@@ -698,7 +698,9 @@ export const translations = {
             cancelAnytime: "Jederzeit kündbar · Keine Bindung · Monatlich auf Ihre Hautdaten neu abgestimmt",
             backToProtocol: "Zurück zum Protokoll"
         }
-    }
+    },
+    // Fallback for Korean language to prevent undefined crashes across the app
+    get ko() { return this.en; }
 };
 
 // ── Phase 1 translations (Navbar + Homepage) ─────────────────────────────────

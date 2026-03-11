@@ -19,7 +19,7 @@ import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD   = "#D4AF37";
+const GOLD = "#D4AF37";
 const BRONZE = "#947E5C";
 
 // ── Concern map ───────────────────────────────────────────────────────────────
@@ -27,15 +27,15 @@ const CONCERN_KEYS = ["sebum", "sensitivity", "hydration", "aging", "pigment", "
 type ConcernKey = typeof CONCERN_KEYS[number];
 
 const CONCERN_META: Record<ConcernKey, { axis: AxisKey; icon: LucideIcon }> = {
-  sebum:       { axis: "seb",     icon: Droplets    },
-  sensitivity: { axis: "sen",     icon: ShieldAlert },
-  hydration:   { axis: "hyd",     icon: Droplet     },
-  aging:       { axis: "aging",   icon: Timer       },
-  pigment:     { axis: "pigment", icon: Sun         },
-  texture:     { axis: "texture", icon: Layers      },
-  barrier:     { axis: "bar",     icon: Shield      },
-  pores:       { axis: "texture", icon: CircleDot   },
-  neuro:       { axis: "sen",     icon: Leaf        },
+  sebum: { axis: "seb", icon: Droplets },
+  sensitivity: { axis: "sen", icon: ShieldAlert },
+  hydration: { axis: "hyd", icon: Droplet },
+  aging: { axis: "aging", icon: Timer },
+  pigment: { axis: "pigment", icon: Sun },
+  texture: { axis: "texture", icon: Layers },
+  barrier: { axis: "bar", icon: Shield },
+  pores: { axis: "texture", icon: CircleDot },
+  neuro: { axis: "sen", icon: Leaf },
 };
 
 // ── Hero slide images ─────────────────────────────────────────────────────────
@@ -150,8 +150,8 @@ function HeroSlider({ slides }: { slides: { headline: string; sub: string; cta: 
             aria-label={`Slide ${i + 1}`}
             className="rounded-full transition-all duration-300"
             style={{
-              width:    current === i ? "1.75rem" : "0.375rem",
-              height:   "0.375rem",
+              width: current === i ? "1.75rem" : "0.375rem",
+              height: "0.375rem",
               background: current === i ? GOLD : "rgba(255,255,255,0.45)",
             }}
           />
@@ -228,7 +228,7 @@ function ConcernSection({
                 className="flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200"
                 style={{
                   borderColor: isActive ? GOLD : "transparent",
-                  background:  isActive ? "rgba(212,175,55,0.07)" : "transparent",
+                  background: isActive ? "rgba(212,175,55,0.07)" : "transparent",
                 }}
               >
                 <div
@@ -265,7 +265,7 @@ function ConcernSection({
                   >
                     {filteredProducts.map((product) => {
                       const state = cartStates[product.id] ?? "idle";
-                      const name  = typeof product.name === "string" ? product.name : (product.name.de ?? product.name.en);
+                      const name = typeof product.name === "string" ? product.name : (product.name.de ?? product.name.en);
                       return (
                         <div
                           key={product.id}
@@ -293,15 +293,14 @@ function ConcernSection({
                             <button
                               onClick={() => onAddToCart(product)}
                               disabled={state === "adding"}
-                              className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50 ${
-                                state === "added"
+                              className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50 ${state === "added"
                                   ? "border border-green-400/50 bg-green-50 dark:bg-green-500/10"
                                   : "border border-stone-200 dark:border-white/10 hover:border-[#D4AF37]/50"
-                              }`}
+                                }`}
                             >
                               {state === "adding" && <Loader2 className="w-3 h-3 animate-spin text-gray-400" />}
-                              {state === "added"  && <Check className="w-3 h-3 text-green-500" strokeWidth={2} />}
-                              {state === "idle"   && <ShoppingBag className="w-3 h-3 text-gray-400" strokeWidth={1.5} />}
+                              {state === "added" && <Check className="w-3 h-3 text-green-500" strokeWidth={2} />}
+                              {state === "idle" && <ShoppingBag className="w-3 h-3 text-gray-400" strokeWidth={1.5} />}
                               <span className={state === "added" ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}>
                                 {state === "adding" ? "…" : state === "added" ? "✓" : "Add"}
                               </span>
@@ -449,15 +448,14 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart 
                               <button
                                 onClick={() => onAddToCart(product)}
                                 disabled={state === "adding"}
-                                className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50 ${
-                                  state === "added"
+                                className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50 ${state === "added"
                                     ? "border border-green-400/50 bg-green-50 dark:bg-green-500/10"
                                     : "border border-stone-200 dark:border-white/10 hover:border-[#D4AF37]/50"
-                                }`}
+                                  }`}
                               >
                                 {state === "adding" && <Loader2 className="w-3 h-3 animate-spin text-gray-400" />}
-                                {state === "added"  && <Check className="w-3 h-3 text-green-500" strokeWidth={2} />}
-                                {state === "idle"   && <ShoppingBag className="w-3 h-3 text-gray-400" strokeWidth={1.5} />}
+                                {state === "added" && <Check className="w-3 h-3 text-green-500" strokeWidth={2} />}
+                                {state === "idle" && <ShoppingBag className="w-3 h-3 text-gray-400" strokeWidth={1.5} />}
                                 <span className={state === "added" ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}>
                                   {state === "adding" ? "…" : state === "added" ? "✓" : "Add"}
                                 </span>
@@ -553,9 +551,9 @@ function Newsletter({
 }: {
   headline: string; sub: string; placeholder: string; submit: string; gdprText: string;
 }) {
-  const [email,  setEmail]  = useState("");
+  const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [done,   setDone]   = useState(false);
+  const [done, setDone] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -630,10 +628,10 @@ function Newsletter({
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Index() {
-  const { language }  = useI18nStore();
-  const p1            = phase1T[language] ?? phase1T.de;
-  const { products }  = useProductStore();
-  const { addItem }   = useCartStore();
+  const { language } = useI18nStore();
+  const p1 = phase1T[language] ?? phase1T.de;
+  const { products } = useProductStore();
+  const { addItem } = useCartStore();
 
   const [cartStates, setCartStates] = useState<Record<string, CartBtnState>>({});
 
@@ -656,7 +654,7 @@ export default function Index() {
 
       <main>
         <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} />
-        <UspStrip  items={p1.home.usp as unknown as { label: string }[]} />
+        <UspStrip items={p1.home.usp as unknown as { label: string }[]} />
         <ConcernSection
           title={p1.home.concernTitle}
           sub={p1.home.concernSub}

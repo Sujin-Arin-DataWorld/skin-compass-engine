@@ -953,7 +953,7 @@ const DiagnosisPage: React.FC = () => {
                   style={{
                     display: "inline-block", padding: "16px 40px", borderRadius: 32, border: "none",
                     background: foundationComplete ? `linear-gradient(135deg, ${GOLD}, ${ROSE})` : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                    color: foundationComplete ? "#0d0d12" : isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
+                    color: foundationComplete ? "#fafafdff" : isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
                     fontSize: 15, fontFamily: "'DM Sans', sans-serif",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: foundationComplete ? "pointer" : "default",

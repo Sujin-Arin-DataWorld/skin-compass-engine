@@ -99,6 +99,8 @@ const Navbar = () => {
   // Shared link style
   const navLink =
     "px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap";
+  const navFont = { fontFamily: language === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" };
+
 
   return (
     <>
@@ -113,13 +115,14 @@ const Navbar = () => {
 
           {/* ── Desktop nav links ── */}
           <div className="hidden md:flex flex-1 items-center gap-0">
-            <Link to="/diagnosis" className={navLink}>{p1.nav.hautAnalyse}</Link>
+            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.hautAnalyse}</Link>
 
             {/* K-Mask Lab dropdown */}
             <div className="relative" ref={kMaskRef}>
               <button
                 onClick={() => setKMaskOpen(!kMaskOpen)}
                 className={`${navLink} flex items-center gap-1`}
+                style={navFont}
               >
                 {p1.nav.kMaskLab}
                 <motion.span
@@ -157,11 +160,12 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
-            <Link to="/diagnosis" className={navLink}>{p1.nav.routinenSets}</Link>
-            <Link to="/diagnosis" className={navLink}>{p1.nav.hautbeduerfnisse}</Link>
-            <Link to="/diagnosis" className={navLink}>{p1.nav.bestseller}</Link>
-            <Link to="/diagnosis" className={navLink}>{p1.nav.science}</Link>
+            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.routinenSets}</Link>
+            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.hautbeduerfnisse}</Link>
+            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.bestseller}</Link>
+            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.science}</Link>
           </div>
+
 
           {/* ── Right icon cluster ── */}
           <div className="ml-auto flex items-center gap-1">
@@ -187,6 +191,7 @@ const Navbar = () => {
                 className="flex h-9 items-center gap-1 px-2.5 rounded-full border border-stone-200 dark:border-white/15 text-[#947E5C] dark:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-colors text-[0.68rem] font-medium tracking-wide"
                 whileTap={{ scale: 0.95 }}
                 aria-label="Change language"
+                style={navFont}
               >
                 <Globe className="h-3.5 w-3.5 shrink-0" />
                 {langLabel}
@@ -216,6 +221,7 @@ const Navbar = () => {
                             ? "bg-stone-50 dark:bg-white/5 font-medium"
                             : "hover:bg-stone-50 dark:hover:bg-white/5"
                         }`}
+                        style={navFont}
                       >
                         <span className="text-gray-800 dark:text-gray-200">{native}</span>
                         <span
@@ -343,6 +349,7 @@ const Navbar = () => {
                 ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
                   <Link key={label} to={href}
                     className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
+                    style={navFont}
                   >
                     <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
                     <span className="text-sm font-medium tracking-wide">{label}</span>
@@ -362,6 +369,7 @@ const Navbar = () => {
                 ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
                   <Link key={label} to={href}
                     className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
+                    style={navFont}
                   >
                     <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
                     <span className="text-sm font-medium tracking-wide">{label}</span>
@@ -376,6 +384,7 @@ const Navbar = () => {
                 </p>
                 <Link to="/diagnosis"
                   className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
+                  style={navFont}
                 >
                   <Atom className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
                   <span className="text-sm font-medium tracking-wide">{p1.nav.science}</span>
@@ -389,7 +398,7 @@ const Navbar = () => {
                 </p>
 
                 {/* Language */}
-                <div className="px-6 pb-3 flex items-center justify-between">
+                <div className="px-6 pb-3 flex items-center justify-between" style={navFont}>
                   <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                     <Globe className="h-3.5 w-3.5" /> Language
                   </span>

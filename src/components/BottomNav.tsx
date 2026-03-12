@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Home, Heart, LayoutGrid, User, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useNavStore } from "@/store/navStore";
+import { useI18nStore } from "@/store/i18nStore";
 
 export function BottomNav() {
   const [isVisible, setIsVisible] = useState(true);
@@ -11,6 +12,8 @@ export function BottomNav() {
   const location = useLocation();
   const cartCount = useCartStore((s) => s.totalItems());
   const { openMobileMenu } = useNavStore();
+  const { language } = useI18nStore();
+  const navFont = { fontFamily: language === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,7 +50,7 @@ export function BottomNav() {
           {/* Glassmorphism background */}
           <div className="absolute inset-0 bg-white/60 dark:bg-[#0a0a0a]/70 backdrop-blur-2xl border-t border-white/40 dark:border-white/[0.08] shadow-[0_-1px_0_0_rgba(0,0,0,0.04),0_-20px_60px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_-1px_0_0_rgba(255,255,255,0.04),0_-20px_60px_-10px_rgba(0,0,0,0.6)] pointer-events-none" />
 
-          <div className="relative grid grid-cols-5 items-center justify-items-center h-16 w-full">
+          <div className="relative grid grid-cols-5 items-center justify-items-center h-16 w-full" style={navFont}>
             {navItems.map((item) => {
               const isActive =
                 item.path !== null &&

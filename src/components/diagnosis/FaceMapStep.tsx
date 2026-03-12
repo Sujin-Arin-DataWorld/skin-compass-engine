@@ -6,6 +6,7 @@ import { useI18nStore } from "@/store/i18nStore";
 import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
 import type { QuestionDef, LocalizedText, QuestionAnswer } from "@/engine/questionRoutingV5";
 import { useTheme } from "next-themes";
+import facemapImg from "@/assets/facemap_final.png";
 
 // ─── 타입 정의 ────────────────────────────────────────────────────────────────
 // 7개의 임상 기능 존 (좌우 대칭 존은 하나로 통합)
@@ -105,27 +106,27 @@ const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
 const COPY: Record<Lang, {
   title: string; subtitle: string;
   selected: (n: number) => string;
-  close: string; continue: string; hint: string;
+  close: string; incomplete: string; complete: string; hint: string;
 }> = {
   en: {
     title: "Where do you notice concerns?",
     subtitle: "Tap a clinical zone on the face map to analyse your skin condition.",
     selected: (n) => n === 1 ? "1 concern selected" : `${n} concerns selected`,
-    close: "Done", continue: "Continue",
+    close: "Selection Complete", incomplete: "Please complete analysis", complete: "Check Results",
     hint: "Tap a zone on the face map to begin",
   },
   de: {
     title: "Wo bemerken Sie Hautprobleme?",
     subtitle: "Tippen Sie auf eine klinische Zone für eine Tiefenanalyse.",
     selected: (n) => `${n} Anliegen ausgewählt`,
-    close: "Fertig", continue: "Weiter",
+    close: "Auswahl Bestätigen", incomplete: "Analyse abschließen", complete: "Ergebnisse ansehen",
     hint: "Tippen Sie auf eine Zone, um zu beginnen",
   },
   ko: {
     title: "어느 부위가 신경 쓰이시나요?",
     subtitle: "얼굴 지도에서 구역을 탭하여 피부 상태를 분석하세요.",
     selected: (n) => `${n}개 선택됨`,
-    close: "완료", continue: "계속",
+    close: "선택 완료", incomplete: "분석을 완료하세요", complete: "결과 확인하기",
     hint: "얼굴 지도에서 구역을 탭하여 시작하세요",
   },
 };
@@ -163,16 +164,16 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "forehead",
     dots: [
-      { x: 250, y: 140 },   // 이마 중앙
-      { x: 180, y: 185 },   // 이마 좌측
-      { x: 320, y: 185 },   // 이마 우측
+      { x: 260, y: 120 },   // 이마 중앙
+      { x: 200, y: 150 },   // 이마 좌측
+      { x: 320, y: 150 },   // 이마 우측
     ],
     connectors: [
-      { x1: 180, y1: 185, x2: 320, y2: 185 },   // 이마 가로 연결선
-      { x1: 250, y1: 140, x2: 250, y2: 185 },   // 중앙 수직 연결선
+      { x1: 200, y1: 150, x2: 320, y2: 150 },   // 이마 가로 연결선
+      { x1: 260, y1: 120, x2: 260, y2: 150 },   // 중앙 수직 연결선
     ],
-    annotLine: { x1: 250, y1: 160, x2: 220, y2: 160 },
-    hitPath: "M 125 82 L 375 82 L 370 192 L 130 192 Z",
+    annotLine: { x1: 200, y1: 150, x2: 70, y2: 135 },
+    hitPath: "M 125 82 L 375 82 L 370 192 L 130 192 Z M 60 110 L 200 110 L 200 170 L 60 170 Z",
   },
 
   // ── 코 & T존 (Nose & T-Zone) — 3개 도트로 T자 세로 축 완성 ───────────────
@@ -180,16 +181,16 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "t_zone",
     dots: [
-      { x: 250, y: 192 },   // 미간 (Glabella) — T존 상단 기준점
-      { x: 250, y: 248 },   // 코 브릿지 (Nose bridge) — T존 중간
-      { x: 250, y: 305 },   // 코 끝 (Nose tip) — T존 하단
+      { x: 258, y: 192 },   // 미간 (Glabella) — T존 상단 기준점
+      { x: 258, y: 248 },   // 코 브릿지 (Nose bridge) — T존 중간
+      { x: 258, y: 305 },   // 코 끝 (Nose tip) — T존 하단
     ],
     connectors: [
-      { x1: 250, y1: 192, x2: 250, y2: 248 },   // 미간 → 브릿지 세로선
-      { x1: 250, y1: 248, x2: 250, y2: 305 },   // 브릿지 → 코끝 세로선
+      { x1: 258, y1: 192, x2: 258, y2: 248 },   // 미간 → 브릿지 세로선
+      { x1: 258, y1: 248, x2: 258, y2: 305 },   // 브릿지 → 코끝 세로선
     ],
-    annotLine: { x1: 250, y1: 305, x2: 295, y2: 325 },
-    hitPath: "M 215 178 L 285 178 L 290 332 L 210 332 Z",
+    annotLine: { x1: 258, y1: 192, x2: 440, y2: 170 },
+    hitPath: "M 215 178 L 285 178 L 290 332 L 210 332 Z M 250 150 L 450 150 L 450 200 L 250 200 Z",
   },
 
   // ── 눈가 & 눈밑 통합 (Eye Area + Under-Eye) ─────────────────────────────
@@ -197,19 +198,19 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "eyes",
     dots: [
-      { x: 175, y: 218 },   // 좌안 외측
-      { x: 325, y: 218 },   // 우안 외측
-      { x: 175, y: 270 },   // 좌측 눈밑 (다크서클)
-      { x: 325, y: 270 },   // 우측 눈밑 (다크서클)
+      { x: 150, y: 218 },   // 좌안 외측
+      { x: 370, y: 218 },   // 우안 외측
+      { x: 150, y: 270 },   // 좌측 눈밑 (다크서클)
+      { x: 370, y: 270 },   // 우측 눈밑 (다크서클)
     ],
     connectors: [
-      { x1: 175, y1: 218, x2: 325, y2: 218 },   // 눈 높이 가로선
-      { x1: 175, y1: 218, x2: 175, y2: 270 },   // 좌측 수직 연결선
-      { x1: 325, y1: 218, x2: 325, y2: 270 },   // 우측 수직 연결선
-      { x1: 175, y1: 270, x2: 325, y2: 270 },   // 눈밑 가로선
+      { x1: 150, y1: 218, x2: 370, y2: 218 },   // 눈 높이 가로선
+      { x1: 150, y1: 218, x2: 150, y2: 270 },   // 좌측 수직 연결선
+      { x1: 370, y1: 218, x2: 370, y2: 270 },   // 우측 수직 연결선
+      { x1: 150, y1: 270, x2: 370, y2: 270 },   // 눈밑 가로선
     ],
-    annotLine: { x1: 325, y1: 218, x2: 385, y2: 205 },
-    hitPath: "M 125 195 L 375 195 L 375 282 L 125 282 Z",
+    annotLine: { x1: 370, y1: 218, x2: 440, y2: 230 },
+    hitPath: "M 125 195 L 375 195 L 375 282 L 125 282 Z M 370 210 L 460 210 L 460 250 L 370 250 Z",
   },
 
   // ── 볼 통합 (Cheeks — 좌우 각 1개 도트, 라벨 인출선 1개) ──────────────────
@@ -218,7 +219,7 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "cheeks",
     dots: [
-      { x: 148, y: 318 },   // 왼볼 중앙 1개
+      { x: 160, y: 318 },   // 왼볼 중앙 1개
       { x: 352, y: 318 },   // 오른볼 중앙 1개
     ],
     connectors: [],   // 볼은 연결선 없음 — 점 두 개만 표시
@@ -231,16 +232,16 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "mouth_chin",
     dots: [
-      { x: 200, y: 375 },   // 입 왼쪽 코너
-      { x: 300, y: 375 },   // 입 오른쪽 코너
-      { x: 250, y: 418 },   // 턱 중앙
+      { x: 200, y: 350 },   // 입 왼쪽 코너
+      { x: 320, y: 350 },   // 입 오른쪽 코너
+      { x: 260, y: 418 },   // 턱 중앙
     ],
     connectors: [
-      { x1: 200, y1: 375, x2: 300, y2: 375 },   // 입술 가로 연결선
-      { x1: 250, y1: 375, x2: 250, y2: 418 },   // 턱 방향 수직선
+      { x1: 200, y1: 350, x2: 320, y2: 350 },   // 입술 가로 연결선
+      { x1: 260, y1: 350, x2: 260, y2: 418 },   // 턱 방향 수직선
     ],
-    annotLine: { x1: 300, y1: 375, x2: 375, y2: 368 },
-    hitPath: "M 152 358 L 348 358 L 342 452 L 158 452 Z",
+    annotLine: { x1: 320, y1: 350, x2: 430, y2: 370 },
+    hitPath: "M 152 358 L 348 358 L 342 452 L 158 452 Z M 330 350 L 450 350 L 450 390 L 330 390 Z",
   },
 
   // ── 턱선 통합 (Jawline — 좌우 단일 항목으로 완전 통합) ───────────────────
@@ -249,17 +250,17 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "jawline",
     dots: [
-      { x: 155, y: 370 },   // 왼쪽 턱선 상단
-      { x: 200, y: 415 },   // 왼쪽 턱선 하단
-      { x: 345, y: 452 },   // 오른쪽 턱선 상단
-      { x: 318, y: 478 },   // 오른쪽 턱선 하단
+      { x: 175, y: 402 },   // 왼쪽 턱선 상단
+      { x: 220, y: 435 },   // 왼쪽 턱선 하단
+      { x: 345, y: 402 },   // 오른쪽 턱선 상단
+      { x: 318, y: 435 },   // 오른쪽 턱선 하단
     ],
     connectors: [
-      { x1: 155, y1: 452, x2: 182, y2: 478 },   // 왼쪽 턱선 사선
-      { x1: 345, y1: 452, x2: 318, y2: 478 },   // 오른쪽 턱선 사선
+      { x1: 175, y1: 402, x2: 220, y2: 435 },   // 왼쪽 턱선 사선
+      { x1: 345, y1: 402, x2: 318, y2: 435 },   // 오른쪽 턱선 사선
     ],
-    annotLine: { x1: 155, y1: 452, x2: 92, y2: 442 },   // 좌측으로 라벨 인출
-    hitPath: "M 100 440 L 215 452 L 215 502 L 105 488 Z M 285 452 L 400 440 L 395 488 L 285 502 Z",
+    annotLine: { x1: 175, y1: 402, x2: 92, y2: 442 },   // 좌측으로 라벨 인출
+    hitPath: "M 130 435 L 200 500 L 170 515 L 105 450 Z M 370 435 L 300 500 L 330 515 L 395 450 Z",
   },
 
   // ── 목 (Neck) — 상부 목 위치로 조정 ──────────────────────────────────────
@@ -267,22 +268,23 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "neck",
     dots: [
-      { x: 205, y: 495 },   // 왼쪽 상부 목
-      { x: 295, y: 495 },   // 오른쪽 상부 목
+      { x: 205, y: 470 },   // 왼쪽 상부 목
+      { x: 320, y: 470 },   // 오른쪽 상부 목
     ],
     connectors: [
-      { x1: 205, y1: 495, x2: 295, y2: 495 },   // 목 가로 연결선
+      { x1: 205, y1: 470, x2: 320, y2: 470 },   // 목 가로 연결선
     ],
-    annotLine: { x1: 250, y1: 495, x2: 250, y2: 535 },
-    hitPath: "M 168 470 L 332 470 L 345 580 L 155 580 Z",
+    annotLine: { x1: 320, y1: 470, x2: 420, y2: 500 },
+    hitPath: "M 168 470 L 332 470 L 345 580 L 155 580 Z M 320 460 L 440 460 L 440 520 L 320 520 Z",
   },
 ];
 
-// ─── Colour palette (from facemap.jpg: warm cream-white) ─────────────────────
-const PEARL_ACTIVE = "rgba(255, 252, 230, 1)";
-const PEARL_IDLE   = "rgba(255, 252, 228, 1)";
-const LINE_ACTIVE  = "rgba(255, 250, 222, 1)";
-const LINE_IDLE    = "rgba(255, 250, 222, 1)";
+// ─── Colour palette ─────────────────────
+const COLOR_PALETTE = {
+  gold: "#c6c0a2ff",
+  dark_idle: "#6098b4ff",   // Dark Mode: Crisp Ice Blue
+  light_idle: "#b38746ff",  // White Mode: Dusty Rose
+};
 
 
 // ─── 3-level animation keyframes ─────────────────────────────────────────────
@@ -293,12 +295,12 @@ const SVG_CSS = `
 
   /* Idle: dots & lines breathe softly — always running */
   @keyframes fms-dot-idle {
-    0%, 100% { opacity: 0.32; }
-    50%       { opacity: 0.68; }
+    0%, 100% { opacity: 0.50; }
+    50%       { opacity: 0.80; }
   }
   @keyframes fms-line-idle {
-    0%, 100% { opacity: 0.16; }
-    50%       { opacity: 0.40; }
+    0%, 100% { opacity: 0.40; }
+    50%       { opacity: 0.80; }
   }
   /* Hover: faster, brighter pulse */
   @keyframes fms-dot-hover {
@@ -317,6 +319,11 @@ const SVG_CSS = `
   @keyframes fms-halo-active {
     0%, 100% { opacity: 0.16; }
     50%       { opacity: 0.36; }
+  }
+  /* Shimmer for completion button */
+  @keyframes fms-btn-shimmer {
+    0%, 100% { box-shadow: 0 4px 12px rgba(226,149,120,0.3); filter: brightness(1); }
+    50%      { box-shadow: 0 4px 24px rgba(226,149,120,0.6); filter: brightness(1.1); }
   }
 `;
 
@@ -352,6 +359,8 @@ function FaceSVG({
   lang: Lang;
 }) {
   const [hoveredZone, setHoveredZone] = useState<ZoneId | null>(null);
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
 
   return (
     <svg
@@ -365,14 +374,8 @@ function FaceSVG({
     >
       <style>{SVG_CSS}</style>
       <defs>
-        {/* Full warm bloom — active halos only */}
         <filter id="fms-glow-warm" x="-80%" y="-80%" width="260%" height="260%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        {/* Soft glow — hover halos + active dots */}
-        <filter id="fms-glow-soft" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b" />
           <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
       </defs>
@@ -388,13 +391,13 @@ function FaceSVG({
         // Priority: active > hovered > idle.  Dimmed when another zone is active.
         const lit    = isActive || isSelected;
         const dimmed = activeZone !== null && !lit;
-        // Hover state only fires when no zone is in the "selected" active state,
-        // so it doesn't override the focus on a selected zone.
-        const warm   = isHovered && !lit && !dimmed;
+        
+        const statusColor = (isSelected || isActive) 
+          ? COLOR_PALETTE.gold 
+          : (isDark ? COLOR_PALETTE.dark_idle : COLOR_PALETTE.light_idle);
 
-        // Line / label intensity driven by the same three levels
-        const lineStroke = (lit || warm) ? LINE_ACTIVE : LINE_IDLE;
-        const lineWidth  = (lit || warm) ? 1.0 : 0.75;
+        const finalOpacity = isSelected ? 1 : (isActive ? 0.9 : 0.6);
+        const finalStrokeWidth = (isSelected || isActive) ? 1.2 : 0.8;
 
         // Stagger idle anim phases per zone so they don't all pulse in sync
         const d0 = zoneIdx * 0.38;
@@ -403,16 +406,20 @@ function FaceSVG({
         const label = ZONE_LABELS[zone][lang];
 
         return (
-          <g key={zone} style={{ opacity: dimmed ? 0.13 : 1, transition: "opacity 0.4s ease" }}>
+          <g key={zone} 
+             onClick={() => onZoneClick(zone)}
+             onMouseEnter={() => setHoveredZone(zone)}
+             onMouseLeave={() => setHoveredZone(null)}
+             style={{ 
+               opacity: dimmed && !isSelected ? 0.4 : 1, 
+               transition: "all 0.4s",
+               cursor: "pointer",
+             }}>
 
             {/* ── Click / hover target — covers the whole zone area ─────── */}
             <path
               d={hitPath}
               fill="transparent"
-              style={{ pointerEvents: "all", cursor: "pointer" }}
-              onClick={() => onZoneClick(zone)}
-              onMouseEnter={() => setHoveredZone(zone)}
-              onMouseLeave={() => setHoveredZone(null)}
             />
 
             {/* ── Connector lines (always visible) ─────────────────────── */}
@@ -420,15 +427,14 @@ function FaceSVG({
               <line
                 key={i}
                 x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
-                stroke={lineStroke}
-                strokeWidth={lineWidth}
+                stroke={statusColor}
+                strokeWidth={finalStrokeWidth}
                 style={{
-                  pointerEvents: "none",
-                  animation: (lit || warm)
+                  animation: (isSelected || isActive)
                     ? "none"
-                    : `fms-line-idle 4.2s ease-in-out ${d0 + i * 0.25}s infinite`,
-                  opacity: (lit || warm) ? (lit ? 0.82 : 0.65) : undefined,
-                  transition: "stroke 0.30s ease, stroke-width 0.30s ease, opacity 0.30s ease",
+                    : `fms-line-idle 3s ease-in-out ${d0 + i * 0.25}s infinite`,
+                  opacity: finalOpacity,
+                  transition: "all 0.4s ease",
                 }}
               />
             ))}
@@ -438,15 +444,14 @@ function FaceSVG({
               <line
                 x1={annotLine.x1} y1={annotLine.y1}
                 x2={annotLine.x2} y2={annotLine.y2}
-                stroke={lineStroke}
-                strokeWidth={(lit || warm) ? 0.85 : 0.65}
+                stroke={statusColor}
+                strokeWidth={finalStrokeWidth}
                 style={{
-                  pointerEvents: "none",
-                  animation: (lit || warm)
+                  animation: (isSelected || isActive)
                     ? "none"
-                    : `fms-line-idle 4.2s ease-in-out ${d0 + 0.15}s infinite`,
-                  opacity: (lit || warm) ? (lit ? 0.72 : 0.55) : undefined,
-                  transition: "stroke 0.30s ease, opacity 0.30s ease",
+                    : `fms-line-idle 3s ease-in-out ${d0 + 0.15}s infinite`,
+                  opacity: finalOpacity,
+                  transition: "all 0.4s ease",
                 }}
               />
             )}
@@ -456,18 +461,17 @@ function FaceSVG({
               <text
                 x={lp.x} y={lp.y}
                 textAnchor={lp.anchor}
-                fill={(lit || warm) ? PEARL_ACTIVE : PEARL_IDLE}
-                fontSize="13"
-                fontFamily="'DM Sans', system-ui, sans-serif"
-                letterSpacing="0.05em"
+                fill={statusColor}
                 style={{
-                  pointerEvents: "none",
-                  fontWeight: (lit || warm) ? 500 : 300,
-                  animation: (lit || warm)
+                  fontFamily: lang === "ko" ? "'Pretendard', 'Noto Sans KR', sans-serif" : "'DM Sans', sans-serif",
+                  fontSize: "14px",
+                  fontWeight: (isSelected || isActive) ? 600 : 400,
+                  opacity: finalOpacity,
+                  letterSpacing: "0.02em",
+                  animation: (isSelected || isActive)
                     ? "none"
-                    : `fms-dot-idle 4s ease-in-out ${d0 + 0.2}s infinite`,
-                  opacity: (lit || warm) ? (lit ? 0.90 : 0.72) : undefined,
-                  transition: "fill 0.30s ease, opacity 0.30s ease",
+                    : `fms-dot-idle 3s ease-in-out ${d0 + 0.2}s infinite`,
+                  transition: "all 0.4s ease",
                   userSelect: "none",
                 }}
               >
@@ -477,55 +481,36 @@ function FaceSVG({
 
             {/* ── Dots (always visible) ─────────────────────────────────── */}
             {dots.map((d, i) => {
-              // Dot scale controls visual size without touching `r` attribute,
-              // so CSS transition: scale works smoothly in all browsers.
-              //   idle  → scale 0.45  (effective r ≈ 2.5 from base r=5.5)
-              //   hover → scale 0.73  (effective r ≈ 4.0)
-              //   active→ scale 1.00  (effective r = 5.5)
-              const dotScale = lit ? 1.0 : warm ? 0.73 : 0.45;
-              const dotFill  = (lit || warm) ? PEARL_ACTIVE : PEARL_IDLE;
-              const dotAnim  = lit
-                ? "fms-dot-active 2.4s ease-in-out infinite"
-                : warm
-                  ? `fms-dot-hover 1.8s ease-in-out infinite`
-                  : `fms-dot-idle 4s ease-in-out ${d0 + i * 0.45}s infinite`;
+              const dotScale = lit ? 1.0 : (isHovered && !dimmed) ? 0.73 : 0.45;
+              const dotAnim  = isSelected
+                ? "none"
+                : lit
+                  ? "fms-dot-active 2.4s ease-in-out infinite"
+                  : (isHovered && !dimmed)
+                    ? `fms-dot-hover 1.8s ease-in-out infinite`
+                    : `fms-dot-idle 3s ease-in-out ${d0 + i * 0.45}s infinite`;
 
               return (
-                <g key={i} style={{ pointerEvents: "none" }}>
-
-                  {/* Full warm bloom — active only */}
-                  {lit && (
+                <g key={i}>
+                  {isSelected && (
                     <circle
                       cx={d.x} cy={d.y} r={14}
-                      fill={PEARL_ACTIVE}
+                      fill={COLOR_PALETTE.gold}
                       filter="url(#fms-glow-warm)"
-                      style={{ animation: "fms-halo-active 3s ease-in-out infinite" }}
+                      style={{ opacity: 0.25 }}
                     />
                   )}
-
-                  {/* Medium soft bloom — hover only */}
-                  {warm && (
-                    <circle
-                      cx={d.x} cy={d.y} r={12}
-                      fill={PEARL_ACTIVE}
-                      filter="url(#fms-glow-soft)"
-                      style={{ animation: "fms-halo-hover 2.5s ease-in-out infinite" }}
-                    />
-                  )}
-
-                  {/* Core dot — always rendered.
-                      Size controlled by transform scale (smooth CSS transition).
-                      Glow filter: none in idle, soft in hover, soft in active. */}
                   <circle
                     cx={d.x} cy={d.y}
                     r={5.5}
-                    fill={dotFill}
-                    filter={(lit || warm) ? "url(#fms-glow-soft)" : undefined}
+                    fill={statusColor}
+                    filter={isSelected ? "url(#fms-glow-warm)" : undefined}
                     style={{
                       transform: `scale(${dotScale})`,
                       transformOrigin: `${d.x}px ${d.y}px`,
                       animation: dotAnim,
-                      transition: "transform 0.28s ease, fill 0.28s ease",
+                      opacity: finalOpacity,
+                      transition: "all 0.4s ease",
                     }}
                   />
                 </g>
@@ -787,6 +772,28 @@ function ConcernAndQuestionPanel({
           })}
         </motion.div>
       )}
+
+      {/* ── Selection Complete CTA Button ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ marginTop: 24 }}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            width: "100%", padding: "14px 24px", borderRadius: 32,
+            background: isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)",
+            border: `1px solid ${isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)"}`,
+            color: isDark ? "#fff" : "#111", fontSize: 15, fontWeight: 600,
+            fontFamily: lang === "ko" ? "'Pretendard', sans-serif" : "'DM Sans', sans-serif",
+            cursor: "pointer", transition: "all 0.3s ease"
+          }}
+        >
+          {lang === "ko" ? "선택 완료" : lang === "de" ? "Auswahl Bestätigen" : "Selection Complete"}
+        </button>
+      </motion.div>
     </div>
   );
 }
@@ -874,6 +881,34 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
 
   const totalSelected = selectedConcerns.size;
 
+  // Check if all required questions for selected concerns are answered
+  const isFullyAnswered = useMemo(() => {
+    if (totalSelected === 0) return false;
+    
+    // Find all triggered axis IDs
+    const triggeredAxisIds = new Set<number>();
+    for (const cid of selectedConcerns) {
+      for (const arr of Object.values(ZONE_CONCERNS)) {
+        const f = arr.find(c => c.id === cid);
+        if (f && f.axis && CONCERN_AXIS_ID[f.axis] !== undefined) {
+          triggeredAxisIds.add(CONCERN_AXIS_ID[f.axis]);
+        }
+      }
+    }
+
+    // Check if each triggered axis has all its required questions answered
+    for (const axisId of Array.from(triggeredAxisIds)) {
+      const axisDef = AXIS_DEFINITIONS.find(a => a.id === axisId);
+      if (!axisDef) continue;
+      
+      const reqQs = axisDef.questions.filter(q => q.required);
+      const answered = reqQs.every(q => store.axisAnswers[q.id] !== undefined);
+      if (reqQs.length > 0 && !answered) return false;
+    }
+    
+    return true;
+  }, [selectedConcerns, store.axisAnswers]);
+
   return (
     <div style={{ width: "100%" }}>
       {/* Header */}
@@ -902,23 +937,34 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
         {/* Face Image Card */}
         <div style={{
           position: "relative",
-          width: isMobile ? "min(88vw, 380px)" : "min(38vw, 460px)",
+          width: "100%",
+          maxWidth: isMobile ? "380px" : "460px",
           aspectRatio: "500/700",
-          flexShrink: 0, borderRadius: 28, overflow: "hidden",
+          flexShrink: 0, 
+          overflow: "visible", // Allowed to be visible so annotLines/labels don't get clipped
+          background: isDark ? "#121214" : "#F2F0ED",
+          borderRadius: 28, 
           boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
-          border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.06)"}`,
+          border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
+          margin: isMobile ? "0 24px" : "0", // Added side margin for mobile safety
         }}>
           <img
-            src="/assets/hero-face.png"
+            src={facemapImg}
             alt="Clinical face map"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            style={{ 
+              width: "100%", height: "100%", 
+              objectFit: "cover", 
+              borderRadius: 28, // Moved border-radius here since wrapper is overflow:visible
+              filter: isDark ? "brightness(0.9) contrast(1.1)" : "none",
+              transition: "filter 0.3s ease" 
+            }}
           />
-          {/* Subtle vignette overlay */}
           <div style={{
             position: "absolute", inset: 0, pointerEvents: "none",
+            borderRadius: 28, // Moved border-radius here since wrapper is overflow:visible
             background: isDark
-              ? "radial-gradient(ellipse at 50% 42%, transparent 38%, rgba(0,0,0,0.38) 100%)"
-              : "radial-gradient(ellipse at 50% 42%, transparent 45%, rgba(0,0,0,0.08) 100%)",
+              ? "radial-gradient(ellipse at 50% 42%, transparent 30%, rgba(18,18,20,0.6) 100%)"
+              : "radial-gradient(ellipse at 50% 42%, transparent 35%, rgba(242,240,237,0.4) 100%)",
           }} />
           <FaceSVG
             activeZone={activeZone}
@@ -1013,23 +1059,24 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
         <div style={{ marginLeft: "auto" }}>
           <button
             onClick={handleNext}
-            disabled={totalSelected === 0}
+            disabled={!isFullyAnswered}
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "14px 32px", borderRadius: 32,
               fontSize: 14, fontWeight: 600,
               fontFamily: "'DM Sans', sans-serif", border: "none",
-              background: totalSelected > 0
-                ? "linear-gradient(135deg, #c9a96e, #a38555)"
+              background: isFullyAnswered
+                ? "linear-gradient(135deg, #E29578, #d38b71)"
                 : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
-              color: totalSelected > 0
+              color: isFullyAnswered
                 ? "#fff"
                 : isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
-              cursor: totalSelected > 0 ? "pointer" : "not-allowed",
+              cursor: isFullyAnswered ? "pointer" : "not-allowed",
               transition: "all 0.3s ease",
-              boxShadow: totalSelected > 0 ? "0 8px 24px rgba(201,169,110,0.3)" : "none",
+              boxShadow: isFullyAnswered ? "0 8px 24px rgba(226,149,120,0.3)" : "none",
+              animation: isFullyAnswered ? "fms-btn-shimmer 2s infinite" : "none",
             }}>
-            {copy.continue} <ChevronRight size={18} />
+            {isFullyAnswered ? copy.complete : copy.incomplete} <ChevronRight size={18} />
           </button>
         </div>
       </div>

@@ -16,7 +16,6 @@ import Navbar from "@/components/Navbar";
 import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
 import type { QuestionDef, AxisDef, LocalizedText } from "@/engine/questionRoutingV5";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
-import faceIllustration from "@/assets/facemap.jpg";
 import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
 import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { convertAxisAnswersToUiSignals } from "@/engine/axisAnswerBridge";
@@ -116,16 +115,6 @@ const ZONES: ZoneConfig[] = [
   },
 ];
 
-// Zone positions — percentage-based for the new face illustration image.
-// { top, left, width, height } in % of image dimensions.
-const ZONE_PCT: Record<ZoneId, { top: number; left: number; width: number; height: number }> = {
-  forehead: { top: 16, left: 25, width: 50, height: 14 },
-  eyes: { top: 32, left: 20, width: 60, height: 10 },
-  nose: { top: 42, left: 35, width: 30, height: 14 },
-  cheeks: { top: 44, left: 15, width: 70, height: 16 },
-  chin: { top: 62, left: 28, width: 44, height: 12 },
-  neck: { top: 76, left: 30, width: 40, height: 10 },
-};
 
 // ─── Concern data ─────────────────────────────────────────────────────────────
 const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
@@ -357,101 +346,6 @@ function InlineQuestionRenderer({
         </motion.div>
       )}
     </>
-  );
-}
-
-// ─── Face Map (image-based) ───────────────────────────────────────────────────
-function FaceMap({
-  activeZone, zoneData, onZoneClick, lang, isMobile, isDark,
-}: {
-  activeZone: ZoneId | null;
-  zoneData: Partial<Record<ZoneId, string[]>>;
-  onZoneClick: (id: ZoneId) => void;
-  lang: Lang;
-  isMobile: boolean;
-  isDark: boolean;
-}) {
-  const imgW = isMobile ? 240 : 320;
-
-  return (
-    <div style={{ width: imgW, margin: "0 auto", position: "relative", userSelect: "none" }}>
-      {/* Face illustration image */}
-      <img
-        src={faceIllustration}
-        alt="Face zone map"
-        draggable={false}
-        style={{
-          width: "100%", height: "auto", display: "block",
-          borderRadius: 20,
-        }}
-      />
-
-      {/* Zone overlays — positioned with percentage coordinates */}
-      {ZONES.map((zone) => {
-        const pct = ZONE_PCT[zone.id];
-        const isActive = activeZone === zone.id;
-        const concerns = zoneData[zone.id] ?? [];
-        const hasData = concerns.length > 0;
-        const label = zoneLabel(zone, lang, true);
-
-        return (
-          <div
-            key={zone.id}
-            onClick={() => onZoneClick(zone.id)}
-            style={{
-              position: "absolute",
-              top: `${pct.top}%`, left: `${pct.left}%`,
-              width: `${pct.width}%`, height: `${pct.height}%`,
-              borderRadius: 14,
-              border: isActive
-                ? "2px solid rgba(164,213,200,0.72)"
-                : hasData
-                  ? "1.5px solid rgba(164,213,200,0.38)"
-                  : "1px solid transparent",
-              background: isActive
-                ? "rgba(164,213,200,0.22)"
-                : hasData
-                  ? "rgba(164,213,200,0.10)"
-                  : "transparent",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}
-          >
-            {/* Zone label — visible when active or has data */}
-            {(isActive || hasData) && (
-              <span style={{
-                fontSize: isMobile ? 10 : 11,
-                fontFamily: "'DM Sans', sans-serif",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                fontWeight: 500,
-                color: isActive ? "rgba(255,255,255,0.95)" : isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.55)",
-                textShadow: isDark ? "0 1px 4px rgba(0,0,0,0.6)" : "0 1px 3px rgba(255,255,255,0.8)",
-                pointerEvents: "none",
-              }}>
-                {label}
-              </span>
-            )}
-
-            {/* Concern count badge */}
-            {hasData && (
-              <span style={{
-                position: "absolute", top: 2, right: 2,
-                width: 18, height: 18, borderRadius: "50%",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                background: isActive ? "rgba(164,213,200,0.55)" : "rgba(164,213,200,0.35)",
-                fontSize: 10, fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 700, color: "rgba(255,255,255,0.95)",
-                pointerEvents: "none",
-              }}>
-                {concerns.length}
-              </span>
-            )}
-          </div>
-        );
-      })}
-    </div>
   );
 }
 

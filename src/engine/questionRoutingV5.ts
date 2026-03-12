@@ -657,20 +657,38 @@ const CONCERN_TO_AXES: Record<string, number[]> = {
   blackheads_forehead: [1, 3], blackheads_nose: [1, 3],
   whiteheads_forehead: [1, 4], forehead_breakouts: [1, 4],
   large_pores_nose: [3],   large_pores_cheeks: [3],
+  oily_f: [1], // new forehead oily
+  
   // → Hydration (2)
   dryness_cheeks: [2],     dryness_eyes: [2],
   dryness_lips: [2],       neck_dryness: [2],
   redness_cheeks: [2, 5],  redness_nose: [5],
   neck_sensitivity: [5],
+  dry_c: [2], dry_m: [2], neck_dry: [2],
+
+  // → Pores (3)
+  bh_t: [3], pores_t: [3],
+
   // → Texture/Breakouts (4)
   cheek_acne: [4],         hormonal_breakouts: [4, 8],
+  breakouts_f: [4],
+
+  // → Sensitivity (5)
+  red_c: [5],
+  
   // → Aging (6)
   forehead_lines: [6],     fine_lines_eyes: [6],
   nasolabial: [6],         neck_wrinkles: [6],
   neck_sagging: [6],       puffiness: [6],
+  lines_f: [6], finelines_e: [6], hollow_e: [6], sag_j: [6], neck_lines: [6],
+  
   // → Pigment (7)
   dark_circles: [7],       pigmentation_cheeks: [7],
   pigmentation_mouth: [7],
+  dc_e: [7], pigm_c: [7],
+
+  // → Hormonal (8)
+  hormonal_m: [8], jaw_acne: [8],
 };
 
 // ─── Routing ──────────────────────────────────────────────────────────────────

@@ -1,7 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import {
   Moon, Sun, ChevronDown, User, Globe, Search,
-  ShoppingBag, LogOut, LayoutDashboard, Menu, X,
+  ShoppingBag, LogOut, LayoutDashboard, X,
+  Microscope, Layers, Trophy, Target, Sparkles, Atom,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +10,7 @@ import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore, translations, phase1T, type Language } from "@/store/i18nStore";
 import { useCartStore } from "@/store/cartStore";
+import { useNavStore } from "@/store/navStore";
 
 // ── Logo ──────────────────────────────────────────────────────────────────────
 function Logo() {
@@ -46,13 +48,14 @@ function AvatarCircle({
   );
 }
 
+
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const [kMaskOpen,    setKMaskOpen]    = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [mobileOpen,   setMobileOpen]   = useState(false);
   const [langOpen,     setLangOpen]     = useState(false);
+  const { mobileMenuOpen, closeMobileMenu } = useNavStore();
 
   const { isLoggedIn, userProfile, logout } = useAuthStore();
   const { language, setLanguage } = useI18nStore();
@@ -64,10 +67,9 @@ const Navbar = () => {
   const redirectParam = encodeURIComponent(location.pathname);
   const loginUrl  = `/login?redirect=${redirectParam}`;
 
-  const kMaskRef   = useRef<HTMLDivElement>(null);
-  const userMenuRef= useRef<HTMLDivElement>(null);
-  const langRef    = useRef<HTMLDivElement>(null);
-
+  const kMaskRef    = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const langRef     = useRef<HTMLDivElement>(null);
   // Close dropdowns on outside click
   useEffect(() => {
     const onOutside = (e: MouseEvent) => {
@@ -80,7 +82,7 @@ const Navbar = () => {
   }, []);
 
   // Close drawer on route change
-  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+  useEffect(() => { closeMobileMenu(); }, [location.pathname]);
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -104,16 +106,7 @@ const Navbar = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-stone-200/70 dark:border-white/[0.06] bg-white/85 dark:bg-black/85 backdrop-blur-xl pt-[env(safe-area-inset-top)]">
         <div className="flex w-full items-center h-16 px-4 md:px-8 lg:px-12">
 
-          {/* ── Mobile hamburger ── */}
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="md:hidden flex h-10 w-10 items-center justify-center rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors mr-1"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-
-          {/* Logo */}
+          {/* Logo — centered on mobile, left on desktop */}
           <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:mr-8">
             <Logo />
           </div>
@@ -172,22 +165,22 @@ const Navbar = () => {
 
           {/* ── Right icon cluster ── */}
           <div className="ml-auto flex items-center gap-1">
-            {/* Search (desktop) */}
-            <button className="hidden md:flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" aria-label="Search">
-              <Search className="h-4 w-4" />
+            {/* Search (all screens) */}
+            <button className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" aria-label="Search">
+              <Search className="h-[1.1rem] w-[1.1rem]" />
             </button>
 
-            {/* Theme toggle */}
+            {/* Theme toggle (desktop only) */}
             <motion.button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              className="hidden md:flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
               whileTap={{ scale: 0.9 }}
               aria-label="Toggle theme"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </motion.button>
 
-            {/* Globe — language dropdown */}
+            {/* Globe — language dropdown (desktop only) */}
             <div className="hidden md:block relative" ref={langRef}>
               <motion.button
                 onClick={() => setLangOpen(!langOpen)}
@@ -290,20 +283,7 @@ const Navbar = () => {
               </Link>
             )}
 
-            {/* Auth — mobile icon */}
-            <div className="md:hidden">
-              {isLoggedIn && userProfile ? (
-                <Link to="/profile" className="flex h-9 w-9 items-center justify-center">
-                  <AvatarCircle avatar={userProfile.avatar} firstName={userProfile.firstName} lastName={userProfile.lastName} size="sm" />
-                </Link>
-              ) : (
-                <Link to={loginUrl} className="flex h-9 w-9 items-center justify-center text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                  <User className="h-5 w-5" />
-                </Link>
-              )}
-            </div>
-
-            {/* Cart */}
+            {/* Cart (all screens) */}
             <Link to="/cart" className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
@@ -317,9 +297,9 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* ── Mobile Drawer ── */}
+      {/* ── Mobile Drawer (Categories) ── */}
       <AnimatePresence>
-        {mobileOpen && (
+        {mobileMenuOpen && (
           <>
             <motion.div
               key="backdrop"
@@ -328,7 +308,7 @@ const Navbar = () => {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed inset-0 z-[60] bg-black/50 md:hidden"
-              onClick={() => setMobileOpen(false)}
+              onClick={closeMobileMenu}
             />
             <motion.aside
               key="drawer"
@@ -342,7 +322,7 @@ const Navbar = () => {
               <div className="flex items-center justify-between px-5 h-16 border-b border-stone-100 dark:border-white/[0.07] flex-shrink-0">
                 <Logo />
                 <button
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMobileMenu}
                   className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
                   aria-label="Close menu"
                 >
@@ -350,67 +330,134 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* Nav links */}
-              <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+              {/* ── Nav sections ── */}
+              <nav className="flex-1 overflow-y-auto pt-7 pb-7">
+
+                {/* ── SKIN LAB ── */}
+                <p className="px-6 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
+                  Skin Lab
+                </p>
                 {([
-                  [p1.nav.hautAnalyse,      "/diagnosis"],
-                  [p1.nav.kMaskLab,         "/diagnosis"],
-                  [p1.nav.routinenSets,     "/diagnosis"],
-                  [p1.nav.hautbeduerfnisse, "/diagnosis"],
-                  [p1.nav.bestseller,       "/diagnosis"],
-                  [p1.nav.science,          "/diagnosis"],
-                ] as [string, string][]).map(([label, href]) => (
-                  <Link
-                    key={label}
-                    to={href}
-                    className="block px-4 py-3 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/5 transition-colors"
+                  { Icon: Microscope, label: p1.nav.hautAnalyse,  href: "/diagnosis" },
+                  { Icon: Layers,     label: p1.nav.routinenSets, href: "/diagnosis" },
+                ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
+                  <Link key={label} to={href}
+                    className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
                   >
-                    {label}
+                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
+                    <span className="text-sm font-medium tracking-wide">{label}</span>
                   </Link>
                 ))}
+
+                <div className="mx-6 my-2 border-t border-stone-100 dark:border-white/[0.06]" />
+
+                {/* ── SHOP ── */}
+                <p className="px-6 mt-3 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
+                  Shop
+                </p>
+                {([
+                  { Icon: Trophy,   label: p1.nav.bestseller,       href: "/diagnosis" },
+                  { Icon: Target,   label: p1.nav.hautbeduerfnisse, href: "/diagnosis" },
+                  { Icon: Sparkles, label: p1.nav.kMaskLab,         href: "/diagnosis" },
+                ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
+                  <Link key={label} to={href}
+                    className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
+                  >
+                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
+                    <span className="text-sm font-medium tracking-wide">{label}</span>
+                  </Link>
+                ))}
+
+                <div className="mx-6 my-2 border-t border-stone-100 dark:border-white/[0.06]" />
+
+                {/* ── KNOWLEDGE ── */}
+                <p className="px-6 mt-3 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
+                  Knowledge
+                </p>
+                <Link to="/diagnosis"
+                  className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
+                >
+                  <Atom className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
+                  <span className="text-sm font-medium tracking-wide">{p1.nav.science}</span>
+                </Link>
               </nav>
 
-              {/* Language pills */}
-              <div className="px-5 py-4 border-t border-stone-100 dark:border-white/[0.07]">
-                <p className="text-[0.6rem] uppercase tracking-widest text-gray-400 mb-2.5">Language</p>
-                <div className="flex gap-2">
-                  {(["de", "en", "ko"] as Language[]).map((lang) => (
-                    <button
-                      key={lang}
-                      onClick={() => setLanguage(lang)}
-                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                        language === lang
-                          ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#947E5C] dark:text-[#D4AF37]"
-                          : "border-stone-200 dark:border-white/15 text-gray-500 dark:text-gray-400 hover:border-[#D4AF37]/40"
-                      }`}
-                    >
-                      {lang.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              {/* ── Settings ── */}
+              <div className="border-t border-stone-100 dark:border-white/[0.07] flex-shrink-0">
+                <p className="px-6 pt-5 pb-3 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
+                  Settings
+                </p>
 
-              {/* Auth */}
-              <div className="px-5 pb-8 flex-shrink-0">
-                {isLoggedIn && userProfile ? (
-                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-white/5">
-                    <AvatarCircle avatar={userProfile.avatar} firstName={userProfile.firstName} lastName={userProfile.lastName} size="sm" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{userProfile.firstName}</p>
-                      <Link to="/profile" className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{t.profile}</Link>
-                    </div>
-                    <button onClick={handleLogout} className="text-red-400 hover:text-red-500 transition-colors" aria-label="Logout">
-                      <LogOut className="h-4 w-4" />
-                    </button>
+                {/* Language */}
+                <div className="px-6 pb-3 flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    <Globe className="h-3.5 w-3.5" /> Language
+                  </span>
+                  <div className="flex gap-1.5">
+                    {(["de", "en", "ko"] as Language[]).map((lang) => (
+                      <button
+                        key={lang}
+                        onClick={() => setLanguage(lang)}
+                        className={`w-9 py-1 rounded-full text-[0.65rem] font-semibold border transition-all ${
+                          language === lang
+                            ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#947E5C] dark:text-[#D4AF37]"
+                            : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-[#D4AF37]/40"
+                        }`}
+                      >
+                        {lang.toUpperCase()}
+                      </button>
+                    ))}
                   </div>
-                ) : (
-                  <Link
-                    to={loginUrl}
-                    className="flex w-full items-center justify-center rounded-full bg-[#D4AF37] px-5 py-3 text-sm font-semibold text-[#0a0a0a] hover:opacity-90 transition-opacity"
-                  >
-                    {p1.nav.signIn}
-                  </Link>
-                )}
+                </div>
+
+                {/* Theme */}
+                <div className="px-6 pb-3 flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                    {theme === "dark" ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />} Theme
+                  </span>
+                  <div className="flex gap-1.5">
+                    {([
+                      { val: "light", label: "White", Icon: Sun },
+                      { val: "dark",  label: "Dark",  Icon: Moon },
+                    ] as { val: string; label: string; Icon: React.ElementType }[]).map(({ val, label, Icon }) => (
+                      <button
+                        key={val}
+                        onClick={() => setTheme(val)}
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border transition-all ${
+                          (val === "dark" ? theme === "dark" : theme !== "dark")
+                            ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#947E5C] dark:text-[#D4AF37]"
+                            : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-[#D4AF37]/40"
+                        }`}
+                      >
+                        <Icon className="h-3 w-3" strokeWidth={1.8} />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Login / User */}
+                <div className="px-6 pb-7 pt-1">
+                  {isLoggedIn && userProfile ? (
+                    <div className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-white/5">
+                      <AvatarCircle avatar={userProfile.avatar} firstName={userProfile.firstName} lastName={userProfile.lastName} size="sm" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{userProfile.firstName}</p>
+                        <Link to="/profile" className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{t.profile}</Link>
+                      </div>
+                      <button onClick={handleLogout} className="text-red-400 hover:text-red-500 transition-colors" aria-label="Logout">
+                        <LogOut className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      to={loginUrl}
+                      className="flex w-full items-center justify-center rounded-full bg-[#D4AF37] px-5 py-3 text-sm font-semibold text-[#0a0a0a] hover:opacity-90 transition-opacity"
+                    >
+                      {p1.nav.signIn}
+                    </Link>
+                  )}
+                </div>
               </div>
             </motion.aside>
           </>

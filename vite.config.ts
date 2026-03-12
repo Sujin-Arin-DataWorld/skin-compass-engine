@@ -11,6 +11,23 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    proxy: {
+      "/api/geo": {
+        target: "https://geocoding-api.open-meteo.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/geo/, ""),
+      },
+      "/api/archive": {
+        target: "https://archive-api.open-meteo.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/archive/, ""),
+      },
+      "/api/forecast": {
+        target: "https://api.open-meteo.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/forecast/, ""),
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

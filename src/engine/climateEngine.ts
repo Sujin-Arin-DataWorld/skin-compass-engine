@@ -65,8 +65,9 @@ export async function fetchCitySuggestions(
   lang: string = "en"
 ): Promise<GeoSuggestion[]> {
   if (!query || query.trim().length < 2) return [];
+  // Use Vite dev-proxy path (/api/geo → geocoding-api.open-meteo.com)
   const url =
-    `https://geocoding-api.open-meteo.com/v1/search` +
+    `/api/geo/v1/search` +
     `?name=${encodeURIComponent(query.trim())}&count=15&language=${lang}&format=json`;
 
   console.log("[climateEngine] geocoding URL →", url);
@@ -110,14 +111,15 @@ export async function fetchClimateData(
   const archiveStart = new Date(archiveEnd);
   archiveStart.setDate(archiveEnd.getDate() - 89); // ~3 months
 
+  // Use Vite dev-proxy paths (/api/archive → archive-api.open-meteo.com, /api/forecast → api.open-meteo.com)
   const archiveUrl =
-    `https://archive-api.open-meteo.com/v1/archive` +
+    `/api/archive/v1/archive` +
     `?latitude=${lat}&longitude=${lon}` +
     `&start_date=${formatDate(archiveStart)}&end_date=${formatDate(archiveEnd)}` +
     `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
 
   const forecastUrl =
-    `https://api.open-meteo.com/v1/forecast` +
+    `/api/forecast/v1/forecast` +
     `?latitude=${lat}&longitude=${lon}` +
     `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max` +
     `&forecast_days=7&timezone=auto`;

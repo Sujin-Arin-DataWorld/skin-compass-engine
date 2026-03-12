@@ -36,7 +36,15 @@ const SLIDE_LABELS = {
     { key: "plans", short: "Abo", full: "Plan wählen" },
     { key: "products", short: "Produkte", full: "Passende Produkte" },
     { key: "subscribe", short: "Strategie", full: "Adaptive Strategie" },
-  ]
+  ],
+  ko: [
+    { key: "diagnosis", short: "패턴", full: "피부 패턴 분석" },
+    { key: "axes", short: "분석", full: "임상 분석 결과" },
+    { key: "protocol", short: "루틴", full: "맞춤 스킨케어 루틴" },
+    { key: "plans", short: "플랜", full: "플랜 선택" },
+    { key: "products", short: "제품", full: "맞춤 추천 제품" },
+    { key: "subscribe", short: "전략", full: "맞춤 스킨케어 전략" },
+  ],
 };
 
 const slideVariants = {

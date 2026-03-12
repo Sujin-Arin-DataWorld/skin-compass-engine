@@ -9,18 +9,27 @@ import { useI18nStore, translations } from "@/store/i18nStore";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 
-// ── Zod schemas ────────────────────────────────────────────────────────────
+type Lang = "en" | "de" | "ko";
+
+// ── Per-language login strings ─────────────────────────────────────────────
+function getLp(language: Lang) {
+    const t = translations[language] as Record<string, unknown>;
+    const lp = (t?.loginPage ?? translations["en"].loginPage) as typeof translations["en"]["loginPage"];
+    return lp;
+}
+
+// ── Zod schemas (language-agnostic, errors translated at render) ──────────
 const loginSchema = z.object({
-    email: z.string().email("Ungültige E-Mail-Adresse"),
-    password: z.string().min(1, "Passwort ist erforderlich"),
+    email: z.string().email(),
+    password: z.string().min(1),
 });
 
 const signupSchema = z.object({
-    firstName: z.string().min(1, "Vorname ist erforderlich"),
-    lastName: z.string().min(1, "Nachname ist erforderlich"),
-    email: z.string().email("Ungültige E-Mail-Adresse"),
-    password: z.string().min(8, "Mindestens 8 Zeichen"),
-    gdpr: z.literal(true, { errorMap: () => ({ message: "Zustimmung zur Datenschutzerklärung erforderlich" }) }),
+    firstName: z.string().min(1),
+    lastName: z.string().min(1),
+    email: z.string().email(),
+    password: z.string().min(8),
+    gdpr: z.literal(true, { errorMap: () => ({ message: "required" }) }),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -36,7 +45,7 @@ function FieldError({ message }: { message?: string }) {
 }
 
 // ── Google button ─────────────────────────────────────────────────────────
-function GoogleButton({ onClick }: { onClick: () => void }) {
+function GoogleButton({ label, onClick }: { label: string; onClick: () => void }) {
     return (
         <button
             type="button"
@@ -49,16 +58,16 @@ function GoogleButton({ onClick }: { onClick: () => void }) {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
-            <span className="hero-serif font-medium tracking-wide text-[15px]">Google로 계속하기</span>
+            <span className="hero-serif font-medium tracking-wide text-[15px]">{label}</span>
         </button>
     );
 }
 
-function Divider() {
+function Divider({ label }: { label: string }) {
     return (
         <div className="flex items-center gap-4 my-5">
             <div className="flex-1 h-[0.5px] bg-border" />
-            <span className="text-xs text-muted-foreground uppercase tracking-widest px-2">또는 이메일로</span>
+            <span className="text-xs text-muted-foreground uppercase tracking-widest px-2">{label}</span>
             <div className="flex-1 h-[0.5px] bg-border" />
         </div>
     );
@@ -82,9 +91,10 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 }
 
 // ── Login form ────────────────────────────────────────────────────────────
-function LoginForm({ onSuccess, onGoogleClick }: { onSuccess: () => void; onGoogleClick: () => void }) {
+function LoginForm({ lang, onSuccess, onGoogleClick }: { lang: Lang; onSuccess: () => void; onGoogleClick: () => void }) {
     const login = useAuthStore((s) => s.login);
     const [authError, setAuthError] = useState("");
+    const lp = getLp(lang);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginValues>({
         resolver: zodResolver(loginSchema),
@@ -93,17 +103,14 @@ function LoginForm({ onSuccess, onGoogleClick }: { onSuccess: () => void; onGoog
     const onSubmit = async (values: LoginValues) => {
         setAuthError("");
         const success = await login(values.email, values.password);
-        if (success) {
-            onSuccess();
-        } else {
-            setAuthError("E-Mail oder Passwort ist falsch.");
-        }
+        if (!success) setAuthError(lp.authError);
+        else onSuccess();
     };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <GoogleButton onClick={onGoogleClick} />
-            <Divider />
+            <GoogleButton label={lp.google} onClick={onGoogleClick} />
+            <Divider label={lp.orEmail} />
 
             {authError && (
                 <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5">
@@ -113,16 +120,16 @@ function LoginForm({ onSuccess, onGoogleClick }: { onSuccess: () => void; onGoog
 
             <div>
                 <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">
-                    E-Mail
+                    {lp.emailLabel}
                 </label>
-                <input type="email" className={inputCls} placeholder="ihre@email.de" {...register("email")} />
+                <input type="email" className={inputCls} placeholder={lp.emailPlaceholder} {...register("email")} />
                 <FieldError message={errors.email?.message} />
             </div>
             <div>
                 <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">
-                    Passwort
+                    {lp.passwordLabel}
                 </label>
-                <input type="password" className={inputCls} placeholder="Passwort" {...register("password")} />
+                <input type="password" className={inputCls} placeholder={lp.passwordPlaceholder} {...register("password")} />
                 <FieldError message={errors.password?.message} />
             </div>
 
@@ -132,16 +139,17 @@ function LoginForm({ onSuccess, onGoogleClick }: { onSuccess: () => void; onGoog
                 className="w-full rounded-2xl py-3.5 text-sm font-bold tracking-wide uppercase transition-all disabled:opacity-50"
                 style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
             >
-                {isSubmitting ? "Wird angemeldet…" : "Anmelden"}
+                {isSubmitting ? lp.submitting : lp.submit}
             </button>
         </form>
     );
 }
 
 // ── Signup form ───────────────────────────────────────────────────────────
-function SignupForm({ onEmailSent, onSuccess, onGoogleClick }: { onEmailSent: () => void; onSuccess: () => void; onGoogleClick: () => void }) {
+function SignupForm({ lang, onEmailSent, onSuccess, onGoogleClick }: { lang: Lang; onEmailSent: () => void; onSuccess: () => void; onGoogleClick: () => void }) {
     const signup = useAuthStore((s) => s.signup);
     const [authError, setAuthError] = useState("");
+    const lp = getLp(lang);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignupValues>({
         resolver: zodResolver(signupSchema),
@@ -157,21 +165,15 @@ function SignupForm({ onEmailSent, onSuccess, onGoogleClick }: { onEmailSent: ()
             password: values.password,
         });
 
-        if (error) {
-            setAuthError(error);
-            return;
-        }
-        if (needsEmailConfirmation) {
-            onEmailSent();
-        } else {
-            onSuccess();
-        }
+        if (error) { setAuthError(error); return; }
+        if (needsEmailConfirmation) onEmailSent();
+        else onSuccess();
     };
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <GoogleButton onClick={onGoogleClick} />
-            <Divider />
+            <GoogleButton label={lp.google} onClick={onGoogleClick} />
+            <Divider label={lp.orEmail} />
 
             {authError && (
                 <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-2.5">
@@ -181,25 +183,25 @@ function SignupForm({ onEmailSent, onSuccess, onGoogleClick }: { onEmailSent: ()
 
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">Vorname</label>
-                    <input type="text" className={inputCls} placeholder="Max" {...register("firstName")} />
+                    <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">{lp.firstNameLabel}</label>
+                    <input type="text" className={inputCls} placeholder={lp.firstNamePlaceholder} {...register("firstName")} />
                     <FieldError message={errors.firstName?.message} />
                 </div>
                 <div>
-                    <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">Nachname</label>
-                    <input type="text" className={inputCls} placeholder="Mustermann" {...register("lastName")} />
+                    <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">{lp.lastNameLabel}</label>
+                    <input type="text" className={inputCls} placeholder={lp.lastNamePlaceholder} {...register("lastName")} />
                     <FieldError message={errors.lastName?.message} />
                 </div>
             </div>
 
             <div>
-                <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">E-Mail</label>
-                <input type="email" className={inputCls} placeholder="ihre@email.de" {...register("email")} />
+                <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">{lp.emailLabel}</label>
+                <input type="email" className={inputCls} placeholder={lp.emailPlaceholder} {...register("email")} />
                 <FieldError message={errors.email?.message} />
             </div>
             <div>
-                <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">Passwort</label>
-                <input type="password" className={inputCls} placeholder="Min. 8 Zeichen" {...register("password")} />
+                <label className="block text-xs font-bold tracking-widest uppercase text-foreground/60 mb-1.5">{lp.passwordLabel}</label>
+                <input type="password" className={inputCls} placeholder={lp.passwordPlaceholder} {...register("password")} />
                 <FieldError message={errors.password?.message} />
             </div>
 
@@ -211,11 +213,11 @@ function SignupForm({ onEmailSent, onSuccess, onGoogleClick }: { onEmailSent: ()
                     className="mt-1 h-4 w-4 rounded border-border accent-primary"
                 />
                 <label htmlFor="gdpr" className="text-xs text-foreground/70 leading-relaxed">
-                    Ich stimme der{" "}
+                    {lp.gdprText}{" "}
                     <Link to="/datenschutz" className="text-primary hover:underline">
-                        Datenschutzerklärung
+                        {lp.gdprLink}
                     </Link>{" "}
-                    zu.
+                    {lang === "ko" ? "" : "zu."}
                 </label>
             </div>
             <FieldError message={errors.gdpr?.message} />
@@ -226,7 +228,7 @@ function SignupForm({ onEmailSent, onSuccess, onGoogleClick }: { onEmailSent: ()
                 className="w-full rounded-2xl py-3.5 text-sm font-bold tracking-wide uppercase transition-all disabled:opacity-50"
                 style={{ background: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
             >
-                {isSubmitting ? "Wird registriert…" : "Registrieren"}
+                {isSubmitting ? lp.submittingSignup : lp.submitSignup}
             </button>
         </form>
     );
@@ -238,7 +240,8 @@ export default function Login() {
     const navigate = useNavigate();
     const { isLoggedIn, loginWithGoogle } = useAuthStore();
     const { language } = useI18nStore();
-    const t = translations[language as keyof typeof translations] || translations["en"];
+    const lang = (["en", "de", "ko"].includes(language) ? language : "en") as Lang;
+    const lp = getLp(lang);
 
     const tabParam = searchParams.get("tab");
     const redirectTo = searchParams.get("redirect") || "/account";
@@ -249,14 +252,9 @@ export default function Login() {
     const [isRedirecting, setIsRedirecting] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    useEffect(() => { window.scrollTo(0, 0); }, []);
 
-    // If already logged in, skip the page
-    if (isLoggedIn) {
-        return <Navigate to={redirectTo} replace />;
-    }
+    if (isLoggedIn) return <Navigate to={redirectTo} replace />;
 
     const executeRedirect = () => {
         setIsRedirecting(true);
@@ -265,7 +263,6 @@ export default function Login() {
 
     const handleGoogleClick = async () => {
         setIsRedirecting(true);
-        // Pass the intended post-auth destination through the OAuth round-trip
         await loginWithGoogle(redirectTo);
     };
 
@@ -284,16 +281,13 @@ export default function Login() {
                             <span className="text-2xl">✉️</span>
                         </div>
                         <h2 className="hero-serif text-foreground mb-2" style={{ fontSize: "1.5rem", fontWeight: 300 }}>
-                            E-Mail bestätigen
+                            {lp.confirmEmailTitle}
                         </h2>
                         <p className="text-sm text-foreground/60 leading-relaxed mb-6">
-                            Wir haben Ihnen einen Bestätigungslink geschickt. Bitte prüfen Sie Ihren Posteingang.
+                            {lp.confirmEmailDesc}
                         </p>
-                        <button
-                            onClick={() => setActiveTab("login")}
-                            className="text-sm text-primary hover:underline"
-                        >
-                            Zurück zur Anmeldung
+                        <button onClick={() => setActiveTab("login")} className="text-sm text-primary hover:underline">
+                            {lp.confirmEmailBack}
                         </button>
                     </motion.div>
                 </main>
@@ -317,29 +311,28 @@ export default function Login() {
                         className="hero-serif text-foreground mb-1"
                         style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 300 }}
                     >
-                        {activeTab === "login" ? t.loginPage?.title ?? "Willkommen zurück" : "Konto erstellen"}
+                        {activeTab === "login" ? lp.title : lp.titleSignup}
                     </h1>
                     <p className="text-sm font-medium leading-relaxed mb-6" style={{ color: "var(--color-gold-text)" }}>
-                        {activeTab === "login"
-                            ? t.loginPage?.subtitle ?? "Melden Sie sich an, um fortzufahren."
-                            : "Erstellen Sie Ihr Skin Strategy Lab Konto."}
+                        {activeTab === "login" ? lp.subtitle : lp.subtitleSignup}
                     </p>
 
                     {/* Tabs */}
                     <div className="flex gap-2 p-1 rounded-2xl bg-muted/30 mb-6">
                         <TabButton active={activeTab === "login"} onClick={() => setActiveTab("login")}>
-                            Anmelden
+                            {lp.tabLogin}
                         </TabButton>
                         <TabButton active={activeTab === "signup"} onClick={() => setActiveTab("signup")}>
-                            Registrieren
+                            {lp.tabSignup}
                         </TabButton>
                     </div>
 
                     {/* Forms */}
                     {activeTab === "login" ? (
-                        <LoginForm onSuccess={executeRedirect} onGoogleClick={handleGoogleClick} />
+                        <LoginForm lang={lang} onSuccess={executeRedirect} onGoogleClick={handleGoogleClick} />
                     ) : (
                         <SignupForm
+                            lang={lang}
                             onEmailSent={() => setEmailSent(true)}
                             onSuccess={executeRedirect}
                             onGoogleClick={handleGoogleClick}
@@ -350,16 +343,16 @@ export default function Login() {
                     <p className="text-center text-xs text-foreground/40 pt-4">
                         {activeTab === "login" ? (
                             <>
-                                Kein Konto?{" "}
+                                {lp.noAccount}{" "}
                                 <button type="button" onClick={() => setActiveTab("signup")} className="text-primary hover:underline">
-                                    Registrieren
+                                    {lp.tabSignup}
                                 </button>
                             </>
                         ) : (
                             <>
-                                Bereits ein Konto?{" "}
+                                {lp.alreadyAccount}{" "}
                                 <button type="button" onClick={() => setActiveTab("login")} className="text-primary hover:underline">
-                                    Anmelden
+                                    {lp.tabLogin}
                                 </button>
                             </>
                         )}

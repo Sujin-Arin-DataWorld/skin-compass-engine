@@ -507,7 +507,8 @@ export const useDiagnosisStore = create<DiagnosisState>()(
         currentCategory: state.currentCategory,
         selectedZones: state.selectedZones,
         axisResponses: state.axisResponses,
-        lifestyle: state.lifestyle,
+        // climateProfile is session-only — excluded so city resets on each fresh visit
+        lifestyle: { ...state.lifestyle, climateProfile: undefined, climate: undefined },
         implicitFlags: state.implicitFlags,
         completedAt: state.completedAt,
         previousResultId: state.previousResultId,

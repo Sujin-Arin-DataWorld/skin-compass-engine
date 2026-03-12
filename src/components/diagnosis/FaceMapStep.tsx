@@ -653,15 +653,12 @@ function ConcernItem({
 
 // ─── Panel ────────────────────────────────────────────────────────────────────
 function ConcernAndQuestionPanel({
-  zone, selectedConcerns, onToggle, onClose, lang, isDark,
+  zone, selectedConcerns, onToggle, onClose, lang, isDark, axisAnswers, onAnswer,
 }: {
   zone: ZoneId; selectedConcerns: Set<string>; onToggle: (id: string) => void;
   onClose: () => void; lang: Lang; isDark: boolean;
+  axisAnswers: Record<string, QuestionAnswer>; onAnswer: (id: string, val: QuestionAnswer) => void;
 }) {
-  const store = useDiagnosisStore();
-  const axisAnswers = store.axisAnswers;
-  const onAnswer = (id: string, val: QuestionAnswer) => store.setAxisAnswer(id, val);
-  const [editingAxes, setEditingAxes] = useState<Set<number>>(new Set());
   const GOLD = "#c9a96e";
 
   const concerns = ZONE_CONCERNS[zone];
@@ -715,8 +712,6 @@ function ConcernAndQuestionPanel({
             if (!axisDef) return null;
             const reqQs = axisDef.questions.filter(q => q.required);
             const isAnswered = reqQs.length > 0 && reqQs.every(q => axisAnswers[q.id] !== undefined);
-            const isEditing  = editingAxes.has(axisId);
-            const showQs     = !isAnswered || isEditing;
 
             const visibleQs: QuestionDef[] = [];
             for (const q of axisDef.questions) {
@@ -738,21 +733,15 @@ function ConcernAndQuestionPanel({
                 background: isDark ? "rgba(0,0,0,0.15)" : "rgba(255,255,255,0.5)",
                 border: `1px solid ${isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"}`,
               }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: isAnswered && !isEditing ? 0 : 16 }}>
+                <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
                   <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: AXIS_COLOR[axisId], fontFamily: "'DM Sans', system-ui, sans-serif" }}>
-                    {gt(axisDef.name, lang)} {isAnswered && !isEditing && "✓"}
+                    {gt(axisDef.name, lang)}
                   </span>
                   {isAnswered && (
-                    <button
-                      onClick={() => setEditingAxes(p => { const n = new Set(p); if (n.has(axisId)) { n.delete(axisId); } else { n.add(axisId); } return n; })}
-                      style={{ background: "none", border: "none", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", cursor: "pointer", fontSize: 12, textDecoration: "underline" }}>
-                      {isEditing
-                        ? (lang === "ko" ? "완료" : "Done")
-                        : (lang === "ko" ? "수정" : "Edit")}
-                    </button>
+                    <span style={{ marginLeft: 8, fontSize: 12, color: "#4ade80" }}>✓</span>
                   )}
                 </div>
-                {showQs && visibleQs.map(q => (
+                {visibleQs.map(q => (
                   <div key={q.id} style={{ marginBottom: 24 }}>
                     <div style={{ fontSize: 16, color: isDark ? "#fff" : "#111", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4 }}>
                       {gt(q.text, lang)}
@@ -796,21 +785,20 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
   const [activeZone, setActiveZone]             = useState<ZoneId | null>(null);
   const [isMobile, setIsMobile]                 = useState(false);
 
+  // Session-scoped axis answers: lazy-initialise with only EXP_* lifestyle values.
+  // This prevents stale AX* answers from a previous session (persisted in localStorage)
+  // from appearing as pre-selected in the deep-dive Q panels.
+  const [sessionAnswers, setSessionAnswers] = useState<Record<string, QuestionAnswer>>(() => {
+    const all = useDiagnosisStore.getState().axisAnswers;
+    return Object.fromEntries(Object.entries(all).filter(([k]) => k.startsWith("EXP_")));
+  });
+
   useEffect(() => {
     const fn = () => setIsMobile(window.innerWidth < 768);
     fn();
     window.addEventListener("resize", fn);
     return () => window.removeEventListener("resize", fn);
   }, []);
-
-  // 이전 세션의 stale AX* 답변을 초기화해 Deep Dive auto-✓ 버그 방지
-  // EXP_* 기반 질문(Phase 01 라이프스타일) 값은 유지
-  useEffect(() => {
-    const cur = store.axisAnswers;
-    const expEntries = Object.entries(cur).filter(([k]) => k.startsWith("EXP_"));
-    store.clearAxisAnswers();
-    expEntries.forEach(([id, val]) => store.setAxisAnswer(id, val));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Derive which zones have ≥1 selected concern (for dot highlighting)
   const selectedZones = useMemo(() => {
@@ -832,6 +820,11 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
   const handleZoneClick = useCallback((id: ZoneId) => {
     setActiveZone(prev => (prev === id ? null : id));
   }, []);
+
+  const handleAnswer = useCallback((id: string, val: QuestionAnswer) => {
+    setSessionAnswers(prev => ({ ...prev, [id]: val }));
+    store.setAxisAnswer(id, val);
+  }, [store]);
 
   const handleNext = useCallback(() => {
     // Build axis weight map
@@ -938,6 +931,8 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
                   onClose={() => setActiveZone(null)}
                   lang={lang}
                   isDark={isDark}
+                  axisAnswers={sessionAnswers}
+                  onAnswer={handleAnswer}
                 />
               </motion.div>
             ) : (
@@ -989,6 +984,8 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
                 onClose={() => setActiveZone(null)}
                 lang={lang}
                 isDark={isDark}
+                axisAnswers={sessionAnswers}
+                onAnswer={handleAnswer}
               />
             </motion.div>
           </div>

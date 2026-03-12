@@ -189,22 +189,22 @@ export function convertAxisAnswersToUiSignals(answers: AnswerMap, lifestyle?: Li
     // 3-4 (7-8h+) → optimal, no penalty
   }
 
-  // EXP_WATER
+  // EXP_WATER (stored as number: 0=low, 1=mid, 2=high; legacy string also supported)
   const water = answers["EXP_WATER"];
-  if (water === "water_low") {
+  if (water === 0 || water === "water_low") {
     s.dry = { ...s.dry, moisture_retention_hours: Math.min(s.dry?.moisture_retention_hours ?? 24, 3) };
-  } else if (water === "water_mid") {
+  } else if (water === 1 || water === "water_mid") {
     s.dry = { ...s.dry, moisture_retention_hours: Math.min(s.dry?.moisture_retention_hours ?? 24, 8) };
   }
-  // water_high → no penalty
+  // water === 2 || "water_high" → no penalty
 
-  // EXP_STRESS
+  // EXP_STRESS (stored as number: 0=low, 1=mod, 2=high; legacy string also supported)
   const stress = answers["EXP_STRESS"];
-  if (stress === "stress_high") {
+  if (stress === 2 || stress === "stress_high") {
     s.acne        = { ...s.acne, recurrence: Math.max(s.acne?.recurrence ?? 0, 65) };
     s.sensitivity = { ...s.sensitivity, reactivity: Math.max(s.sensitivity?.reactivity ?? 0, 55) };
     s.aging       = { ...s.aging, rebound: Math.max(s.aging?.rebound ?? 0, 1) as 0 | 1 | 2 | 3 };
-  } else if (stress === "stress_mod") {
+  } else if (stress === 1 || stress === "stress_mod") {
     s.acne = { ...s.acne, recurrence: Math.max(s.acne?.recurrence ?? 0, 35) };
   }
 

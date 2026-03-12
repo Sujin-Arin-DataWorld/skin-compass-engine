@@ -289,7 +289,7 @@ const ZONES_DEF: ZoneDef[] = [
   },
 ];
 
-// ─── Colour palette ───────────────────── 존 라벨 색상
+// ─── Colour palette ───────────────────── 존 라벨 색상. 점색깔. 라인색깔. 
 const COLOR_PALETTE = {
   dark_selected: "#f7e28dff", // Dark Mode Selected: Muted Terracotta
   light_selected: "#8EA273", // White Mode Selected: Deep Terracotta (slightly darker for contrast)
@@ -571,7 +571,7 @@ function InlineQuestionRenderer({
     borderRadius: 24, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
     cursor: "pointer", minHeight: 44, lineHeight: "1.2",
     border: sel ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
-    background: sel ? "rgba(201,169,110,0.15)" : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+    background: sel ? (isDark ? "rgba(201,169,110,0.15)" : "rgba(122,162,115,0.15)") : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
     color: sel ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
     transition: "all 0.3s ease",
   });
@@ -636,7 +636,7 @@ function InlineQuestionRenderer({
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
-          style={{ marginTop: 16, paddingLeft: 16, borderLeft: `2px solid ${GOLD}33`, overflow: "hidden" }}
+          style={{ marginTop: 16, paddingLeft: 16, borderLeft: `2px solid ${isDark ? "#c9a96e33" : "#7A9E8233"}`, overflow: "hidden" }}
         >
           <div style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
             {gt(q.conditional.inject.text, lang)}
@@ -658,7 +658,7 @@ function ConcernItem({
 }: {
   concern: Concern; selected: boolean; onToggle: () => void; lang: Lang; isDark: boolean;
 }) {
-  const GOLD = "#c9a96e";
+  const GOLD = isDark ? "#c9a96e" : "#7A9E82";
   return (
     <motion.button onClick={onToggle} whileTap={{ scale: 0.98 }}
       style={{
@@ -666,7 +666,7 @@ function ConcernItem({
         justifyContent: "space-between", gap: 12,
         padding: "13px 16px", borderRadius: 14,
         textAlign: "left", cursor: "pointer", transition: "all 0.2s ease",
-        background: selected ? "rgba(201,169,110,0.12)" : isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
+        background: selected ? (isDark ? "rgba(201,169,110,0.12)" : "rgba(122,162,115,0.12)") : isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)",
         border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
         color: selected ? GOLD : isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)",
         fontFamily: "'DM Sans', sans-serif", fontSize: 14,
@@ -696,7 +696,8 @@ function ConcernAndQuestionPanel({
   onClose: () => void; lang: Lang; isDark: boolean;
   axisAnswers: Record<string, QuestionAnswer>; onAnswer: (id: string, val: QuestionAnswer) => void;
 }) {
-  const GOLD = "#c9a96e";
+  const GOLD = isDark ? "#c9a96e" : "#7A9E82";
+  const GOLD_DEEP = isDark ? "#a38555" : "#2D4F39";
 
   const concerns = ZONE_CONCERNS[zone];
   const triggeredAxisIds = Array.from(new Set(
@@ -805,9 +806,9 @@ function ConcernAndQuestionPanel({
           marginTop: 16, width: "100%", padding: "14px 0",
           borderRadius: 24, fontSize: 14, fontWeight: 600,
           fontFamily: "'DM Sans', sans-serif", border: "none",
-          background: "linear-gradient(135deg, #8EA273, #2D4F39)",
-          color: "#fff", cursor: "pointer",
-          boxShadow: "0 6px 20px rgba(111, 152, 141, 0.3)",
+          background: isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)",
+          color: isDark ? "#0d0d12" : "#fff", cursor: "pointer",
+          boxShadow: isDark ? "0 6px 20px rgba(201,169,110,0.3)" : "0 6px 20px rgba(45,79,57,0.25)",
         }}
       >
         {lang === "ko" ? "선택 완료" : lang === "de" ? "Auswahl bestätigen" : "Confirm Selection"}
@@ -930,7 +931,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
         gap: 28,
         padding: "0 20px",
       }}>
-        {/* Face Image Card */}
+        {/* Face Image Card */} 
         <div style={{
           position: "relative",
           width: "100%",
@@ -938,7 +939,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
           aspectRatio: "600/700",
           flexShrink: 0, 
           borderRadius: 28, 
-          background: isDark ? "#121214" : "#becad3bf",
+          background: isDark ? "#484f4ba5" : "#becad3bf",
           boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
           border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
           margin: isMobile ? "0 auto" : "0",
@@ -1060,12 +1061,16 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
             onClick={handleNext}
             disabled={!totalSelected}
             animate={allZonesDone ? {
-              boxShadow: [
+              boxShadow: isDark ? [
                 "0 8px 24px rgba(201,169,110,0.4)",
                 "0 8px 40px rgba(201,169,110,0.85)",
                 "0 8px 24px rgba(201,169,110,0.4)",
+              ] : [
+                "0 8px 24px rgba(45,79,57,0.35)",
+                "0 8px 40px rgba(45,79,57,0.7)",
+                "0 8px 24px rgba(45,79,57,0.35)",
               ],
-            } : { boxShadow: totalSelected > 0 ? "0 4px 16px rgba(201,169,110,0.15)" : "none" }}
+            } : { boxShadow: totalSelected > 0 ? (isDark ? "0 4px 16px rgba(201,169,110,0.15)" : "0 4px 16px rgba(45,79,57,0.15)") : "none" }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
             style={{
               display: "flex", alignItems: "center", gap: 10,
@@ -1073,9 +1078,9 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
               fontSize: 14, fontWeight: 600,
               fontFamily: "'DM Sans', sans-serif", border: "none",
               background: allZonesDone
-                ? "linear-gradient(135deg, #c9a96e, #a38555)"
+                ? (isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)")
                 : totalSelected > 0
-                  ? "linear-gradient(135deg, rgba(201,169,110,0.45), rgba(163,133,85,0.45))"
+                  ? (isDark ? "linear-gradient(135deg, rgba(201,169,110,0.45), rgba(163,133,85,0.45))" : "linear-gradient(135deg, rgba(142,162,115,0.55), rgba(45,79,57,0.55))")
                   : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
               color: totalSelected > 0
                 ? "#fff"

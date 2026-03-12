@@ -22,8 +22,10 @@ import { convertAxisAnswersToUiSignals } from "@/engine/axisAnswerBridge";
 import { runDiagnosis } from "@/engine/runDiagnosisV4";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
-const GOLD = "#c9a96e";
-const ROSE = "#b76e79";
+const GOLD_DARK = "#c9a96e";
+const ROSE      = "#b76e79";
+const SAGE      = "#7A9E82";   // light-mode primary accent
+const FOREST    = "#2D4F39";   // light-mode deep accent
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type ZoneId = "forehead" | "eyes" | "nose" | "cheeks" | "chin" | "neck";
@@ -75,6 +77,7 @@ const AXIS_COLOR: Record<number, string> = {
 
 // Module-level pill style — used in Foundation, InlineQuestionRenderer, atopy banner
 function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
+  const GOLD = isDark ? GOLD_DARK : SAGE;
   return {
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
@@ -247,6 +250,7 @@ function InlineQuestionRenderer({
   allAnswers: Record<string, QuestionAnswer>;
   isDark: boolean;
 }) {
+  const GOLD = isDark ? GOLD_DARK : SAGE;
   // Check if a conditional follow-up should show after this question
   const showConditional = q.conditional != null &&
     (() => {
@@ -557,7 +561,9 @@ const DiagnosisPage: React.FC = () => {
   const { language } = useI18nStore();
   const lang = language as Lang;
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+  const isDark      = resolvedTheme === "dark";
+  const GOLD        = isDark ? GOLD_DARK : SAGE;
+  const GOLD_DEEP   = isDark ? "#947E5C" : FOREST;
   const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
 
   // ── Local state ──
@@ -725,8 +731,8 @@ const DiagnosisPage: React.FC = () => {
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap');
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:4px}
-        ::-webkit-scrollbar-thumb{background:rgba(201,169,110,0.2);border-radius:4px}
-        input[type="range"]{accent-color:#c9a96e}
+        ::-webkit-scrollbar-thumb{background:${isDark ? 'rgba(201,169,110,0.2)' : 'rgba(45,79,57,0.15)'};border-radius:4px}
+        input[type="range"]{accent-color:${isDark ? '#c9a96e' : '#7A9E82'}}
       `}</style>
 
       <Navbar />
@@ -742,7 +748,8 @@ const DiagnosisPage: React.FC = () => {
             <motion.div
               style={{
                 position: "relative", width: "100%", maxWidth: 380, borderRadius: 24, overflow: "hidden",
-                border: "1px solid rgba(201,169,110,0.3)",
+                border: `1px solid ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.2)"}`,
+
                 background: isDark ? "rgba(20,20,32,0.97)" : "rgba(255,255,255,0.97)",
                 backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)"
               }}
@@ -810,10 +817,10 @@ const DiagnosisPage: React.FC = () => {
                     onClick={() => { store.reset(); setShowRetestModal(false); }}
                     style={{
                       width: "100%", padding: "14px 24px", borderRadius: 14, border: "none",
-                      background: `linear-gradient(135deg, ${GOLD}, #947E5C)`,
+                      background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DEEP})`,
                       color: "#0d0d12", fontSize: 13, fontFamily: "'DM Sans', sans-serif",
                       letterSpacing: "0.1em", fontWeight: 600, cursor: "pointer",
-                      boxShadow: "0 6px 24px rgba(201,169,110,0.3)"
+                      boxShadow: `0 6px 24px ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.25)"}`
                     }}>
                     {lang === "ko" ? "새 분석 시작" : lang === "de" ? "Neue Analyse starten" : "Start New Analysis"}
                   </motion.button>
@@ -821,7 +828,7 @@ const DiagnosisPage: React.FC = () => {
                     onClick={() => navigate("/profile")}
                     style={{
                       width: "100%", padding: "12px 24px", borderRadius: 14,
-                      border: "1px solid rgba(201,169,110,0.3)", background: "transparent",
+                      border: `1px solid ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.2)"}`, background: "transparent",
                       color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)", fontSize: 13, fontFamily: "'DM Sans', sans-serif",
                       letterSpacing: "0.06em", cursor: "pointer"
                     }}>
@@ -859,7 +866,7 @@ const DiagnosisPage: React.FC = () => {
           })}
         </div>
         <p style={{
-          fontSize: 12, letterSpacing: "0.22em", color: `rgba(201,169,110,0.6)`,
+          fontSize: 12, letterSpacing: "0.22em", color: isDark ? "rgba(201,169,110,0.6)" : "rgba(45,79,57,0.65)",
           textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif", marginBottom: 36
         }}>
           {phase === "foundation" && (lang === "de" ? "Phase 01 · Basis-Scan" : lang === "ko" ? "Phase 01 · 기초 스캔" : "Phase 01 · Foundation Scan")}
@@ -950,7 +957,7 @@ const DiagnosisPage: React.FC = () => {
                     fontSize: 15, fontFamily: "'DM Sans', sans-serif",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: foundationComplete ? "pointer" : "default",
-                    boxShadow: foundationComplete ? "0 8px 32px rgba(201,169,110,0.3)" : "none",
+                    boxShadow: foundationComplete ? `0 8px 32px ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.25)"}` : "none",
                     transition: "all 0.4s ease",
                   }}>
                   {lang === "de" ? "Gesichts-Mapping beginnen →" : lang === "ko" ? "얼굴 매핑 시작 →" : "Begin Face Mapping →"}
@@ -979,7 +986,7 @@ const DiagnosisPage: React.FC = () => {
               <div style={{ position: "relative", width: 80, height: 80 }}>
                 <motion.div style={{
                   position: "absolute", inset: -16, borderRadius: "50%",
-                  background: `radial-gradient(circle, rgba(201,169,110,0.15) 0%, transparent 70%)`
+                  background: `radial-gradient(circle, ${isDark ? 'rgba(201,169,110,0.15)' : 'rgba(45,79,57,0.12)'} 0%, transparent 70%)`
                 }}
                   animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }} />
@@ -1003,7 +1010,7 @@ const DiagnosisPage: React.FC = () => {
                 }} />
                 <motion.div style={{
                   position: "absolute", inset: 26, borderRadius: "50%",
-                  background: `radial-gradient(circle, ${GOLD}, rgba(201,169,110,0.4))`
+                  background: `radial-gradient(circle, ${GOLD}, ${isDark ? 'rgba(201,169,110,0.4)' : 'rgba(45,79,57,0.35)'})`
                 }}
                   animate={{ scale: [0.6, 1.15, 0.6], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />

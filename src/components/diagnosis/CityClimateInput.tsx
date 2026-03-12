@@ -148,7 +148,7 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
         animate={{ opacity: 1 }}
         className="flex items-center gap-2.5 rounded-xl border border-border/40 bg-card/40 px-3 py-3 sm:px-4"
       >
-        <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin text-amber-500 flex-shrink-0" />
+        <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin text-emerald-600 dark:text-amber-500 flex-shrink-0" />
         <span className="text-xs sm:text-sm text-muted-foreground">{tx(C.loading, lang)}</span>
       </motion.div>
     );
@@ -166,17 +166,17 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-amber-500/30 bg-amber-50/40 dark:bg-amber-950/10 p-3 sm:p-4 space-y-2.5 sm:space-y-3"
+        className="rounded-xl border border-emerald-600/25 bg-emerald-50/30 dark:border-amber-500/30 dark:bg-amber-950/10 p-3 sm:p-4 space-y-2.5 sm:space-y-3"
       >
         {/* City row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-1.5 sm:gap-2 min-w-0">
             <MapPin
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-700 dark:text-amber-400 flex-shrink-0 mt-0.5"
               strokeWidth={1.7}
             />
             <div className="min-w-0">
-              <p className="text-xs sm:text-sm font-medium text-amber-700 dark:text-amber-300 break-words leading-snug">
+              <p className="text-xs sm:text-sm font-medium text-emerald-800 dark:text-amber-300 break-words leading-snug">
                 {storedProfile.city}
               </p>
               <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5">
@@ -214,7 +214,7 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
   return (
     <div className="relative">
       {/* Input field */}
-      <div className="relative flex items-center rounded-xl border border-border/60 bg-background/80 focus-within:border-amber-400 transition-colors">
+      <div className="relative flex items-center rounded-xl border border-border/60 bg-background/80 focus-within:border-emerald-500 dark:focus-within:border-amber-400 transition-colors">
         {searching ? (
           <Loader2
             className="absolute left-3 w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin text-muted-foreground pointer-events-none"

@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
@@ -19,8 +20,10 @@ import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD = "#D4AF37";
-const BRONZE = "#947E5C";
+const GOLD_DARK = "#D4AF37";
+const BRONZE    = "#947E5C";
+const SAGE      = "#7A9E82";   // light-mode accent
+const FOREST    = "#2D4F39";   // light-mode deep
 
 // ── Concern map ───────────────────────────────────────────────────────────────
 const CONCERN_KEYS = ["sebum", "sensitivity", "hydration", "aging", "pigment", "texture", "barrier", "pores", "neuro"] as const;
@@ -48,7 +51,7 @@ const HERO_IMAGES = [
 type CartBtnState = "idle" | "adding" | "added";
 
 // ── Hero Slider ───────────────────────────────────────────────────────────────
-function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string; cta: string }[], lang: string }) {
+function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { headline: string; sub: string; cta: string }[], lang: string, accent: string, accentDeep: string, isDark: boolean }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [current, setCurrent] = useState(0);
 
@@ -85,7 +88,7 @@ function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string;
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4"
-                  style={{ color: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
+                  style={{ color: accent, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                 >
                   Skin Strategy Lab
                 </motion.p>
@@ -132,13 +135,20 @@ function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string;
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 10 }}
                   transition={{ duration: 0.5, delay: 0.24 }}
                 >
-                  <Link
-                    to="/diagnosis"
-                    className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-medium tracking-wide text-[#0a0a0a] transition-opacity hover:opacity-85"
-                    style={{ background: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
-                  >
-                    {slides[i]?.cta}
-                  </Link>
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Link
+                      to="/diagnosis"
+                      className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide transition-opacity hover:opacity-90"
+                      style={{
+                        background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
+                        color: isDark ? "#0a0a0a" : "#fff",
+                        boxShadow: isDark ? "0 6px 24px rgba(212,175,55,0.35)" : "0 6px 24px rgba(45,79,57,0.3)",
+                        fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif",
+                      }}
+                    >
+                      {slides[i]?.cta}
+                    </Link>
+                  </motion.div>
                 </motion.div>
               </div>
             </div>
@@ -173,7 +183,7 @@ function HeroSlider({ slides, lang }: { slides: { headline: string; sub: string;
             style={{
               width: current === i ? "1.75rem" : "0.375rem",
               height: "0.375rem",
-              background: current === i ? GOLD : "rgba(255,255,255,0.45)",
+              background: current === i ? accent : "rgba(255,255,255,0.45)",
             }}
           />
         ))}
@@ -206,7 +216,7 @@ function UspStrip({ items }: { items: { label: string }[] }) {
 
 // ── 9 Skin Concerns ───────────────────────────────────────────────────────────
 function ConcernSection({
-  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart, lang,
+  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart, lang, accent, accentDeep,
 }: {
   title: string; sub: string;
   concernLabels: Record<ConcernKey, string>;
@@ -214,7 +224,7 @@ function ConcernSection({
   products: Product[];
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
-  lang: string;
+  lang: string; accent: string; accentDeep: string;
 }) {
   const [active, setActive] = useState<ConcernKey | null>(null);
 
@@ -226,7 +236,7 @@ function ConcernSection({
     <section className="bg-stone-50 dark:bg-[#0d0d0d] py-20 px-5 md:px-10">
       <div className="mx-auto max-w-5xl">
         <div className="text-center mb-12">
-          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: GOLD }}>
+          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
             Skin Strategy Lab
           </p>
           <h2
@@ -249,7 +259,7 @@ function ConcernSection({
                 whileTap={{ scale: 0.93 }}
                 className="flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200"
                 style={{
-                  borderColor: isActive ? GOLD : "transparent",
+                  borderColor: isActive ? accent : "transparent",
                   background: isActive ? "rgba(212,175,55,0.07)" : "transparent",
                 }}
               >
@@ -257,9 +267,9 @@ function ConcernSection({
                   className="w-11 h-11 rounded-full flex items-center justify-center"
                   style={{ background: isActive ? "rgba(212,175,55,0.12)" : "rgba(148,126,92,0.07)" }}
                 >
-                  <Icon className="w-5 h-5" style={{ color: isActive ? GOLD : BRONZE }} strokeWidth={1.5} />
+                  <Icon className="w-5 h-5" style={{ color: isActive ? accent : BRONZE }} strokeWidth={1.5} />
                 </div>
-                <span className="text-xs font-medium text-center leading-tight" style={{ color: isActive ? GOLD : "#9a9a9a" }}>
+                <span className="text-xs font-medium text-center leading-tight" style={{ color: isActive ? accent : "#9a9a9a" }}>
                   {concernLabels[key]}
                 </span>
               </motion.button>
@@ -309,7 +319,7 @@ function ConcernSection({
                                 {name}
                               </p>
                             </Link>
-                            <p className="text-sm font-medium mb-2" style={{ color: GOLD }}>
+                            <p className="text-sm font-medium mb-2" style={{ color: accent }}>
                               €{(product.price ?? product.price_eur).toFixed(2)}
                             </p>
                             <button
@@ -349,13 +359,13 @@ const ROUTINE_MOOD_IMAGES = [
   "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&w=800&q=80",
 ];
 
-function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, lang }: {
+function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, lang, accent, accentDeep }: {
   title: string; sub: string;
   cards: { badge: string; title: string; desc: string; cta: string }[];
   products: Product[];
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
-  lang: string;
+  lang: string; accent: string; accentDeep: string;
 }) {
   const routineSlices = [
     products.slice(0, Math.min(products.length, 6)),
@@ -367,7 +377,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
     <section className="py-20 px-5 md:px-10 bg-white dark:bg-[#0a0a0a]">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-16">
-          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: GOLD }}>
+          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
             Skin Strategy Lab
           </p>
           <h2
@@ -409,7 +419,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                   <div className="absolute bottom-0 left-0 p-6 md:p-8">
                     <span
                       className="text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase font-semibold block mb-2 drop-shadow-md"
-                      style={{ color: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
+                      style={{ color: accent, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                     >
                       {card.badge}
                     </span>
@@ -423,7 +433,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                     <Link
                       to="/diagnosis"
                       className="inline-flex items-center mt-5 text-sm md:text-base font-medium tracking-wide hover:opacity-75 transition-opacity drop-shadow-md"
-                      style={{ color: GOLD, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
+                      style={{ color: accent, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
                     >
                       {card.cta} →
                     </Link>
@@ -465,7 +475,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                                   {name}
                                 </p>
                               </Link>
-                              <p className="text-sm font-medium mb-2" style={{ color: GOLD }}>
+                              <p className="text-sm font-medium mb-2" style={{ color: accent }}>
                                 €{(product.price ?? product.price_eur).toFixed(2)}
                               </p>
                               <button
@@ -500,7 +510,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
 }
 
 // ── Diagnosis Banner ──────────────────────────────────────────────────────────
-function DiagnosisBanner({ headline, sub, cta, lang }: { headline: string; sub: string; cta: string, lang: string }) {
+function DiagnosisBanner({ headline, sub, cta, lang, accent, accentDeep, isDark }: { headline: string; sub: string; cta: string, lang: string, accent: string, accentDeep: string, isDark: boolean }) {
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "420px" }}>
       <img
@@ -520,7 +530,7 @@ function DiagnosisBanner({ headline, sub, cta, lang }: { headline: string; sub: 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-5"
-          style={{ color: GOLD }}
+          style={{ color: accent }}
         >
           Skin Strategy Lab
         </motion.p>
@@ -549,19 +559,26 @@ function DiagnosisBanner({ headline, sub, cta, lang }: { headline: string; sub: 
           viewport={{ once: true }}
           transition={{ delay: 0.22 }}
         >
-          <Link
-            to="/diagnosis"
-            className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-medium tracking-wide text-[#0a0a0a] transition-all hover:opacity-85"
-            style={{
-              background: GOLD,
-              boxShadow: "0 0 0 0 rgba(212,175,55,0)",
-              transition: "opacity 0.2s, box-shadow 0.3s",
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 28px rgba(212,175,55,0.55)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = "0 0 0 0 rgba(212,175,55,0)"; }}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.97 }}
           >
-            {cta}
-          </Link>
+            <Link
+              to="/diagnosis"
+              className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide"
+              style={{
+                background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
+                color: isDark ? "#0a0a0a" : "#fff",
+                boxShadow: isDark ? "0 8px 32px rgba(212,175,55,0.45)" : "0 8px 32px rgba(45,79,57,0.35)",
+              }}
+            >
+              {cta}
+            </Link>
+          </motion.div>
         </motion.div>
       </div>
     </section>
@@ -570,9 +587,9 @@ function DiagnosisBanner({ headline, sub, cta, lang }: { headline: string; sub: 
 
 // ── Newsletter ────────────────────────────────────────────────────────────────
 function Newsletter({
-  headline, sub, placeholder, submit, gdprText, lang,
+  headline, sub, placeholder, submit, gdprText, lang, accent, accentDeep, isDark,
 }: {
-  headline: string; sub: string; placeholder: string; submit: string; gdprText: string; lang: string;
+  headline: string; sub: string; placeholder: string; submit: string; gdprText: string; lang: string; accent: string; accentDeep: string; isDark: boolean;
 }) {
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -594,7 +611,7 @@ function Newsletter({
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="mx-auto max-w-lg text-center"
       >
-        <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: GOLD }}>
+        <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
           Skin Strategy Lab
         </p>
         <h2
@@ -618,22 +635,29 @@ function Newsletter({
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={placeholder}
                 required
-                className="flex-1 rounded-full border border-stone-200 dark:border-white/15 bg-white dark:bg-[#111] px-5 py-3 text-sm md:text-base text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:border-[#D4AF37]/50 transition-colors"
+                className="flex-1 rounded-full border border-stone-200 dark:border-white/15 bg-white dark:bg-[#111] px-5 py-3 text-sm md:text-base text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:border-emerald-500/50 dark:focus:border-[#D4AF37]/50 transition-colors"
               />
-              <button
+              <motion.button
                 type="submit"
-                className="shrink-0 rounded-full px-6 py-3 text-sm md:text-base font-medium tracking-wide text-[#0a0a0a] hover:opacity-85 transition-opacity"
-                style={{ background: GOLD }}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="shrink-0 rounded-full px-6 py-3 text-sm md:text-base font-semibold tracking-wide"
+                style={{
+                  background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
+                  color: isDark ? "#0a0a0a" : "#fff",
+                  boxShadow: isDark ? "0 6px 20px rgba(212,175,55,0.35)" : "0 6px 20px rgba(45,79,57,0.28)",
+                  border: "none", cursor: "pointer",
+                }}
               >
                 {submit}
-              </button>
+              </motion.button>
             </div>
             <label className="flex items-start gap-2.5 cursor-pointer text-left">
               <input
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded cursor-pointer accent-[#D4AF37]"
+                className="mt-0.5 h-4 w-4 rounded cursor-pointer accent-emerald-600 dark:accent-[#D4AF37]"
               />
               <span className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
                 {gdprText}{" "}
@@ -651,6 +675,10 @@ function Newsletter({
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Index() {
+  const { resolvedTheme } = useTheme();
+  const isDark     = resolvedTheme === "dark";
+  const accent     = isDark ? GOLD_DARK : SAGE;
+  const accentDeep = isDark ? "#947E5C" : FOREST;
   const { language } = useI18nStore();
   const p1 = phase1T[language] ?? phase1T.de;
   const { products } = useProductStore();
@@ -676,7 +704,7 @@ export default function Index() {
       <div className="h-16" />
 
       <main>
-        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} lang={language} />
+        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} lang={language} accent={accent} accentDeep={accentDeep} isDark={isDark} />
         <UspStrip items={p1.home.usp as unknown as { label: string }[]} />
         <ConcernSection
           title={p1.home.concernTitle}
@@ -687,6 +715,8 @@ export default function Index() {
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
           lang={language}
+          accent={accent}
+          accentDeep={accentDeep}
         />
         <RoutineShowcase
           title={p1.home.routineTitle}
@@ -696,12 +726,17 @@ export default function Index() {
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
           lang={language}
+          accent={accent}
+          accentDeep={accentDeep}
         />
         <DiagnosisBanner
           headline={p1.home.bannerHeadline}
           sub={p1.home.bannerSub}
           cta={p1.home.bannerCta}
           lang={language}
+          accent={accent}
+          accentDeep={accentDeep}
+          isDark={isDark}
         />
         <Newsletter
           headline={p1.home.newsletterHeadline}
@@ -710,6 +745,9 @@ export default function Index() {
           submit={p1.home.newsletterSubmit}
           gdprText={p1.home.newsletterGdpr}
           lang={language}
+          accent={accent}
+          accentDeep={accentDeep}
+          isDark={isDark}
         />
       </main>
 

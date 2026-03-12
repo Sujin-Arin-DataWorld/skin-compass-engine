@@ -5,17 +5,111 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuthStore } from "@/store/authStore";
-import { useI18nStore, translations } from "@/store/i18nStore";
+import { useI18nStore } from "@/store/i18nStore";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 
 type Lang = "en" | "de" | "ko";
 
-// ── Per-language login strings ─────────────────────────────────────────────
+// ── Login page strings (self-contained — avoids translations.ko getter bug) ──
+const LOGIN_I18N = {
+    en: {
+        title: "Secure Access",
+        titleSignup: "Create Account",
+        subtitle: "Your 10-Axis Skin Strategy is a clinical asset. Sign in to secure your precision data and unlock your personalized formula. Unsaved data will be lost.",
+        subtitleSignup: "Create your Skin Strategy Lab account.",
+        tabLogin: "Sign In",
+        tabSignup: "Register",
+        google: "Continue with Google",
+        orEmail: "or continue with email",
+        emailLabel: "E-Mail",
+        emailPlaceholder: "your@email.com",
+        passwordLabel: "Password",
+        passwordPlaceholder: "Your Password",
+        firstNameLabel: "First Name",
+        firstNamePlaceholder: "Jane",
+        lastNameLabel: "Last Name",
+        lastNamePlaceholder: "Doe",
+        gdprText: "I agree to the",
+        gdprLink: "Privacy Policy",
+        gdprSuffix: "",
+        submit: "Sign In",
+        submitSignup: "Register",
+        submitting: "Signing in…",
+        submittingSignup: "Registering…",
+        authError: "Invalid email or password.",
+        noAccount: "Don't have an account?",
+        alreadyAccount: "Already have an account?",
+        confirmEmailTitle: "Confirm your e-mail",
+        confirmEmailDesc: "We sent you a confirmation link. Please check your inbox.",
+        confirmEmailBack: "Back to Sign In",
+    },
+    de: {
+        title: "Sicherer Zugang",
+        titleSignup: "Konto erstellen",
+        subtitle: "Ihre 10-Achsen-Hautstrategie ist ein klinischer Vermögenswert. Melden Sie sich an, um Ihre präzisen Daten zu sichern und Ihre personalisierte Formel freizuschalten. Ungespeicherte Daten gehen verloren.",
+        subtitleSignup: "Erstellen Sie Ihr Skin Strategy Lab Konto.",
+        tabLogin: "Anmelden",
+        tabSignup: "Registrieren",
+        google: "Mit Google fortfahren",
+        orEmail: "oder mit E-Mail fortfahren",
+        emailLabel: "E-Mail",
+        emailPlaceholder: "ihre@email.de",
+        passwordLabel: "Passwort",
+        passwordPlaceholder: "Ihr Passwort",
+        firstNameLabel: "Vorname",
+        firstNamePlaceholder: "Max",
+        lastNameLabel: "Nachname",
+        lastNamePlaceholder: "Mustermann",
+        gdprText: "Ich stimme der",
+        gdprLink: "Datenschutzerklärung",
+        gdprSuffix: "zu.",
+        submit: "Anmelden",
+        submitSignup: "Registrieren",
+        submitting: "Wird angemeldet…",
+        submittingSignup: "Wird registriert…",
+        authError: "E-Mail oder Passwort ist falsch.",
+        noAccount: "Noch kein Konto?",
+        alreadyAccount: "Bereits ein Konto?",
+        confirmEmailTitle: "E-Mail bestätigen",
+        confirmEmailDesc: "Wir haben Ihnen einen Bestätigungslink geschickt. Bitte prüfen Sie Ihren Posteingang.",
+        confirmEmailBack: "Zurück zur Anmeldung",
+    },
+    ko: {
+        title: "안전한 접근",
+        titleSignup: "계정 만들기",
+        subtitle: "10축 피부 전략은 임상적 자산입니다. 로그인하여 정밀 데이터를 보호하고 맞춤 포뮬러를 확인하세요. 저장되지 않은 데이터는 사라집니다.",
+        subtitleSignup: "Skin Strategy Lab 계정을 만드세요.",
+        tabLogin: "로그인",
+        tabSignup: "회원가입",
+        google: "Google로 계속하기",
+        orEmail: "또는 이메일로",
+        emailLabel: "이메일",
+        emailPlaceholder: "your@email.com",
+        passwordLabel: "비밀번호",
+        passwordPlaceholder: "비밀번호",
+        firstNameLabel: "이름",
+        firstNamePlaceholder: "홍",
+        lastNameLabel: "성",
+        lastNamePlaceholder: "길동",
+        gdprText: "다음에 동의합니다 —",
+        gdprLink: "개인정보 처리방침",
+        gdprSuffix: "",
+        submit: "로그인",
+        submitSignup: "회원가입",
+        submitting: "로그인 중…",
+        submittingSignup: "가입 중…",
+        authError: "이메일 또는 비밀번호가 올바르지 않습니다.",
+        noAccount: "계정이 없으신가요?",
+        alreadyAccount: "이미 계정이 있으신가요?",
+        confirmEmailTitle: "이메일을 확인하세요",
+        confirmEmailDesc: "확인 링크를 보내드렸습니다. 받은 편지함을 확인해 주세요.",
+        confirmEmailBack: "로그인으로 돌아가기",
+    },
+} as const;
+
 function getLp(language: Lang) {
-    const t = translations[language] as Record<string, unknown>;
-    const lp = (t?.loginPage ?? translations["en"].loginPage) as typeof translations["en"]["loginPage"];
-    return lp;
+    return LOGIN_I18N[language] ?? LOGIN_I18N.en;
 }
 
 // ── Zod schemas (language-agnostic, errors translated at render) ──────────
@@ -216,8 +310,8 @@ function SignupForm({ lang, onEmailSent, onSuccess, onGoogleClick }: { lang: Lan
                     {lp.gdprText}{" "}
                     <Link to="/datenschutz" className="text-primary hover:underline">
                         {lp.gdprLink}
-                    </Link>{" "}
-                    {lang === "ko" ? "" : "zu."}
+                    </Link>
+                    {lp.gdprSuffix ? ` ${lp.gdprSuffix}` : ""}
                 </label>
             </div>
             <FieldError message={errors.gdpr?.message} />

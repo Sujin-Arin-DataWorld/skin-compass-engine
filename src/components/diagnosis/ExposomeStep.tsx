@@ -13,6 +13,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Lang, QuestionAnswer } from "@/engine/questionRoutingV5";
+import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -97,15 +98,6 @@ const STRESS_OPTS = [
   { id: "stress_low",  emoji: "😌", label: { en: "Low",      de: "Niedrig", ko: "낮음" } as LT, accent: "emerald" },
   { id: "stress_mod",  emoji: "😐", label: { en: "Moderate", de: "Mittel",  ko: "보통" } as LT, accent: "amber"   },
   { id: "stress_high", emoji: "😰", label: { en: "High",     de: "Hoch",   ko: "높음" } as LT, accent: "rose"    },
-] as const;
-
-// ─── Climate options ──────────────────────────────────────────────────────────
-
-const CLIMATE_OPTS = [
-  { id: "climate_cold_dry",  icon: "❄️", label: { en: "Cold & Dry",        de: "Kalt & Trocken",     ko: "춥고 건조" } as LT, desc: { en: "Northern / Central Europe", de: "Nord-/Mitteleuropa", ko: "북유럽 / 중부 유럽" } as LT },
-  { id: "climate_humid",     icon: "🌊", label: { en: "Humid",              de: "Feucht",             ko: "습함" } as LT,       desc: { en: "Tropical or coastal",       de: "Tropisch oder Küste",ko: "열대 또는 해안 지역" } as LT },
-  { id: "climate_hot_dry",   icon: "☀️", label: { en: "Hot & Dry",          de: "Heiß & Trocken",     ko: "덥고 건조" } as LT, desc: { en: "Mediterranean, desert",     de: "Mittelmeer, Wüste",  ko: "지중해, 사막 지역"  } as LT },
-  { id: "climate_mild",      icon: "🌤️", label: { en: "Temperate / Mild",   de: "Gemäßigt / Mild",    ko: "온화" } as LT,      desc: { en: "Variable four seasons",     de: "Vier Jahreszeiten",  ko: "사계절이 뚜렷"      } as LT },
 ] as const;
 
 // ─── Exercise options ─────────────────────────────────────────────────────────
@@ -539,43 +531,10 @@ export function ExposomeStep({ lang, answers, onChange, onNext, onBack }: Exposo
           <QSection>
             <QLabel text={L.q4} lang={lang} />
             <WhyAsk text={L.q4why} lang={lang} />
-            <div className="grid grid-cols-2 gap-2.5">
-              {CLIMATE_OPTS.map((opt) => {
-                const selected = answers["EXP_CLIMATE"] === opt.id;
-                return (
-                  <motion.button
-                    key={opt.id}
-                    onClick={() => onChange("EXP_CLIMATE", opt.id)}
-                    whileTap={{ scale: 0.985 }}
-                    className={`relative flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition-colors min-h-[56px] touch-manipulation ${
-                      selected
-                        ? "border-amber-500 bg-amber-50/60 dark:bg-amber-950/20"
-                        : "border-border hover:border-amber-300/50"
-                    }`}
-                  >
-                    <span className="text-xl flex-shrink-0">{opt.icon}</span>
-                    <div className="min-w-0">
-                      <p className={`text-sm font-medium leading-snug ${selected ? "text-amber-700 dark:text-amber-300" : "font-light text-foreground"}`}>
-                        {tx(opt.label, lang)}
-                      </p>
-                      <p className="text-[10px] font-light text-muted-foreground leading-tight break-keep">
-                        {tx(opt.desc, lang)}
-                      </p>
-                    </div>
-                    <AnimatePresence>
-                      {selected && (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="pointer-events-none absolute inset-0 rounded-xl border-2 border-amber-500"
-                        />
-                      )}
-                    </AnimatePresence>
-                  </motion.button>
-                );
-              })}
-            </div>
+            <CityClimateInput
+              lang={lang}
+              onLegacyChange={(climateType) => onChange("EXP_CLIMATE", climateType)}
+            />
           </QSection>
         </motion.div>
 

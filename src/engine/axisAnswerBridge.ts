@@ -7,8 +7,9 @@
 
 import type { AnswerMap } from "@/engine/questionRoutingV5";
 import type { UiSignalsV4 } from "@/engine/uiMappingV4";
+import type { Lifestyle } from "@/store/diagnosisStore";
 
-export function convertAxisAnswersToUiSignals(answers: AnswerMap): UiSignalsV4 {
+export function convertAxisAnswersToUiSignals(answers: AnswerMap, lifestyle?: Lifestyle): UiSignalsV4 {
   const s: UiSignalsV4 = {};
 
   // ── Axis 0: SPF / Cleanse (barrier & oxidation signals) ──────────────────
@@ -207,17 +208,32 @@ export function convertAxisAnswersToUiSignals(answers: AnswerMap): UiSignalsV4 {
     s.acne = { ...s.acne, recurrence: Math.max(s.acne?.recurrence ?? 0, 35) };
   }
 
-  // EXP_CLIMATE
+  // EXP_CLIMATE — use ClimateProfile risk levels when available; fall back to legacy string
+  const cp = lifestyle?.climateProfile;
   const climate = answers["EXP_CLIMATE"];
-  if (climate === "climate_cold_dry") {
+
+  const dryRisk  = cp?.drynessRisk  ?? (climate === "climate_cold_dry" ? "high" : "low");
+  const coldRisk = cp?.coldRisk     ?? (climate === "climate_cold_dry" ? "high" : "low");
+  const humidRisk = cp?.humidityRisk ?? (climate === "climate_humid"   ? "high" : "low");
+  const uvRisk   = cp?.uvRisk       ?? (climate === "climate_hot_dry"  ? "high" : "low");
+  const heatRisk = cp?.heatRisk     ?? (climate === "climate_hot_dry"  ? "high" : "low");
+
+  if (dryRisk === "high" || coldRisk === "high") {
     s.dry     = { ...s.dry, dry_environment_worse: true };
     s.barrier = { ...s.barrier, recovery_hours: Math.max(s.barrier?.recovery_hours ?? 0, 36) };
-  } else if (climate === "climate_humid") {
-    s.oil = { ...s.oil, summer_worse: true };
-  } else if (climate === "climate_hot_dry") {
-    s.pigment = { ...s.pigment, sun_reaction: Math.max(s.pigment?.sun_reaction ?? 0, 55) };
+  } else if (dryRisk === "moderate" || coldRisk === "moderate") {
+    s.dry = { ...s.dry, dry_environment_worse: true };
   }
-  // climate_mild → no additional signals
+
+  if (humidRisk === "high") {
+    s.oil = { ...s.oil, summer_worse: true };
+  }
+
+  if (uvRisk === "high" || heatRisk === "high") {
+    s.pigment = { ...s.pigment, sun_reaction: Math.max(s.pigment?.sun_reaction ?? 0, 65) };
+  } else if (uvRisk === "moderate" || heatRisk === "moderate") {
+    s.pigment = { ...s.pigment, sun_reaction: Math.max(s.pigment?.sun_reaction ?? 0, 45) };
+  }
 
   // EXP_EXERCISE
   const exercise = answers["EXP_EXERCISE"];

@@ -62,7 +62,12 @@ function calcSebum(ar: AxisResponses, ls: Lifestyle): number {
   // Supporting (×1)
   if (ls.stressLevel === "stress_high") score += 8;
   else if (ls.stressLevel === "stress_mod") score += 4;
-  if (ls.climate === "climate_humid") score += 5;
+
+  // Climate: use ClimateProfile risk if available, else fall back to legacy string
+  const humidRisk = ls.climateProfile?.humidityRisk
+    ?? (ls.climate === "climate_humid" ? "high" : "low");
+  if (humidRisk === "high") score += 5;
+  else if (humidRisk === "moderate") score += 3;
 
   return clamp(score);
 }
@@ -108,7 +113,12 @@ function calcHydration(ar: AxisResponses, ls: Lifestyle): number {
   }
 
   // Supporting (×1) — climate
-  if (ls.climate === "climate_cold_dry") score -= 8;
+  const dryRisk = ls.climateProfile?.drynessRisk
+    ?? (ls.climate === "climate_cold_dry" ? "high" : "low");
+  const coldRisk = ls.climateProfile?.coldRisk
+    ?? (ls.climate === "climate_cold_dry" ? "high" : "low");
+  if (dryRisk === "high" || coldRisk === "high") score -= 8;
+  else if (dryRisk === "moderate" || coldRisk === "moderate") score -= 4;
 
   return clamp(score);
 }
@@ -226,7 +236,14 @@ function calcSensitivity(ar: AxisResponses, ls: Lifestyle): number {
 
   if (ls.stressLevel === "stress_high") score += 8;
   else if (ls.stressLevel === "stress_mod") score += 4;
-  if (ls.climate === "climate_cold_dry") score += 5;
+
+  // Cold/dry climate amplifies sensitivity
+  const sensColdRisk = ls.climateProfile?.coldRisk
+    ?? (ls.climate === "climate_cold_dry" ? "high" : "low");
+  const sensDryRisk = ls.climateProfile?.drynessRisk
+    ?? (ls.climate === "climate_cold_dry" ? "high" : "low");
+  if (sensColdRisk === "high" || sensDryRisk === "high") score += 5;
+  else if (sensColdRisk === "moderate" || sensDryRisk === "moderate") score += 2;
 
   return clamp(score);
 }
@@ -308,7 +325,14 @@ function calcPigment(ar: AxisResponses, ls: Lifestyle): number {
 
   // Supporting (×1)
   if (ls.outdoorExercise === "ex_daily") score += 8;
-  if (ls.climate === "climate_hot_dry")  score += 5;
+
+  // Hot/UV climate amplifies pigment risk
+  const pigUvRisk  = ls.climateProfile?.uvRisk
+    ?? (ls.climate === "climate_hot_dry" ? "high" : "low");
+  const pigHeatRisk = ls.climateProfile?.heatRisk
+    ?? (ls.climate === "climate_hot_dry" ? "high" : "low");
+  if (pigUvRisk === "high" || pigHeatRisk === "high") score += 5;
+  else if (pigUvRisk === "moderate" || pigHeatRisk === "moderate") score += 2;
 
   return clamp(score);
 }
@@ -346,7 +370,14 @@ function calcBarrier(ar: AxisResponses, ls: Lifestyle): number {
     else if (sleep === 1) score += 5;
   }
   if (ls.stressLevel === "stress_high") score += 8;
-  if (ls.climate === "climate_cold_dry") score += 5;
+
+  // Cold/dry climate degrades the barrier
+  const barColdRisk = ls.climateProfile?.coldRisk
+    ?? (ls.climate === "climate_cold_dry" ? "high" : "low");
+  const barDryRisk  = ls.climateProfile?.drynessRisk
+    ?? (ls.climate === "climate_cold_dry" ? "high" : "low");
+  if (barColdRisk === "high" || barDryRisk === "high") score += 5;
+  else if (barColdRisk === "moderate" || barDryRisk === "moderate") score += 2;
 
   return clamp(score);
 }

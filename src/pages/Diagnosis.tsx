@@ -18,6 +18,7 @@ import type { QuestionDef, AxisDef, LocalizedText } from "@/engine/questionRouti
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
 import faceIllustration from "@/assets/facemap.jpg";
 import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
+import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { convertAxisAnswersToUiSignals } from "@/engine/axisAnswerBridge";
 import { runDiagnosis } from "@/engine/runDiagnosisV4";
 
@@ -190,16 +191,6 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     textDE: "Aktuelles Stresslevel",
     textKO: "현재 스트레스 수준",
     options: [{ label: "Low", value: 1 }, { label: "Moderate", value: 2 }, { label: "High", value: 3 }],
-  },
-  {
-    id: "climate", icon: "🌍",
-    text: "Your climate",
-    textDE: "Ihr Klima",
-    textKO: "거주 기후",
-    options: [
-      { label: "Cold & Dry", value: 1 }, { label: "Humid", value: 2 },
-      { label: "Hot & Dry", value: 3 }, { label: "Temperate", value: 4 },
-    ],
   },
 ];
 
@@ -719,7 +710,9 @@ const DiagnosisPage: React.FC = () => {
   const lastTier = lastRecord?.skin_tier ?? null;
 
   // Derived state
-  const foundationComplete = FOUNDATION_QUESTIONS.every(fq => foundationAnswers[fq.id] !== undefined);
+  const foundationComplete =
+    FOUNDATION_QUESTIONS.every(fq => foundationAnswers[fq.id] !== undefined) &&
+    store.lifestyle.climateProfile != null;
   const totalConcerns = Object.values(zoneData).reduce((sum, arr) => sum + (arr?.length ?? 0), 0);
   const zonesWithData = Object.values(zoneData).filter(arr => arr && arr.length > 0).length;
   const axisAnswers = store.axisAnswers as Record<string, QuestionAnswer>;
@@ -764,7 +757,7 @@ const DiagnosisPage: React.FC = () => {
     store.setAxisAnswer("EXP_SLEEP", (foundationAnswers.sleep ?? 1) - 1);
     store.setAxisAnswer("EXP_WATER", (foundationAnswers.water ?? 1) - 1);
     store.setAxisAnswer("EXP_STRESS", (foundationAnswers.stress ?? 1) - 1);
-    store.setAxisAnswer("EXP_CLIMATE", (foundationAnswers.climate ?? 1) - 1);
+    // EXP_CLIMATE is set directly by CityClimateInput via setClimateProfile
     setPhase("scanning");
   }, [foundationComplete, foundationAnswers, store]);
 
@@ -780,7 +773,7 @@ const DiagnosisPage: React.FC = () => {
 
     await new Promise(r => setTimeout(r, 400));
 
-    const uiSignals = convertAxisAnswersToUiSignals(store.axisAnswers);
+    const uiSignals = convertAxisAnswersToUiSignals(store.axisAnswers, store.lifestyle);
     const metaAnswers: Record<string, number | boolean> = {
       ...(store.metaAnswers as Record<string, number | boolean>),
       atopy: store.implicitFlags.atopyFlag,
@@ -1028,6 +1021,30 @@ const DiagnosisPage: React.FC = () => {
                     </div>
                   </motion.div>
                 ))}
+
+                {/* Climate card — city search input */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: FOUNDATION_QUESTIONS.length * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                  style={{
+                    gridColumn: isMobile ? "span 2" : "auto",
+                    background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+                    border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
+                    borderRadius: 16, padding: "20px 16px",
+                    backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
+                  }}>
+                  <div style={{ fontSize: 24, marginBottom: 8 }}>🌍</div>
+                  <div style={{
+                    fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 14,
+                    fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5
+                  }}>
+                    {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
+                  </div>
+                  <CityClimateInput
+                    lang={lang}
+                    onLegacyChange={(climateType) => store.setAxisAnswer("EXP_CLIMATE", climateType)}
+                  />
+                </motion.div>
               </div>
               <div style={{ textAlign: "center" }}>
                 <motion.button onClick={handleBeginFaceMapping}

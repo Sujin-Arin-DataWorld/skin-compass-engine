@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { SkinType, ContextKey, Tier, DiagnosisResult } from "@/engine/types";
 import type { UiSignalsV4 } from "@/engine/uiMappingV4";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
+import type { ClimateProfile } from "@/engine/climateEngine";
 
 // ─── Typed axis response structures ──────────────────────────────────────────
 
@@ -78,8 +79,11 @@ export interface Lifestyle {
   waterIntake?: string;
   stressLevel?: string;
   climate?: string;
+  climateProfile?: ClimateProfile;
   outdoorExercise?: string;
 }
+
+export type { ClimateProfile };
 
 export interface ImplicitFlags {
   likelyHormonalCycleUser: boolean;
@@ -302,6 +306,7 @@ interface DiagnosisState {
   setTier: (tier: Tier) => void;
   setAxisAnswer: (id: string, value: QuestionAnswer) => void;
   clearAxisAnswers: () => void;
+  setClimateProfile: (profile: ClimateProfile) => void;
   setResult: (result: DiagnosisResult) => void;
   setUiSignals: (category: string, data: Record<string, unknown>) => void;
   setInteractive: <K extends keyof InteractiveState>(key: K, value: InteractiveState[K]) => void;
@@ -392,6 +397,10 @@ export const useDiagnosisStore = create<DiagnosisState>()(
 
       setTier: (tier) => set({ selectedTier: tier }),
       clearAxisAnswers: () => set({ axisAnswers: {} as Record<string, QuestionAnswer> }),
+      setClimateProfile: (profile) =>
+        set((state) => ({
+          lifestyle: { ...state.lifestyle, climateProfile: profile, climate: profile.climateType },
+        })),
       setResult: (result) => set({ result }),
 
       setUiSignals: (category, data) =>

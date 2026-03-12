@@ -107,6 +107,7 @@ const COPY: Record<Lang, {
   title: string; subtitle: string;
   selected: (n: number) => string;
   close: string; continue: string; hint: string;
+  confirmSelection: string; completeCta: string; resultsCta: string;
 }> = {
   en: {
     title: "Where do you notice concerns?",
@@ -114,6 +115,9 @@ const COPY: Record<Lang, {
     selected: (n) => n === 1 ? "1 concern selected" : `${n} concerns selected`,
     close: "Done", continue: "Continue",
     hint: "Tap a zone on the face map to begin",
+    confirmSelection: "Confirm Selection",
+    completeCta: "Please complete analysis",
+    resultsCta: "Check Results",
   },
   de: {
     title: "Wo bemerken Sie Hautprobleme?",
@@ -121,6 +125,9 @@ const COPY: Record<Lang, {
     selected: (n) => `${n} Anliegen ausgewählt`,
     close: "Fertig", continue: "Weiter",
     hint: "Tippen Sie auf eine Zone, um zu beginnen",
+    confirmSelection: "Auswahl bestätigen",
+    completeCta: "Analyse abschließen",
+    resultsCta: "Ergebnisse ansehen",
   },
   ko: {
     title: "어느 부위가 신경 쓰이시나요?",
@@ -128,12 +135,15 @@ const COPY: Record<Lang, {
     selected: (n) => `${n}개 선택됨`,
     close: "완료", continue: "계속",
     hint: "얼굴 지도에서 구역을 탭하여 시작하세요",
+    confirmSelection: "선택 완료",
+    completeCta: "분석을 완료하세요",
+    resultsCta: "결과 확인하기",
   },
 };
 
 // ─── SVG Geometry ─────────────────────────────────────────────────────────────
-// viewBox "0 0 500 700" — all coordinates are in this space.
-// The container uses aspect-ratio 500/700 with objectFit cover.
+// viewBox "-50 0 600 700" — face coords unchanged; 50px padding each side for labels.
+// The container uses aspect-ratio 600/700 with objectFit cover.
 //
 // Dot layout (facemap.jpg portrait, face centered ~250, hairline ~y80):
 //   Forehead    y≈120   eyes y≈215   dark circles y≈255
@@ -155,7 +165,7 @@ interface ZoneDef {
 }
 
 // ─── SVG 존 기하 데이터 ───────────────────────────────────────────────────────
-// viewBox "0 0 500 700" 기준 좌표.
+// viewBox "-50 0 600 700" 기준 — 얼굴 좌표 유지, 양옆 50px 여백 추가.
 // 대칭 존(볼·턱선)은 단일 항목에 좌우 모든 도트·연결선을 통합:
 //   hitPath에 두 개의 서브패스(M...Z M...Z)를 사용해 좌우 영역을 동시에 커버
 //   → 어느 쪽을 클릭/호버해도 onZoneClick/hoveredZone이 동일 ID로 발동
@@ -279,12 +289,12 @@ const ZONES_DEF: ZoneDef[] = [
   },
 ];
 
-// ─── Colour palette ─────────────────────
+// ─── Colour palette ───────────────────── 존 라벨 색상
 const COLOR_PALETTE = {
   dark_selected: "#f7e28dff", // Dark Mode Selected: Muted Terracotta
-  light_selected: "#8f6e6bff", // White Mode Selected: Deep Terracotta (slightly darker for contrast)
+  light_selected: "#8EA273", // White Mode Selected: Deep Terracotta (slightly darker for contrast)
   dark_idle: "rgba(174, 226, 255, 0.5)",   // Dark Mode: Crisp Ice Blue with opacity
-  light_idle: "#D4A29C",  // White Mode: Dusty Rose
+  light_idle: "#8EA273",  // White Mode: Dusty Rose
 };
 
 
@@ -312,7 +322,7 @@ const SVG_CSS = `
     0%, 100% { opacity: 0.10; }
     50%       { opacity: 0.24; }
   }
-  /* Active / Selected: full bloom */
+  /* Active (zone open): full bloom */
   @keyframes fms-dot-active {
     0%, 100% { opacity: 0.90; }
     50%       { opacity: 1.00; }
@@ -320,6 +330,15 @@ const SVG_CSS = `
   @keyframes fms-halo-active {
     0%, 100% { opacity: 0.16; }
     50%       { opacity: 0.36; }
+  }
+  /* Selected (questions done): steady bling — dot & halo pulse together */
+  @keyframes fms-dot-selected {
+    0%, 100% { opacity: 0.85; transform: scale(1.0); }
+    50%       { opacity: 1.00; transform: scale(1.15); }
+  }
+  @keyframes fms-halo-selected {
+    0%, 100% { opacity: 0.20; transform: scale(1.0); }
+    50%       { opacity: 0.50; transform: scale(1.35); }
   }
 `;
 
@@ -360,7 +379,7 @@ function FaceSVG({
 
   return (
     <svg
-      viewBox="0 0 500 700"
+      viewBox="-50 0 600 700"
       style={{
         position: "absolute", inset: 0,
         width: "100%", height: "100%",
@@ -407,7 +426,7 @@ function FaceSVG({
              onMouseEnter={() => setHoveredZone(zone)}
              onMouseLeave={() => setHoveredZone(null)}
              style={{ 
-               opacity: dimmed && !isSelected ? 0.2 : 1, 
+               opacity: dimmed && !isSelected ? 0.8 : 1, 
                transition: "all 0.4s",
                cursor: "pointer",
              }}>
@@ -460,7 +479,7 @@ function FaceSVG({
                 fill={statusColor}
                 style={{
                   fontFamily: lang === "ko" ? "'Pretendard', 'Noto Sans KR', sans-serif" : "'DM Sans', sans-serif",
-                  fontSize: "14px",
+                  fontSize: "16px",
                   fontWeight: (isSelected || isActive) ? 600 : 400,
                   opacity: finalOpacity,
                   letterSpacing: "0.02em",
@@ -477,36 +496,54 @@ function FaceSVG({
 
             {/* ── Dots (always visible) ─────────────────────────────────── */}
             {dots.map((d, i) => {
-              const dotScale = lit ? 1.0 : (isHovered && !dimmed) ? 0.73 : 0.45;
-              const dotAnim  = isSelected
-                ? "none"
+              const dotAnim = isSelected
+                ? `fms-dot-selected 2s ease-in-out ${i * 0.3}s infinite`
                 : lit
                   ? "fms-dot-active 2.4s ease-in-out infinite"
                   : (isHovered && !dimmed)
-                    ? `fms-dot-hover 1.8s ease-in-out infinite`
+                    ? `fms-dot-hover 0.8s ease-in-out infinite`
                     : `fms-dot-idle 3s ease-in-out ${d0 + i * 0.45}s infinite`;
 
               return (
                 <g key={i}>
-                  {isSelected && (
+                  {/* 호버 시 블링블링 광채 레이어 */}
+                  {isHovered && !dimmed && !isSelected && (
                     <circle
-                      cx={d.x} cy={d.y} r={14}
-                      fill={isDark ? COLOR_PALETTE.dark_selected : COLOR_PALETTE.light_selected}
+                      cx={d.x} cy={d.y} r={7}
+                      fill={statusColor}
                       filter="url(#fms-glow-warm)"
-                      style={{ opacity: 0.25 }}
+                      style={{
+                        animation: "fms-halo-hover 1.2s ease-in-out infinite",
+                        opacity: 0.5,
+                      }}
                     />
                   )}
+
+                  {/* 진단 완료 시 펄싱 광채 */}
+                  {isSelected && (
+                    <circle
+                      cx={d.x} cy={d.y} r={7
+                      }
+                      fill={isDark ? COLOR_PALETTE.dark_selected : COLOR_PALETTE.light_selected}
+                      filter="url(#fms-glow-warm)"
+                      style={{
+                        animation: `fms-halo-selected 2s ease-in-out ${i * 0.3}s infinite`,
+                        transformOrigin: `${d.x}px ${d.y}px`,
+                      }}
+                    />
+                  )}
+
+                  {/* 메인 도트 */}
                   <circle
                     cx={d.x} cy={d.y}
-                    r={5.5}
+                    r={3.3}
                     fill={statusColor}
-                    filter={isSelected ? "url(#fms-glow-warm)" : undefined}
+                    filter={(isSelected || (isHovered && !dimmed)) ? "url(#fms-glow-warm)" : undefined}
                     style={{
-                      transform: `scale(${dotScale})`,
                       transformOrigin: `${d.x}px ${d.y}px`,
                       animation: dotAnim,
                       opacity: finalOpacity,
-                      transition: "all 0.4s ease",
+                      transition: "opacity 0.3s ease",
                     }}
                   />
                 </g>
@@ -527,7 +564,7 @@ function InlineQuestionRenderer({
   onChange: (id: string, val: QuestionAnswer) => void;
   lang: Lang; allAnswers: Record<string, QuestionAnswer>; isDark: boolean;
 }) {
-  const GOLD = "#c9a96e";
+  const GOLD = "#FD8B7C";
   const pillSt = (sel: boolean): React.CSSProperties => ({
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
@@ -757,6 +794,24 @@ function ConcernAndQuestionPanel({
           })}
         </motion.div>
       )}
+
+      {/* Confirm Selection button */}
+      <motion.button
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        onClick={onClose}
+        style={{
+          marginTop: 16, width: "100%", padding: "14px 0",
+          borderRadius: 24, fontSize: 14, fontWeight: 600,
+          fontFamily: "'DM Sans', sans-serif", border: "none",
+          background: "linear-gradient(135deg, #8EA273, #2D4F39)",
+          color: "#fff", cursor: "pointer",
+          boxShadow: "0 6px 20px rgba(111, 152, 141, 0.3)",
+        }}
+      >
+        {lang === "ko" ? "선택 완료" : lang === "de" ? "Auswahl bestätigen" : "Confirm Selection"}
+      </motion.button>
     </div>
   );
 }
@@ -847,6 +902,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
   }, [selectedConcerns, store, onNext]);
 
   const totalSelected = selectedConcerns.size;
+  const allZonesDone  = selectedZones.size === ZONES_DEF.length;
 
   return (
     <div style={{ width: "100%" }}>
@@ -860,7 +916,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
       </h2>
       <p style={{
         fontSize: 14, marginBottom: 32,
-        color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)",
+        color: isDark ? "rgba(185, 182, 141, 0.76)" : "rgba(0,0,0,0.6)",
         fontFamily: "'DM Sans',sans-serif",
       }}>
         {copy.subtitle}
@@ -878,11 +934,11 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
         <div style={{
           position: "relative",
           width: "100%",
-          maxWidth: isMobile ? "380px" : "460px",
-          aspectRatio: "500/700",
+          maxWidth: isMobile ? "430px" : "520px",
+          aspectRatio: "600/700",
           flexShrink: 0, 
           borderRadius: 28, 
-          background: isDark ? "#121214" : "#F2F0ED",
+          background: isDark ? "#121214" : "#becad3bf",
           boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
           border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
           margin: isMobile ? "0 auto" : "0",
@@ -894,7 +950,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
               width: "100%", height: "100%", 
               objectFit: "cover", 
               borderRadius: 28,
-              filter: isDark ? "brightness(0.9) contrast(1.1)" : "none",
+              filter: isDark ? "brightness(0.8) contrast(1.2) multiply" : "mix-blend-mode: multiply",
               transition: "filter 0.3s ease" 
             }}
           />
@@ -902,8 +958,8 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
             position: "absolute", inset: 0, pointerEvents: "none",
             borderRadius: 28,
             background: isDark
-              ? "radial-gradient(ellipse at 50% 42%, transparent 30%, rgba(18,18,20,0.6) 100%)"
-              : "radial-gradient(ellipse at 50% 42%, transparent 35%, rgba(242,240,237,0.4) 100%)",
+              ? "radial-gradient(ellipse at 50% 45%, transparent 20%, rgba(18,18,20,0.6) 100%)"
+              : "radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(242,240,237,0.4) 100%)",
           }} />
           <FaceSVG
             activeZone={activeZone}
@@ -1000,26 +1056,40 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
           </p>
         )}
         <div style={{ marginLeft: "auto" }}>
-          <button
+          <motion.button
             onClick={handleNext}
-            disabled={totalSelected === 0}
+            disabled={!totalSelected}
+            animate={allZonesDone ? {
+              boxShadow: [
+                "0 8px 24px rgba(201,169,110,0.4)",
+                "0 8px 40px rgba(201,169,110,0.85)",
+                "0 8px 24px rgba(201,169,110,0.4)",
+              ],
+            } : { boxShadow: totalSelected > 0 ? "0 4px 16px rgba(201,169,110,0.15)" : "none" }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
             style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "14px 32px", borderRadius: 32,
               fontSize: 14, fontWeight: 600,
               fontFamily: "'DM Sans', sans-serif", border: "none",
-              background: totalSelected > 0
+              background: allZonesDone
                 ? "linear-gradient(135deg, #c9a96e, #a38555)"
-                : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
+                : totalSelected > 0
+                  ? "linear-gradient(135deg, rgba(201,169,110,0.45), rgba(163,133,85,0.45))"
+                  : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
               color: totalSelected > 0
                 ? "#fff"
                 : isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
               cursor: totalSelected > 0 ? "pointer" : "not-allowed",
-              transition: "all 0.3s ease",
-              boxShadow: totalSelected > 0 ? "0 8px 24px rgba(201,169,110,0.3)" : "none",
+              transition: "background 0.4s ease",
             }}>
-            {copy.continue} <ChevronRight size={18} />
-          </button>
+            {allZonesDone
+              ? copy.resultsCta
+              : totalSelected > 0
+                ? copy.completeCta
+                : copy.continue}
+            <ChevronRight size={18} />
+          </motion.button>
         </div>
       </div>
     </div>

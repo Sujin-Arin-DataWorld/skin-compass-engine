@@ -604,7 +604,17 @@ function InlineQuestionRenderer({
             const on = sel.includes(opt.id);
             return (
               <div key={opt.id}
-                onClick={() => onChange(q.id, on ? sel.filter(x => x !== opt.id) : [...sel, opt.id])}
+                onClick={() => {
+                  let next: string[];
+                  if (on) {
+                    next = sel.filter(x => x !== opt.id);
+                  } else if (q.exclusiveIds?.includes(opt.id)) {
+                    next = [opt.id];
+                  } else {
+                    next = [...sel.filter(x => !q.exclusiveIds?.includes(x)), opt.id];
+                  }
+                  onChange(q.id, next);
+                }}
                 style={pillSt(on)}>
                 {gt(opt.label, lang)}
               </div>

@@ -46,6 +46,7 @@ export interface QuestionDef {
   conditional?: ConditionalDef;
   axisHints: Partial<Record<string, number>>; // axis-key → weight multiplier
   hideIf?: { questionId: string; values: string[] }; // hide this question if condition met
+  exclusiveIds?: string[]; // if one of these IDs is selected, all other selections are cleared
 }
 
 export interface AxisDef {
@@ -272,33 +273,33 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
     questions: [
       {
         id: "AX4_Q1",
-        type: "image",
-        text: t("What type of breakouts do you experience most?", "Welche Art von Unreinheiten haben Sie am häufigsten?", "주로 어떤 종류의 트러블이 생기나요?"),
+        type: "multi",
+        text: t("What types of troubles do you usually experience?", "Welche Art von Unreinheiten haben Sie am häufigsten?", "주로 어떤 종류의 트러블이 생기나요?"),
         required: true,
         axisHints: { acne: 1.0, texture: 0.5 },
         options: [
           withGloss(
-            opt("acne_comedonal", 2, "Closed Comedones",  "Geschlossene Komedonen", "폐쇄면포",          "🟡",
+            opt("acne_comedonal", 2, "Skin-colored bumps (whiteheads)", "Hautfarbene Pickelchen (Whiteheads)", "피부 속 하얀 알갱이 (화이트헤드)", "🟡",
               "Small bumps under skin, skin-colored", "Kleine Erhöhungen unter der Haut", "피부 속 작은 돌기"),
             "Clogged pores that haven't become inflamed yet — appearing as small skin-coloured bumps or milia.",
             "Verstopfte Poren ohne Entzündung — erscheinen als hautfarbene Unebenheiten oder Milien.",
             "아직 염증이 없는 막힌 모공으로 피부색 작은 돌기나 비립종처럼 나타납니다."
           ),
           withGloss(
-            opt("acne_pustular",  2, "Pustules",           "Pusteln",                "농포",              "🔴",
+            opt("acne_pustular",  2, "Pus-filled pimples", "Eiter-Pickel", "고름이 있는 뾰루지", "🔴",
               "Red, inflamed with visible pus", "Rot und entzündet mit sichtbarem Eiter", "붉고 염증성, 고름 보임"),
             "Infected pimples — red, inflamed spots with visible white or yellow pus at their centre.",
             "Infizierte Pickel — rote, entzündete Stellen mit sichtbarem weißem oder gelbem Eiter.",
             "감염된 여드름으로 중앙에 흰색 또는 노란색 고름이 보이는 붉고 염증성 병변입니다."
           ),
           withGloss(
-            opt("acne_cystic",    3, "Cystic / Nodular",  "Zystisch / Nodulär",    "낭종성 / 결절성",   "🟣",
+            opt("acne_cystic",    3, "Deep, painful lumps", "Tiefe, schmerzhafte Knoten", "크고 깊은 혹 같은 트러블", "🟣",
               "Deep, painful nodules that don't surface", "Tiefe, schmerzhafte Knoten", "깊고 통증 있는 결절"),
             "Deep, painful lesions that form beneath the skin — a more severe form of acne often requiring medical treatment.",
             "Tiefe, schmerzhafte Läsionen unter der Hautoberfläche — schwere Akneform, die oft ärztliche Behandlung erfordert.",
             "피부 깊숙이 형성되는 크고 통증이 있는 병변으로, 의학적 치료가 필요한 심한 형태의 여드름입니다."
           ),
-          opt("acne_notsure",   1, "Not Sure",           "Nicht sicher",           "잘 모르겠어요",     "❓"),
+          opt("acne_notsure",   1, "Not Sure", "Nicht sicher", "잘 모르겠어요", "❓"),
         ],
       },
       {
@@ -332,7 +333,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       },
       {
         id: "AX4_Q3",
-        type: "single",
+        type: "multi",
         text: t("Do breakouts leave marks after healing?", "Hinterlassen Unreinheiten nach dem Abheilen Flecken?", "트러블이 나은 후 흔적이 남나요?"),
         required: false,
         axisHints: { pigment: 0.7, acne: 0.3 },
@@ -450,7 +451,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         options: [
           opt("firm_jaw",         2, "Jawline",         "Kieferlinie",      "턱선"),
           opt("firm_cheeks",      2, "Cheeks",          "Wangen",           "볼"),
-          opt("firm_under_eyes",  2, "Under eyes",      "Unteraugenlid",    "눈 아래"),
+          opt("firm_under_eyes",  2, "Around the eyes", "Um die Augen",     "눈 주변"),
           opt("firm_neck",        2, "Neck",            "Hals",             "목"),
           opt("firm_nasolabial",  2, "Nasolabial area", "Nasolabialbereich","팔자 부위"),
         ],
@@ -496,7 +497,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
     questions: [
       {
         id: "AX7_Q1",
-        type: "image",
+        type: "multi",
         text: t("What type of discoloration do you primarily have?", "Welche Art von Verfärbung haben Sie hauptsächlich?", "주로 어떤 유형의 색소 변화가 있나요?"),
         required: true,
         axisHints: { pigment: 1.0, ox: 0.3 },
@@ -576,14 +577,20 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       },
       {
         id: "AX8_Q3",
-        type: "single",
-        text: t("Are you currently on hormonal medication?", "Nehmen Sie derzeit hormonelle Medikamente ein?", "현재 호르몬 약을 복용 중인가요?"),
+        type: "multi",
+        text: t("Are you currently taking any hormonal medication?", "Nehmen Sie derzeit Medikamente ein?", "현재 복용 중인 약이 있나요?"),
         required: false,
         axisHints: { acne: 0.3 },
+        exclusiveIds: ["hormone_none"],
         options: [
-          opt("hmed_yes",    1, "Yes",                 "Ja",                   "예"),
-          opt("hmed_no",     0, "No",                  "Nein",                 "아니요"),
-          opt("hmed_prefer", 0, "Prefer not to say",  "Keine Angabe",         "말씀드리기 어려워요"),
+          opt("hormone_bc",       1, "Contraceptive pill",                     "Antibabypille",                              "피임약"),
+          opt("hormone_hormonal", 1, "Hormone therapy (HRT)",                  "Hormontherapie (HRT)",                       "호르몬 치료제 (에스트로겐·프로게스테론 등)"),
+          opt("hormone_adhd",     1, "ADHD medication",                        "ADHS-Medikament",                            "ADHD 약 (리탈린·콘서타 등)"),
+          opt("hormone_antidep",  1, "Antidepressants / Anxiolytics",          "Antidepressiva / Anxiolytika",               "항우울제 / 항불안제"),
+          opt("hormone_thyroid",  1, "Thyroid medication",                     "Schilddrüsenmedikament",                     "갑상선 약"),
+          opt("hormone_other",    1, "Other prescription medication",          "Andere verschreibungspflichtige Medikamente","기타 처방약 복용 중"),
+          opt("hormone_none",     0, "None",                                   "Keine",                                      "복용하지 않음"),
+          opt("hormone_unsure",   0, "Not sure",                               "Nicht sicher",                               "잘 모르겠어요"),
         ],
       },
     ],

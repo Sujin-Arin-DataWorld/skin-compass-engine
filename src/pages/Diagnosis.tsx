@@ -292,7 +292,14 @@ function InlineQuestionRenderer({
             const isOn = sel.includes(opt.id);
             return (
               <div key={opt.id} onClick={() => {
-                const next = isOn ? sel.filter(x => x !== opt.id) : [...sel, opt.id];
+                let next: string[];
+                if (isOn) {
+                  next = sel.filter(x => x !== opt.id);
+                } else if (q.exclusiveIds?.includes(opt.id)) {
+                  next = [opt.id]; // exclusive option selected: clear all others
+                } else {
+                  next = [...sel.filter(x => !q.exclusiveIds?.includes(x)), opt.id]; // deselect any exclusive options
+                }
                 onChange(q.id, next);
               }} style={pillStyle(isOn, isDark)}>
                 {gt(opt.label, lang)}
@@ -368,6 +375,7 @@ function ConcernPanel({
   onToggleEdit: (axisId: number) => void;
   isDark: boolean;
 }) {
+  const GOLD = isDark ? GOLD_DARK : SAGE;
   if (!activeZone) {
     return (
       <div style={{
@@ -417,7 +425,7 @@ function ConcernPanel({
                 padding: "10px 18px", borderRadius: 24, fontSize: 14, minHeight: 44,
                 fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
                 border: isOn ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
-                background: isOn ? "rgba(201,169,110,0.12)" : isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
+                background: isOn ? (isDark ? "rgba(201,169,110,0.12)" : "rgba(122,162,115,0.12)") : isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
                 color: isOn ? GOLD : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)",
                 transition: "all 0.3s ease",
               }}>

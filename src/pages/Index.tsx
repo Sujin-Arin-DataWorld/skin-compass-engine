@@ -67,7 +67,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
   }, [emblaApi]);
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: "min(100svh, 720px)" }}>
+    <section className="relative w-full overflow-hidden" style={{ height: "min(100svh, 720px)", boxShadow: "inset 0 0 80px rgba(245,235,210,0.12)" }}>
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
           {HERO_IMAGES.map((img, i) => (
@@ -81,6 +81,11 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
               <div
                 className="absolute inset-0"
                 style={{ background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)" }}
+              />
+              {/* Dreamy beige-sage mist overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{ background: "radial-gradient(ellipse at 70% 30%, rgba(245,238,224,0.18) 0%, rgba(142,162,115,0.08) 50%, transparent 75%)" }}
               />
               <div className="absolute inset-0 flex flex-col justify-end pb-16 px-8 md:px-20 lg:px-28">
                 <motion.p
@@ -135,7 +140,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 10 }}
                   transition={{ duration: 0.5, delay: 0.24 }}
                 >
-                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                  <motion.div whileTap={{ scale: 0.97 }}>
                     <Link
                       to="/diagnosis"
                       className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide transition-opacity hover:opacity-90"
@@ -202,8 +207,8 @@ function UspStrip({ items }: { items: { label: string }[] }) {
           const Icon = icons[i] ?? Sparkles;
           return (
             <div key={i} className="flex flex-col items-center text-center gap-3">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(212,175,55,0.08)" }}>
-                <Icon className="w-5 h-5" style={{ color: BRONZE }} strokeWidth={1.5} />
+              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(220,160,160,0.12)" }}>
+                <Icon className="w-5 h-5" style={{ color: "#c07a7a" }} strokeWidth={1.5} />
               </div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300 tracking-wide">{item.label}</p>
             </div>
@@ -564,7 +569,6 @@ function DiagnosisBanner({ headline, sub, cta, lang, accent, accentDeep, isDark 
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
           >
             <Link
@@ -639,7 +643,6 @@ function Newsletter({
               />
               <motion.button
                 type="submit"
-                whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
                 className="shrink-0 rounded-full px-6 py-3 text-sm md:text-base font-semibold tracking-wide"
                 style={{

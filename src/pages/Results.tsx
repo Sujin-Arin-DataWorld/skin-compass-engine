@@ -4,9 +4,8 @@ import { Navigate, Link, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
-import { calculateSkinVector } from "@/engine/skinVectorEngine";
-import { buildRoutine } from "@/engine/routineEngine";
-import type { RoutineOutput } from "@/engine/routineEngine";
+import { buildRoutineV5 } from "@/engine/routineEngineV5";
+import type { RoutineOutputV5 } from "@/engine/routineEngineV5";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 import SlideDiagnosisSummary from "@/components/results/SlideDiagnosisSummary";
@@ -86,7 +85,7 @@ function makeMockResult(products: Product[]): DiagnosisResult {
 }
 
 const ResultsPage = () => {
-  const { result: storeResult, axisResponses, lifestyle, implicitFlags } = useDiagnosisStore();
+  const { result: storeResult, implicitFlags } = useDiagnosisStore();
   const { products } = useProductStore();
   const [searchParams] = useSearchParams();
   const isDebug = searchParams.get("debug") === "true";
@@ -99,11 +98,11 @@ const ResultsPage = () => {
     return null;
   }, [storeResult, products]);
 
-  // B-1 + B-2: compute skin vector + personalised routine (pure, no side-effects)
-  const routineOutput = useMemo<RoutineOutput>(() => {
-    const vector = calculateSkinVector(axisResponses, lifestyle, implicitFlags);
-    return buildRoutine(vector, implicitFlags, axisResponses);
-  }, [axisResponses, lifestyle, implicitFlags]);
+  // B-1 + B-2: compute personalised routine from V5 result (pure, no side-effects)
+  const routineOutput = useMemo<RoutineOutputV5 | null>(() => {
+    if (!result) return null;
+    return buildRoutineV5(result, implicitFlags, "Full");
+  }, [result, implicitFlags]);
 
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);

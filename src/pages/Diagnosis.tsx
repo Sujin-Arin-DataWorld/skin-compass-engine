@@ -18,8 +18,7 @@ import type { QuestionDef, AxisDef, LocalizedText } from "@/engine/questionRouti
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
 import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
 import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
-import { convertAxisAnswersToUiSignals } from "@/engine/axisAnswerBridge";
-import { runDiagnosis } from "@/engine/runDiagnosisV4";
+import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const GOLD_DARK = "#c9a96e";
@@ -686,23 +685,16 @@ const DiagnosisPage: React.FC = () => {
     try {
       await new Promise(r => setTimeout(r, 400));
 
-      const uiSignals = convertAxisAnswersToUiSignals(store.axisAnswers, store.lifestyle);
-      const metaAnswers: Record<string, number | boolean> = {
-        ...(store.metaAnswers as Record<string, number | boolean>),
-        atopy: store.implicitFlags.atopyFlag,
-      };
-
-      const result = runDiagnosis({
-        severities: store.severities,
-        contexts: store.contexts,
-        skinType: store.skinType || "normal",
-        tier: store.selectedTier || "Full",
-        metaAnswers,
-        uiSignals,
+      const result = runDiagnosisV5({
+        axisAnswers:   store.axisAnswers,
+        selectedZones: store.selectedZones ?? {},
+        implicitFlags: store.implicitFlags,
+        lifestyle:     store.lifestyle,
+        products:      [],
       });
 
       if (!result) {
-        console.error("[handleCompleteAnalysis] runDiagnosis returned null/undefined");
+        console.error("[handleCompleteAnalysis] runDiagnosisV5 returned null/undefined");
         setAnalyzing(false);
         return;
       }

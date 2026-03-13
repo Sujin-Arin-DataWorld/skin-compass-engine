@@ -317,6 +317,9 @@ interface DiagnosisState {
   actions: StoreActions;
 }
 
+/** Public type alias — use this when you need to type a snapshot of the store */
+export type DiagnosisStoreState = DiagnosisState;
+
 // ─── Initial state ────────────────────────────────────────────────────────────
 
 const defaultImplicitFlags: ImplicitFlags = {

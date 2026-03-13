@@ -67,7 +67,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
   }, [emblaApi]);
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: "min(100svh, 720px)", boxShadow: "inset 0 0 80px rgba(245,235,210,0.12)" }}>
+    <section className="relative w-full overflow-hidden" style={{ height: "min(100svh, 720px)" }}>
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
           {HERO_IMAGES.map((img, i) => (
@@ -76,18 +76,36 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
                 src={img}
                 alt={slides[i]?.headline ?? ""}
                 className="absolute inset-0 w-full h-full object-cover"
+                style={{ zIndex: 0 }}
                 loading={i === 0 ? "eager" : "lazy"}
               />
+              {/* Dark gradient: left-to-right text readability */}
               <div
                 className="absolute inset-0"
-                style={{ background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)" }}
+                style={{ background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)", zIndex: 1 }}
               />
-              {/* Dreamy beige-sage mist overlay */}
+              {/* Dreamy mist overlay — sage green (light) / champagne gold (dark) */}
               <div
                 className="absolute inset-0 pointer-events-none"
-                style={{ background: "radial-gradient(ellipse at 70% 30%, rgba(245,238,224,0.18) 0%, rgba(142,162,115,0.08) 50%, transparent 75%)" }}
+                style={{
+                  background: isDark
+                    ? "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(201,169,110,0.32) 0%, rgba(160,130,80,0.14) 55%, transparent 100%)"
+                    : "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(122,158,130,0.50) 0%, rgba(45,79,57,0.22) 55%, transparent 100%)",
+                  zIndex: 2,
+                  mixBlendMode: isDark ? "screen" : "multiply",
+                }}
               />
-              <div className="absolute inset-0 flex flex-col justify-end pb-16 px-8 md:px-20 lg:px-28">
+              {/* Soft inset border glow */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  boxShadow: isDark
+                    ? "inset 0 0 140px rgba(201,169,110,0.22), inset 0 -60px 80px rgba(160,130,80,0.10)"
+                    : "inset 0 0 140px rgba(122,158,130,0.28), inset 0 -60px 80px rgba(45,79,57,0.12)",
+                  zIndex: 3,
+                }}
+              />
+              <div className="absolute inset-0 flex flex-col justify-end pb-16 px-8 md:px-20 lg:px-28" style={{ zIndex: 4 }}>
                 <motion.p
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
@@ -201,7 +219,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
 function UspStrip({ items }: { items: { label: string }[] }) {
   const icons = [FlaskConical, ShieldCheck, Package, Sparkles];
   return (
-    <section className="border-b border-stone-100 dark:border-white/[0.06] bg-white dark:bg-[#0a0a0a]">
+    <section className="border-b border-stone-100 dark:border-white/[0.06] bg-white dark:bg-transparent">
       <div className="mx-auto max-w-5xl px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8">
         {items.map((item, i) => {
           const Icon = icons[i] ?? Sparkles;
@@ -238,7 +256,7 @@ function ConcernSection({
     : [];
 
   return (
-    <section className="bg-stone-50 dark:bg-[#0d0d0d] py-20 px-5 md:px-10">
+    <section className="bg-stone-50 dark:bg-transparent py-20 px-5 md:px-10">
       <div className="mx-auto max-w-5xl">
         <div className="text-center mb-12">
           <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
@@ -306,11 +324,11 @@ function ConcernSection({
                       return (
                         <div
                           key={product.id}
-                          className="flex-shrink-0 w-44 md:w-52 rounded-2xl border border-stone-200 dark:border-white/10 bg-white dark:bg-[#111] overflow-hidden"
+                          className="flex-shrink-0 w-44 md:w-52 rounded-2xl border border-stone-200 dark:border-white/10 bg-white dark:bg-white/[0.05] dark:backdrop-blur-sm overflow-hidden"
                           style={{ scrollSnapAlign: "start" }}
                         >
                           <Link to={`/formula/${product.id}`}>
-                            <div className="w-full aspect-square bg-stone-50 dark:bg-[#0d0d0d] flex items-center justify-center p-3">
+                            <div className="w-full aspect-square bg-stone-50 dark:bg-black/[0.12] flex items-center justify-center p-3">
                               {product.image ? (
                                 <img src={product.image} alt={name} className="w-full h-full object-contain" loading="lazy" />
                               ) : (
@@ -379,7 +397,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
   ];
 
   return (
-    <section className="py-20 px-5 md:px-10 bg-white dark:bg-[#0a0a0a]">
+    <section className="py-20 px-5 md:px-10 bg-white dark:bg-transparent">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-16">
           <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
@@ -462,11 +480,11 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                         return (
                           <div
                             key={product.id}
-                            className="flex-shrink-0 w-44 md:w-52 rounded-2xl border border-stone-200 dark:border-white/10 bg-white dark:bg-[#111] overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-xl dark:hover:shadow-black/40 hover:border-[#D4AF37]/30"
+                            className="flex-shrink-0 w-44 md:w-52 rounded-2xl border border-stone-200 dark:border-white/10 bg-white dark:bg-white/[0.05] dark:backdrop-blur-sm overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-xl dark:hover:shadow-black/40 hover:border-[#D4AF37]/30"
                             style={{ scrollSnapAlign: "start" }}
                           >
                             <Link to={`/formula/${product.id}`}>
-                              <div className="w-full aspect-square bg-stone-50 dark:bg-[#0d0d0d] flex items-center justify-center p-3">
+                              <div className="w-full aspect-square bg-stone-50 dark:bg-black/[0.12] flex items-center justify-center p-3">
                                 {product.image ? (
                                   <img src={product.image} alt={name} className="w-full h-full object-contain" loading="lazy" />
                                 ) : (
@@ -607,7 +625,7 @@ function Newsletter({
   };
 
   return (
-    <section className="bg-stone-50 dark:bg-[#0d0d0d] py-20 px-5">
+    <section className="bg-stone-50 dark:bg-transparent py-20 px-5">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -639,7 +657,7 @@ function Newsletter({
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={placeholder}
                 required
-                className="flex-1 rounded-full border border-stone-200 dark:border-white/15 bg-white dark:bg-[#111] px-5 py-3 text-sm md:text-base text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:border-emerald-500/50 dark:focus:border-[#D4AF37]/50 transition-colors"
+                className="flex-1 rounded-full border border-stone-200 dark:border-white/15 bg-white dark:bg-white/[0.05] dark:backdrop-blur-sm px-5 py-3 text-sm md:text-base text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:border-emerald-500/50 dark:focus:border-[#D4AF37]/50 transition-colors"
               />
               <motion.button
                 type="submit"
@@ -702,13 +720,14 @@ export default function Index() {
   }, [addItem, language]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a0a]">
+    <div className="min-h-screen bg-white dark:bg-transparent">
       <Navbar />
       <div className="h-16" />
 
       <main>
         <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} lang={language} accent={accent} accentDeep={accentDeep} isDark={isDark} />
         <UspStrip items={p1.home.usp as unknown as { label: string }[]} />
+        {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
         <ConcernSection
           title={p1.home.concernTitle}
           sub={p1.home.concernSub}
@@ -721,6 +740,7 @@ export default function Index() {
           accent={accent}
           accentDeep={accentDeep}
         />
+        {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
         <RoutineShowcase
           title={p1.home.routineTitle}
           sub={p1.home.routineSub}

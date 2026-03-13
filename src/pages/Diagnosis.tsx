@@ -671,44 +671,71 @@ const DiagnosisPage: React.FC = () => {
 
   // Phase 03: Complete Analysis → runDiagnosis → /results
   const handleCompleteAnalysis = useCallback(async () => {
-    // Support both legacy zoneData flow (Phase 02) and new FaceMapStep flow (store.selectedZones).
-    // Use getState() for selectedZones because setAllZones is called synchronously just before onNext().
+    if (analyzing) return;
+
     const { selectedZones } = useDiagnosisStore.getState();
-    const facemapConcerns = Object.values(selectedZones)
+
+    // facemapConcerns — safe even if selectedZones is undefined
+    const facemapConcerns = Object.values(selectedZones ?? {})
       .reduce((sum, z) => sum + (z?.concerns?.length ?? 0), 0);
-    if ((totalConcerns === 0 && facemapConcerns === 0) || analyzing) return;
+
+    if (totalConcerns === 0 && facemapConcerns === 0) return;
+
     setAnalyzing(true);
 
-    await new Promise(r => setTimeout(r, 400));
+    try {
+      await new Promise(r => setTimeout(r, 400));
 
-    const uiSignals = convertAxisAnswersToUiSignals(store.axisAnswers, store.lifestyle);
-    const metaAnswers: Record<string, number | boolean> = {
-      ...(store.metaAnswers as Record<string, number | boolean>),
-      atopy: store.implicitFlags.atopyFlag,
-    };
-    const result = runDiagnosis({
-      severities: store.severities,
-      contexts: store.contexts,
-      skinType: store.skinType || "normal",
-      tier: store.selectedTier || "Full",
-      metaAnswers,
-      uiSignals,
-    });
+      const uiSignals = convertAxisAnswersToUiSignals(store.axisAnswers, store.lifestyle);
+      const metaAnswers: Record<string, number | boolean> = {
+        ...(store.metaAnswers as Record<string, number | boolean>),
+        atopy: store.implicitFlags.atopyFlag,
+      };
 
-    store.setResult(result);
+      const result = runDiagnosis({
+        severities: store.severities,
+        contexts: store.contexts,
+        skinType: store.skinType || "normal",
+        tier: store.selectedTier || "Full",
+        metaAnswers,
+        uiSignals,
+      });
 
-    const TIER_MAP: Record<string, string> = { Entry: "Entry", Full: "Advanced", Premium: "Clinical" };
-    const flatProducts = Object.entries(
-      result.product_bundle as Record<string, Array<{ id: string; name: { en: string } }>>
-    ).flatMap(([phase, prods]) => prods.map(p => ({ id: p.id, name: p.name.en, phase })));
+      if (!result) {
+        console.error("[handleCompleteAnalysis] runDiagnosis returned null/undefined");
+        setAnalyzing(false);
+        return;
+      }
 
-    await saveDiagnosis(
-      result.axis_scores as Record<string, number>,
-      TIER_MAP[store.selectedTier] ?? "Entry",
-      flatProducts
-    );
+      store.setResult(result);
 
-    navigate("/results");
+      const TIER_MAP: Record<string, string> = {
+        Entry: "Entry", Full: "Advanced", Premium: "Clinical",
+      };
+
+      const productBundle = (result.product_bundle ?? {}) as Record<
+        string, Array<{ id: string; name: { en: string } }>
+      >;
+      const flatProducts = Object.entries(productBundle).flatMap(([phase, prods]) =>
+        (prods ?? []).map(p => ({ id: p.id, name: p.name?.en ?? "", phase }))
+      );
+
+      // saveDiagnosis failure is non-fatal — navigate regardless
+      try {
+        await saveDiagnosis(
+          result.axis_scores as Record<string, number>,
+          TIER_MAP[store.selectedTier] ?? "Entry",
+          flatProducts
+        );
+      } catch (saveErr) {
+        console.warn("[handleCompleteAnalysis] saveDiagnosis failed (non-fatal):", saveErr);
+      }
+
+      navigate("/results");
+    } catch (err) {
+      console.error("[handleCompleteAnalysis] fatal error:", err);
+      setAnalyzing(false);
+    }
   }, [totalConcerns, analyzing, store, saveDiagnosis, navigate]);
 
   const AX9_OPTIONS = [

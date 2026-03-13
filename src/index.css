@@ -149,12 +149,13 @@
   }
 
   .dark {
-    /* ── Dark mode — Serene Clinical Dark ── */
-    --background: 210 18% 10%;
-    /* #141A1F */
-    --background-2: 210 14% 13%;
-    --card: 210 14% 14%;
-    /* #1E252C — visible card lift */
+    /* ── Dark mode — App-matched Navy Slate ── */
+    --background: 220 22% 12%;
+    /* #151b27 — dark navy, matches app bg */
+    --background-2: 220 20% 14%;
+    /* #19202e */
+    --card: 220 18% 17%;
+    /* #1f2636 — card lift, matches app card surface */
     --card-foreground: 210 10% 88%;
     /* #D9DDE1 */
 
@@ -165,18 +166,19 @@
     --foreground-hint: 210 8% 50%;
     /* #747D86 */
 
-    --popover: 210 14% 14%;
+    --popover: 220 18% 17%;
     --popover-foreground: 210 10% 88%;
 
     --primary: 76 30% 55%;
     /* #96AD66 — brighter sage for dark bg */
-    --primary-foreground: 210 18% 10%;
+    --primary-foreground: 220 22% 12%;
 
     --secondary: 34 35% 60%;
     /* Warm Sand brightened */
-    --secondary-foreground: 210 18% 10%;
+    --secondary-foreground: 220 22% 12%;
 
-    --muted: 210 12% 18%;
+    --muted: 220 16% 20%;
+    /* #232d3f */
     --muted-foreground: 210 8% 50%;
 
     --accent: 76 20% 18%;
@@ -185,8 +187,9 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 85% 97%;
 
-    --border: 210 10% 22%;
-    --input: 210 12% 18%;
+    --border: 220 14% 22%;
+    /* #282f3e */
+    --input: 220 16% 20%;
     --ring: 76 30% 55%;
 
     /* Custom tokens — dark */
@@ -264,9 +267,9 @@
 
   .dark body {
     background-image:
-      radial-gradient(ellipse 80% 50% at 15% 10%, hsl(76 20% 14% / 0.4) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 40% at 85% 85%, hsl(210 18% 12% / 0.5) 0%, transparent 50%),
-      radial-gradient(ellipse 100% 60% at 50% 50%, hsl(210 14% 11% / 0.2) 0%, transparent 65%);
+      radial-gradient(ellipse 80% 60% at 10% 0%, hsl(220 30% 20% / 0.65) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 50% at 90% 100%, hsl(215 25% 16% / 0.55) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, hsl(220 20% 14% / 0.3) 0%, transparent 65%);
   }
 
   h1,

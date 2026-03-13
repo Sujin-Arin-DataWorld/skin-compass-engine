@@ -846,6 +846,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
   const copy              = COPY[lang];
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
+  const GOLD   = isDark ? "#c9a96e" : "#7A9E82";
 
   const [selectedConcerns, setSelectedConcerns] = useState<Set<string>>(new Set());
   const [activeZone, setActiveZone]             = useState<ZoneId | null>(null);
@@ -1004,17 +1005,43 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
               </motion.div>
             ) : (
               <motion.div
+                key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 style={{
-                  width: "min(380px, 40vw)", height: 300,
-                  display: "flex", alignItems: "center", justifyContent: "center",
+                  width: "min(380px, 40vw)", minHeight: 300,
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                   border: `1px dashed ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
                   borderRadius: 24, padding: 32, textAlign: "center",
                 }}>
-                <p style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif" }}>
-                  {copy.hint}
-                </p>
+                {allZonesDone ? (
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+                    <div style={{ fontSize: 22, marginBottom: 10 }}>✨</div>
+                    <div style={{ fontSize: 15, color: GOLD, fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
+                      {lang === "ko" ? "피부 분석 준비 완료!"
+                        : lang === "de" ? "Hautanalyse bereit!"
+                        : "Skin Analysis Ready!"}
+                    </div>
+                    <div style={{ fontSize: 13, marginTop: 6, fontFamily: "'DM Sans', sans-serif", color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>
+                      {lang === "ko" ? "결과를 확인하세요"
+                        : lang === "de" ? "Ergebnisse ansehen"
+                        : "Check your results"}
+                    </div>
+                  </motion.div>
+                ) : (
+                  <>
+                    <p style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif" }}>
+                      {copy.hint}
+                    </p>
+                    <div style={{ marginTop: 12, fontSize: 12, fontFamily: "'DM Sans', sans-serif", color: isDark ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.28)" }}>
+                      {lang === "ko"
+                        ? `완료 ${selectedZones.size} / 전체 ${ZONES_DEF.length} 구역`
+                        : lang === "de"
+                        ? `${selectedZones.size} von ${ZONES_DEF.length} Zonen abgeschlossen`
+                        : `${selectedZones.size} of ${ZONES_DEF.length} zones completed`}
+                    </div>
+                  </>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

@@ -1,8 +1,24 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { DiagnosisResult } from "@/engine/types";
+import type { DiagnosisResult, AxisKey, ProjectedImprovement } from "@/engine/types";
+import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS } from "@/engine/types";
 import { useI18nStore } from "@/store/i18nStore";
-import type { RoutineOutput, RoutineStep, StepRole, BaseType, TargetTrouble, SkinRescueProtocol } from "@/engine/routineEngine";
+import type { RoutineOutput, RoutineStep, StepRole, BaseType, TargetTrouble } from "@/engine/routineEngine";
+
+// ─── Axis label maps ───────────────────────────────────────────────────────────
+
+const AXIS_LABELS_KO: Record<AxisKey, string> = {
+  seb:              "피지",
+  hyd:              "수분",
+  bar:              "피부 장벽",
+  sen:              "민감성",
+  ox:               "산화 스트레스",
+  acne:             "여드름",
+  pigment:          "색소침착",
+  texture:          "피부결",
+  aging:            "노화",
+  makeup_stability: "메이크업 지속",
+};
 
 // ─── Clinical flag alerts (kept from legacy protocol) ─────────────────────────
 
@@ -51,28 +67,28 @@ const ROLE_ICON: Record<StepRole, string> = {
 };
 
 const ROLE_LABEL: Record<StepRole, Record<string, string>> = {
-  cleanser:    { en: "Cleanser",    de: "Reiniger",      ko: "클렌저"   },
-  toner:       { en: "Toner",       de: "Toner",         ko: "토너"     },
-  serum:       { en: "Serum",       de: "Serum",         ko: "세럼"     },
+  cleanser:    { en: "Cleanser",    de: "Reiniger",      ko: "클렌저"    },
+  toner:       { en: "Toner",       de: "Toner",         ko: "토너"      },
+  serum:       { en: "Serum",       de: "Serum",         ko: "세럼"      },
   treatment:   { en: "Treatment",   de: "Treatment",     ko: "트리트먼트" },
   moisturizer: { en: "Moisturiser", de: "Feuchtigkeits-\ncreme", ko: "보습제" },
-  spf:         { en: "SPF",         de: "Sonnenschutz",  ko: "선크림"   },
-  device:      { en: "Device",      de: "Gerät",         ko: "기기"     },
+  spf:         { en: "SPF",         de: "Sonnenschutz",  ko: "선크림"    },
+  device:      { en: "Device",      de: "Gerät",         ko: "기기"      },
 };
 
 const BASE_TYPE_LABEL: Record<BaseType, Record<string, string>> = {
-  "oily":                      { en: "Oily",                          de: "Ölig",                         ko: "지성"        },
-  "combination-dehydrated-oily": { en: "Combination-Dehydrated",     de: "Mischhaut-Dehydriert",         ko: "복합성-수분부족" },
-  "dry":                       { en: "Dry",                           de: "Trocken",                      ko: "건성"        },
-  "normal":                    { en: "Normal / Balanced",             de: "Normal / Ausgeglichen",        ko: "중성 / 균형"  },
+  "oily":                        { en: "Oily",                      de: "Ölig",                     ko: "지성"         },
+  "combination-dehydrated-oily": { en: "Combination-Dehydrated",    de: "Mischhaut-Dehydriert",      ko: "복합성-수분부족" },
+  "dry":                         { en: "Dry",                       de: "Trocken",                   ko: "건성"         },
+  "normal":                      { en: "Normal / Balanced",         de: "Normal / Ausgeglichen",     ko: "중성 / 균형"   },
 };
 
 const TARGET_LABEL: Record<TargetTrouble, Record<string, string>> = {
   "barrier-repair":        { en: "Barrier Repair & Soothing",    de: "Barriere-Reparatur & Beruhigung", ko: "배리어 회복 & 진정"  },
-  "intense-hydration":     { en: "Intense Hydration",            de: "Intensive Feuchtigkeit",          ko: "집중 수분 공급"     },
-  "blemish-sebum-control": { en: "Blemish & Sebum Control",      de: "Unreinheiten & Talg-Kontrolle",   ko: "트러블 & 피지 관리" },
+  "intense-hydration":     { en: "Intense Hydration",            de: "Intensive Feuchtigkeit",          ko: "집중 수분 공급"      },
+  "blemish-sebum-control": { en: "Blemish & Sebum Control",      de: "Unreinheiten & Talg-Kontrolle",   ko: "트러블 & 피지 관리"  },
   "brightening":           { en: "Brightening & Tone Correction", de: "Aufhellung & Ton-Korrektur",     ko: "브라이트닝 & 톤 보정" },
-  "well-aging":            { en: "Well-Aging & Firming",          de: "Well-Aging & Straffung",          ko: "안티에이징 & 탄력"  },
+  "well-aging":            { en: "Well-Aging & Firming",          de: "Well-Aging & Straffung",          ko: "안티에이징 & 탄력"   },
 };
 
 const TARGET_COLOR: Record<TargetTrouble, string> = {
@@ -82,6 +98,161 @@ const TARGET_COLOR: Record<TargetTrouble, string> = {
   "brightening":           "#C9A96E",
   "well-aging":            "#9E6EC9",
 };
+
+// ─── Projected Improvement section ────────────────────────────────────────────
+
+interface ImproveSectionProps {
+  improvement: ProjectedImprovement;
+  primaryAxis: AxisKey;
+  accentColor: string;
+  lang: "en" | "de" | "ko";
+}
+
+function ProjectedImprovementSection({
+  improvement,
+  primaryAxis,
+  accentColor,
+  lang,
+}: ImproveSectionProps) {
+  const axisLabel = (key: AxisKey) =>
+    lang === "ko" ? AXIS_LABELS_KO[key]
+    : lang === "de" ? AXIS_LABELS_DE[key]
+    : AXIS_LABELS[key];
+
+  // Canonical axis order, only axes with currentScore ≥ 25
+  const activeAxes = AXIS_KEYS.filter(
+    (k) => improvement[k] && improvement[k].currentScore >= 25,
+  );
+  if (activeAxes.length === 0) return null;
+
+  // Resolve the summary axis (prefer primaryAxis if eligible)
+  const summaryAxis = activeAxes.includes(primaryAxis) ? primaryAxis : activeAxes[0];
+  const { currentScore: cur, targetScore4w: t4w } = improvement[summaryAxis];
+  const improvePct = cur > 0 ? Math.round(((cur - t4w) / cur) * 100) : 0;
+
+  const GOLD      = "#c9a96e";
+  const GOLD_FAINT = "#c9a96e44";
+
+  const title: Record<string, string> = {
+    en: "Projected Improvement",
+    de: "Projizierter Fortschritt",
+    ko: "예상 개선 효과",
+  };
+  const legendNow: Record<string, string>  = { en: "Current",        de: "Aktuell",          ko: "현재"   };
+  const legend4w:  Record<string, string>  = { en: "4-Week Target",  de: "4-Wochen-Ziel",    ko: "4주 목표" };
+  const legend12w: Record<string, string>  = { en: "12-Week Target", de: "12-Wochen-Ziel",   ko: "12주 목표" };
+
+  const summaryText: Record<string, string> = {
+    en: `Following this protocol, your ${AXIS_LABELS[summaryAxis]} severity is projected to reduce by ${improvePct}% in 4 weeks.`,
+    de: `Diesem Protokoll folgend soll die ${AXIS_LABELS_DE[summaryAxis]}-Belastung in 4 Wochen um ${improvePct}% abnehmen.`,
+    ko: `이 루틴을 따르면 ${AXIS_LABELS_KO[summaryAxis]} 수치가 4주 후 ${improvePct}% 개선될 것으로 예상됩니다.`,
+  };
+
+  return (
+    <motion.div
+      className="mb-5 rounded-2xl overflow-hidden"
+      style={{
+        background: "hsl(var(--card) / 0.5)",
+        border: "1px solid hsl(var(--border) / 0.5)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+      }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15 }}
+    >
+      <div className="px-4 pt-4 pb-3">
+        <p style={{
+          fontSize: "0.65rem", fontWeight: 700,
+          color: "hsl(var(--foreground-hint))",
+          textTransform: "uppercase", letterSpacing: "0.1em",
+          marginBottom: "12px",
+        }}>
+          {title[lang]}
+        </p>
+
+        <div className="space-y-4">
+          {activeAxes.map((key) => {
+            const { currentScore, targetScore4w, targetScore12w } = improvement[key];
+            return (
+              <div key={key}>
+                <div className="flex justify-between items-baseline mb-1.5">
+                  <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "hsl(var(--foreground))" }}>
+                    {axisLabel(key)}
+                  </span>
+                  <span style={{ fontSize: "0.72rem", color: "hsl(var(--foreground-hint))" }}>
+                    {currentScore} → {targetScore4w} → {targetScore12w}
+                  </span>
+                </div>
+
+                {/* Bar track */}
+                <div
+                  className="relative h-2.5 rounded-full overflow-hidden"
+                  style={{ background: "hsl(var(--muted))" }}
+                >
+                  {/* Current severity — solid accent fill */}
+                  <div
+                    className="absolute left-0 top-0 h-full rounded-full"
+                    style={{
+                      width: `${currentScore}%`,
+                      background: `linear-gradient(90deg, ${accentColor}bb, ${accentColor})`,
+                    }}
+                  />
+                  {/* 12-week target tick — faint gold */}
+                  <div
+                    className="absolute top-0 h-full w-[2px]"
+                    style={{ left: `${targetScore12w}%`, background: GOLD_FAINT }}
+                  />
+                  {/* 4-week target tick — bright gold */}
+                  <div
+                    className="absolute top-0 h-full w-[2px]"
+                    style={{
+                      left: `${targetScore4w}%`,
+                      background: GOLD,
+                      boxShadow: `0 0 4px ${GOLD}88`,
+                    }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Summary statement */}
+        {improvePct > 0 && (
+          <p style={{
+            fontSize: "0.8rem",
+            color: "hsl(var(--foreground-hint))",
+            lineHeight: 1.55,
+            marginTop: "14px",
+            fontStyle: "italic",
+          }}>
+            {summaryText[lang] ?? summaryText.en}
+          </p>
+        )}
+      </div>
+
+      {/* Legend */}
+      <div
+        className="flex flex-wrap gap-x-4 gap-y-1 px-4 pb-3 pt-2.5"
+        style={{ borderTop: "1px solid hsl(var(--border) / 0.3)" }}
+      >
+        <div className="flex items-center gap-1.5">
+          <div className="h-2 w-6 rounded-full" style={{ background: accentColor }} />
+          <span style={{ fontSize: "0.65rem", color: "hsl(var(--foreground-hint))" }}>{legendNow[lang]}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="h-2 w-[2px] rounded-full" style={{ background: GOLD, boxShadow: `0 0 4px ${GOLD}88` }} />
+          <span style={{ fontSize: "0.65rem", color: "hsl(var(--foreground-hint))" }}>{legend4w[lang]}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="h-2 w-[2px] rounded-full" style={{ background: GOLD_FAINT }} />
+          <span style={{ fontSize: "0.65rem", color: "hsl(var(--foreground-hint))" }}>{legend12w[lang]}</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -123,23 +294,23 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
   const accentColor = isSosActive ? SOS_CORAL : TARGET_COLOR[targetTrouble];
 
   const copy = {
-    eyebrow:        { en: "Your Personalised Protocol",    de: "Ihr Persönliches Protokoll",    ko: "맞춤 루틴"           },
+    eyebrow:        { en: "Your Personalised Protocol",    de: "Ihr Persönliches Protokoll",    ko: "맞춤 루틴"            },
     sub:            { en: "Personalised sequence based on your skin vector", de: "Personalisierte Sequenz basierend auf Ihrem Hautvektor", ko: "피부 벡터 기반 맞춤 시퀀스" },
-    match:          { en: "protocol match",                de: "Protokoll-Übereinstimmung",     ko: "프로토콜 일치율"      },
-    signals:        { en: "signals",                       de: "Signale",                       ko: "신호"               },
-    baseLabel:      { en: "Skin Type",                     de: "Hauttyp",                       ko: "피부 타입"           },
-    targetLabel:    { en: "Priority Target",               de: "Haupt-Ziel",                    ko: "우선 케어"           },
+    match:          { en: "protocol match",                de: "Protokoll-Übereinstimmung",     ko: "프로토콜 일치율"       },
+    signals:        { en: "signals",                       de: "Signale",                       ko: "신호"                },
+    baseLabel:      { en: "Skin Type",                     de: "Hauttyp",                       ko: "피부 타입"            },
+    targetLabel:    { en: "Priority Target",               de: "Haupt-Ziel",                    ko: "우선 케어"            },
     noSteps:        { en: "No steps for this timing.",     de: "Keine Schritte für diesen Zeitpunkt.", ko: "해당 타이밍에 단계가 없습니다." },
-    step:           { en: "Step",                          de: "Schritt",                       ko: "단계"               },
-    advancedLabel:  { en: "Advanced ✦",                    de: "Advanced ✦",                    ko: "어드밴스드 ✦"        },
-    cautionTitle:   { en: "Device therapy paused",         de: "Gerätetherapie pausiert",       ko: "기기 테라피 일시 중단" },
+    step:           { en: "Step",                          de: "Schritt",                       ko: "단계"                },
+    advancedLabel:  { en: "Advanced ✦",                    de: "Advanced ✦",                    ko: "어드밴스드 ✦"         },
+    cautionTitle:   { en: "Device therapy paused",         de: "Gerätetherapie pausiert",       ko: "기기 테라피 일시 중단"  },
     upgradeAdvanced:{ en: "→ Unlock Advanced: 5-step + Medicube Booster Pro Device",
                       de: "→ Advanced freischalten: 5-Schritt + Medicube Booster Pro",
                       ko: "→ 어드밴스드 해제: 5단계 + 메디큐브 부스터 프로 기기" },
     // ── B-3 SOS copy ────────────────────────────────────────────────────────
     sosEyebrow:   { en: "🚨 SOS Rescue Protocol",        de: "🚨 SOS Rettungsprotokoll",        ko: "🚨 SOS 레스큐 프로토콜" },
-    sosSub:       { en: "K-Derma Clinic Exclusive",      de: "K-Derma Klinik Exklusiv",         ko: "피부과 전문 추천"      },
-    sosBadge:     { en: "Minimalist 3-Step Protocol",    de: "Minimalprotokoll — 3 Schritte",   ko: "미니멀 3단계 프로토콜" },
+    sosSub:       { en: "K-Derma Clinic Exclusive",      de: "K-Derma Klinik Exklusiv",         ko: "피부과 전문 추천"       },
+    sosBadge:     { en: "Minimalist 3-Step Protocol",    de: "Minimalprotokoll — 3 Schritte",   ko: "미니멀 3단계 프로토콜"  },
     sosBrandNote: { en: "Clinical dermatology brands only", de: "Nur klinische Dermatologie-Marken", ko: "임상 피부과 브랜드 전용" },
   };
   const t = (k: keyof typeof copy) => copy[k][lang] ?? copy[k]["en"];
@@ -170,7 +341,7 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
               {confidence}% {t("match")}
             </span>
             <span style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))" }}>
-              · {t("signals").replace("signals", `${signalCount} ${t("signals")}`)}
+              · {signalCount} {t("signals")}
             </span>
           </div>
         </motion.div>
@@ -224,12 +395,24 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
           </div>
         </motion.div>
 
+        {/* ── Projected Improvement (V5) — shown only when data is available ── */}
+        {result.projected_improvement && !isSosActive && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.16 }}>
+            <ProjectedImprovementSection
+              improvement={result.projected_improvement}
+              primaryAxis={result.primary_concerns[0] ?? "sen"}
+              accentColor={accentColor}
+              lang={lang}
+            />
+          </motion.div>
+        )}
+
         {/* Level + timing toggles */}
         <motion.div
           className="flex items-center justify-between gap-3 mb-5"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.16 }}
+          transition={{ delay: 0.18 }}
         >
           {/* Level toggle — replaced by fixed SOS badge when rescue override is active */}
           {isSosActive ? (
@@ -278,18 +461,18 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
 
           {/* AM / PM toggle */}
           <div className="flex rounded-xl overflow-hidden" style={{ background: "hsl(var(--muted))", padding: "3px", gap: "3px" }}>
-            {(["am", "pm"] as const).map((t) => (
+            {(["am", "pm"] as const).map((tm) => (
               <button
-                key={t}
-                onClick={() => setTiming(t)}
+                key={tm}
+                onClick={() => setTiming(tm)}
                 className="rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-200"
                 style={{
-                  background: timing === t ? "hsl(var(--card))" : "transparent",
-                  color: timing === t ? accentColor : "hsl(var(--foreground-hint))",
-                  boxShadow: timing === t ? "0 1px 4px hsl(0 0% 0% / 0.12)" : "none",
+                  background: timing === tm ? "hsl(var(--card))" : "transparent",
+                  color: timing === tm ? accentColor : "hsl(var(--foreground-hint))",
+                  boxShadow: timing === tm ? "0 1px 4px hsl(0 0% 0% / 0.12)" : "none",
                 }}
               >
-                {t === "am" ? "☀️ AM" : "🌙 PM"}
+                {tm === "am" ? "☀️ AM" : "🌙 PM"}
               </button>
             ))}
           </div>
@@ -301,7 +484,7 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
             className="mb-4 rounded-2xl px-4 py-3 flex gap-3 items-start"
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18 }}
+            transition={{ delay: 0.2 }}
             style={{
               background: "linear-gradient(135deg, #1a140022 0%, #2e220033 100%)",
               border: "1px solid #D4AF3755",
@@ -325,7 +508,7 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
             className="mb-5 rounded-2xl px-5 py-4"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.18, type: "spring", stiffness: 260, damping: 24 }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 24 }}
             style={{
               background: `linear-gradient(135deg, ${SOS_CORAL}0d 0%, ${SOS_AMBER}0a 100%)`,
               border: `1px solid ${SOS_CORAL}44`,
@@ -422,7 +605,7 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
                     </p>
                   </div>
 
-                  {/* Formulation badge — "Device" label for device cards, formulation name otherwise */}
+                  {/* Formulation badge */}
                   <div
                     className="flex-shrink-0 rounded-full px-2 py-0.5"
                     style={{

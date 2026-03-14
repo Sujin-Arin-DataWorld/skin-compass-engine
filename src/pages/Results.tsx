@@ -17,7 +17,10 @@ import SlideSubscribe from "@/components/results/SlideSubscribe";
 import SlideNav from "@/components/results/SlideNav";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { useProductStore } from "@/store/productStore";
-import type { DiagnosisResult, AxisScores, AxisSeverity, Product } from "@/engine/types";
+import type {
+  DiagnosisResult, AxisScores, AxisSeverity, Product,
+  ClinicalGrade, ZoneId, ZoneHeatmapEntry, ScoreProvenance, ProjectedImprovement, AxisKey,
+} from "@/engine/types";
 
 const SLIDE_LABELS = {
   en: [
@@ -54,10 +57,69 @@ const slideVariants = {
 
 // Dev-only mock result for testing Results UI without running full diagnosis
 function makeMockResult(products: Product[]): DiagnosisResult {
-  const axis_scores: AxisScores = { seb: 62, hyd: 48, bar: 74, sen: 85, ox: 33, acne: 71, pigment: 45, texture: 56, aging: 38, makeup_stability: 22 };
-  const axis_severity: AxisSeverity = { seb: 2, hyd: 1, bar: 2, sen: 3, ox: 1, acne: 2, pigment: 1, texture: 2, aging: 1, makeup_stability: 0 };
+  const axis_scores: AxisScores    = { seb: 62, hyd: 48, bar: 74, sen: 85, ox: 33, acne: 71, pigment: 45, texture: 56, aging: 38, makeup_stability: 22 };
+  const axis_severity: AxisSeverity = { seb: 2,  hyd: 1,  bar: 2,  sen: 3,  ox: 1,  acne: 2,  pigment: 1,  texture: 2,  aging: 1,  makeup_stability: 0 };
+
+  // ── V5 mock fields ──────────────────────────────────────────────────────────
+  const axis_clinical_grade: Record<AxisKey, { grade: ClinicalGrade; label: { en: string; de: string; ko: string } }> = {
+    seb:              { grade: "active",   label: { en: "Active",   de: "Aktiv",    ko: "활성" } },
+    hyd:              { grade: "watch",    label: { en: "Watch",    de: "Beachten", ko: "주의" } },
+    bar:              { grade: "active",   label: { en: "Active",   de: "Aktiv",    ko: "활성" } },
+    sen:              { grade: "critical", label: { en: "Critical", de: "Kritisch", ko: "위험" } },
+    ox:               { grade: "watch",    label: { en: "Watch",    de: "Beachten", ko: "주의" } },
+    acne:             { grade: "active",   label: { en: "Active",   de: "Aktiv",    ko: "활성" } },
+    pigment:          { grade: "watch",    label: { en: "Watch",    de: "Beachten", ko: "주의" } },
+    texture:          { grade: "active",   label: { en: "Active",   de: "Aktiv",    ko: "활성" } },
+    aging:            { grade: "watch",    label: { en: "Watch",    de: "Beachten", ko: "주의" } },
+    makeup_stability: { grade: "stable",   label: { en: "Stable",   de: "Stabil",   ko: "안정" } },
+  };
+
+  const zone_heatmap: Partial<Record<ZoneId, ZoneHeatmapEntry>> = {
+    forehead: { intensity: 0.55, dominantAxis: "seb", concernCount: 3,
+      summary: { en: "Oily T-zone with intermittent congestion", de: "Ölige T-Zone mit gelegentlicher Verstopfung", ko: "간헐적 모공 막힘이 있는 T존 유분" } },
+    cheeks:   { intensity: 0.72, dominantAxis: "sen", concernCount: 4,
+      summary: { en: "Reactive skin with redness and heat sensitivity", de: "Reaktive Haut mit Rötungen und Wärmeempfindlichkeit", ko: "홍조 및 열 민감성이 있는 반응성 피부" } },
+    nose:     { intensity: 0.48, dominantAxis: "acne", concernCount: 2,
+      summary: { en: "Enlarged pores with blackhead tendency", de: "Vergrößerte Poren mit Mitesser-Neigung", ko: "블랙헤드 경향이 있는 확장된 모공" } },
+  };
+
+  const score_provenance: ScoreProvenance[] = [
+    {
+      axis: "sen", totalScore: 85,
+      breakdown: {
+        zoneConcerns:        [{ zone: "cheeks", concernId: "redness_c", contribution: 18 }, { zone: "cheeks", concernId: "stinging_c", contribution: 12 }],
+        deepDiveQuestions:   [{ questionId: "SEN_01", contribution: 20 }],
+        foundationModifiers: [{ factor: "high_stress", multiplier: 1.15 }],
+        crossAxisBonus:      null,
+      },
+    },
+    {
+      axis: "bar", totalScore: 74,
+      breakdown: {
+        zoneConcerns:        [{ zone: "cheeks", concernId: "dryness_c", contribution: 15 }],
+        deepDiveQuestions:   [{ questionId: "BAR_01", contribution: 18 }],
+        foundationModifiers: [{ factor: "low_sleep", multiplier: 1.10 }],
+        crossAxisBonus:      { pattern: "barrier_stress", bonusPercent: 8 },
+      },
+    },
+  ];
+
+  const projected_improvement: ProjectedImprovement = {
+    seb:              { currentScore: 62, targetScore4w: 51, targetScore12w: 43 },
+    hyd:              { currentScore: 48, targetScore4w: 37, targetScore12w: 30 },
+    bar:              { currentScore: 74, targetScore4w: 56, targetScore12w: 46 },
+    sen:              { currentScore: 85, targetScore4w: 68, targetScore12w: 58 },
+    ox:               { currentScore: 33, targetScore4w: 28, targetScore12w: 25 },
+    acne:             { currentScore: 71, targetScore4w: 60, targetScore12w: 53 },
+    pigment:          { currentScore: 45, targetScore4w: 41, targetScore12w: 38 },
+    texture:          { currentScore: 56, targetScore4w: 49, targetScore12w: 44 },
+    aging:            { currentScore: 38, targetScore4w: 34, targetScore12w: 31 },
+    makeup_stability: { currentScore: 22, targetScore4w: 19, targetScore12w: 16 },
+  };
+  // ────────────────────────────────────────────────────────────────────────────
+
   return {
-    engineVersion: "v4-mock",
+    engineVersion: "v5-mock",
     axis_scores,
     axis_severity,
     axis_scores_normalized: axis_scores,
@@ -65,14 +127,14 @@ function makeMockResult(products: Product[]): DiagnosisResult {
     urgency_level: "HIGH",
     active_flags: ["BARRIER_EMERGENCY"],
     radar_chart_data: [
-      { axis: "Sebum", score: 62, label: "Sebum" },
-      { axis: "Hydration", score: 48, label: "Hydration" },
-      { axis: "Barrier", score: 74, label: "Barrier" },
+      { axis: "Sebum",       score: 62, label: "Sebum"       },
+      { axis: "Hydration",   score: 48, label: "Hydration"   },
+      { axis: "Barrier",     score: 74, label: "Barrier"     },
       { axis: "Sensitivity", score: 85, label: "Sensitivity" },
-      { axis: "Acne", score: 71, label: "Acne" },
-      { axis: "Aging", score: 38, label: "Aging" },
+      { axis: "Acne",        score: 71, label: "Acne"        },
+      { axis: "Aging",       score: 38, label: "Aging"       },
     ],
-    primary_concerns: ["sen", "bar", "acne"],
+    primary_concerns:   ["sen", "bar", "acne"],
     secondary_concerns: ["seb", "hyd", "texture"],
     product_bundle: {
       Phase1: products[0] ? [products[0]] : [],
@@ -81,6 +143,11 @@ function makeMockResult(products: Product[]): DiagnosisResult {
       Phase4: products[3] ? [products[3]] : [],
       Phase5: products[4] ? [products[4]] : [],
     },
+    // V5 fields
+    axis_clinical_grade,
+    zone_heatmap,
+    score_provenance,
+    projected_improvement,
   };
 }
 
@@ -143,7 +210,7 @@ const ResultsPage = () => {
   const slides = [
     <SlideDiagnosisSummary result={result} />,
     <SlideAxisBreakdown result={result} goToProducts={() => goTo(PRODUCTS_SLIDE)} />,
-    <SlideProtocol result={result} routineOutput={routineOutput} />,
+    <SlideProtocol result={result} routineOutput={routineOutput!} />,
     <SlideSubscriptionTable result={result} />,
     <SlideWhyProducts result={result} />,
     <SlideSubscribe result={result} />,

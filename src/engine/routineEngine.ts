@@ -20,7 +20,7 @@
  *   → Device lockout guaranteed (atopyFlag → safetyBlocked → advanced = null).
  */
 
-import type { SkinVector } from "@/engine/skinVectorEngine";
+import type { SkinVector } from "@/engine/types";
 import type { AxisResponses, ImplicitFlags } from "@/store/diagnosisStore";
 
 // ─── Domain types ─────────────────────────────────────────────────────────────

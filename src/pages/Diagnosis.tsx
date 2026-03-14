@@ -27,7 +27,7 @@ const SAGE      = "#7A9E82";   // light-mode primary accent
 const FOREST    = "#2D4F39";   // light-mode deep accent
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type ZoneId = "forehead" | "eyes" | "nose" | "cheeks" | "chin" | "neck";
+type ZoneId = "forehead" | "eyes" | "nose" | "cheeks" | "mouth" | "jawline" | "neck";
 type Phase = "foundation" | "scanning" | "facemap";
 type Lang = "en" | "de" | "ko";
 
@@ -108,8 +108,12 @@ const ZONES: ZoneConfig[] = [
     labelShort: "Cheeks", labelShortDE: "Wangen", labelShortKO: "볼"
   },
   {
-    id: "chin", label: "Chin & Mouth", labelDE: "Kinn & Mund", labelKO: "턱 & 입",
-    labelShort: "Chin", labelShortDE: "Kinn", labelShortKO: "턱"
+    id: "mouth", label: "Mouth Area", labelDE: "Mundpartie", labelKO: "입가",
+    labelShort: "Mouth", labelShortDE: "Mund", labelShortKO: "입가"
+  },
+  {
+    id: "jawline", label: "Jawline", labelDE: "Kieferlinie", labelKO: "턱선",
+    labelShort: "Jaw", labelShortDE: "Kiefer", labelShortKO: "턱선"
   },
   {
     id: "neck", label: "Neck", labelDE: "Hals", labelKO: "목",
@@ -146,11 +150,17 @@ const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
     { id: "pigment_c", label: "Dark Spots", labelDE: "Dunkle Flecken", labelKO: "색소침착", axis: "pigment", icon: "🌑" },
     { id: "pores_c", label: "Visible Pores", labelDE: "Sichtbare Poren", labelKO: "가시 모공", axis: "pores", icon: "◉" },
   ],
-  chin: [
-    { id: "hormonal_ch", label: "Recurring Breakouts", labelDE: "Wiederkehrende Unreinheiten", labelKO: "반복 트러블", axis: "hormonal", icon: "🔄" },
-    { id: "dryness_m", label: "Dryness around Mouth", labelDE: "Trockenheit um den Mund", labelKO: "입 주변 건조", axis: "hydration", icon: "🏜️" },
-    { id: "nasolabial", label: "Smile Lines", labelDE: "Nasolabialfalten", labelKO: "팔자 주름", axis: "aging", icon: "〰️" },
-    { id: "pigment_m", label: "Dark Spots", labelDE: "Dunkle Flecken", labelKO: "색소침착", axis: "pigment", icon: "🌑" },
+  mouth: [
+    { id: "dryness_m",  label: "Dryness around Mouth",    labelDE: "Trockenheit um den Mund",  labelKO: "입 주변 건조 / 당김",  axis: "hydration",   icon: "🏜️" },
+    { id: "nasolabial", label: "Smile Lines",              labelDE: "Nasolabialfalten",          labelKO: "팔자 주름",           axis: "aging",       icon: "〰️" },
+    { id: "pigment_m",  label: "Dark Spots near Mouth",   labelDE: "Dunkle Flecken am Mund",   labelKO: "입가 잡티 / 칙칙함",  axis: "pigment",     icon: "🌑" },
+    { id: "perioral_m", label: "Irritation around Mouth", labelDE: "Reizung um den Mund",      labelKO: "입 주변 자극 / 따가움", axis: "sensitivity", icon: "🩷" },
+  ],
+  jawline: [
+    { id: "hormonal_j", label: "Recurring Hormonal Breakouts", labelDE: "Wiederkehrende hormonelle Unreinheiten", labelKO: "같은 자리에 반복되는 트러블", axis: "hormonal", icon: "🔄" },
+    { id: "cystic_j",   label: "Deep Painful Bumps",           labelDE: "Tiefe schmerzhafte Knoten",             labelKO: "크고 깊은 혹 같은 트러블",  axis: "hormonal", icon: "🟣" },
+    { id: "texture_j",  label: "Rough / Bumpy Texture",        labelDE: "Raue / unebene Textur",                labelKO: "턱선 피부 결 거칠음",       axis: "texture",  icon: "◉" },
+    { id: "sagging_j",  label: "Loss of Jawline Definition",   labelDE: "Verlust der Kieferkontur",             labelKO: "턱선 탄력 저하 / 처짐",     axis: "aging",    icon: "↓" },
   ],
   neck: [
     { id: "neck_lines", label: "Neck Lines", labelDE: "Halsfalten", labelKO: "목 주름", axis: "aging", icon: "〰️" },

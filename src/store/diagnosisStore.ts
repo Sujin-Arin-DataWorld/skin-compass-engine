@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { SkinType, ContextKey, Tier, DiagnosisResult } from "@/engine/types";
-import type { UiSignalsV4 } from "@/engine/uiMappingV4";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
 import type { ClimateProfile } from "@/engine/climateEngine";
 
@@ -284,7 +283,7 @@ interface DiagnosisState {
   selectedTier: Tier;
 
   // Interactive UI signals
-  uiSignals: UiSignalsV4;
+  uiSignals: Record<string, Record<string, unknown>>;
 
   // Interactive component state (persisted across category navigation)
   interactiveState: InteractiveState;
@@ -344,7 +343,7 @@ const initialState = {
   metaAnswers: {} as Record<string, number | boolean>,
   axisAnswers: {} as Record<string, QuestionAnswer>,
   selectedTier: "Full" as Tier,
-  uiSignals: {} as UiSignalsV4,
+  uiSignals: {} as Record<string, Record<string, unknown>>,
   interactiveState: { ...defaultInteractiveState },
   result: null as DiagnosisResult | null,
 };

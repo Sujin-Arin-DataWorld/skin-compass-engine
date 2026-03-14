@@ -228,3 +228,19 @@ export type ProjectedImprovement = Record<
   AxisKey,
   { currentScore: number; targetScore4w: number; targetScore12w: number }
 >;
+
+/**
+ * 9-axis skin vector produced by skinVectorEngine (V4 shim).
+ * Used as input to routineEngine.ts and routineEngineV5.ts.
+ */
+export interface SkinVector {
+  sebum: number;
+  hydration: number;
+  pores: number;
+  texture: number;
+  sensitivity: number;
+  aging: number;
+  pigment: number;
+  barrier: number;
+  atopy: number;
+}

@@ -32,9 +32,8 @@ import {
   type MockProduct,
   type RoutineOutput,
 } from "@/engine/routineEngine";
-import type { SkinVector } from "@/engine/skinVectorEngine";
 import type { ImplicitFlags, AxisResponses } from "@/store/diagnosisStore";
-import type { AxisKey, DiagnosisResult, Product, Tier } from "@/engine/types";
+import type { AxisKey, DiagnosisResult, Product, Tier, SkinVector } from "@/engine/types";
 import { AXIS_KEYS } from "@/engine/types";
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -11,29 +11,30 @@ import facemapImg from "@/assets/facemap_final.png";
 // ─── 타입 정의 ────────────────────────────────────────────────────────────────
 // 7개의 임상 기능 존 (좌우 대칭 존은 하나로 통합)
 type ZoneId =
-  | "forehead"     // 이마
-  | "t_zone"       // 코 & T존
-  | "eyes"         // 눈가 & 눈밑 (다크서클 통합)
-  | "cheeks"       // 볼 (좌우 통합)
-  | "mouth_chin"   // 입가 & 턱
-  | "jawline"      // 턱선 (좌우 통합)
-  | "neck";        // 목
+  | "forehead"   // 이마
+  | "nose"       // 코 & T존
+  | "eyes"       // 눈가 & 눈밑 (다크서클 통합)
+  | "cheeks"     // 볼 (좌우 통합)
+  | "mouth"      // 입가 (팔자주름·입 주변)
+  | "jawline"    // 턱선 (호르몬·탄력)
+  | "neck";      // 목
 
 type Lang = "en" | "de" | "ko";
 
 interface Concern { id: string; label: Record<Lang, string>; axis: string; }
 
-// ─── Axis mappings ────────────────────────────────────────────────────────────
+// ─── Axis mappings ─────────────────────────────────────────────────────────────
+// axis values match AxisKey in types.ts; used for chip color display only.
 const CONCERN_AXIS_ID: Record<string, number> = {
-  seb: 1, hyd: 2, pores: 3, texture: 4,
-  sen: 5, aging: 6, pigment: 7, hormonal: 8,
+  seb: 1, hyd: 2, texture: 3, acne: 4,
+  sen: 5, aging: 6, pigment: 7,
 };
 
 const AXIS_COLOR: Record<number, string> = {
   1: "rgba(201,169,110,0.8)", 2: "rgba(100,180,220,0.8)",
   3: "rgba(160,140,120,0.8)", 4: "rgba(220,120,120,0.8)",
   5: "rgba(220,160,160,0.8)", 6: "rgba(180,160,200,0.8)",
-  7: "rgba(180,140,100,0.8)", 8: "rgba(200,130,170,0.8)",
+  7: "rgba(180,140,100,0.8)",
 };
 
 const gt = (t: LocalizedText, lang: Lang): string =>
@@ -41,64 +42,75 @@ const gt = (t: LocalizedText, lang: Lang): string =>
 
 // ─── 존 이름 (7개 임상 존) ────────────────────────────────────────────────────
 const ZONE_LABELS: Record<ZoneId, Record<Lang, string>> = {
-  forehead:   { en: "Forehead",      de: "Stirn",          ko: "이마"         },
-  t_zone:     { en: "Nose & T-Zone", de: "Nase & T-Zone",  ko: "코 & T존"      },
-  eyes:       { en: "Eye Area",      de: "Augenpartie",    ko: "눈가 & 눈밑"   },
-  cheeks:     { en: "Cheeks",        de: "Wangen",         ko: "볼"           },
-  mouth_chin: { en: "Mouth & Chin",  de: "Mund & Kinn",    ko: "입가 & 턱"     },
-  jawline:    { en: "Jawline",       de: "Kieferlinie",    ko: "턱선"         },
-  neck:       { en: "Neck",          de: "Hals",           ko: "목"           },
+  forehead: { en: "Forehead",     de: "Stirn",         ko: "이마"       },
+  nose:     { en: "Nose & T-Zone",de: "Nase & T-Zone", ko: "코 & T존"   },
+  eyes:     { en: "Eye Area",     de: "Augenpartie",   ko: "눈가 & 눈밑" },
+  cheeks:   { en: "Cheeks",       de: "Wangen",        ko: "볼"         },
+  mouth:    { en: "Mouth Area",   de: "Mundpartie",    ko: "입가"       },
+  jawline:  { en: "Jawline",      de: "Kieferlinie",   ko: "턱선"       },
+  neck:     { en: "Neck",         de: "Hals",          ko: "목"         },
 };
 
-// ─── 존별 피부 고민 데이터 (7개 임상 존으로 단순화) ───────────────────────────
+// ─── 존별 피부 고민 데이터 ────────────────────────────────────────────────────
+// IDs and zone keys match scoringEngineV5 CONCERN_AXIS_MAP exactly.
 // 대칭 존(볼, 턱선)은 좌우 하나로 통합 → 중복 없이 정확한 진단 가중치 산출
 const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
-  // 이마 — 피지·노화·트러블 중심
+  // 이마 — 피지·모공·노화·트러블
   forehead: [
-    { id: "oily_f",      label: { en: "Oily / Shiny",      de: "Ölig / Glänzend",    ko: "유분 / 번들거림" }, axis: "seb"     },
-    { id: "lines_f",     label: { en: "Forehead Lines",    de: "Stirnfalten",         ko: "이마 주름"       }, axis: "aging"   },
-    { id: "breakouts_f", label: { en: "Breakouts",         de: "Unreinheiten",        ko: "트러블"          }, axis: "texture" },
+    { id: "oily_f",       label: { en: "Oily / Shiny",          de: "Ölig / Glänzend",       ko: "이마 번들거림"      }, axis: "seb"     },
+    { id: "blackheads_f", label: { en: "Blackheads",             de: "Mitesser",               ko: "까만 점 같은 모공"  }, axis: "texture" },
+    { id: "whiteheads_f", label: { en: "Whiteheads",             de: "Komedonen",              ko: "피부 속 좁쌀 돌기"  }, axis: "texture" },
+    { id: "lines_f",      label: { en: "Forehead Lines",         de: "Stirnfalten",            ko: "이마 주름"          }, axis: "aging"   },
+    { id: "breakouts_f",  label: { en: "Breakouts",              de: "Unreinheiten",           ko: "트러블"             }, axis: "texture" },
   ],
 
   // 코 & T존 — 모공·피지 집중 구역
-  t_zone: [
-    { id: "bh_t",    label: { en: "Blackheads (Nose)", de: "Mitesser (Nase)",   ko: "블랙헤드 / 피지" }, axis: "pores" },
-    { id: "pores_t", label: { en: "Enlarged Pores",    de: "Vergrößerte Poren", ko: "넓은 모공"        }, axis: "pores" },
+  nose: [
+    { id: "blackheads_n", label: { en: "Blackheads (Nose)",      de: "Mitesser (Nase)",        ko: "코 위 까만 점들"   }, axis: "texture" },
+    { id: "pores_n",      label: { en: "Enlarged Pores",         de: "Vergrößerte Poren",      ko: "딸기 씨 같은 모공" }, axis: "texture" },
+    { id: "oily_n",       label: { en: "Always Shiny / Oily",    de: "Immer glänzend / fettig",ko: "코가 항상 번들거림" }, axis: "seb"     },
+    { id: "redness_n",    label: { en: "Redness around Nose",    de: "Rötung um Nase",         ko: "코 주변 붉어짐"    }, axis: "sen"     },
   ],
 
-  // 눈가 & 눈밑 통합 — 노화·색소·볼륨 감소 (이전 eyes + dark_circles 통합)
+  // 눈가 & 눈밑 통합 — 노화·색소·수분
   eyes: [
-    { id: "dc_e",        label: { en: "Dark Circles",       de: "Dunkle Augenringe",  ko: "다크서클"        }, axis: "pigment" },
-    { id: "finelines_e", label: { en: "Fine Lines",         de: "Feine Linien",       ko: "잔주름"           }, axis: "aging"   },
-    { id: "hollow_e",    label: { en: "Under-Eye Hollows",  de: "Eingefallene Augen", ko: "눈밑 꺼짐"        }, axis: "aging"   },
+    { id: "dark_circles_e", label: { en: "Dark Circles",         de: "Dunkle Augenringe",      ko: "다크서클"           }, axis: "pigment" },
+    { id: "fine_lines_e",   label: { en: "Fine Lines",           de: "Feine Linien",           ko: "잔주름"             }, axis: "aging"   },
+    { id: "puffiness_e",    label: { en: "Puffiness / Swelling", de: "Schwellungen / Tränensäcke", ko: "눈가 붓기"      }, axis: "aging"   },
+    { id: "dryness_e",      label: { en: "Dryness / Rough",      de: "Trockenheit / Rau",      ko: "눈가 당김 / 까칠함" }, axis: "hyd"     },
   ],
 
-  // 볼 (좌우 통합) — 민감성·수분·색소 중심
-  // SVG에서 좌우 hitPath가 모두 이 존을 가리킴 → 클릭 시 동일 패널 표시
+  // 볼 (좌우 통합) — 민감성·트러블·수분·색소·모공
   cheeks: [
-    { id: "red_c",  label: { en: "Redness / Flushing",   de: "Rötungen",        ko: "홍조 / 붉은기"   }, axis: "sen"     },
-    { id: "dry_c",  label: { en: "Dryness / Tightness",  de: "Trockenheit",     ko: "건조함 / 당김"   }, axis: "hyd"     },
-    { id: "pigm_c", label: { en: "Sun Spots / Pigment",  de: "Pigmentflecken",  ko: "기미 / 색소침착" }, axis: "pigment" },
+    { id: "redness_c",  label: { en: "Redness / Flushing",     de: "Rötung / Flush",         ko: "쉽게 붉어짐 / 열감"   }, axis: "sen"     },
+    { id: "acne_c",     label: { en: "Breakouts / Acne",       de: "Unreinheiten / Akne",    ko: "트러블"                }, axis: "acne"    },
+    { id: "dryness_c",  label: { en: "Dryness / Tightness",   de: "Trockenheit / Spannung", ko: "건조 / 당김"           }, axis: "hyd"     },
+    { id: "pigment_c",  label: { en: "Dark Spots / Pigment",  de: "Pigmentflecken",         ko: "잡티 / 얼룩"           }, axis: "pigment" },
+    { id: "pores_c",    label: { en: "Visible Pores",         de: "Sichtbare Poren",        ko: "볼 모공이 눈에 띔"     }, axis: "texture" },
   ],
 
-  // 입가 & 턱 — 표정주름(팔자)·호르몬성 트러블·수분 (턱선과 임상적으로 구분)
-  mouth_chin: [
-    { id: "nasolabial", label: { en: "Nasolabial Folds",    de: "Nasolabialfalten",       ko: "팔자주름"        }, axis: "aging"    },
-    { id: "hormonal_m", label: { en: "Chin Breakouts",      de: "Unreinheiten am Kinn",   ko: "턱 주변 트러블"  }, axis: "hormonal" },
-    { id: "dry_m",      label: { en: "Dry Lips / Perioral", de: "Trockene Lippen",        ko: "입가 건조함"     }, axis: "hyd"      },
+  // 입가 — 팔자주름·색소·수분·자극
+  mouth: [
+    { id: "nasolabial", label: { en: "Smile Lines",             de: "Nasolabialfalten",       ko: "팔자 주름"             }, axis: "aging"   },
+    { id: "dryness_m",  label: { en: "Dryness around Mouth",   de: "Trockenheit um den Mund",ko: "입 주변 건조 / 당김"   }, axis: "hyd"     },
+    { id: "pigment_m",  label: { en: "Dark Spots near Mouth",  de: "Dunkle Flecken am Mund", ko: "입가 잡티 / 칙칙함"   }, axis: "pigment" },
+    { id: "perioral_m", label: { en: "Irritation around Mouth",de: "Reizung um den Mund",    ko: "입 주변 자극 / 따가움" }, axis: "sen"     },
   ],
 
-  // 턱선 (좌우 통합) — 중력성 처짐·림프성 여드름 (입/턱 존과 임상적으로 구분)
-  // SVG에서 좌우 hitPath가 모두 이 존을 가리킴 → 클릭 시 동일 패널 표시
+  // 턱선 (좌우 통합) — 호르몬·낭포·결·탄력
   jawline: [
-    { id: "sag_j",    label: { en: "Loss of Firmness", de: "Konturverlust",  ko: "턱선 탄력 저하" }, axis: "aging"    },
-    { id: "jaw_acne", label: { en: "Jawline Acne",     de: "Akne am Kiefer", ko: "턱선 여드름"    }, axis: "hormonal" },
+    { id: "hormonal_j", label: { en: "Recurring Hormonal Breakouts", de: "Wiederkehrende hormonelle Pickel", ko: "같은 자리에 반복되는 트러블" }, axis: "acne"    },
+    { id: "cystic_j",   label: { en: "Deep Painful Bumps",          de: "Tiefe schmerzhafte Knoten",        ko: "크고 깊은 혹 같은 트러블"   }, axis: "acne"    },
+    { id: "texture_j",  label: { en: "Rough / Bumpy Texture",       de: "Raue / unebene Textur",            ko: "턱선 피부 결 거칠음"         }, axis: "texture" },
+    { id: "sagging_j",  label: { en: "Loss of Jawline Definition",  de: "Verlust der Kieferkontur",         ko: "턱선 탄력 저하 / 처짐"       }, axis: "aging"   },
   ],
 
-  // 목 — 노화·수분 (목 주름·텍넥 집중)
+  // 목 — 주름·탄력·홍조·수분
   neck: [
-    { id: "neck_lines", label: { en: "Neck Lines",     de: "Halsfalten",  ko: "목 주름"     }, axis: "aging" },
-    { id: "neck_dry",   label: { en: "Rough Texture",  de: "Raue Textur", ko: "거친 피부결" }, axis: "hyd"   },
+    { id: "neck_lines", label: { en: "Neck Lines",            de: "Halsfalten",          ko: "목 주름"            }, axis: "aging" },
+    { id: "sagging",    label: { en: "Loss of Firmness",      de: "Elastizitätsverlust", ko: "목살 처짐 / 탄력 없음" }, axis: "aging" },
+    { id: "neck_red",   label: { en: "Redness / Irritation",  de: "Rötung / Reizung",   ko: "목 부위 붉어짐"      }, axis: "sen"   },
+    { id: "neck_dry",   label: { en: "Dryness / Rough",       de: "Trockenheit / Rau",  ko: "목 피부 까칠함"      }, axis: "hyd"   },
   ],
 };
 
@@ -189,7 +201,7 @@ const ZONES_DEF: ZoneDef[] = [
   // ── 코 & T존 (Nose & T-Zone) — 3개 도트로 T자 세로 축 완성 ───────────────
   // 미간(Glabella) → 코 브릿지 → 코 끝 3점이 T존의 세로 기둥을 형성
   {
-    zone: "t_zone",
+    zone: "nose",
     dots: [
       { x: 258, y: 192 },   // 미간 (Glabella) — T존 상단 기준점
       { x: 258, y: 248 },   // 코 브릿지 (Nose bridge) — T존 중간
@@ -240,7 +252,7 @@ const ZONES_DEF: ZoneDef[] = [
   // ── 입가 & 턱 (Mouth & Chin) ─────────────────────────────────────────────
   // 팔자주름·호르몬 트러블 중심 — 턱선의 중력성 처짐과 임상적으로 구분
   {
-    zone: "mouth_chin",
+    zone: "mouth",
     dots: [
       { x: 200, y: 350 },   // 입 왼쪽 코너
       { x: 320, y: 350 },   // 입 오른쪽 코너

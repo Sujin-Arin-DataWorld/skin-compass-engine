@@ -94,25 +94,40 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX0_Q1",
         type: "single",
-        text: t("How often do you apply SPF sunscreen?", "Wie oft tragen Sie Sonnenschutz (LSF) auf?", "SPF 선크림을 얼마나 자주 바르시나요?"),
+        text: t("Do you wear sunscreen every morning, even on cloudy days?", "Tragen Sie jeden Morgen Sonnenschutz auf – auch an bewölkten Tagen?", "흐린 날에도 매일 아침 선크림을 바르시나요?"),
+        hint: t(
+          "80% of UV reaches you even through clouds. Daily SPF is the #1 anti-aging habit according to dermatologists worldwide.",
+          "80% der UV-Strahlung dringt durch Wolken. Täglicher Sonnenschutz ist laut Dermatologen weltweit die wichtigste Anti-Aging-Gewohnheit.",
+          "구름을 뚫고도 자외선의 80%가 도달해요. 매일 선크림 바르기는 전 세계 피부과 의사가 인정하는 노화 방지 습관 1위입니다."
+        ),
         required: true,
         axisHints: { ox: 0.9 },
         options: [
-          opt("spf_daily",   0, "Always (Daily)", "Immer (täglich)", "항상 (매일)",       "☀️", "Applied every morning regardless of weather", "Jeden Morgen aufgetragen, unabhängig vom Wetter", "날씨에 관계없이 매일 아침 사용"),
-          opt("spf_outdoor", 1, "Only Outdoors",  "Nur bei Outdoor-Aktivitäten", "야외 활동 시에만", "🌤️", "Applied before outdoor activities only", "Nur vor Outdoor-Aktivitäten", "야외 활동 전에만 사용"),
-          opt("spf_rarely",  3, "Rarely / Never", "Selten / Nie", "드물게 / 전혀",           "🌙", "Rarely or not at all", "Selten oder gar nicht", "드물거나 전혀 사용하지 않음"),
+          opt("spf_daily",   0, "Yes, every morning",    "Ja, jeden Morgen",                  "네, 매일 아침",       "☀️", "Applied every morning regardless of weather", "Jeden Morgen aufgetragen, unabhängig vom Wetter", "날씨에 관계없이 매일 아침 사용"),
+          opt("spf_outdoor", 1, "Only when going outside","Nur wenn ich nach draußen gehe",    "야외 나갈 때만",     "🌤️", "Applied before outdoor activities only", "Nur vor Outdoor-Aktivitäten", "야외 활동 전에만 사용"),
+          opt("spf_rarely",  3, "Rarely or never",        "Selten oder nie",                   "거의 안 바름",       "🌙", "Rarely or not at all", "Selten oder gar nicht", "드물거나 전혀 사용하지 않음"),
         ],
       },
       {
         id: "AX0_Q2",
         type: "single",
-        text: t("What is your typical evening cleansing routine?", "Wie sieht Ihre abendliche Reinigungsroutine aus?", "저녁 세안 루틴은 어떻게 되시나요?"),
+        text: t("How do you wash your face at night?", "Wie reinigen Sie Ihr Gesicht abends?", "저녁에 세안은 어떻게 하시나요?"),
+        hint: t(
+          "Incomplete cleansing leaves sunscreen and makeup residue that clogs pores and disrupts your skin barrier overnight.",
+          "Unvollständige Reinigung hinterlässt Sonnenschutz- und Make-up-Rückstände, die über Nacht die Poren verstopfen.",
+          "세안이 불완전하면 선크림·메이크업 잔여물이 모공을 막고 밤새 피부 장벽을 약화시켜요."
+        ),
         required: true,
         axisHints: { bar: 0.7, seb: 0.4 },
         options: [
-          opt("cleanse_double", 0, "Double Cleanse",     "Doppelte Reinigung",        "더블 클렌징",  "🫧", "Oil/balm cleanser + foam/gel", "Öl-/Balsam-Reiniger + Schaum/Gel", "오일/밤 + 폼/젤 클렌저"),
-          opt("cleanse_foam",   1, "Foam or Gel Only",   "Nur Schaum oder Gel",       "폼/젤 클렌저만", "💧", "Single foam or gel cleanser", "Nur ein Schaum- oder Gel-Reiniger", "폼 또는 젤 클렌저 단독"),
-          opt("cleanse_water",  2, "Water / Wipes Only", "Nur Wasser / Abschminktücher", "물 / 클렌징 티슈만", "🌊", "Water rinse or micellar water only", "Nur Wasserreinigung oder Mizellenwasser", "물 세안 또는 미셀라 워터만"),
+          withGloss(
+            opt("cleanse_double", 0, "Oil or balm first, then foam/gel", "Erst Öl oder Balsam, dann Schaum/Gel", "오일/밤 먼저, 그 다음 폼/젤", "🫧"),
+            "This is called double cleansing — it removes sunscreen and makeup residue that water alone can't dissolve.",
+            "Das nennt man Doppelreinigung — sie entfernt Sonnenschutz- und Make-up-Rückstände, die Wasser allein nicht löst.",
+            "더블 클렌징이라고 해요 — 물만으로는 지워지지 않는 선크림·메이크업 잔여물을 확실히 제거해줘요."
+          ),
+          opt("cleanse_foam",   1, "Foam or gel cleanser only",          "Nur Schaum- oder Gelreiniger",         "폼/젤 클렌저만", "💧"),
+          opt("cleanse_water",  2, "Water or wipes only",                "Nur Wasser oder Tücher",               "물 세안 또는 클렌징 티슈만", "🌊"),
         ],
       },
     ],
@@ -128,14 +143,19 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX1_Q1",
         type: "single",
-        text: t("How quickly does your skin become shiny after cleansing?", "Wie schnell wird Ihre Haut nach der Reinigung glänzend?", "세안 후 얼마나 빨리 피부가 번들거리나요?"),
+        text: t("After washing your face in the morning, when does the shine appear?", "Wann beginnt Ihre Haut nach der morgendlichen Reinigung zu glänzen?", "아침 세안 후 얼마나 지나면 얼굴이 번들거리나요?"),
+        hint: t(
+          "This estimates your sebum production rate — the faster the shine, the more active your oil glands.",
+          "Das schätzt Ihre Talgproduktionsrate ein — je schneller der Glanz, desto aktiver Ihre Talgdrüsen.",
+          "피지 분비 속도를 추정하는 질문이에요 — 번들거림이 빨리 올수록 피지선이 활발합니다."
+        ),
         required: true,
         axisHints: { seb: 1.0, makeup_stability: 0.6 },
         options: [
-          opt("shine_1hr",       3, "Constantly (Within 1 hr)",     "Ständig (innerhalb 1 Std.)",      "항상 (1시간 이내)"),
-          opt("shine_midday",    2, "Frequently (By midday)",        "Häufig (bis Mittag)",             "자주 (점심 무렵)"),
-          opt("shine_afternoon", 1, "Occasionally (Late afternoon)", "Gelegentlich (Nachmittags)",      "가끔 (오후 늦게)"),
-          opt("shine_never",     0, "None (Rarely / Never)",         "Nicht (Selten / Nie)",            "없음 (드물게 / 전혀)"),
+          opt("shine_1hr",       3, "By breakfast time (~1 hr)",       "Bis zum Frühstück (~1 Std.)",     "아침 식사 무렵 (약 1시간)"),
+          opt("shine_midday",    2, "Around lunchtime",                "Gegen Mittag",                    "점심 무렵"),
+          opt("shine_afternoon", 1, "Late afternoon, barely noticeable","Nachmittags, kaum merklich",      "오후 늦게, 거의 느끼지 못함"),
+          opt("shine_never",     0, "Stays matte all day",             "Bleibt den ganzen Tag matt",      "하루 종일 매트함 유지"),
         ],
       },
       {
@@ -164,6 +184,24 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           opt("tex_none",     0, "None — Smooth",                       "Nicht vorhanden — Glatt",             "없음 — 부드러움"),
         ],
       },
+      {
+        id: "AX1_Q4",
+        type: "single",
+        text: t("By 2 PM, what does your base makeup look like?", "Wie sieht Ihr Foundation-Make-up gegen 14 Uhr aus?", "오후 2시경, 베이스 메이크업 상태는 어떤가요?"),
+        hint: t(
+          "Makeup breakdown speed is a validated proxy for sebum output in clinical dermatology.",
+          "Die Geschwindigkeit des Make-up-Abbaus ist ein klinisch validierter Indikator für die Talgproduktion.",
+          "화장 무너짐 속도는 피부과 임상에서 검증된 피지량 추정 지표예요."
+        ),
+        required: false,
+        axisHints: { seb: 0.7, makeup_stability: 0.9 },
+        options: [
+          opt("makeup_melted",  3, "Patchy and melted away",       "Fleckig und abgetragen",          "얼룩덜룩 녹아내림"),
+          opt("makeup_tzone",   2, "T-zone slightly faded",        "T-Zone leicht verblasst",         "T존만 살짝 지워짐"),
+          opt("makeup_intact",  0, "Still mostly intact",          "Noch weitgehend intakt",          "거의 그대로 유지"),
+          opt("makeup_nomake",  0, "I don't wear base makeup",     "Ich trage kein Foundation-Make-up","베이스 메이크업 안 함"),
+        ],
+      },
     ],
   },
 
@@ -177,14 +215,19 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX2_Q1",
         type: "single",
-        text: t("Does your skin feel tight and dry on the inside, even if the surface looks oily?", "Fühlt sich Ihre Haut von innen angespannt an – auch wenn die Oberfläche ölig wirkt?", "표면이 유분져 보여도 피부 속은 건조하고 당기는 느낌이 있나요?"),
+        text: t("After washing, does your skin feel like wearing a mask that's one size too small?", "Fühlt sich Ihre Haut nach dem Waschen an, als würden Sie eine zu kleine Maske tragen?", "세안 후, 피부가 한 사이즈 작은 마스크를 쓴 것처럼 조이는 느낌이 드나요?"),
+        hint: t(
+          "That 'squeezing' sensation means your skin barrier is losing water rapidly — a key indicator of TEWL (Trans-Epidermal Water Loss).",
+          "Dieses 'Zusammenziehen' bedeutet, dass Ihre Hautbarriere schnell Wasser verliert — ein wichtiger TEWL-Indikator.",
+          "이 '조이는' 느낌은 피부 장벽에서 수분이 빠르게 증발하고 있다는 신호예요 (경피 수분 손실, TEWL)."
+        ),
         required: true,
         axisHints: { hyd: 1.0, bar: 0.6 },
         options: [
-          opt("tight_constantly",  3, "Constantly — All day",             "Ständig — Den ganzen Tag",         "항상 — 하루 종일"),
-          opt("tight_frequently",  2, "Frequently — Often tight",         "Häufig — Oft angespannt",          "자주 — 자주 당김"),
-          opt("tight_after_wash",  1, "Occasionally — Only after washing", "Gelegentlich — Nur nach Reinigung", "가끔 — 세안 후에만"),
-          opt("tight_never",       0, "None — Never tight",               "Nie — Nie angespannt",             "없음 — 전혀 당기지 않음"),
+          opt("tight_constantly",  3, "Unbearable — skin might crack",           "Unerträglich — Haut könnte reißen",         "찢어질 것 같아요"),
+          opt("tight_frequently",  2, "Tight but fades after moisturizer",       "Angespannt, nachlassend nach Feuchtigkeitspflege", "당기지만 보습제 바르면 나아짐"),
+          opt("tight_after_wash",  1, "Brief tightness only after washing",      "Kurze Spannung nur nach dem Waschen",       "세안 직후에만 잠깐"),
+          opt("tight_never",       0, "Comfortable — no tightness at all",       "Angenehm — keine Spannung",                 "편안해요 — 전혀 당기지 않음"),
         ],
       },
       {
@@ -420,6 +463,57 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           opt("tol_few",     3, "Very few are tolerated",     "Sehr wenige werden vertragen", "극소수만 사용 가능"),
         ],
       },
+      {
+        id: "AX5_Q_BARRIER",
+        type: "single",
+        text: t("After cleansing, how urgently do you NEED to apply moisturizer?", "Wie dringend müssen Sie nach der Reinigung Feuchtigkeitspflege auftragen?", "세안 후, 보습제를 얼마나 급하게 발라야 하나요?"),
+        hint: t(
+          "The urgency reflects your barrier's water-holding capacity — the faster you need moisture, the more your barrier is compromised.",
+          "Die Dringlichkeit spiegelt die Wasserhaltungskapazität Ihrer Hautbarriere wider.",
+          "보습 긴급도는 피부 장벽의 수분 보유력을 반영해요 — 빨리 발라야 할수록 장벽이 약화된 상태입니다."
+        ),
+        required: false,
+        axisHints: { bar: 1.0, hyd: 0.5, sen: 0.3 },
+        options: [
+          opt("barrier_sos",      3, "Immediately — can't wait 1 minute", "Sofort — kann keine Minute warten",  "즉시 — 1분도 못 참겠어요"),
+          opt("barrier_5min",     2, "Within 5 minutes",                  "Innerhalb von 5 Minuten",           "5분 이내"),
+          opt("barrier_norush",   0, "No rush — skin stays comfortable",  "Keine Eile — Haut bleibt angenehm", "서두를 필요 없어요"),
+        ],
+      },
+      {
+        id: "AX5_Q_NEURO",
+        type: "single",
+        text: t("When you try a new product, do you feel a brief 'spicy tingle' — like eating something hot?", "Wenn Sie ein neues Produkt ausprobieren, spüren Sie ein kurzes 'scharfes Kribbeln' — wie beim Essen von etwas Heißem?", "새 화장품을 바르면 잠깐이지만 '매운 음식 먹은 듯한 따끔함'이 느껴지나요?"),
+        hint: t(
+          "This stinging sensation indicates heightened nerve-ending reactivity — a sign of neurosensitive skin.",
+          "Dieses Stechen weist auf eine erhöhte Nervenendreaktivität hin — ein Zeichen neurosensitiver Haut.",
+          "이 따끔함은 피부 신경 말단의 반응이 높다는 신호예요 — 신경 민감형 피부의 특징입니다."
+        ),
+        required: false,
+        axisHints: { sen: 1.0 },
+        options: [
+          opt("neuro_always",  3, "Almost every new product",  "Fast bei jedem neuen Produkt",  "거의 모든 새 제품에서"),
+          opt("neuro_some",    2, "Some products",             "Bei einigen Produkten",         "일부 제품에서"),
+          opt("neuro_never",   0, "Never noticed",             "Nie bemerkt",                   "느낀 적 없어요"),
+        ],
+      },
+      {
+        id: "AX5_Q_INFLAM",
+        type: "single",
+        text: t("After exercise or spicy food, does your face turn 'apple-red' and stay that way?", "Wird Ihr Gesicht nach Sport oder scharfem Essen 'apfelrot' und bleibt das lange so?", "운동하거나 매운 음식 먹으면 얼굴이 '사과처럼' 빨개지고 오래 지속되나요?"),
+        hint: t(
+          "Prolonged flushing signals elevated blood vessel reactivity — a hallmark of inflammatory sensitivity.",
+          "Anhaltende Rötung signalisiert eine erhöhte Blutgefäßreaktivität — ein Zeichen entzündlicher Empfindlichkeit.",
+          "오래 지속되는 홍조는 혈관 반응성이 높은 염증 민감형 피부의 신호예요."
+        ),
+        required: false,
+        axisHints: { sen: 1.0 },
+        options: [
+          opt("inflam_severe", 3, "Intense redness, 30+ minutes",   "Starke Rötung, 30+ Minuten",    "강한 홍조, 30분 이상 지속"),
+          opt("inflam_mild",   1, "Slight flush, fades quickly",    "Leichte Rötung, verblasst schnell", "가볍게 붉어졌다 금방 사라짐"),
+          opt("inflam_none",   0, "No noticeable flushing",         "Keine merkliche Rötung",        "특별한 홍조 없음"),
+        ],
+      },
     ],
   },
 
@@ -433,13 +527,18 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX6_Q1",
         type: "slider",
-        text: t("Rate the depth of your most noticeable lines or wrinkles.", "Bewerten Sie die Tiefe Ihrer auffälligsten Linien oder Falten.", "가장 눈에 띄는 주름의 깊이를 평가하세요."),
+        text: t("When you smile and then relax, how visible are the lines that remain?", "Wenn Sie lächeln und sich dann entspannen — wie sichtbar sind die verbleibenden Linien?", "웃었다 표정을 풀었을 때, 남아있는 주름이 얼마나 보이나요?"),
+        hint: t(
+          "Static wrinkles (visible at rest) indicate deeper collagen loss than dynamic ones (visible only when moving).",
+          "Statische Falten (in Ruhe sichtbar) zeigen tieferen Kollagenverlust als dynamische (nur bei Bewegung sichtbar).",
+          "표정을 안 지어도 보이는 주름은 콜라겐 손실이 깊다는 뜻이에요."
+        ),
         required: true,
         axisHints: { aging: 1.0 },
         slider: {
           min: 1, max: 10, step: 1, defaultValue: 3,
-          labelMin: t("Fine surface lines", "Feine Oberflächenlinien", "얕은 잔주름"),
-          labelMax: t("Deep folds",         "Tiefe Falten",           "깊은 주름"),
+          labelMin: t("Gone — completely smooth", "Weg — völlig glatt",      "완전히 사라짐"),
+          labelMax: t("Deep, clearly visible",    "Tief, deutlich sichtbar", "깊고 선명하게 보임"),
         },
       },
       {
@@ -607,7 +706,12 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX9_Q1",
         type: "single",
-        text: t("Do you experience chronic, severe itching that disrupts daily life?", "Leiden Sie unter chronischem, starkem Juckreiz, der Ihren Alltag beeinträchtigt?", "일상생활에 지장을 줄 정도의 만성적인 심한 가려움증이 있나요?"),
+        text: t("Do you sometimes have an itch that keeps coming back, no matter what you do?", "Haben Sie manchmal Juckreiz, der immer wieder kommt, egal was Sie tun?", "뭘 해도 자꾸 돌아오는 가려움이 있나요?"),
+        hint: t(
+          "Recurring itch can be an early sign of atopic dermatitis or psoriasis — we ask to ensure safe product recommendations.",
+          "Wiederkehrender Juckreiz kann ein frühes Zeichen für Atopische Dermatitis oder Psoriasis sein — wir fragen, um sichere Produktempfehlungen zu gewährleisten.",
+          "반복되는 가려움은 아토피나 건선의 초기 신호일 수 있어요 — 안전한 제품 추천을 위해 확인합니다."
+        ),
         required: true,
         axisHints: { sen: 1.0, bar: 0.8 },
         options: FREQ_OPTIONS,
@@ -659,43 +763,49 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
 // ─── Trigger mapping ──────────────────────────────────────────────────────────
 
 const CONCERN_TO_AXES: Record<string, number[]> = {
-  // → Sebum (1)
-  oily_tzone: [1],         oily_nose: [1],
-  blackheads_forehead: [1, 3], blackheads_nose: [1, 3],
-  whiteheads_forehead: [1, 4], forehead_breakouts: [1, 4],
-  large_pores_nose: [3],   large_pores_cheeks: [3],
-  oily_f: [1], // new forehead oily
-  
-  // → Hydration (2)
-  dryness_cheeks: [2],     dryness_eyes: [2],
-  dryness_lips: [2],       neck_dryness: [2],
-  redness_cheeks: [2, 5],  redness_nose: [5],
-  neck_sensitivity: [5],
-  dry_c: [2], dry_m: [2], neck_dry: [2],
+  // Forehead
+  oily_f:        [1],
+  blackheads_f:  [1, 3],
+  whiteheads_f:  [1, 4],
+  lines_f:       [6],
+  breakouts_f:   [1, 4],
 
-  // → Pores (3)
-  bh_t: [3], pores_t: [3],
+  // Eyes
+  fine_lines_e:  [6],
+  dark_circles_e:[7],
+  puffiness_e:   [6],
+  dryness_e:     [2],
 
-  // → Texture/Breakouts (4)
-  cheek_acne: [4],         hormonal_breakouts: [4, 8],
-  breakouts_f: [4],
+  // Nose
+  pores_n:       [3],
+  blackheads_n:  [1, 3],
+  oily_n:        [1],
+  redness_n:     [5],
 
-  // → Sensitivity (5)
-  red_c: [5],
-  
-  // → Aging (6)
-  forehead_lines: [6],     fine_lines_eyes: [6],
-  nasolabial: [6],         neck_wrinkles: [6],
-  neck_sagging: [6],       puffiness: [6],
-  lines_f: [6], finelines_e: [6], hollow_e: [6], sag_j: [6], neck_lines: [6],
-  
-  // → Pigment (7)
-  dark_circles: [7],       pigmentation_cheeks: [7],
-  pigmentation_mouth: [7],
-  dc_e: [7], pigm_c: [7],
+  // Cheeks
+  redness_c:     [5],
+  acne_c:        [4],
+  dryness_c:     [2],
+  pigment_c:     [7],
+  pores_c:       [3],
 
-  // → Hormonal (8)
-  hormonal_m: [8], jaw_acne: [8],
+  // Mouth
+  dryness_m:     [2],
+  nasolabial:    [6],
+  pigment_m:     [7],
+  perioral_m:    [5],
+
+  // Jawline
+  hormonal_j:    [4, 8],
+  cystic_j:      [4, 8],
+  texture_j:     [4],
+  sagging_j:     [6],
+
+  // Neck
+  neck_lines:    [6],
+  sagging:       [6],
+  neck_red:      [5],
+  neck_dry:      [2],
 };
 
 // ─── Routing ──────────────────────────────────────────────────────────────────

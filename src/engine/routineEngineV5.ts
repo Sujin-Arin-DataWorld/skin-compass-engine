@@ -37,6 +37,149 @@ import type { AxisKey, DiagnosisResult, Product, Tier, SkinVector } from "@/engi
 import { AXIS_KEYS } from "@/engine/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Phase 3.5B: Age-adaptive ingredient concentration profiles
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface AgeProfile {
+  retinolMax: number;
+  vitaminCRange: string;
+  exfoliationFreq: string;
+  priorityAxes: AxisKey[];
+  avoidIngredients: string[];
+}
+
+export const AGE_PROFILES: Record<number, AgeProfile> = {
+  0: { // Under 20
+    retinolMax: 0,
+    vitaminCRange: "skip or 5% max",
+    exfoliationFreq: "1x per week max",
+    priorityAxes: ["acne", "seb", "texture"],
+    avoidIngredients: ["retinol", "high_concentration_aha"],
+  },
+  1: { // 20-29
+    retinolMax: 0.3,
+    vitaminCRange: "10-15%",
+    exfoliationFreq: "2x per week",
+    priorityAxes: ["acne", "seb", "pigment", "hyd"],
+    avoidIngredients: [],
+  },
+  2: { // 30-39
+    retinolMax: 0.5,
+    vitaminCRange: "15-20%",
+    exfoliationFreq: "2-3x per week",
+    priorityAxes: ["aging", "pigment", "hyd", "ox"],
+    avoidIngredients: [],
+  },
+  3: { // 40-49
+    retinolMax: 0.5,
+    vitaminCRange: "15-20%",
+    exfoliationFreq: "2-3x per week",
+    priorityAxes: ["aging", "hyd", "bar", "pigment"],
+    avoidIngredients: [],
+  },
+  4: { // 50-59
+    retinolMax: 1.0,
+    vitaminCRange: "15-20%",
+    exfoliationFreq: "2x per week",
+    priorityAxes: ["aging", "hyd", "bar", "pigment"],
+    avoidIngredients: [],
+  },
+  5: { // 60+
+    retinolMax: 0.5,
+    vitaminCRange: "10-15%",
+    exfoliationFreq: "1x per week",
+    priorityAxes: ["aging", "hyd", "bar"],
+    avoidIngredients: ["high_concentration_aha", "strong_retinol"],
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 3.5C: Seasonal guidance
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface SeasonalGuidance {
+  currentSeason: "summer" | "winter" | "transitional";
+  moisturizerTexture: "gel" | "lotion" | "cream" | "rich_cream";
+  cleanserNote: { en: string; de: string; ko: string };
+  spfNote: { en: string; de: string; ko: string };
+}
+
+export function computeSeasonalGuidance(
+  scores: DiagnosisResult["axis_scores"],
+  foundation: { seasonal_change?: number; texture_pref?: number },
+  latitude: number = 50,
+): SeasonalGuidance {
+  const month = new Date().getMonth();
+  const isWinter = month >= 10 || month <= 2;
+  const isSummer = month >= 5 && month <= 8;
+  const currentSeason: SeasonalGuidance["currentSeason"] =
+    isWinter ? "winter" : isSummer ? "summer" : "transitional";
+
+  let moisturizerTexture: SeasonalGuidance["moisturizerTexture"];
+
+  if (isWinter) {
+    if (scores.hyd >= 50 || scores.bar >= 50) {
+      moisturizerTexture = "rich_cream";
+    } else if (scores.seb >= 60) {
+      moisturizerTexture = "lotion";
+    } else {
+      moisturizerTexture = "cream";
+    }
+  } else if (isSummer) {
+    if (scores.seb >= 50) {
+      moisturizerTexture = "gel";
+    } else if (scores.hyd >= 50) {
+      moisturizerTexture = "lotion";
+    } else {
+      moisturizerTexture = "lotion";
+    }
+  } else {
+    moisturizerTexture = "lotion";
+  }
+
+  // Respect user texture preference unless barrier is in crisis
+  const texturePref = foundation.texture_pref;
+  if (texturePref !== undefined && texturePref !== 3 && scores.bar < 60) {
+    const prefMap: SeasonalGuidance["moisturizerTexture"][] = ["gel", "lotion", "cream", "cream"];
+    moisturizerTexture = prefMap[texturePref] ?? moisturizerTexture;
+  }
+
+  return {
+    currentSeason,
+    moisturizerTexture,
+    cleanserNote: isWinter
+      ? { en: "In winter, use a cream or milk cleanser to avoid stripping moisture",
+          de: "Im Winter eignet sich eine Reinigungsmilch, um die Feuchtigkeit zu erhalten",
+          ko: "겨울에는 수분을 빼앗기지 않는 밀크/크림 클렌저를 추천해요" }
+      : { en: "In summer, a gel or foam cleanser effectively removes excess oil and sweat",
+          de: "Im Sommer entfernt ein Gel- oder Schaumreiniger überschüssiges Öl und Schweiß",
+          ko: "여름에는 피지와 땀을 깔끔하게 제거하는 젤/폼 클렌저를 추천해요" },
+    spfNote: (latitude >= 45 && isWinter)
+      ? { en: "At your latitude, winter UVB is minimal — SPF 15-30 is sufficient. Focus on barrier protection.",
+          de: "In Ihrem Breitengrad ist die Winter-UVB-Strahlung gering — LSF 15-30 reicht. Fokus auf Barriereschutz.",
+          ko: "거주 위도에서는 겨울 UVB가 적어요 — SPF 15-30이면 충분합니다. 장벽 보호에 집중하세요." }
+      : { en: "Daily SPF 30+ recommended year-round at your location",
+          de: "Täglicher LSF 30+ wird ganzjährig an Ihrem Standort empfohlen",
+          ko: "거주 지역에서는 연중 SPF 30+ 매일 사용을 권장합니다" },
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 3.5E: Skinimalism step-count guard
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Returns a step-count override for 60+ users with compromised barrier. */
+export function determineSkinimalismOverride(
+  ageBracket: number | undefined,
+  barScore: number,
+): number | null {
+  if ((ageBracket ?? -1) >= 5 && barScore >= 50) {
+    return 3; // 60+ + fragile barrier → max 3 steps
+  }
+  return null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // V5 additive types
 // ─────────────────────────────────────────────────────────────────────────────
 

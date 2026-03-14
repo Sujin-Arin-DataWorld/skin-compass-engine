@@ -29,7 +29,8 @@ import { computeScores }                          from "@/engine/scoringEngineV5
 import type { ScoringInput }                      from "@/engine/scoringEngineV5";
 import { buildSkinVector }                        from "@/engine/skinVectorEngineV5";
 import type { SkinVectorResult, SkinVectorInput } from "@/engine/skinVectorEngineV5";
-import { buildProductBundleV5 }                   from "@/engine/routineEngineV5";
+import { buildProductBundleV5, computeSeasonalGuidance } from "@/engine/routineEngineV5";
+import { generateAxisExplanations }               from "@/engine/axisExplanationEngine";
 import type { DiagnosisStoreState }               from "@/store/diagnosisStore";
 import type { SelectedZones, Lifestyle, ImplicitFlags } from "@/store/diagnosisStore";
 import type { Product, Tier } from "@/engine/types";
@@ -110,11 +111,31 @@ function buildFoundation(
     (typeof climateFromAnswer === "string" ? climateFromAnswer : null) ??
     (lifestyle?.climate ?? null);
 
+  // Age bracket: from EXP_AGE axis answer (0-5)
+  const ageRaw = axisAnswers["EXP_AGE"];
+  const ageBracket = typeof ageRaw === "number" ? ageRaw : undefined;
+
+  // Gender: from EXP_GENDER axis answer (0=female, 1=male, 2=other)
+  const genderRaw = axisAnswers["EXP_GENDER"];
+  const gender = typeof genderRaw === "number" ? genderRaw : undefined;
+
+  // Seasonal change: from EXP_SEASONAL axis answer (0-3)
+  const seasonalRaw = axisAnswers["EXP_SEASONAL"];
+  const seasonalChange = typeof seasonalRaw === "number" ? seasonalRaw : undefined;
+
+  // Texture preference: from EXP_TEXTURE axis answer (0-3)
+  const textureRaw = axisAnswers["EXP_TEXTURE"];
+  const texturePref = typeof textureRaw === "number" ? textureRaw : undefined;
+
   return {
-    sleep:   sleepIndex,
-    water:   waterIndex,
-    stress:  stressIndex,
-    climate: climate ?? null,
+    sleep:            sleepIndex,
+    water:            waterIndex,
+    stress:           stressIndex,
+    climate:          climate ?? null,
+    age_bracket:      ageBracket,
+    gender:           gender,
+    seasonal_change:  seasonalChange,
+    texture_pref:     texturePref,
   };
 }
 
@@ -255,8 +276,21 @@ export function runDiagnosisV5(input: BridgeInput): SkinVectorResult {
   // Step 3 — Routine / product bundle
   const productBundle = buildProductBundleV5(result, input.implicitFlags, input.tier ?? "Full");
 
+  // Step 4 — Seasonal guidance + axis explanations (Phase 3.5C/D)
+  const foundation = scoringInput.foundation;
+  const climateLat = (input.lifestyle as { climateProfile?: { lat?: number } } | undefined)
+    ?.climateProfile?.lat ?? 50;
+  const seasonalGuidance = computeSeasonalGuidance(result.axis_scores, foundation, climateLat);
+
+  const axis_explanations = generateAxisExplanations(
+    result.axis_scores,
+    foundation,
+    seasonalGuidance.currentSeason,
+  );
+
   return {
     ...result,
     product_bundle: productBundle,
+    axis_explanations,
   };
 }

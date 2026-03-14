@@ -10,29 +10,53 @@ export type AxisScores = Record<AxisKey, number>;
 export type AxisSeverity = Record<AxisKey, 0 | 1 | 2 | 3>;
 
 export const AXIS_LABELS: Record<AxisKey, string> = {
-  seb: "Sebum",
-  hyd: "Hydration",
-  bar: "Barrier",
-  sen: "Sensitivity",
-  ox: "Oxidative Stress",
-  acne: "Acne",
-  pigment: "Pigmentation",
-  texture: "Texture",
-  aging: "Aging",
-  makeup_stability: "Makeup Stability",
+  seb:              "Oiliness",
+  hyd:              "Dryness",
+  bar:              "Skin Barrier",
+  sen:              "Sensitivity",
+  ox:               "UV & Environmental Damage",
+  acne:             "Breakouts",
+  pigment:          "Dark Spots & Tone",
+  texture:          "Skin Texture",
+  aging:            "Firmness & Lines",
+  makeup_stability: "Makeup Wear",
 };
 
 export const AXIS_LABELS_DE: Record<AxisKey, string> = {
-  seb: "Talg",
-  hyd: "Feuchtigkeit",
-  bar: "Hautbarriere",
-  sen: "Empfindlichkeit",
-  ox: "Oxidativer Stress",
-  acne: "Akne",
-  pigment: "Pigmentierung",
-  texture: "Textur",
-  aging: "Alterung",
-  makeup_stability: "Make-up Stabilität",
+  seb:              "Fettige Haut",
+  hyd:              "Trockene Haut",
+  bar:              "Hautschutzbarriere",
+  sen:              "Empfindlichkeit",
+  ox:               "UV- & Umweltbelastung",
+  acne:             "Unreinheiten",
+  pigment:          "Flecken & Hautton",
+  texture:          "Hautbild",
+  aging:            "Straffheit & Falten",
+  makeup_stability: "Make-up Haltbarkeit",
+};
+
+export const AXIS_LABELS_KO: Record<AxisKey, string> = {
+  seb:              "유분 / 번들거림",
+  hyd:              "건조 / 당김",
+  bar:              "피부 보호막",
+  sen:              "민감도",
+  ox:               "자외선 · 환경 스트레스",
+  acne:             "트러블",
+  pigment:          "잡티 · 피부톤",
+  texture:          "피부결",
+  aging:            "탄력 · 주름",
+  makeup_stability: "화장 지속력",
+};
+
+/** Male-specific axis label overrides (Phase 3.5E). Rename makeup_stability to Skin Comfort. */
+export const AXIS_LABELS_MALE: Partial<Record<AxisKey, string>> = {
+  makeup_stability: "Skin Comfort",
+};
+export const AXIS_LABELS_MALE_DE: Partial<Record<AxisKey, string>> = {
+  makeup_stability: "Hautkomfort",
+};
+export const AXIS_LABELS_MALE_KO: Partial<Record<AxisKey, string>> = {
+  makeup_stability: "피부 편안함",
 };
 
 export const RADAR_AXES: AxisKey[] = ["seb", "hyd", "bar", "sen", "acne", "pigment", "texture", "aging", "ox", "makeup_stability"];
@@ -143,6 +167,8 @@ export interface DiagnosisResult {
   product_bundle: Record<string, Product[]>;
 
   // ── V5 optional additive fields ────────────────────────────────────────────
+  /** Per-axis "why this recommendation" persuasion layer (Phase 3.5D). */
+  axis_explanations?: AxisExplanation[];
   /** Per-axis clinical grade (stable / watch / active / critical). */
   axis_clinical_grade?: Record<AxisKey, { grade: ClinicalGrade; label: { en: string; de: string; ko: string } }>;
   /** Per-zone heatmap intensities and dominant axes from Phase 02 selections. */
@@ -204,6 +230,17 @@ export interface ScoreProvenance {
   };
 }
 
+/** Per-axis clinical explanation for the results persuasion layer (Phase 3.5D). */
+export interface AxisExplanation {
+  axis: AxisKey;
+  score: number;
+  severity: 0 | 1 | 2 | 3;
+  /** Short, user-facing explanation of WHY this axis scored this way. */
+  explanation: { en: string; de: string; ko: string };
+  /** What will happen if they follow the routine for 4 weeks. */
+  expectedOutcome: { en: string; de: string; ko: string };
+}
+
 /** Input shape expected by scoringEngineV5.computeScores(). */
 export interface ScoringInput {
   /** Zone concern chip selections from Phase 02. */
@@ -212,10 +249,14 @@ export interface ScoringInput {
   axisAnswers: Record<string, QuestionAnswer>;
   /** Phase 01 lifestyle foundation values (all 0-indexed). */
   foundation: {
-    sleep:   number;   // 0 = <5h  1 = 5-6h  2 = 7h  3 = 8h+
-    water:   number;   // 0 = 1-2 glasses  1 = 3-5  2 = 6+
-    stress:  number;   // 0 = Low  1 = Moderate  2 = High
-    climate: string | null;
+    sleep:           number;    // 0 = <5h  1 = 5-6h  2 = 7h  3 = 8h+
+    water:           number;    // 0 = 1-2 glasses  1 = 3-5  2 = 6+
+    stress:          number;    // 0 = Low  1 = Moderate  2 = High
+    climate:         string | null;
+    age_bracket?:    number;    // 0=<20  1=20s  2=30s  3=40s  4=50s  5=60+
+    gender?:         number;    // 0=female  1=male  2=non-binary/prefer not
+    seasonal_change?: number;   // 0=no change  1=oilier summer  2=dry yr-round  3=oily yr-round
+    texture_pref?:   number;    // 0=gel  1=lotion  2=cream  3=depends on season
   };
   implicitFlags: { atopyFlag: boolean; [key: string]: unknown };
 }

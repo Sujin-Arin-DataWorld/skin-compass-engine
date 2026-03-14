@@ -35,10 +35,14 @@ export interface ScoringInput {
   axisAnswers: Record<string, QuestionAnswer>;
   /** Phase 01 lifestyle foundation (all values 0-indexed) */
   foundation: {
-    sleep:   number;   // 0=<5h  1=5-6h  2=7h  3=8h+
-    water:   number;   // 0=1-2 glasses  1=3-5  2=6+
-    stress:  number;   // 0=Low  1=Moderate  2=High
-    climate: string | null;
+    sleep:            number;    // 0=<5h  1=5-6h  2=7h  3=8h+
+    water:            number;    // 0=1-2 glasses  1=3-5  2=6+
+    stress:           number;    // 0=Low  1=Moderate  2=High
+    climate:          string | null;
+    age_bracket?:     number;    // 0=<20  1=20s  2=30s  3=40s  4=50s  5=60+
+    gender?:          number;    // 0=female  1=male  2=non-binary/prefer not
+    seasonal_change?: number;    // 0=no change  1=oilier summer/drier winter  2=dry yr-round  3=oily yr-round
+    texture_pref?:    number;    // 0=gel  1=lotion  2=cream  3=depends on season
   };
   implicitFlags: { atopyFlag: boolean; [key: string]: unknown };
 }
@@ -259,6 +263,55 @@ function buildFoundationMods(
     mods.pigment.push({ factor: "climate_tropical",  multiplier: 1.08 });
   }
 
+  // ── Age modifiers (Phase 3.5B) ───────────────────────────────────────────────
+  const age = f.age_bracket ?? -1; // -1 = not answered
+
+  if (age >= 3) { // 40+
+    mods.aging.push({ factor: "age_40plus", multiplier: 1.15 });
+    mods.hyd.push(  { factor: "age_40plus_dryness", multiplier: 1.10 });
+  }
+  if (age >= 4) { // 50+
+    mods.aging.push({ factor: "age_50plus", multiplier: 1.20 });
+    mods.bar.push(  { factor: "age_50plus_barrier", multiplier: 1.10 });
+    mods.hyd.push(  { factor: "age_50plus_dryness", multiplier: 1.15 });
+  }
+  if (age >= 5) { // 60+
+    mods.aging.push({ factor: "age_60plus", multiplier: 1.25 });
+    mods.hyd.push(  { factor: "age_60plus_dryness", multiplier: 1.20 });
+    mods.bar.push(  { factor: "age_60plus_barrier", multiplier: 1.15 });
+    mods.seb.push(  { factor: "age_60plus_seb_decrease", multiplier: 0.85 });
+  }
+  if (age >= 0 && age <= 1) { // under 29
+    mods.seb.push(  { factor: "age_young_seb",  multiplier: 1.10 });
+    mods.acne.push( { factor: "age_young_acne", multiplier: 1.10 });
+  }
+
+  // ── Gender modifiers (Phase 3.5B) ────────────────────────────────────────────
+  const gender = f.gender ?? -1; // -1 = not answered
+
+  if (gender === 1) { // male — higher sebum production
+    mods.seb.push({ factor: "male_seb", multiplier: 1.12 });
+  }
+
+  // ── Seasonal modifiers (Phase 3.5C) ──────────────────────────────────────────
+  const season = f.seasonal_change ?? -1;
+  const currentMonth = new Date().getMonth(); // 0-11
+  const isWinter = currentMonth >= 10 || currentMonth <= 2; // Nov-Feb
+  const isSummer = currentMonth >= 5 && currentMonth <= 8;  // Jun-Sep
+
+  if (season === 1 || season === 2) { // drier in winter
+    if (isWinter) {
+      mods.hyd.push({ factor: "seasonal_winter_dry",     multiplier: 1.12 });
+      mods.bar.push({ factor: "seasonal_winter_barrier", multiplier: 1.08 });
+    }
+  }
+  if (season === 1 || season === 3) { // oilier in summer
+    if (isSummer) {
+      mods.seb.push( { factor: "seasonal_summer_oily", multiplier: 1.10 });
+      mods.acne.push({ factor: "seasonal_summer_acne", multiplier: 1.05 });
+    }
+  }
+
   return mods;
 }
 
@@ -409,6 +462,11 @@ export function computeScores(input: ScoringInput): ScoringOutput {
     raw.sen = Math.min(raw.sen * 1.20, 95);
     raw.bar = Math.min(raw.bar * 1.20, 95);
     if (!activeFlags.includes("ATOPY")) activeFlags.push("ATOPY");
+  }
+
+  // Male gender flag — used by UI to adjust labels and question routing (Phase 3.5E)
+  if ((foundation.gender ?? -1) === 1 && !activeFlags.includes("MALE")) {
+    activeFlags.push("MALE");
   }
 
   // ───────────────────────────────────────────────────────────────────────────

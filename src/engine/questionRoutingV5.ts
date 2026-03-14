@@ -47,6 +47,10 @@ export interface QuestionDef {
   axisHints: Partial<Record<string, number>>; // axis-key → weight multiplier
   hideIf?: { questionId: string; values: string[] }; // hide this question if condition met
   exclusiveIds?: string[]; // if one of these IDs is selected, all other selections are cleared
+  /** Hide this question for users outside the given age_bracket range. */
+  showForAge?: { min?: number; max?: number };
+  /** Hide this question if the user's gender matches any of these values (0=female,1=male,2=other). */
+  hideIfGender?: number[];
 }
 
 export interface AxisDef {
@@ -87,7 +91,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 0,
     name: t("Global Habits & Base Routine", "Allgemeine Gewohnheiten & Basis-Routine", "기본 습관 및 루틴"),
-    eyebrow: t("Foundation", "Basis", "기반"),
+    eyebrow: t("Your Daily Basics", "Ihre tägliche Basis", "데일리 기본 루틴"),
     triggerConcerns: [],
     alwaysShow: true,
     questions: [
@@ -130,6 +134,27 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           opt("cleanse_water",  2, "Water or wipes only",                "Nur Wasser oder Tücher",               "물 세안 또는 클렌징 티슈만", "🌊"),
         ],
       },
+      {
+        id: "AX0_Q3",
+        type: "single",
+        text: t(
+          "What type of sunscreen do you usually use?",
+          "Welchen Sonnenschutz verwenden Sie normalerweise?",
+          "보통 어떤 선크림을 사용하시나요?"
+        ),
+        hint: t(
+          "Waterproof or mineral sunscreens need oil-based cleansing to remove properly — leftover residue can clog pores",
+          "Wasserfeste oder mineralische Sonnencremes müssen mit Öl-Reinigung entfernt werden — Rückstände können Poren verstopfen",
+          "워터프루프나 무기자차 선크림은 오일 클렌징으로 확실히 제거해야 모공이 막히지 않아요"
+        ),
+        required: false,
+        axisHints: { bar: 0.3, texture: 0.2 },
+        options: [
+          opt("spf_mineral_wp",    1, "Mineral / Waterproof SPF",   "Mineralisch / Wasserfest",         "무기자차 / 워터프루프"),
+          opt("spf_chemical_light",0, "Lightweight daily SPF",      "Leichter Tages-Sonnenschutz",      "가벼운 데일리 선크림"),
+          opt("spf_none",          2, "I don't use sunscreen",      "Ich benutze keinen Sonnenschutz",  "선크림을 안 써요"),
+        ],
+      },
     ],
   },
 
@@ -137,7 +162,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 1,
     name: t("Sebum & Oiliness", "Talg & Glanz", "피지 & 유분"),
-    eyebrow: t("Axis 01 — Sebum", "Achse 01 — Talg", "축 01 — 피지"),
+    eyebrow: t("Oiliness Check", "Fettigkeit-Check", "유분 체크"),
     triggerConcerns: ["oily_tzone", "oily_nose", "blackheads_forehead", "blackheads_nose", "whiteheads_forehead", "forehead_breakouts"],
     questions: [
       {
@@ -187,6 +212,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX1_Q4",
         type: "single",
+        hideIfGender: [1],  // male users don't typically wear base makeup
         text: t("By 2 PM, what does your base makeup look like?", "Wie sieht Ihr Foundation-Make-up gegen 14 Uhr aus?", "오후 2시경, 베이스 메이크업 상태는 어떤가요?"),
         hint: t(
           "Makeup breakdown speed is a validated proxy for sebum output in clinical dermatology.",
@@ -202,6 +228,29 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           opt("makeup_nomake",  0, "I don't wear base makeup",     "Ich trage kein Foundation-Make-up","베이스 메이크업 안 함"),
         ],
       },
+      {
+        id: "AX1_Q4_MALE",
+        type: "single",
+        hideIfGender: [0, 2],  // only shown to male users
+        text: t(
+          "After shaving, how does your skin feel by midday?",
+          "Wie fühlt sich Ihre Haut nach dem Rasieren am Mittag an?",
+          "면도 후 정오 무렵 피부 상태는 어떤가요?"
+        ),
+        hint: t(
+          "Post-shave oiliness or tightness reveals your skin's sebum behavior and barrier response after mechanical stress.",
+          "Öl oder Spannung nach dem Rasieren zeigt das Talg- und Barriereverhalten Ihrer Haut nach mechanischem Stress.",
+          "면도 후 유분감이나 당김은 기계적 자극 후 피지 분비와 장벽 반응을 파악하는 데 도움이 돼요."
+        ),
+        required: false,
+        axisHints: { seb: 0.5, bar: 0.4, sen: 0.3 },
+        options: [
+          opt("postshave_tight",  2, "Tight, dry, or irritated",      "Angespannt, trocken oder gereizt", "당기거나 건조하거나 자극받음"),
+          opt("postshave_oily",   2, "Oily or shiny",                 "Ölig oder glänzend",               "유분지고 번들거림"),
+          opt("postshave_fine",   0, "Comfortable — no issues",       "Angenehm — keine Probleme",        "편안해요 — 문제 없음"),
+          opt("postshave_noshave",0, "I don't shave",                 "Ich rasiere mich nicht",           "면도 안 해요"),
+        ],
+      },
     ],
   },
 
@@ -209,7 +258,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 2,
     name: t("Hydration & Dryness", "Feuchtigkeit & Trockenheit", "수분 & 건조"),
-    eyebrow: t("Axis 02 — Hydration", "Achse 02 — Feuchtigkeit", "축 02 — 수분"),
+    eyebrow: t("Dryness Check", "Trockenheits-Check", "건조 체크"),
     triggerConcerns: ["dryness_cheeks", "dryness_eyes", "dryness_lips", "neck_dryness", "redness_cheeks", "redness_nose", "neck_sensitivity"],
     questions: [
       {
@@ -217,9 +266,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         type: "single",
         text: t("After washing, does your skin feel like wearing a mask that's one size too small?", "Fühlt sich Ihre Haut nach dem Waschen an, als würden Sie eine zu kleine Maske tragen?", "세안 후, 피부가 한 사이즈 작은 마스크를 쓴 것처럼 조이는 느낌이 드나요?"),
         hint: t(
-          "That 'squeezing' sensation means your skin barrier is losing water rapidly — a key indicator of TEWL (Trans-Epidermal Water Loss).",
-          "Dieses 'Zusammenziehen' bedeutet, dass Ihre Hautbarriere schnell Wasser verliert — ein wichtiger TEWL-Indikator.",
-          "이 '조이는' 느낌은 피부 장벽에서 수분이 빠르게 증발하고 있다는 신호예요 (경피 수분 손실, TEWL)."
+          "That 'squeezing' sensation means your skin barrier is losing water rapidly — your barrier needs extra support to lock in moisture.",
+          "Dieses 'Zusammenziehen' bedeutet, dass Ihre Hautbarriere schnell Wasser verliert — sie braucht extra Unterstützung, um Feuchtigkeit einzuschließen.",
+          "이 '조이는' 느낌은 피부 장벽에서 수분이 빠르게 증발하고 있다는 신호예요 — 수분을 잡아두는 장벽 케어가 필요합니다."
         ),
         required: true,
         axisHints: { hyd: 1.0, bar: 0.6 },
@@ -262,7 +311,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 3,
     name: t("Pore Visibility", "Porensichtbarkeit", "모공 가시성"),
-    eyebrow: t("Axis 03 — Pores", "Achse 03 — Poren", "축 03 — 모공"),
+    eyebrow: t("Pore Check", "Poren-Check", "모공 체크"),
     triggerConcerns: ["large_pores_nose", "large_pores_cheeks", "blackheads_nose", "blackheads_forehead"],
     questions: [
       {
@@ -311,7 +360,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 4,
     name: t("Breakouts & Texture", "Unreinheiten & Textur", "트러블 & 피부 결"),
-    eyebrow: t("Axis 04 — Texture", "Achse 04 — Textur", "축 04 — 피부 결"),
+    eyebrow: t("Breakout Check", "Unreinheiten-Check", "트러블 체크"),
     triggerConcerns: ["forehead_breakouts", "cheek_acne", "hormonal_breakouts", "whiteheads_forehead"],
     questions: [
       {
@@ -382,13 +431,13 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         axisHints: { pigment: 0.7, acne: 0.3 },
         options: [
           withGloss(
-            opt("mark_pie",   2, "Red / Pink marks (PIE)",   "Rote / rosa Flecken (PIE)",      "붉은/분홍 흔적 (PIE)"),
+            opt("mark_pie",   2, "Red / pink marks after breakouts",   "Rote / rosa Flecken nach Unreinheiten",      "트러블 후 남는 붉은/분홍 흔적"),
             "PIE — Post-Inflammatory Erythema. Temporary red/pink flat marks after a pimple heals. Usually fade in weeks to months.",
             "PIE — Post-entzündliches Erythem. Vorübergehende rote/rosa Flecken nach dem Abheilen, meist in Wochen bis Monaten.",
             "PIE(홍반성 색소침착) — 트러블 치유 후 남는 일시적인 붉은/분홍 자국으로, 주로 몇 주에서 몇 달 내 사라집니다."
           ),
           withGloss(
-            opt("mark_pih",   3, "Brown / Dark marks (PIH)", "Braune / dunkle Flecken (PIH)",  "갈색/어두운 흔적 (PIH)"),
+            opt("mark_pih",   3, "Dark marks after breakouts", "Dunkle Flecken nach Unreinheiten",  "트러블 후 남는 어두운 흔적"),
             "PIH — Post-Inflammatory Hyperpigmentation. Dark marks caused by excess melanin after inflammation. Can persist for months.",
             "PIH — Post-entzündliche Hyperpigmentierung. Dunkle Flecken durch Melaninüberschuss, können Monate anhalten.",
             "PIH(염증 후 과색소침착) — 염증 후 멜라닌 과다로 생기는 갈색/어두운 자국으로 몇 달간 지속될 수 있습니다."
@@ -410,7 +459,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 5,
     name: t("Sensitivity & Barrier", "Empfindlichkeit & Barriere", "민감도 & 피부 장벽"),
-    eyebrow: t("Axis 05 — Barrier", "Achse 05 — Barriere", "축 05 — 피부 장벽"),
+    eyebrow: t("Sensitivity Check", "Empfindlichkeits-Check", "민감도 체크"),
     triggerConcerns: ["redness_cheeks", "redness_nose", "neck_sensitivity", "dryness_cheeks"],
     questions: [
       {
@@ -514,6 +563,29 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           opt("inflam_none",   0, "No noticeable flushing",         "Keine merkliche Rötung",        "특별한 홍조 없음"),
         ],
       },
+      {
+        id: "AX5_Q_SHAVE",
+        type: "single",
+        hideIfGender: [0, 2],  // only shown to male users
+        text: t(
+          "Do you experience razor burn, bumps, or persistent redness after shaving?",
+          "Haben Sie Rasierbrand, Pickel oder anhaltende Rötung nach dem Rasieren?",
+          "면도 후 면도 자극, 모낭염, 또는 지속적인 홍조가 생기나요?"
+        ),
+        hint: t(
+          "Post-shave irritation disrupts the skin barrier and can lead to chronic sensitivity — it's a significant barrier stressor for male skin.",
+          "Rasierirritationen stören die Hautbarriere und können zu chronischer Empfindlichkeit führen — ein wesentlicher Barrierestressor für Männerhaut.",
+          "면도 자극은 피부 장벽을 손상시키고 만성 민감성으로 이어질 수 있어요 — 남성 피부의 주요 장벽 스트레스 요인입니다."
+        ),
+        required: false,
+        axisHints: { bar: 0.8, sen: 0.6 },
+        options: [
+          opt("razburn_severe", 3, "Severe — persistent redness or bumps", "Stark — anhaltende Rötung oder Pickel", "심각 — 지속적인 홍조 또는 모낭염"),
+          opt("razburn_mild",   1, "Mild — brief redness only",            "Mild — nur kurze Rötung",               "약함 — 짧은 홍조만"),
+          opt("razburn_none",   0, "None — skin tolerates shaving well",   "Keine — Haut verträgt Rasieren gut",    "없음 — 면도 잘 버텨요"),
+          opt("razburn_na",     0, "I don't shave",                        "Ich rasiere mich nicht",                "면도 안 해요"),
+        ],
+      },
     ],
   },
 
@@ -521,7 +593,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 6,
     name: t("Aging & Firmness", "Hautalterung & Festigkeit", "노화 & 탄력"),
-    eyebrow: t("Axis 06 — Aging", "Achse 06 — Alterung", "축 06 — 노화"),
+    eyebrow: t("Firmness & Lines", "Straffheit & Falten", "탄력 & 주름"),
     triggerConcerns: ["forehead_lines", "fine_lines_eyes", "nasolabial", "neck_wrinkles", "neck_sagging", "puffiness"],
     questions: [
       {
@@ -534,6 +606,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           "표정을 안 지어도 보이는 주름은 콜라겐 손실이 깊다는 뜻이에요."
         ),
         required: true,
+        showForAge: { min: 1 },
         axisHints: { aging: 1.0 },
         slider: {
           min: 1, max: 10, step: 1, defaultValue: 3,
@@ -591,7 +664,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 7,
     name: t("Pigmentation & Tone", "Pigmentierung & Teint", "색소침착 & 피부톤"),
-    eyebrow: t("Axis 07 — Pigment", "Achse 07 — Pigment", "축 07 — 색소"),
+    eyebrow: t("Dark Spots & Tone", "Flecken & Hautton", "잡티 & 피부톤"),
     triggerConcerns: ["dark_circles", "pigmentation_cheeks", "pigmentation_mouth"],
     questions: [
       {
@@ -601,7 +674,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: true,
         axisHints: { pigment: 1.0, ox: 0.3 },
         options: [
-          opt("pig_pih",     2, "Post-acne Marks",        "Akne-Narben / PIH",           "트러블 흔적 (PIH)",    "🟤",
+          opt("pig_pih",     2, "Dark marks after breakouts", "Dunkle Flecken nach Unreinheiten", "트러블 후 어두운 흔적", "🟤",
             "Dark marks where blemishes healed", "Dunkle Flecken nach Unreinheiten", "트러블 치유 후 어두운 흔적"),
           opt("pig_sun",     2, "Sun-induced Spots",      "Sonnenflecken",                "자외선 색소침착",     "🌞",
             "Discrete spots from UV exposure", "Diskrete Flecken durch UV-Bestrahlung", "자외선 노출로 인한 반점"),
@@ -645,7 +718,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 8,
     name: t("Hormonal Influence", "Hormoneller Einfluss", "호르몬적 영향"),
-    eyebrow: t("Axis 08 — Hormonal", "Achse 08 — Hormonal", "축 08 — 호르몬"),
+    eyebrow: t("Hormonal Influence", "Hormoneller Einfluss", "호르몬 영향"),
     triggerConcerns: ["hormonal_breakouts"],
     questions: [
       {
@@ -653,6 +726,8 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         type: "single",
         text: t("Do your skin changes fluctuate significantly with your hormonal cycle?", "Schwanken Ihre Hautveränderungen stark mit Ihrem Hormonstatus?", "호르몬 주기에 따라 피부 변화가 뚜렷한가요?"),
         required: true,
+        showForAge: { min: 1, max: 4 },
+        hideIfGender: [1],
         axisHints: { acne: 0.8, sen: 0.4 },
         options: [
           opt("horm_severe", 3, "Severe fluctuations",  "Starke Schwankungen",  "심한 변화"),
@@ -699,7 +774,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   {
     id: 9,
     name: t("Chronic Skin Conditions", "Chronische Hauterkrankungen", "만성 피부 질환"),
-    eyebrow: t("Axis 09 — Clinical Check", "Achse 09 — Klinischer Check", "축 09 — 임상 체크"),
+    eyebrow: t("Chronic Skin Check", "Chronische Haut-Check", "만성 피부 체크"),
     triggerConcerns: [],
     alwaysShow: true,
     questions: [

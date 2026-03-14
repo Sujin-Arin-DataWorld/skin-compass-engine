@@ -2,26 +2,14 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useI18nStore } from "@/store/i18nStore";
-import type { DiagnosisResult, AxisKey, ScoreProvenance, ZoneId } from "@/engine/types";
-import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS } from "@/engine/types";
+import type { DiagnosisResult, AxisKey, ScoreProvenance, ZoneId, AxisExplanation } from "@/engine/types";
+import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO, AXIS_LABELS_MALE, AXIS_LABELS_MALE_DE, AXIS_LABELS_MALE_KO, AXIS_KEYS } from "@/engine/types";
 import RadarChart from "@/components/diagnosis/RadarChart";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // i18n maps
 // ─────────────────────────────────────────────────────────────────────────────
 
-const AXIS_LABELS_KO: Record<AxisKey, string> = {
-  seb:              "피지",
-  hyd:              "수분",
-  bar:              "피부 장벽",
-  sen:              "민감도",
-  ox:               "산화 스트레스",
-  acne:             "여드름",
-  pigment:          "색소침착",
-  texture:          "피부결",
-  aging:            "노화",
-  makeup_stability: "메이크업 지속력",
-};
 
 const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, {
   en: (s: number) => string;
@@ -39,9 +27,9 @@ const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, {
     ko: (s) => s >= 75 ? "빠른 피지 재분비, T존 집중" : s >= 50 ? "균형적이나 습도에 반응" : "조절됨",
   },
   hyd: {
-    en: (s) => s >= 75 ? "Compromised moisture barrier (TEWL risk)" : s >= 50 ? "Suboptimal retention" : "Adequate",
-    de: (s) => s >= 75 ? "Geschädigte Feuchtigkeitsbarriere (TEWL-Risiko)" : s >= 50 ? "Suboptimale Speicherung" : "Ausreichend",
-    ko: (s) => s >= 75 ? "수분 장벽 손상 (TEWL 위험)" : s >= 50 ? "수분 유지력 부족" : "적절함",
+    en: (s) => s >= 75 ? "Rapid moisture loss — barrier needs repair" : s >= 50 ? "Suboptimal moisture retention" : "Adequate",
+    de: (s) => s >= 75 ? "Schneller Feuchtigkeitsverlust — Barriere braucht Reparatur" : s >= 50 ? "Suboptimale Feuchtigkeitsspeicherung" : "Ausreichend",
+    ko: (s) => s >= 75 ? "빠른 수분 손실 — 장벽 회복 필요" : s >= 50 ? "수분 유지력 부족" : "적절함",
   },
   sen: {
     en: (s) => s >= 75 ? "High reactivity — multiple trigger exposure" : s >= 50 ? "Moderate — flush and thermal reactivity" : "Manageable",
@@ -314,7 +302,10 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
   );
   const topAxis = sorted[0];
 
-  const labels = language === "de" ? AXIS_LABELS_DE : language === "ko" ? AXIS_LABELS_KO : AXIS_LABELS;
+  const isMale = result.active_flags.includes("MALE");
+  const baseLabels = language === "de" ? AXIS_LABELS_DE : language === "ko" ? AXIS_LABELS_KO : AXIS_LABELS;
+  const maleOverrides = isMale ? (language === "de" ? AXIS_LABELS_MALE_DE : language === "ko" ? AXIS_LABELS_MALE_KO : AXIS_LABELS_MALE) : {};
+  const labels = { ...baseLabels, ...maleOverrides } as Record<AxisKey, string>;
 
   // V5 lookup helpers — graceful when fields are absent
   const clinicalGrade = result.axis_clinical_grade;
@@ -557,6 +548,56 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
               <ArrowRight size={14} />
             </button>
           )}
+
+        {/* ── "Why this recommendation" explanations (Phase 3.5D) ── */}
+        {result.axis_explanations && result.axis_explanations.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65 }}
+            className="mt-5"
+          >
+            <p className="slide-eyebrow mb-3" style={{ letterSpacing: "0.12em" }}>
+              {language === "de"
+                ? "Warum diese Empfehlung?"
+                : language === "ko"
+                ? "이 추천의 이유"
+                : "Why this recommendation?"}
+            </p>
+            <div className="space-y-3">
+              {(result.axis_explanations as AxisExplanation[]).slice(0, 3).map((exp) => {
+                const axLabel = language === "de"
+                  ? AXIS_LABELS_DE[exp.axis]
+                  : language === "ko"
+                  ? AXIS_LABELS_KO[exp.axis]
+                  : AXIS_LABELS[exp.axis];
+                const explanation = exp.explanation[language as "en" | "de" | "ko"] ?? exp.explanation.en;
+                const outcome = exp.expectedOutcome[language as "en" | "de" | "ko"] ?? exp.expectedOutcome.en;
+                return (
+                  <div
+                    key={exp.axis}
+                    className="rounded-xl border p-3"
+                    style={{
+                      borderColor: "hsl(var(--border) / 0.6)",
+                      background: "hsl(var(--card) / 0.6)",
+                    }}
+                  >
+                    <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "hsl(var(--primary))", marginBottom: 4 }}>
+                      {axLabel}
+                    </p>
+                    <p className="slide-body" style={{ fontSize: "0.8rem", lineHeight: 1.5, marginBottom: 4 }}>
+                      {explanation}
+                    </p>
+                    <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.4, fontStyle: "italic" }}>
+                      {language === "de" ? "In 4 Wochen: " : language === "ko" ? "4주 후: " : "In 4 weeks: "}
+                      {outcome}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
         </motion.div>
       </div>
     </div>

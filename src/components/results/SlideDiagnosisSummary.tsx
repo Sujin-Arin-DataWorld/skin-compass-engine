@@ -472,6 +472,49 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           })}
         </motion.div>
 
+        {/* ── Section E2: Dehydrated-Oily (수부지) special card ── */}
+        {(result.active_flags.includes("Dehydrated-Oily") ||
+          (result.axis_scores.seb >= 50 && result.axis_scores.hyd >= 50)) && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: hasHeatmap ? 0.55 : 0.48, duration: 0.4 }}
+            className="rounded-2xl border p-4 mb-5"
+            style={{
+              borderColor: "rgba(100,180,220,0.35)",
+              background: "linear-gradient(135deg, rgba(100,180,220,0.08) 0%, rgba(201,169,110,0.06) 100%)",
+            }}
+          >
+            <p className="slide-eyebrow mb-1" style={{ fontSize: "0.65rem", letterSpacing: "0.14em", color: "hsl(var(--primary))" }}>
+              {language === "de" ? "Besonderer Befund" : language === "ko" ? "특별 감지" : "Special Detection"}
+            </p>
+            <p
+              className="font-display mb-2"
+              style={{ fontSize: "1.05rem", fontWeight: 600, color: "hsl(var(--foreground))" }}
+            >
+              {language === "de"
+                ? "Fettig-dehydrierte Haut erkannt"
+                : language === "ko"
+                ? "수부지(속건조 지성) 피부 감지"
+                : "Dehydrated-Oily Skin Detected"}
+            </p>
+            <p className="slide-body mb-2.5" style={{ fontSize: "0.82rem", lineHeight: 1.55 }}>
+              {language === "de"
+                ? "Ihre Haut sieht oberflächlich ölig aus, ist aber darunter durstig nach Feuchtigkeit. Das ist in europäischen Sommern sehr häufig. Leichte Hydration, die schnell einzieht ohne zu fetten, ist der Schlüssel."
+                : language === "ko"
+                ? "피부 표면은 번들거리는데 속은 사실 수분이 부족한 상태예요. 유럽 여름에 매우 흔한 현상이에요. 가벼우면서 빠르게 흡수되는 수분 제품이 핵심입니다."
+                : "Your skin looks oily on the surface, but underneath it's actually thirsty for moisture. This is very common in European summers. You need lightweight hydration that absorbs fast without leaving grease."}
+            </p>
+            <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.5 }}>
+              {language === "de"
+                ? "✓ Empfohlen: Hyaluronsäure-Gel, wasserbasierte Seren, ölfreie Pflege · ✗ Vermeiden: schwere Cremes, aggressive Reiniger"
+                : language === "ko"
+                ? "✓ 추천: 히알루론산 젤, 수분 세럼, 오일프리 보습제 · ✗ 피해야 할 것: 무거운 크림, 세정력 강한 클렌저"
+                : "✓ Look for: Hyaluronic acid gel, water-based serums, oil-free moisturizers · ✗ Avoid: Heavy creams, stripping foam cleansers"}
+            </p>
+          </motion.div>
+        )}
+
         {/* ── Section F: Forward pull ── */}
         <motion.p
           initial={{ opacity: 0 }}

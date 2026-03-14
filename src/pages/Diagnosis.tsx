@@ -47,6 +47,7 @@ interface FoundationOption { label: string; value: number }
 interface FoundationQuestion {
   id: string; icon: string;
   text: string; textDE: string; textKO: string;
+  hint?: string; hintDE?: string; hintKO?: string;
   options: FoundationOption[];
 }
 
@@ -173,6 +174,37 @@ const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
 // ─── Foundation questions ─────────────────────────────────────────────────────
 const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
   {
+    id: "age_bracket", icon: "🎂",
+    text: "What is your age range?",
+    textDE: "In welcher Altersgruppe sind Sie?",
+    textKO: "연령대가 어떻게 되시나요?",
+    hint: "Your skin's needs change with age — this helps us recommend the right level of care",
+    hintDE: "Die Bedürfnisse Ihrer Haut verändern sich mit dem Alter — so können wir die richtige Pflege empfehlen",
+    hintKO: "나이에 따라 피부가 필요로 하는 관리가 달라져요 — 맞춤 추천을 위해 확인합니다",
+    options: [
+      { label: "Under 20", value: 0 },
+      { label: "20–29", value: 1 },
+      { label: "30–39", value: 2 },
+      { label: "40–49", value: 3 },
+      { label: "50–59", value: 4 },
+      { label: "60+", value: 5 },
+    ],
+  },
+  {
+    id: "gender", icon: "👤",
+    text: "How do you identify?",
+    textDE: "Wie identifizieren Sie sich?",
+    textKO: "성별이 어떻게 되시나요?",
+    hint: "Hormones significantly affect skin — this helps with hormonal and product recommendations",
+    hintDE: "Hormone beeinflussen Ihre Haut erheblich — dies hilft bei hormonellen und Produktempfehlungen",
+    hintKO: "호르몬이 피부에 큰 영향을 미쳐요 — 호르몬 관련 추천에 활용됩니다",
+    options: [
+      { label: "Female", value: 0 },
+      { label: "Male", value: 1 },
+      { label: "Non-binary / Prefer not to say", value: 2 },
+    ],
+  },
+  {
     id: "sleep", icon: "🌙",
     text: "Average hours of restful sleep",
     textDE: "Stunden erholsamen Schlafs",
@@ -193,6 +225,36 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     textKO: "현재 스트레스 수준",
     options: [{ label: "Low", value: 1 }, { label: "Moderate", value: 2 }, { label: "High", value: 3 }],
   },
+  {
+    id: "seasonal_change", icon: "🍂",
+    text: "Does your skin behave differently in summer vs. winter?",
+    textDE: "Verhält sich Ihre Haut im Sommer anders als im Winter?",
+    textKO: "여름과 겨울에 피부 상태가 달라지나요?",
+    hint: "Many Europeans experience oilier skin in summer and tighter/drier skin in winter — your routine should adapt",
+    hintDE: "Viele Europäer haben im Sommer fettigere und im Winter trockenere Haut — Ihre Routine sollte sich anpassen",
+    hintKO: "유럽에서는 여름에 더 유분지고 겨울에 더 건조해지는 분들이 많아요 — 루틴도 따라 바뀌어야 합니다",
+    options: [
+      { label: "Yes — oilier in summer, drier in winter", value: 1 },
+      { label: "Yes — dry year-round, but worse in winter", value: 2 },
+      { label: "Yes — oily year-round, but worse in summer", value: 3 },
+      { label: "No significant change", value: 0 },
+    ],
+  },
+  {
+    id: "texture_pref", icon: "🧴",
+    text: "What kind of moisturizer texture do you prefer?",
+    textDE: "Welche Konsistenz bevorzugen Sie bei Ihrer Feuchtigkeitspflege?",
+    textKO: "선호하는 보습제 질감이 어떤가요?",
+    hint: "We'll recommend products that feel right on YOUR skin — no point prescribing a heavy cream if you hate the feel",
+    hintDE: "Wir empfehlen Produkte, die sich für SIE gut anfühlen — eine schwere Creme nützt nichts, wenn Sie das Gefühl nicht mögen",
+    hintKO: "피부에 맞으면서 발림감도 좋아야 꾸준히 쓸 수 있어요 — 선호도를 반영합니다",
+    options: [
+      { label: "Light gel or water-based", value: 0 },
+      { label: "Medium lotion", value: 1 },
+      { label: "Rich cream", value: 2 },
+      { label: "Depends on season", value: 3 },
+    ],
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -205,6 +267,9 @@ function concernLabel(c: Concern, lang: Lang): string {
 }
 function fqText(fq: FoundationQuestion, lang: Lang): string {
   return lang === "de" ? fq.textDE : lang === "ko" ? fq.textKO : fq.text;
+}
+function fqHint(fq: FoundationQuestion, lang: Lang): string | undefined {
+  return lang === "de" ? fq.hintDE : lang === "ko" ? fq.hintKO : fq.hint;
 }
 function formatDiagnosisDate(isoStr: string, lang: Lang): string {
   const d = new Date(isoStr);
@@ -469,7 +534,10 @@ function ConcernPanel({
         const isEditing = editingAxes.has(axisId);
         const showQuestions = !isAnswered || isEditing;
 
-        // Build visible questions respecting hideIf + conditional injection
+        // Build visible questions respecting hideIf + conditional injection + age/gender gates
+        const storedGender = typeof axisAnswers["EXP_GENDER"] === "number" ? axisAnswers["EXP_GENDER"] as number : -1;
+        const storedAge    = typeof axisAnswers["EXP_AGE"]    === "number" ? axisAnswers["EXP_AGE"]    as number : -1;
+
         const visibleQs: QuestionDef[] = [];
         for (const q of axisDef.questions) {
           if (q.hideIf) {
@@ -480,6 +548,13 @@ function ConcernPanel({
                 : q.hideIf.values.includes(String(hAns));
               if (matches) continue;
             }
+          }
+          // Gender gate (Phase 3.5E)
+          if (q.hideIfGender && storedGender >= 0 && q.hideIfGender.includes(storedGender)) continue;
+          // Age gate (Phase 3.5B)
+          if (q.showForAge && storedAge >= 0) {
+            if (q.showForAge.min !== undefined && storedAge < q.showForAge.min) continue;
+            if (q.showForAge.max !== undefined && storedAge > q.showForAge.max) continue;
           }
           visibleQs.push(q);
         }
@@ -674,6 +749,14 @@ const DiagnosisPage: React.FC = () => {
     store.setAxisAnswer("EXP_SLEEP", (foundationAnswers.sleep ?? 1) - 1);
     store.setAxisAnswer("EXP_WATER", (foundationAnswers.water ?? 1) - 1);
     store.setAxisAnswer("EXP_STRESS", (foundationAnswers.stress ?? 1) - 1);
+    if (foundationAnswers.age_bracket !== undefined)
+      store.setAxisAnswer("EXP_AGE", foundationAnswers.age_bracket);
+    if (foundationAnswers.gender !== undefined)
+      store.setAxisAnswer("EXP_GENDER", foundationAnswers.gender);
+    if (foundationAnswers.seasonal_change !== undefined)
+      store.setAxisAnswer("EXP_SEASONAL", foundationAnswers.seasonal_change);
+    if (foundationAnswers.texture_pref !== undefined)
+      store.setAxisAnswer("EXP_TEXTURE", foundationAnswers.texture_pref);
     // EXP_CLIMATE is set directly by CityClimateInput via setClimateProfile
     setPhase("scanning");
   }, [foundationComplete, foundationAnswers, store]);
@@ -945,9 +1028,15 @@ const DiagnosisPage: React.FC = () => {
                     }}>
                     <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
                     <div style={{
-                      fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 14,
+                      fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 6,
                       fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5
                     }}>{fqText(fq, lang)}</div>
+                    {fqHint(fq, lang) && (
+                      <div style={{
+                        fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+                        fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4, marginBottom: 10, fontStyle: "italic"
+                      }}>{fqHint(fq, lang)}</div>
+                    )}
                     <div style={{ display: "flex", flexWrap: "wrap" }}>
                       {fq.options.map(opt => (
                         <div key={opt.value}

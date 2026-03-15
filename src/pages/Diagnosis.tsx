@@ -4,7 +4,7 @@
 // foundation & atopy store wiring, and the full "Complete Analysis" → runDiagnosis → /results flow.
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { X } from "lucide-react";
@@ -13,9 +13,6 @@ import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
 import { useDiagnosis } from "@/hooks/useDiagnosis";
 import Navbar from "@/components/Navbar";
-import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
-import type { QuestionDef, AxisDef, LocalizedText } from "@/engine/questionRoutingV5";
-import type { QuestionAnswer } from "@/engine/questionRoutingV5";
 import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
 import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
@@ -27,21 +24,8 @@ const SAGE      = "#7A9E82";   // light-mode primary accent
 const FOREST    = "#2D4F39";   // light-mode deep accent
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type ZoneId = "forehead" | "eyes" | "nose" | "cheeks" | "mouth" | "jawline" | "neck";
 type Phase = "foundation" | "scanning" | "facemap";
 type Lang = "en" | "de" | "ko";
-
-interface ZoneConfig {
-  id: ZoneId;
-  label: string; labelDE: string; labelKO: string;
-  labelShort: string; labelShortDE: string; labelShortKO: string;
-}
-
-interface Concern {
-  id: string;
-  label: string; labelDE: string; labelKO: string;
-  axis: string; icon: string;
-}
 
 interface FoundationOption { label: string; value: number }
 interface FoundationQuestion {
@@ -51,29 +35,6 @@ interface FoundationQuestion {
   options: FoundationOption[];
 }
 
-// ─── Phase 03: New constants ──────────────────────────────────────────────────
-
-// Maps Phase 02 concern axis strings → AXIS_DEFINITIONS numeric IDs
-const CONCERN_AXIS_ID: Record<string, number> = {
-  sebum: 1, hydration: 2, pores: 3, texture: 4,
-  sensitivity: 5, aging: 6, pigment: 7, hormonal: 8,
-};
-
-// Localized text extractor — matches getText() in AxisQuestionStep.tsx
-const gt = (t: LocalizedText, lang: Lang): string =>
-  (t as unknown as Record<string, string>)[lang] ?? (t as unknown as Record<string, string>).en;
-
-// Axis accent colors
-const AXIS_COLOR: Record<number, string> = {
-  1: "rgba(201,169,110,0.8)",
-  2: "rgba(100,180,220,0.8)",
-  3: "rgba(160,140,120,0.8)",
-  4: "rgba(220,120,120,0.8)",
-  5: "rgba(220,160,160,0.8)",
-  6: "rgba(180,160,200,0.8)",
-  7: "rgba(180,140,100,0.8)",
-  8: "rgba(200,130,170,0.8)",
-};
 
 // Module-level pill style — used in Foundation, InlineQuestionRenderer, atopy banner
 function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
@@ -90,86 +51,6 @@ function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
   };
 }
 
-// ─── Zone catalogue ───────────────────────────────────────────────────────────
-const ZONES: ZoneConfig[] = [
-  {
-    id: "forehead", label: "Forehead", labelDE: "Stirn", labelKO: "이마",
-    labelShort: "Forehead", labelShortDE: "Stirn", labelShortKO: "이마"
-  },
-  {
-    id: "eyes", label: "Eye Area", labelDE: "Augenpartie", labelKO: "눈가",
-    labelShort: "Eyes", labelShortDE: "Augen", labelShortKO: "눈가"
-  },
-  {
-    id: "nose", label: "Nose / T-Zone", labelDE: "Nase / T-Zone", labelKO: "코 / T존",
-    labelShort: "T-Zone", labelShortDE: "T-Zone", labelShortKO: "T존"
-  },
-  {
-    id: "cheeks", label: "Cheeks", labelDE: "Wangen", labelKO: "볼",
-    labelShort: "Cheeks", labelShortDE: "Wangen", labelShortKO: "볼"
-  },
-  {
-    id: "mouth", label: "Mouth Area", labelDE: "Mundpartie", labelKO: "입가",
-    labelShort: "Mouth", labelShortDE: "Mund", labelShortKO: "입가"
-  },
-  {
-    id: "jawline", label: "Jawline", labelDE: "Kieferlinie", labelKO: "턱선",
-    labelShort: "Jaw", labelShortDE: "Kiefer", labelShortKO: "턱선"
-  },
-  {
-    id: "neck", label: "Neck", labelDE: "Hals", labelKO: "목",
-    labelShort: "Neck", labelShortDE: "Hals", labelShortKO: "목"
-  },
-];
-
-
-// ─── Concern data ─────────────────────────────────────────────────────────────
-const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
-  forehead: [
-    { id: "oily_f", label: "Oily / Shiny", labelDE: "Fettig / Glänzend", labelKO: "유분 / 광택", axis: "sebum", icon: "💧" },
-    { id: "blackheads_f", label: "Blackheads", labelDE: "Mitesser", labelKO: "블랙헤드", axis: "pores", icon: "⬤" },
-    { id: "whiteheads_f", label: "Whiteheads", labelDE: "Komedonen", labelKO: "화이트헤드", axis: "texture", icon: "○" },
-    { id: "lines_f", label: "Lines / Wrinkles", labelDE: "Falten / Linien", labelKO: "주름", axis: "aging", icon: "〰️" },
-    { id: "breakouts_f", label: "Breakouts", labelDE: "Unreinheiten", labelKO: "트러블", axis: "texture", icon: "🔴" },
-  ],
-  eyes: [
-    { id: "fine_lines_e", label: "Fine Lines", labelDE: "Feine Linien", labelKO: "잔주름", axis: "aging", icon: "〰️" },
-    { id: "dark_circles_e", label: "Dark Circles", labelDE: "Augenringe", labelKO: "다크서클", axis: "pigment", icon: "🌑" },
-    { id: "puffiness_e", label: "Puffiness", labelDE: "Schwellungen", labelKO: "부종", axis: "aging", icon: "💤" },
-    { id: "dryness_e", label: "Dryness", labelDE: "Trockenheit", labelKO: "건조", axis: "hydration", icon: "🏜️" },
-  ],
-  nose: [
-    { id: "pores_n", label: "Enlarged Pores", labelDE: "Vergrößerte Poren", labelKO: "넓은 모공", axis: "pores", icon: "◉" },
-    { id: "blackheads_n", label: "Blackheads", labelDE: "Mitesser", labelKO: "블랙헤드", axis: "pores", icon: "⬤" },
-    { id: "oily_n", label: "Excessive Oil", labelDE: "Übermäßiger Glanz", labelKO: "과다 피지", axis: "sebum", icon: "💧" },
-    { id: "redness_n", label: "Redness", labelDE: "Rötung", labelKO: "홍조", axis: "sensitivity", icon: "🩷" },
-  ],
-  cheeks: [
-    { id: "redness_c", label: "Redness / Rosacea", labelDE: "Rötung / Rosazea", labelKO: "홍조 / 주사", axis: "sensitivity", icon: "🩷" },
-    { id: "acne_c", label: "Breakouts", labelDE: "Unreinheiten", labelKO: "트러블", axis: "texture", icon: "🔴" },
-    { id: "dryness_c", label: "Dryness / Tightness", labelDE: "Trockenheit / Spannung", labelKO: "건조 / 당김", axis: "hydration", icon: "🏜️" },
-    { id: "pigment_c", label: "Dark Spots", labelDE: "Dunkle Flecken", labelKO: "색소침착", axis: "pigment", icon: "🌑" },
-    { id: "pores_c", label: "Visible Pores", labelDE: "Sichtbare Poren", labelKO: "가시 모공", axis: "pores", icon: "◉" },
-  ],
-  mouth: [
-    { id: "dryness_m",  label: "Dryness around Mouth",    labelDE: "Trockenheit um den Mund",  labelKO: "입 주변 건조 / 당김",  axis: "hydration",   icon: "🏜️" },
-    { id: "nasolabial", label: "Smile Lines",              labelDE: "Nasolabialfalten",          labelKO: "팔자 주름",           axis: "aging",       icon: "〰️" },
-    { id: "pigment_m",  label: "Dark Spots near Mouth",   labelDE: "Dunkle Flecken am Mund",   labelKO: "입가 잡티 / 칙칙함",  axis: "pigment",     icon: "🌑" },
-    { id: "perioral_m", label: "Irritation around Mouth", labelDE: "Reizung um den Mund",      labelKO: "입 주변 자극 / 따가움", axis: "sensitivity", icon: "🩷" },
-  ],
-  jawline: [
-    { id: "hormonal_j", label: "Recurring Hormonal Breakouts", labelDE: "Wiederkehrende hormonelle Unreinheiten", labelKO: "같은 자리에 반복되는 트러블", axis: "hormonal", icon: "🔄" },
-    { id: "cystic_j",   label: "Deep Painful Bumps",           labelDE: "Tiefe schmerzhafte Knoten",             labelKO: "크고 깊은 혹 같은 트러블",  axis: "hormonal", icon: "🟣" },
-    { id: "texture_j",  label: "Rough / Bumpy Texture",        labelDE: "Raue / unebene Textur",                labelKO: "턱선 피부 결 거칠음",       axis: "texture",  icon: "◉" },
-    { id: "sagging_j",  label: "Loss of Jawline Definition",   labelDE: "Verlust der Kieferkontur",             labelKO: "턱선 탄력 저하 / 처짐",     axis: "aging",    icon: "↓" },
-  ],
-  neck: [
-    { id: "neck_lines", label: "Neck Lines", labelDE: "Halsfalten", labelKO: "목 주름", axis: "aging", icon: "〰️" },
-    { id: "sagging", label: "Loss of Firmness", labelDE: "Elastizitätsverlust", labelKO: "탄력 저하", axis: "aging", icon: "↓" },
-    { id: "neck_red", label: "Redness / Irritation", labelDE: "Rötung / Reizung", labelKO: "홍조 / 자극", axis: "sensitivity", icon: "🩷" },
-    { id: "neck_dry", label: "Dryness", labelDE: "Trockenheit", labelKO: "건조", axis: "hydration", icon: "🏜️" },
-  ],
-};
 
 // ─── Foundation questions ─────────────────────────────────────────────────────
 const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
@@ -258,13 +139,6 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-function zoneLabel(z: ZoneConfig, lang: Lang, short = false): string {
-  if (short) return lang === "de" ? z.labelShortDE : lang === "ko" ? z.labelShortKO : z.labelShort;
-  return lang === "de" ? z.labelDE : lang === "ko" ? z.labelKO : z.label;
-}
-function concernLabel(c: Concern, lang: Lang): string {
-  return lang === "de" ? c.labelDE : lang === "ko" ? c.labelKO : c.label;
-}
 function fqText(fq: FoundationQuestion, lang: Lang): string {
   return lang === "de" ? fq.textDE : lang === "ko" ? fq.textKO : fq.text;
 }
@@ -310,341 +184,6 @@ function MiniRadarChart({ scores }: { scores: Record<string, number> }) {
   );
 }
 
-// ─── Phase 03: InlineQuestionRenderer ────────────────────────────────────────
-// Renders a single QuestionDef inline inside the concern panel.
-// Handles: single, multi, image (as single), slider.
-// Conditionally injects follow-up question from q.conditional.
-function InlineQuestionRenderer({
-  q, value, onChange, lang, allAnswers, isDark,
-}: {
-  q: QuestionDef;
-  value: QuestionAnswer;
-  onChange: (id: string, val: QuestionAnswer) => void;
-  lang: Lang;
-  allAnswers: Record<string, QuestionAnswer>;
-  isDark: boolean;
-}) {
-  const GOLD = isDark ? GOLD_DARK : SAGE;
-  // Check if a conditional follow-up should show after this question
-  const showConditional = q.conditional != null &&
-    (() => {
-      const triggerVal = allAnswers[q.conditional!.ifQuestionId];
-      if (triggerVal == null) return false;
-      const vals = q.conditional!.ifValues;
-      return Array.isArray(triggerVal)
-        ? triggerVal.some(v => vals.includes(String(v)))
-        : vals.includes(String(triggerVal));
-    })();
-
-  return (
-    <>
-      {/* single / image — select one option */}
-      {(q.type === "single" || q.type === "image") && q.options && (
-        <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {q.options.map((opt) => (
-            <div key={opt.id} onClick={() => onChange(q.id, opt.id)} style={pillStyle(value === opt.id, isDark)}>
-              {opt.icon && <span style={{ marginRight: 4 }}>{opt.icon}</span>}
-              {gt(opt.label, lang)}
-              {opt.description && value === opt.id && (
-                <span style={{
-                  display: "block", fontSize: 10, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)",
-                  fontStyle: "italic", marginTop: 2, letterSpacing: 0
-                }}>
-                  {gt(opt.description, lang)}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* multi — select multiple */}
-      {q.type === "multi" && q.options && (
-        <div style={{ display: "flex", flexWrap: "wrap" }}>
-          {q.options.map((opt) => {
-            const sel = (value as string[]) ?? [];
-            const isOn = sel.includes(opt.id);
-            return (
-              <div key={opt.id} onClick={() => {
-                let next: string[];
-                if (isOn) {
-                  next = sel.filter(x => x !== opt.id);
-                } else if (q.exclusiveIds?.includes(opt.id)) {
-                  next = [opt.id]; // exclusive option selected: clear all others
-                } else {
-                  next = [...sel.filter(x => !q.exclusiveIds?.includes(x)), opt.id]; // deselect any exclusive options
-                }
-                onChange(q.id, next);
-              }} style={pillStyle(isOn, isDark)}>
-                {gt(opt.label, lang)}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* slider */}
-      {q.type === "slider" && q.slider && (
-        <div style={{ margin: "4px 0 8px" }}>
-          <input
-            type="range"
-            min={q.slider.min} max={q.slider.max} step={q.slider.step}
-            value={(value as number) ?? q.slider.defaultValue}
-            onChange={(e) => onChange(q.id, Number(e.target.value))}
-            style={{ width: "100%", accentColor: GOLD, cursor: "pointer" }}
-          />
-          <div style={{
-            display: "flex", justifyContent: "space-between",
-            fontSize: 12, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif",
-            marginTop: 4
-          }}>
-            <span>{gt(q.slider.labelMin, lang)}</span>
-            <span style={{ color: GOLD, fontWeight: 600 }}>{(value as number) ?? q.slider.defaultValue}</span>
-            <span>{gt(q.slider.labelMax, lang)}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Conditional follow-up */}
-      {showConditional && q.conditional && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-          style={{
-            marginTop: 12, paddingLeft: 12,
-            borderLeft: `2px solid ${GOLD}33`
-          }}>
-          <div style={{
-            fontSize: 15, color: isDark ? "rgba(255,255,255,0.72)" : "rgba(0,0,0,0.6)", marginBottom: 10,
-            fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6
-          }}>
-            {gt(q.conditional.inject.text, lang)}
-          </div>
-          <InlineQuestionRenderer
-            q={q.conditional.inject}
-            value={allAnswers[q.conditional.inject.id]}
-            isDark={isDark}
-            onChange={onChange}
-            lang={lang}
-            allAnswers={allAnswers}
-          />
-        </motion.div>
-      )}
-    </>
-  );
-}
-
-// ─── Phase 03: ConcernPanel (updated with deep-dive questions) ────────────────
-function ConcernPanel({
-  activeZone, zoneData, onToggle, lang,
-  axisAnswers, onAnswer, editingAxes, onToggleEdit, isDark,
-}: {
-  activeZone: ZoneId | null;
-  zoneData: Partial<Record<ZoneId, string[]>>;
-  onToggle: (zone: ZoneId, cid: string) => void;
-  lang: Lang;
-  axisAnswers: Record<string, QuestionAnswer>;
-  onAnswer: (id: string, val: QuestionAnswer) => void;
-  editingAxes: Set<number>;
-  onToggleEdit: (axisId: number) => void;
-  isDark: boolean;
-}) {
-  const GOLD = isDark ? GOLD_DARK : SAGE;
-  if (!activeZone) {
-    return (
-      <div style={{
-        color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontSize: 14,
-        fontFamily: "'DM Sans', sans-serif", textAlign: "center",
-        padding: "56px 20px", fontStyle: "italic"
-      }}>
-        {lang === "de" ? "← Tippen Sie auf eine Zone im Gesicht"
-          : lang === "ko" ? "← 얼굴 지도에서 부위를 선택하세요"
-            : "← Tap a zone on the face map to begin"}
-      </div>
-    );
-  }
-
-  const zone = ZONES.find(z => z.id === activeZone)!;
-  const concerns = ZONE_CONCERNS[activeZone];
-  const selected = zoneData[activeZone] ?? [];
-
-  // Derive which axis IDs are triggered by selected concerns (deduped)
-  const triggeredAxisIds = Array.from(new Set(
-    selected
-      .map(cId => concerns.find(c => c.id === cId)?.axis)
-      .filter((axis): axis is string => axis !== undefined && CONCERN_AXIS_ID[axis] !== undefined)
-      .map(axis => CONCERN_AXIS_ID[axis])
-  ));
-
-  return (
-    <>
-      {/* Zone heading */}
-      <div style={{
-        fontSize: 13, letterSpacing: "0.2em", color: GOLD,
-        textTransform: "uppercase", marginBottom: 16,
-        fontFamily: "'DM Sans', sans-serif", fontWeight: 500
-      }}>
-        {zoneLabel(zone, lang)} —{" "}
-        {lang === "de" ? "Beschwerden wählen" : lang === "ko" ? "고민 선택" : "Select your concerns"}
-      </div>
-
-      {/* Concern chips */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 8px", marginBottom: selected.length > 0 ? 20 : 0 }}>
-        {concerns.map((c) => {
-          const isOn = selected.includes(c.id);
-          return (
-            <motion.div key={c.id} onClick={() => onToggle(activeZone, c.id)} whileTap={{ scale: 0.95 }}
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "10px 18px", borderRadius: 24, fontSize: 14, minHeight: 44,
-                fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
-                border: isOn ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)"}`,
-                background: isOn ? (isDark ? "rgba(201,169,110,0.12)" : "rgba(122,162,115,0.12)") : isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.02)",
-                color: isOn ? GOLD : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)",
-                transition: "all 0.3s ease",
-              }}>
-              <span>{c.icon}</span>
-              <span>{concernLabel(c, lang)}</span>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {selected.length === 0 && (
-        <div style={{
-          fontSize: 13, color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontFamily: "'DM Sans', sans-serif",
-          fontStyle: "italic", marginTop: 4
-        }}>
-          {lang === "de" ? "Alle zutreffenden Beschwerden auswählen"
-            : lang === "ko" ? "해당하는 피부 고민을 선택하세요"
-              : "Select all concerns that apply to this area"}
-        </div>
-      )}
-
-      {/* ── Phase 03: Deep-dive axis questions ── */}
-      {triggeredAxisIds.map((axisId) => {
-        const axisDef: AxisDef | undefined = AXIS_DEFINITIONS.find(a => a.id === axisId);
-        if (!axisDef) return null;
-
-        const color = AXIS_COLOR[axisId] ?? "rgba(201,169,110,0.8)";
-
-        // Smart deduplication: is this axis fully answered?
-        const requiredQs = axisDef.questions.filter(q => q.required);
-        const isAnswered = requiredQs.length > 0 && requiredQs.every(q => axisAnswers[q.id] !== undefined);
-        const isEditing = editingAxes.has(axisId);
-        const showQuestions = !isAnswered || isEditing;
-
-        // Build visible questions respecting hideIf + conditional injection + age/gender gates
-        const storedGender = typeof axisAnswers["EXP_GENDER"] === "number" ? axisAnswers["EXP_GENDER"] as number : -1;
-        const storedAge    = typeof axisAnswers["EXP_AGE"]    === "number" ? axisAnswers["EXP_AGE"]    as number : -1;
-
-        const visibleQs: QuestionDef[] = [];
-        for (const q of axisDef.questions) {
-          if (q.hideIf) {
-            const hAns = axisAnswers[q.hideIf.questionId];
-            if (hAns !== undefined) {
-              const matches = Array.isArray(hAns)
-                ? hAns.some(v => q.hideIf!.values.includes(String(v)))
-                : q.hideIf.values.includes(String(hAns));
-              if (matches) continue;
-            }
-          }
-          // Gender gate (Phase 3.5E)
-          if (q.hideIfGender && storedGender >= 0 && q.hideIfGender.includes(storedGender)) continue;
-          // Age gate (Phase 3.5B)
-          if (q.showForAge && storedAge >= 0) {
-            if (q.showForAge.min !== undefined && storedAge < q.showForAge.min) continue;
-            if (q.showForAge.max !== undefined && storedAge > q.showForAge.max) continue;
-          }
-          visibleQs.push(q);
-        }
-
-        return (
-          <motion.div key={axisId}
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            style={{
-              marginTop: 20, paddingTop: 16,
-              borderTop: "1px solid rgba(201,169,110,0.08)",
-              opacity: isAnswered && !isEditing ? 0.45 : 1,
-              transition: "opacity 0.3s ease",
-            }}>
-
-            {/* Axis tag + status */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              marginBottom: 12
-            }}>
-              <span style={{
-                display: "inline-block", fontSize: 10, letterSpacing: "0.18em",
-                textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif",
-                background: color.replace("0.8)", "0.08)"),
-                borderRadius: 12, padding: "3px 10px", color: color,
-              }}>
-                {gt(axisDef.name, lang)}
-                {isAnswered && !isEditing && (
-                  <span style={{ marginLeft: 6, color: "#4ade80", fontSize: 10 }}>✓</span>
-                )}
-              </span>
-              {isAnswered && (
-                <button onClick={() => onToggleEdit(axisId)}
-                  style={{
-                    background: "none", border: "none", cursor: "pointer",
-                    fontSize: 11, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif",
-                    padding: "2px 6px", textDecoration: "underline"
-                  }}>
-                  {isEditing
-                    ? (lang === "de" ? "Fertig" : lang === "ko" ? "완료" : "Done")
-                    : (lang === "de" ? "Bearbeiten" : lang === "ko" ? "수정" : "Edit")}
-                </button>
-              )}
-            </div>
-
-            {/* Questions (or "already answered" summary) */}
-            {isAnswered && !isEditing ? (
-              <div style={{
-                fontSize: 13, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)",
-                fontFamily: "'DM Sans', sans-serif", fontStyle: "italic"
-              }}>
-                {lang === "de" ? "Bereits beantwortet"
-                  : lang === "ko" ? "이미 답변 완료"
-                    : "Already answered — click Edit to modify"}
-              </div>
-            ) : (
-              showQuestions && visibleQs.map((q) => (
-                <div key={q.id} style={{ marginBottom: 16 }}>
-                  <div style={{
-                    fontSize: 16, color: isDark ? "rgba(255,255,255,0.78)" : "rgba(0,0,0,0.65)", marginBottom: 10,
-                    fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6
-                  }}>
-                    {gt(q.text, lang)}
-                    {q.hint && (
-                      <span style={{
-                        display: "block", fontSize: 12, color: "rgba(255,255,255,0.3)",
-                        fontStyle: "italic", marginTop: 2
-                      }}>
-                        {gt(q.hint, lang)}
-                      </span>
-                    )}
-                  </div>
-                  <InlineQuestionRenderer
-                    isDark={isDark}
-                    q={q}
-                    value={axisAnswers[q.id]}
-                    onChange={onAnswer}
-                    lang={lang}
-                    allAnswers={axisAnswers}
-                  />
-                </div>
-              ))
-            )}
-          </motion.div>
-        );
-      })}
-    </>
-  );
-}
-
 // ─── Main page ────────────────────────────────────────────────────────────────
 const DiagnosisPage: React.FC = () => {
   const navigate = useNavigate();
@@ -661,12 +200,8 @@ const DiagnosisPage: React.FC = () => {
   // ── Local state ──
   const [phase, setPhase] = useState<Phase>("foundation");
   const [foundationAnswers, setFounds] = useState<Record<string, number>>({});
-  const [zoneData, setZoneData] = useState<Partial<Record<ZoneId, string[]>>>({});
-  const [activeZone, setActiveZone] = useState<ZoneId | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [showRetestModal, setShowRetestModal] = useState(false);
-  // Phase 03 state
-  const [editingAxes, setEditingAxes] = useState<Set<number>>(new Set());
   const [analyzing, setAnalyzing] = useState(false);
   const hasCheckedHistory = useRef(false);
 
@@ -705,43 +240,6 @@ const DiagnosisPage: React.FC = () => {
   const foundationComplete =
     FOUNDATION_QUESTIONS.every(fq => foundationAnswers[fq.id] !== undefined) &&
     store.lifestyle.climateProfile != null;
-  const totalConcerns = Object.values(zoneData).reduce((sum, arr) => sum + (arr?.length ?? 0), 0);
-  const zonesWithData = Object.values(zoneData).filter(arr => arr && arr.length > 0).length;
-  const axisAnswers = store.axisAnswers as Record<string, QuestionAnswer>;
-
-  // Atopy answer from store (wired in Phase 03)
-  const atopyStoreVal = axisAnswers["AX9_Q2"] as string | undefined;
-  const showItching = atopyStoreVal !== undefined && atopyStoreVal !== "dx_none";
-  const itchingVal = axisAnswers["AX9_Q1"] as string | undefined;
-
-  // ── Callbacks ──
-  const toggleConcern = useCallback((zoneId: ZoneId, cid: string) => {
-    setZoneData(prev => {
-      const existing = prev[zoneId] ?? [];
-      const next = existing.includes(cid)
-        ? existing.filter(c => c !== cid)
-        : [...existing, cid];
-      return { ...prev, [zoneId]: next };
-    });
-  }, []);
-
-  const handleZoneClick = useCallback((id: ZoneId) => {
-    setActiveZone(prev => prev === id ? null : id);
-  }, []);
-
-  // Phase 03: answer callback
-  const onAnswer = useCallback((id: string, val: QuestionAnswer) => {
-    store.setAxisAnswer(id, val);
-  }, [store]);
-
-  // Phase 03: edit toggle
-  const handleToggleEdit = useCallback((axisId: number) => {
-    setEditingAxes(prev => {
-      const next = new Set(prev);
-      next.has(axisId) ? next.delete(axisId) : next.add(axisId);
-      return next;
-    });
-  }, []);
 
   // Phase 03: begin face mapping — wire foundation answers to store
   const handleBeginFaceMapping = useCallback(() => {
@@ -771,7 +269,7 @@ const DiagnosisPage: React.FC = () => {
     const facemapConcerns = Object.values(selectedZones ?? {})
       .reduce((sum, z) => sum + (z?.concerns?.length ?? 0), 0);
 
-    if (totalConcerns === 0 && facemapConcerns === 0) return;
+    if (facemapConcerns === 0) return;
 
     setAnalyzing(true);
 
@@ -821,25 +319,7 @@ const DiagnosisPage: React.FC = () => {
       console.error("[handleCompleteAnalysis] fatal error:", err);
       setAnalyzing(false);
     }
-  }, [totalConcerns, analyzing, store, saveDiagnosis, navigate]);
-
-  const AX9_OPTIONS = [
-    { label: "Yes — Atopic Dermatitis", labelDE: "Ja — Atopische Dermatitis", labelKO: "예 — 아토피 피부염", val: "dx_atopic" },
-    { label: "Yes — Psoriasis", labelDE: "Ja — Psoriasis", labelKO: "예 — 건선", val: "dx_psoriasis" },
-    { label: "Suspected", labelDE: "Vermutet", labelKO: "의심", val: "dx_suspected" },
-    { label: "No", labelDE: "Nein", labelKO: "아니요", val: "dx_none" },
-  ];
-  const ax9Label = (opt: typeof AX9_OPTIONS[number]) =>
-    lang === "de" ? opt.labelDE : lang === "ko" ? opt.labelKO : opt.label;
-
-  const ITCH_OPTIONS = [
-    { label: "Yes, frequently", labelDE: "Ja, häufig", labelKO: "예, 자주", val: "constantly" },
-    { label: "Sometimes", labelDE: "Manchmal", labelKO: "가끔", val: "frequently" },
-    { label: "Rarely", labelDE: "Selten", labelKO: "드물게", val: "occasionally" },
-    { label: "No", labelDE: "Nein", labelKO: "아니요", val: "never" },
-  ];
-  const itchLabel = (opt: typeof ITCH_OPTIONS[number]) =>
-    lang === "de" ? opt.labelDE : lang === "ko" ? opt.labelKO : opt.label;
+  }, [analyzing, store, saveDiagnosis, navigate]);
 
   return (
     <div style={{

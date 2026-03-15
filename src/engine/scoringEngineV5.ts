@@ -9,16 +9,23 @@
  *   Layer 4 — Cross-axis interaction bonus (multiplicative)
  *   Layer 5 — S-curve normalisation → 0-100 final
  *
- * Sigmoid calibrated so that:
- *   • 1 zone chip-only  ≈ 20  (k=0.041, mid=40)
- *   • 7 zones chip-only ≈ 55
- *   • chip + full deep-dive ceiling ≈ 85-95
+ * Sigmoid recalibrated (Phase 4.5) for severity-weighted chips:
+ *   • 1 chip severity=3 (raw ≈ 6.4)   → ~20  (k=0.055, mid=32)
+ *   • Mixed severity 4 zones (raw ≈ 25) → ~40 (moderate lower bound)
+ *   • Mixed severity 4 zones (raw ≈ 32) → ~50 (moderate mid)
+ *   • Severe 5 zones + L2 (raw ≈ 50)   → ~73 (severe lower bound)
+ *   • 7 zones sev=3 + full L2 (raw ≈ 80) → ~94 (ceiling)
+ *
+ * Previous values: k=0.041, mid=40 — calibrated for binary chips (no severity).
+ * Reduced mid from 40 → 32 to compensate for lower average raw scores due
+ * to severity weighting (sev=1 gives 0.33× contribution, not 1.0×).
  */
 
 import { AXIS_DEFINITIONS } from "@/engine/questionRoutingV5";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
 import { AXIS_KEYS } from "@/engine/types";
 import type { AxisKey } from "@/engine/types";
+import { inferFromFaceMap } from "@/engine/faceMapInference";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
@@ -29,20 +36,23 @@ export type ZoneId =
   | "mouth"   | "jawline" | "neck";
 
 export interface ScoringInput {
-  /** Zone concern chip selections from Phase 02 */
-  zoneData: Record<string, string[]>;
-  /** Deep-dive question answers from Phase 03 */
+  /** Zone concern chip selections — with severity (1=mild, 2=moderate, 3=severe) */
+  zoneData: Record<string, Record<string, 1 | 2 | 3>>;
+  /** Tail question answers */
   axisAnswers: Record<string, QuestionAnswer>;
-  /** Phase 01 lifestyle foundation (all values 0-indexed) */
+  /** Phase 01 lifestyle foundation */
   foundation: {
-    sleep:            number;    // 0=<5h  1=5-6h  2=7h  3=8h+
-    water:            number;    // 0=1-2 glasses  1=3-5  2=6+
-    stress:           number;    // 0=Low  1=Moderate  2=High
-    climate:          string | null;
-    age_bracket?:     number;    // 0=<20  1=20s  2=30s  3=40s  4=50s  5=60+
-    gender?:          number;    // 0=female  1=male  2=non-binary/prefer not
-    seasonal_change?: number;    // 0=no change  1=oilier summer/drier winter  2=dry yr-round  3=oily yr-round
-    texture_pref?:    number;    // 0=gel  1=lotion  2=cream  3=depends on season
+    sleep:              number;         // 0=<5h  1=5-6h  2=7h  3=8h+
+    water:              number;         // 0=1-2 glasses  1=3-5  2=6+
+    stress:             number;         // 0=Low  1=Moderate  2=High
+    climate:            string | null;
+    age_bracket:        number;         // 0=<20  1=20s  2=30s  3=40s  4=50s  5=60+
+    gender:             number;         // 0=female  1=male  2=other
+    outdoor:            number;         // 0=indoor  1=1-2hrs  2=3+hrs
+    altitude:           number;         // 0=never  1=occasional  2=regular
+    seasonal_change?:   number;         // 0=stable  1=oily-summer-dry-winter  2=dry-always  3=oily-always
+    texture_pref?:      number;         // 0=gel  1=lotion  2=cream  3=seasonal
+    menopause_status?:  string;         // meno_pre, meno_peri, meno_post_early, meno_post_late, meno_unsure
   };
   implicitFlags: { atopyFlag: boolean; [key: string]: unknown };
 }
@@ -146,10 +156,11 @@ const ZONES: ZoneId[] = ["forehead", "eyes", "nose", "cheeks", "mouth", "jawline
 const LAYER1_MAX = 45;   // max raw pts from zone concern spread
 const LAYER2_MAX = 35;   // max raw pts from deep-dive questions
 
-// Sigmoid calibrated for chip-only range 20-55
-// Derivation: solve sigmoid(45/7) = 20 and sigmoid(45) = 55 → k≈0.041, mid≈40
-const SIG_K   = 0.041;
-const SIG_MID = 40;
+// Sigmoid recalibrated (Phase 4.5) for severity-weighted chips.
+// Previous: k=0.041, mid=40. New: k=0.055, mid=32.
+// Derivation: sigmoid(6.4)≈20 and sigmoid(25)≈40 with k=0.055, mid=32.
+const SIG_K   = 0.055;
+const SIG_MID = 32;
 
 const SCORE_FLOOR = 2;   // absolute minimum (no concerns present)
 const SCORE_CEIL  = 98;  // hard ceiling
@@ -312,6 +323,43 @@ function buildFoundationMods(
     }
   }
 
+  // ── Outdoor exposure (Exposome) ───────────────────────────────────────────────
+  const outdoor = f.outdoor ?? 0;
+  if (outdoor >= 2) { // 3+ hours daily
+    mods.ox.push(      { factor: "outdoor_high_uv",      multiplier: 1.15 });
+    mods.pigment.push( { factor: "outdoor_high_pigment",  multiplier: 1.08 });
+  }
+
+  // ── Altitude exposure ─────────────────────────────────────────────────────────
+  const altitude = f.altitude ?? 0;
+  if (altitude >= 1) { // occasional or regular
+    mods.ox.push({ factor: "altitude_uv_increase", multiplier: 1.20 });
+  }
+  if (altitude >= 2) { // regular (stacks with above)
+    mods.ox.push({ factor: "altitude_regular", multiplier: 1.10 });
+  }
+
+  // ── Menopause modifiers (clinical: 30% collagen loss in first 5 years) ────────
+  const meno = f.menopause_status;
+  if (meno === "meno_peri") {
+    mods.sen.push(  { factor: "perimenopause_sensitivity",      multiplier: 1.12 });
+    mods.seb.push(  { factor: "perimenopause_seb_flux",         multiplier: 1.08 });
+    mods.aging.push({ factor: "perimenopause_collagen_start",   multiplier: 1.10 });
+  }
+  if (meno === "meno_post_early") {
+    // MOST CRITICAL PERIOD — fastest collagen loss
+    mods.aging.push({ factor: "postmeno_early_collagen_crisis", multiplier: 1.30 });
+    mods.hyd.push(  { factor: "postmeno_early_ceramide_loss",   multiplier: 1.25 });
+    mods.bar.push(  { factor: "postmeno_early_barrier_collapse",multiplier: 1.20 });
+    mods.seb.push(  { factor: "postmeno_early_seb_drop",        multiplier: 0.80 });
+  }
+  if (meno === "meno_post_late") {
+    mods.aging.push({ factor: "postmeno_late_chronic",      multiplier: 1.20 });
+    mods.hyd.push(  { factor: "postmeno_late_chronic_dry",  multiplier: 1.18 });
+    mods.bar.push(  { factor: "postmeno_late_thin_skin",    multiplier: 1.15 });
+    mods.seb.push(  { factor: "postmeno_late_low_seb",      multiplier: 0.75 });
+  }
+
   return mods;
 }
 
@@ -339,37 +387,43 @@ export function computeScores(input: ScoringInput): ScoringOutput {
   const hasAnyConcern = new Set<AxisKey>();
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Layer 1 — Zone Concern Spread
+  // Layer 1 — Zone Concern Spread (severity-weighted)
   // Each zone contributes at most once per axis (using the max weight among
-  // all concerns in that zone that map to that axis).
-  // score_per_zone = (maxWeight / 7) × 45
+  // all concerns in that zone that map to that axis), multiplied by the
+  // maximum severity among those concerns.
+  // score_per_zone = (maxWeight / 7) × 45 × sevMult
+  // sevMult: severity 1 → 0.33, severity 2 → 0.66, severity 3 → 1.0
   // ───────────────────────────────────────────────────────────────────────────
   for (const zoneId of ZONES) {
-    const concerns = (zoneData[zoneId] ?? []) as string[];
+    const concerns = zoneData[zoneId];
+    if (!concerns || typeof concerns !== "object" || Array.isArray(concerns)) continue;
 
-    // Group concerns by target axis
-    const byAxis: Partial<Record<AxisKey, string[]>> = {};
-    for (const cId of concerns) {
+    // Group concerns by target axis, preserving severity
+    const byAxis: Partial<Record<AxisKey, { id: string; severity: number }[]>> = {};
+    for (const [cId, severity] of Object.entries(concerns)) {
       const entry = CONCERN_AXIS_MAP[cId];
       if (!entry) continue;
       const { axis, flag } = entry;
       if (flag && !activeFlags.includes(flag)) activeFlags.push(flag);
-      (byAxis[axis] ??= []).push(cId);
+      (byAxis[axis] ??= []).push({ id: cId, severity: severity as number });
     }
 
     for (const [axisStr, axisConcerns] of Object.entries(byAxis)) {
       const axis = axisStr as AxisKey;
       hasAnyConcern.add(axis);
 
-      // Zone weight = max weight among all concerns in this zone for this axis
-      const maxW  = Math.max(...(axisConcerns as string[]).map(id => zoneWeight(zoneId, id)));
-      const zoneContrib = (maxW / ZONES.length) * LAYER1_MAX;
+      // Severity multiplier: max severity among concerns in this zone for this axis
+      const maxSev = Math.max(...axisConcerns.map(c => c.severity));
+      const sevMult = maxSev / 3;
+
+      const maxW = Math.max(...axisConcerns.map(c => zoneWeight(zoneId as ZoneId, c.id)));
+      const zoneContrib = (maxW / ZONES.length) * LAYER1_MAX * sevMult;
       raw[axis] += zoneContrib;
 
       // Attribute contribution evenly across the concerns for provenance display
-      const perConcern = zoneContrib / (axisConcerns as string[]).length;
-      for (const cId of axisConcerns as string[]) {
-        prov[axis].zoneConcerns.push({ zone: zoneId, concernId: cId, contribution: perConcern });
+      const perConcern = zoneContrib / axisConcerns.length;
+      for (const c of axisConcerns) {
+        prov[axis].zoneConcerns.push({ zone: zoneId as ZoneId, concernId: c.id, contribution: perConcern });
       }
     }
   }
@@ -445,6 +499,43 @@ export function computeScores(input: ScoringInput): ScoringOutput {
   }
 
   // ───────────────────────────────────────────────────────────────────────────
+  // Layer 2 Compensation — Resolved axis implied contribution
+  //
+  // If an axis was fully characterised by high-severity chips (resolvedAxes)
+  // but received no tail-question answers, give it an implied L2 contribution
+  // so it doesn't under-score compared to the old all-questions model.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  // Flatten zoneData to concernSeverity map for inferFromFaceMap
+  const flatSeverity: Record<string, 1 | 2 | 3> = {};
+  for (const zoneConcerns of Object.values(zoneData)) {
+    for (const [cId, sev] of Object.entries(zoneConcerns)) {
+      flatSeverity[cId] = sev as 1 | 2 | 3;
+    }
+  }
+  const inference = Object.keys(flatSeverity).length > 0
+    ? inferFromFaceMap(flatSeverity)
+    : null;
+
+  if (inference) {
+    for (const axis of AXIS_KEYS) {
+      if (inference.resolvedAxes.includes(axis) && l2[axis].answered === 0) {
+        // Implied L2 = proportional to how much Layer 1 contributed
+        const chipContribution = raw[axis]; // raw score so far (Layer 1 only at this point)
+        const impliedL2 = Math.min(
+          (chipContribution / LAYER1_MAX) * LAYER2_MAX * 0.6,  // 60% of theoretical max
+          LAYER2_MAX * 0.5  // hard cap at 50% of L2 max
+        );
+        raw[axis] += impliedL2;
+        prov[axis].deepDiveQuestions.push({
+          questionId: "__chip_implied__",
+          contribution: impliedL2,
+        });
+      }
+    }
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
   // Layer 3 — Foundation Modifiers  (multiplicative)
   // ───────────────────────────────────────────────────────────────────────────
 
@@ -505,6 +596,28 @@ export function computeScores(input: ScoringInput): ScoringOutput {
   if (raw.seb >= 40 && raw.texture >= 40) {
     raw.texture *= 1.15;
     prov.texture.crossAxisBonus = { pattern: "Congestion Complex", bonusPercent: 15 };
+  }
+
+  // 6. PIH Cascade — acne + pigmentation co-elevation
+  // Post-inflammatory hyperpigmentation: breakout marks become dark spots
+  if (raw.acne >= 35 && raw.pigment >= 30) {
+    raw.pigment *= 1.12;
+    prov.pigment.crossAxisBonus = { pattern: "PIH Cascade", bonusPercent: 12 };
+  }
+
+  // 7. Stress-Sebum Loop — high stress + elevated sebum
+  // Cortisol-driven oil overproduction feeds acne cycle
+  if (foundation.stress >= 2 && raw.seb >= 40) {
+    raw.seb *= 1.10;
+    raw.acne = Math.min(raw.acne * 1.08, 95);
+    prov.seb.crossAxisBonus = { pattern: "Stress-Sebum Loop", bonusPercent: 10 };
+  }
+
+  // 8. Dry-Aging Acceleration — dehydration + aging
+  // Dehydration makes wrinkles appear deeper; compromised barrier accelerates aging
+  if (raw.hyd >= 40 && raw.aging >= 35) {
+    raw.aging *= 1.12;
+    prov.aging.crossAxisBonus = { pattern: "Dry-Aging Acceleration", bonusPercent: 12 };
   }
 
   // ───────────────────────────────────────────────────────────────────────────

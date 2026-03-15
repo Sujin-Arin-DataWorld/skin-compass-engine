@@ -113,11 +113,11 @@ function buildFoundation(
 
   // Age bracket: from EXP_AGE axis answer (0-5)
   const ageRaw = axisAnswers["EXP_AGE"];
-  const ageBracket = typeof ageRaw === "number" ? ageRaw : undefined;
+  const ageBracket = typeof ageRaw === "number" ? ageRaw : 2; // default 30s
 
   // Gender: from EXP_GENDER axis answer (0=female, 1=male, 2=other)
   const genderRaw = axisAnswers["EXP_GENDER"];
-  const gender = typeof genderRaw === "number" ? genderRaw : undefined;
+  const gender = typeof genderRaw === "number" ? genderRaw : 2; // default other
 
   // Seasonal change: from EXP_SEASONAL axis answer (0-3)
   const seasonalRaw = axisAnswers["EXP_SEASONAL"];
@@ -127,32 +127,78 @@ function buildFoundation(
   const textureRaw = axisAnswers["EXP_TEXTURE"];
   const texturePref = typeof textureRaw === "number" ? textureRaw : undefined;
 
+  // Outdoor exposure: from EXP_OUTDOOR axis answer (0=indoor, 1=1-2hrs, 2=3+hrs)
+  const outdoorRaw = axisAnswers["EXP_OUTDOOR"];
+  const outdoor = typeof outdoorRaw === "number" ? outdoorRaw : 0;
+
+  // Altitude exposure: from EXP_ALTITUDE axis answer (0=never, 1=occasional, 2=regular)
+  const altitudeRaw = axisAnswers["EXP_ALTITUDE"];
+  const altitude = typeof altitudeRaw === "number" ? altitudeRaw : 0;
+
+  // Menopause status: from tail question answer "menopause_status"
+  const menoRaw = axisAnswers["menopause_status"];
+  const menopauseStatus = typeof menoRaw === "string" ? menoRaw : undefined;
+
   return {
-    sleep:            sleepIndex,
-    water:            waterIndex,
-    stress:           stressIndex,
-    climate:          climate ?? null,
-    age_bracket:      ageBracket,
-    gender:           gender,
-    seasonal_change:  seasonalChange,
-    texture_pref:     texturePref,
+    sleep:             sleepIndex,
+    water:             waterIndex,
+    stress:            stressIndex,
+    climate:           climate ?? null,
+    age_bracket:       ageBracket,
+    gender:            gender,
+    outdoor:           outdoor,
+    altitude:          altitude,
+    seasonal_change:   seasonalChange,
+    texture_pref:      texturePref,
+    menopause_status:  menopauseStatus,
   };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Zone data converter — SelectedZones → Record<string, string[]>
+// Zone data converter — SelectedZones → Record<string, Record<string, 1|2|3>>
 // ─────────────────────────────────────────────────────────────────────────────
 
-function buildZoneData(
+function buildZoneDataFromStore(
   selectedZones: SelectedZones,
-): Record<string, string[]> {
-  const zoneData: Record<string, string[]> = {};
+): Record<string, Record<string, 1 | 2 | 3>> {
+  const zoneData: Record<string, Record<string, 1 | 2 | 3>> = {};
   for (const [zoneId, entry] of Object.entries(selectedZones ?? {})) {
-    if (Array.isArray(entry?.concerns) && entry.concerns.length > 0) {
-      zoneData[zoneId] = entry.concerns;
+    if (!Array.isArray(entry?.concerns) || entry.concerns.length === 0) continue;
+    const zoneSev: Record<string, 1 | 2 | 3> = {};
+    for (const cId of entry.concerns) {
+      // Use stored severity if available, otherwise default to mild (1)
+      const sev = (entry.severity?.[cId] ?? 1) as 1 | 2 | 3;
+      zoneSev[cId] = sev;
     }
+    zoneData[zoneId] = zoneSev;
   }
   return zoneData;
+}
+
+/**
+ * Converts a flat concernSeverity map (from FaceMapStep) into
+ * zone-grouped format expected by scoringEngineV5.
+ */
+export function buildZoneData(
+  concernSeverity: Record<string, 1 | 2 | 3>,
+  zoneConcerns: Record<string, { id: string; axis: string }[]>,
+): Record<string, Record<string, 1 | 2 | 3>> {
+  const result: Record<string, Record<string, 1 | 2 | 3>> = {};
+
+  for (const [zoneId, concerns] of Object.entries(zoneConcerns)) {
+    const zoneSev: Record<string, 1 | 2 | 3> = {};
+    for (const c of concerns) {
+      const sev = concernSeverity[c.id];
+      if (sev && sev > 0) {
+        zoneSev[c.id] = sev;
+      }
+    }
+    if (Object.keys(zoneSev).length > 0) {
+      result[zoneId] = zoneSev;
+    }
+  }
+
+  return result;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -203,10 +249,10 @@ function buildAxisAnswers(
  */
 export function convertToScoringInput(
   store:     DiagnosisStoreState,
-  zoneData?: Record<string, string[]>,
+  zoneData?: Record<string, Record<string, 1 | 2 | 3>>,
 ): ScoringInput {
   return {
-    zoneData:      zoneData ?? buildZoneData(store.selectedZones),
+    zoneData:      zoneData ?? buildZoneDataFromStore(store.selectedZones),
     axisAnswers:   buildAxisAnswers(store.axisAnswers),
     foundation:    buildFoundation(store.axisAnswers, store.lifestyle),
     implicitFlags: { atopyFlag: store.implicitFlags.atopyFlag },
@@ -227,17 +273,56 @@ export interface BridgeInput {
 }
 
 /**
- * buildScoringInput
+ * buildScoringInput (BridgeInput overload — backward compat)
  *
  * Alternative entry point for callers that pre-package data into BridgeInput.
  * Internally delegates to the same helpers as convertToScoringInput.
  */
-export function buildScoringInput(input: BridgeInput): ScoringInput {
+export function buildScoringInput(input: BridgeInput): ScoringInput;
+
+/**
+ * buildScoringInput (Step 11 — severity-map overload)
+ *
+ * Assembles a full ScoringInput directly from UI state:
+ * - concernSeverity: flat map from FaceMapStep
+ * - zoneConcerns: ZONE_CONCERNS lookup (maps zone → concern list)
+ * - axisAnswers: tail question answers
+ * - foundationData: pre-built foundation object
+ * - implicitFlags: atopy/other flags
+ */
+export function buildScoringInput(
+  concernSeverity: Record<string, 1 | 2 | 3>,
+  zoneConcerns: Record<string, { id: string; axis: string }[]>,
+  axisAnswers: Record<string, QuestionAnswer>,
+  foundationData: ScoringInput["foundation"],
+  implicitFlags: ScoringInput["implicitFlags"],
+): ScoringInput;
+
+export function buildScoringInput(
+  inputOrSeverity: BridgeInput | Record<string, 1 | 2 | 3>,
+  zoneConcerns?: Record<string, { id: string; axis: string }[]>,
+  axisAnswers?: Record<string, QuestionAnswer>,
+  foundationData?: ScoringInput["foundation"],
+  implicitFlags?: ScoringInput["implicitFlags"],
+): ScoringInput {
+  // BridgeInput overload — has selectedZones property
+  if ("selectedZones" in inputOrSeverity) {
+    const input = inputOrSeverity as BridgeInput;
+    return {
+      zoneData:      buildZoneDataFromStore(input.selectedZones),
+      axisAnswers:   buildAxisAnswers(input.axisAnswers),
+      foundation:    buildFoundation(input.axisAnswers, input.lifestyle),
+      implicitFlags: { atopyFlag: input.implicitFlags.atopyFlag },
+    };
+  }
+
+  // Severity-map overload
+  const concernSeverity = inputOrSeverity as Record<string, 1 | 2 | 3>;
   return {
-    zoneData:      buildZoneData(input.selectedZones),
-    axisAnswers:   buildAxisAnswers(input.axisAnswers),
-    foundation:    buildFoundation(input.axisAnswers, input.lifestyle),
-    implicitFlags: { atopyFlag: input.implicitFlags.atopyFlag },
+    zoneData:      buildZoneData(concernSeverity, zoneConcerns!),
+    axisAnswers:   axisAnswers!,
+    foundation:    foundationData!,
+    implicitFlags: implicitFlags!,
   };
 }
 
@@ -263,10 +348,17 @@ export function runDiagnosisV5(input: BridgeInput): SkinVectorResult {
   const scoringOutput = computeScores(scoringInput);
 
   // Step 2 — Vector assembly
+  // Flatten zoneData from Record<zone, Record<concern, severity>> → Record<zone, string[]>
+  // for skinVectorEngineV5 which only needs concern IDs, not severity
+  const flatZoneData: Record<string, string[]> = {};
+  for (const [zoneId, sevMap] of Object.entries(scoringInput.zoneData)) {
+    flatZoneData[zoneId] = Object.keys(sevMap);
+  }
+
   const vectorInput: SkinVectorInput = {
     scores:        scoringOutput.scores,
     provenance:    scoringOutput.provenance,
-    zoneData:      scoringInput.zoneData,
+    zoneData:      flatZoneData,
     implicitFlags: scoringInput.implicitFlags,
     activeFlags:   scoringOutput.activeFlags,
     products:      input.products ?? [],

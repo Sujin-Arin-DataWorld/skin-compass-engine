@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useI18nStore } from "@/store/i18nStore";
+import { useDiagnosisStore } from "@/store/diagnosisStore";
 import type { DiagnosisResult, AxisKey, ZoneId, ZoneHeatmapEntry } from "@/engine/types";
+import { computeSkinAge, AGE_MIDPOINTS } from "@/engine/diagnosisComparison";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // i18n maps
@@ -261,6 +263,11 @@ interface Props {
 
 const SlideDiagnosisSummary = ({ result }: Props) => {
   const { language } = useI18nStore();
+  const store = useDiagnosisStore();
+  const ageBracket  = (store.axisAnswers["EXP_AGE"]    as number | undefined) ?? 2;
+  const menoStatus  = (store.axisAnswers["menopause_status"] as string | undefined) ?? null;
+  const realAge     = AGE_MIDPOINTS[ageBracket] ?? 35;
+  const skinAgeData = computeSkinAge(realAge, result.axis_scores, menoStatus);
 
   const patternNameEN = result.detected_patterns[0]?.pattern.name_en ?? "Balanced Profile";
   const p = result.detected_patterns[0]?.pattern as unknown as Record<string, string> | undefined;
@@ -514,6 +521,93 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
             </p>
           </motion.div>
         )}
+
+        {/* ── Section E3: Skin Age Card ── */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: hasHeatmap ? 0.54 : 0.48, duration: 0.4 }}
+          style={{
+            padding: "20px 24px", borderRadius: 20, textAlign: "center",
+            background: "linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--card)))",
+            border: "1px solid hsl(var(--primary) / 0.15)",
+            marginBottom: 20,
+          }}
+        >
+          <div style={{
+            fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase",
+            color: "hsl(var(--foreground-hint))",
+            fontFamily: "'DM Sans', sans-serif", marginBottom: 8,
+          }}>
+            {language === "ko" ? "피부 나이" : language === "de" ? "Ihr Hautalter" : "Your Skin Age"}
+          </div>
+          <div style={{
+            fontSize: 42, fontWeight: 300,
+            color: "hsl(var(--primary))",
+            fontFamily: "'DM Sans', sans-serif",
+          }}>
+            {skinAgeData.skinAge}
+          </div>
+          <div style={{
+            fontSize: 13, color: "hsl(var(--foreground-hint))",
+            fontFamily: "'DM Sans', sans-serif", marginTop: 4,
+          }}>
+            {language === "ko"
+              ? `실제 나이: ${realAge}세`
+              : language === "de"
+              ? `Tatsächliches Alter: ${realAge}`
+              : `Actual age: ${realAge}`}
+          </div>
+          {skinAgeData.comparison === "older" && (
+            <div style={{
+              fontSize: 12, marginTop: 10,
+              color: "hsl(var(--foreground-hint))",
+              fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5,
+            }}>
+              {language === "ko"
+                ? "맞춤 관리 12주로 피부 나이를 실제 나이에 맞출 수 있어요."
+                : language === "de"
+                ? "Mit gezielter Pflege können wir Ihr Hautalter in 12 Wochen angleichen."
+                : "With targeted care, we can bring your skin age back in line within 12 weeks."}
+            </div>
+          )}
+          {skinAgeData.comparison === "younger" && (
+            <div style={{
+              fontSize: 12, marginTop: 10,
+              color: "hsl(var(--foreground-hint))",
+              fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5,
+            }}>
+              {language === "ko"
+                ? "피부 나이가 실제보다 어려요 — 지금 관리를 유지하세요!"
+                : language === "de"
+                ? "Ihr Hautalter ist jünger als Ihr tatsächliches Alter — weiter so!"
+                : "Your skin age is younger than your actual age — your routine is working!"}
+            </div>
+          )}
+        </motion.div>
+
+        {/* ── Section E3: Clinical Trust Banner ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: hasHeatmap ? 0.58 : 0.52, duration: 0.4 }}
+          style={{
+            padding: "14px 20px", borderRadius: 14, marginBottom: 24,
+            background: "hsl(var(--primary) / 0.04)",
+            border: "1px solid hsl(var(--primary) / 0.12)",
+            fontSize: 12,
+            color: "hsl(var(--foreground-hint))",
+            fontFamily: "'DM Sans', sans-serif",
+            lineHeight: 1.6,
+          }}
+        >
+          🔬{" "}
+          {language === "ko"
+            ? "진단은 전 세계 피부과 의사가 사용하는 임상 방법론을 기반으로 합니다 — SOS 피지 척도, TEWL 장벽 평가, APIA 프레임워크. 카메라 없이도 정확한 분석이 가능합니다."
+            : language === "de"
+            ? "Ihre Diagnose basiert auf Methoden der klinischen Dermatologie weltweit — darunter die SOS-Skala, TEWL-Barrierebewertung und das APIA-Framework. Keine Kamera nötig."
+            : "Your diagnosis uses methods from clinical dermatology worldwide — including the SOS scale, TEWL barrier assessment, and the APIA framework. No camera needed."}
+        </motion.div>
 
         {/* ── Section F: Forward pull ── */}
         <motion.p

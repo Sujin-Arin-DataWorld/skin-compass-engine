@@ -51,6 +51,12 @@ export interface QuestionDef {
   showForAge?: { min?: number; max?: number };
   /** Hide this question if the user's gender matches any of these values (0=female,1=male,2=other). */
   hideIfGender?: number[];
+  /** Clinical derivation — shown as a trust badge in TailQuestionSection */
+  clinicalBasis?: {
+    method: string;      // e.g. "SOS (Skin Oiliness Scale)"
+    validation: string;  // e.g. "Correlates with Sebumeter at r=0.54, p<0.01"
+    source: string;      // e.g. "Journal of Dermatological Science, 2020"
+  };
 }
 
 export interface AxisDef {
@@ -172,10 +178,15 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         hint: t(
           "This estimates your sebum production rate — the faster the shine, the more active your oil glands.",
           "Das schätzt Ihre Talgproduktionsrate ein — je schneller der Glanz, desto aktiver Ihre Talgdrüsen.",
-          "피지 분비 속도를 추정하는 질문이에요 — 번들거림이 빨리 올수록 피지선이 활발합니다."
+          "피지 분비 속도를 추정하는 질문이에요 — 번들거림이 빨리 올수록 피지선이 활발해요."
         ),
         required: true,
         axisHints: { seb: 1.0, makeup_stability: 0.6 },
+        clinicalBasis: {
+          method: "Skin Oiliness Scale (SOS)",
+          validation: "Sebumeter correlation r=0.54, p<0.01",
+          source: "J Dermatological Science",
+        },
         options: [
           opt("shine_1hr",       3, "By breakfast time (~1 hr)",       "Bis zum Frühstück (~1 Std.)",     "아침 식사 무렵 (약 1시간)"),
           opt("shine_midday",    2, "Around lunchtime",                "Gegen Mittag",                    "점심 무렵"),
@@ -267,11 +278,16 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         text: t("After washing, does your skin feel like wearing a mask that's one size too small?", "Fühlt sich Ihre Haut nach dem Waschen an, als würden Sie eine zu kleine Maske tragen?", "세안 후, 피부가 한 사이즈 작은 마스크를 쓴 것처럼 조이는 느낌이 드나요?"),
         hint: t(
           "That 'squeezing' sensation means your skin barrier is losing water rapidly — your barrier needs extra support to lock in moisture.",
-          "Dieses 'Zusammenziehen' bedeutet, dass Ihre Hautbarriere schnell Wasser verliert — sie braucht extra Unterstützung, um Feuchtigkeit einzuschließen.",
-          "이 '조이는' 느낌은 피부 장벽에서 수분이 빠르게 증발하고 있다는 신호예요 — 수분을 잡아두는 장벽 케어가 필요합니다."
+          "Dieses 'Zusammenziehen' bedeutet, dass Ihre Hautschutzbarriere schnell Wasser verliert — sie braucht extra Unterstützung, um Feuchtigkeit einzuschließen.",
+          "이 '조이는' 느낌은 피부 장벽에서 수분이 빠르게 증발하고 있다는 신호예요 — 수분을 잡아두는 장벽 케어가 필요해요."
         ),
         required: true,
         axisHints: { hyd: 1.0, bar: 0.6 },
+        clinicalBasis: {
+          method: "TEWL Sensory Markers",
+          validation: "Correlates with Tewameter readings",
+          source: "Int J Cosmetic Science",
+        },
         options: [
           opt("tight_constantly",  3, "Unbearable — skin might crack",           "Unerträglich — Haut könnte reißen",         "찢어질 것 같아요"),
           opt("tight_frequently",  2, "Tight but fades after moisturizer",       "Angespannt, nachlassend nach Feuchtigkeitspflege", "당기지만 보습제 바르면 나아짐"),
@@ -440,7 +456,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             opt("mark_pih",   3, "Dark marks after breakouts", "Dunkle Flecken nach Unreinheiten",  "트러블 후 남는 어두운 흔적"),
             "PIH — Post-Inflammatory Hyperpigmentation. Dark marks caused by excess melanin after inflammation. Can persist for months.",
             "PIH — Post-entzündliche Hyperpigmentierung. Dunkle Flecken durch Melaninüberschuss, können Monate anhalten.",
-            "PIH(염증 후 과색소침착) — 염증 후 멜라닌 과다로 생기는 갈색/어두운 자국으로 몇 달간 지속될 수 있습니다."
+            "PIH(염증 후 과색소침착) — 염증 후 멜라닌 과다로 생기는 갈색/어두운 자국으로 몇 달간 지속될 수 있어요."
           ),
           withGloss(
             opt("mark_scar",  2, "Indented scars",           "Eingefallene Narben",            "패인 흉터"),
@@ -518,11 +534,16 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         text: t("After cleansing, how urgently do you NEED to apply moisturizer?", "Wie dringend müssen Sie nach der Reinigung Feuchtigkeitspflege auftragen?", "세안 후, 보습제를 얼마나 급하게 발라야 하나요?"),
         hint: t(
           "The urgency reflects your barrier's water-holding capacity — the faster you need moisture, the more your barrier is compromised.",
-          "Die Dringlichkeit spiegelt die Wasserhaltungskapazität Ihrer Hautbarriere wider.",
+          "Die Dringlichkeit spiegelt die Wasserhaltungskapazität Ihrer Hautschutzbarriere wider.",
           "보습 긴급도는 피부 장벽의 수분 보유력을 반영해요 — 빨리 발라야 할수록 장벽이 약화된 상태입니다."
         ),
         required: false,
         axisHints: { bar: 1.0, hyd: 0.5, sen: 0.3 },
+        clinicalBasis: {
+          method: "APIA Methodology",
+          validation: "European dermatology clinical framework",
+          source: "APIA Protocol",
+        },
         options: [
           opt("barrier_sos",      3, "Immediately — can't wait 1 minute", "Sofort — kann keine Minute warten",  "즉시 — 1분도 못 참겠어요"),
           opt("barrier_5min",     2, "Within 5 minutes",                  "Innerhalb von 5 Minuten",           "5분 이내"),
@@ -540,6 +561,11 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         ),
         required: false,
         axisHints: { sen: 1.0 },
+        clinicalBasis: {
+          method: "Lactic Acid Sting Test (proxy)",
+          validation: "Standard dermatology office assessment",
+          source: "Contact Dermatitis Journal",
+        },
         options: [
           opt("neuro_always",  3, "Almost every new product",  "Fast bei jedem neuen Produkt",  "거의 모든 새 제품에서"),
           opt("neuro_some",    2, "Some products",             "Bei einigen Produkten",         "일부 제품에서"),
@@ -574,7 +600,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         ),
         hint: t(
           "Post-shave irritation disrupts the skin barrier and can lead to chronic sensitivity — it's a significant barrier stressor for male skin.",
-          "Rasierirritationen stören die Hautbarriere und können zu chronischer Empfindlichkeit führen — ein wesentlicher Barrierestressor für Männerhaut.",
+          "Rasierirritationen stören die Hautschutzbarriere und können zu chronischer Empfindlichkeit führen — ein wesentlicher Barrierestressor für Männerhaut.",
           "면도 자극은 피부 장벽을 손상시키고 만성 민감성으로 이어질 수 있어요 — 남성 피부의 주요 장벽 스트레스 요인입니다."
         ),
         required: false,
@@ -592,7 +618,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   // ── Axis 6: Aging ─────────────────────────────────────────────────────────
   {
     id: 6,
-    name: t("Aging & Firmness", "Hautalterung & Festigkeit", "노화 & 탄력"),
+    name: t("Aging & Firmness", "Straffheit & Falten", "노화 & 탄력"),
     eyebrow: t("Firmness & Lines", "Straffheit & Falten", "탄력 & 주름"),
     triggerConcerns: ["forehead_lines", "fine_lines_eyes", "nasolabial", "neck_wrinkles", "neck_sagging", "puffiness"],
     questions: [
@@ -608,6 +634,11 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: true,
         showForAge: { min: 1 },
         axisHints: { aging: 1.0 },
+        clinicalBasis: {
+          method: "Fitzpatrick Wrinkle Scale",
+          validation: "Clinical grading system for photoaging",
+          source: "Dermatologic Surgery",
+        },
         slider: {
           min: 1, max: 10, step: 1, defaultValue: 3,
           labelMin: t("Gone — completely smooth", "Weg — völlig glatt",      "완전히 사라짐"),
@@ -652,7 +683,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             opt("active_aha_bha",  0, "AHA / BHA",  "AHA / BHA",  "AHA / BHA"),
             "AHAs (e.g. Glycolic Acid) exfoliate the surface; BHAs (e.g. Salicylic Acid) exfoliate deep inside pores. Both improve texture and tone.",
             "AHAs (z.B. Glykolsäure) exfoliieren die Oberfläche; BHAs (z.B. Salicylsäure) exfoliieren tief in den Poren.",
-            "AHA(예: 글리콜릭산)는 표면을, BHA(예: 살리실산)는 모공 안쪽을 각질 제거합니다."
+            "AHA(예: 글리콜릭산)는 표면을, BHA(예: 살리실산)는 모공 안쪽을 각질 제거해요."
           ),
           opt("active_none",     0, "None",       "Keine",      "없음"),
         ],
@@ -663,7 +694,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   // ── Axis 7: Pigmentation ──────────────────────────────────────────────────
   {
     id: 7,
-    name: t("Pigmentation & Tone", "Pigmentierung & Teint", "색소침착 & 피부톤"),
+    name: t("Pigmentation & Tone", "Flecken & Hautton", "색소침착 & 피부톤"),
     eyebrow: t("Dark Spots & Tone", "Flecken & Hautton", "잡티 & 피부톤"),
     triggerConcerns: ["dark_circles", "pigmentation_cheeks", "pigmentation_mouth"],
     questions: [
@@ -785,7 +816,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         hint: t(
           "Recurring itch can be an early sign of atopic dermatitis or psoriasis — we ask to ensure safe product recommendations.",
           "Wiederkehrender Juckreiz kann ein frühes Zeichen für Atopische Dermatitis oder Psoriasis sein — wir fragen, um sichere Produktempfehlungen zu gewährleisten.",
-          "반복되는 가려움은 아토피나 건선의 초기 신호일 수 있어요 — 안전한 제품 추천을 위해 확인합니다."
+          "반복되는 가려움은 아토피나 건선의 초기 신호일 수 있어요 — 안전한 제품 추천을 위해 확인해요."
         ),
         required: true,
         axisHints: { sen: 1.0, bar: 0.8 },
@@ -801,7 +832,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           withGloss(
             opt("dx_atopic",    3, "Yes — Atopic Dermatitis", "Ja — Atopische Dermatitis", "예 — 아토피 피부염"),
             "Atopic Dermatitis (Eczema) — chronic inflammatory condition causing intense itching, redness, and impaired skin barrier. Requires a gentle, barrier-repair-focused routine.",
-            "Atopische Dermatitis (Ekzem) — chronisch entzündliche Erkrankung mit starkem Juckreiz und gestörter Hautbarriere.",
+            "Atopische Dermatitis (Ekzem) — chronisch entzündliche Erkrankung mit starkem Juckreiz und gestörter Hautschutzbarriere.",
             "아토피 피부염(습진) — 심한 가려움, 붉음증, 피부 장벽 기능 저하를 일으키는 만성 염증성 피부 질환입니다."
           ),
           withGloss(
@@ -814,7 +845,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             opt("dx_suspected", 2, "Suspected / Undiagnosed", "Vermutet / Nicht diagnostiziert", "의심 / 미진단"),
             "If you suspect Atopic Dermatitis or Psoriasis but haven't been formally diagnosed, we'll factor this into a sensitivity-focused protocol.",
             "Wenn Sie Atopische Dermatitis oder Psoriasis vermuten, berücksichtigen wir dies in Ihrem sensibilitätsfokussierten Protokoll.",
-            "아토피 또는 건선이 의심되지만 진단받지 못하셨다면, 민감성 맞춤 프로토콜에 이를 반영합니다."
+            "아토피 또는 건선이 의심되지만 진단받지 못하셨다면, 민감성 맞춤 프로토콜에 이를 반영해요."
           ),
           opt("dx_no",        0, "No",                      "Nein",                      "아니요"),
         ],

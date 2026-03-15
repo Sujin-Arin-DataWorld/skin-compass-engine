@@ -5,7 +5,8 @@
       "Bash(python3 -:*)",
       "Bash(python3 -c \":*)",
       "Read(//Users/sujinpark/Downloads/**)",
-      "Bash(ls src/engine/axisAnswerBridge*)"
+      "Bash(ls src/engine/axisAnswerBridge*)",
+      "Bash(npx tsc --noEmit --project tsconfig.json)"
     ]
   }
 }

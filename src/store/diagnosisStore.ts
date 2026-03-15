@@ -102,7 +102,7 @@ export interface SkinVector {
 }
 
 export interface SelectedZones {
-  [zoneId: string]: { concerns: string[] };
+  [zoneId: string]: { concerns: string[]; severity?: Record<string, 1 | 2 | 3> };
 }
 
 // ─── Legacy interactive state (kept for UI component backward compat) ─────────

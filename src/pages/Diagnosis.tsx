@@ -27,12 +27,16 @@ const FOREST    = "#2D4F39";   // light-mode deep accent
 type Phase = "foundation" | "scanning" | "facemap";
 type Lang = "en" | "de" | "ko";
 
-interface FoundationOption { label: string; value: number }
+interface FoundationOption { label: { en: string; de: string; ko: string }; value: number }
 interface FoundationQuestion {
   id: string; icon: string;
   text: string; textDE: string; textKO: string;
   hint?: string; hintDE?: string; hintKO?: string;
   options: FoundationOption[];
+}
+
+function optLabel(opt: FoundationOption, lang: Lang): string {
+  return opt.label[lang] ?? opt.label.en;
 }
 
 
@@ -63,12 +67,12 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Die Bedürfnisse Ihrer Haut verändern sich mit dem Alter — so können wir die richtige Pflege empfehlen",
     hintKO: "나이에 따라 피부가 필요로 하는 관리가 달라져요 — 맞춤 추천을 위해 확인합니다",
     options: [
-      { label: "Under 20", value: 0 },
-      { label: "20–29", value: 1 },
-      { label: "30–39", value: 2 },
-      { label: "40–49", value: 3 },
-      { label: "50–59", value: 4 },
-      { label: "60+", value: 5 },
+      { label: { en: "Under 20",  de: "Unter 20",  ko: "20세 미만" }, value: 0 },
+      { label: { en: "20–29",     de: "20–29",     ko: "20–29세"  }, value: 1 },
+      { label: { en: "30–39",     de: "30–39",     ko: "30–39세"  }, value: 2 },
+      { label: { en: "40–49",     de: "40–49",     ko: "40–49세"  }, value: 3 },
+      { label: { en: "50–59",     de: "50–59",     ko: "50–59세"  }, value: 4 },
+      { label: { en: "60+",       de: "60+",       ko: "60세 이상" }, value: 5 },
     ],
   },
   {
@@ -80,9 +84,9 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Hormone beeinflussen Ihre Haut erheblich — dies hilft bei hormonellen und Produktempfehlungen",
     hintKO: "호르몬이 피부에 큰 영향을 미쳐요 — 호르몬 관련 추천에 활용됩니다",
     options: [
-      { label: "Female", value: 0 },
-      { label: "Male", value: 1 },
-      { label: "Non-binary / Prefer not to say", value: 2 },
+      { label: { en: "Female",                       de: "Weiblich",              ko: "여성"              }, value: 0 },
+      { label: { en: "Male",                          de: "Männlich",              ko: "남성"              }, value: 1 },
+      { label: { en: "Non-binary / Prefer not to say", de: "Nicht-binär / Keine Angabe", ko: "논바이너리 / 답하고 싶지 않음" }, value: 2 },
     ],
   },
   {
@@ -90,21 +94,34 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     text: "Average hours of restful sleep",
     textDE: "Stunden erholsamen Schlafs",
     textKO: "평균 수면 시간",
-    options: [{ label: "< 5h", value: 1 }, { label: "5–6h", value: 2 }, { label: "7h", value: 3 }, { label: "8h+", value: 4 }],
+    options: [
+      { label: { en: "< 5h",  de: "< 5 Std.",  ko: "5시간 미만"  }, value: 1 },
+      { label: { en: "5–6h",  de: "5–6 Std.",  ko: "5-6시간"    }, value: 2 },
+      { label: { en: "7h",    de: "7 Std.",    ko: "7시간"      }, value: 3 },
+      { label: { en: "8h+",   de: "8+ Std.",   ko: "8시간 이상"  }, value: 4 },
+    ],
   },
   {
     id: "water", icon: "💧",
     text: "Daily water intake",
     textDE: "Tägliche Wasseraufnahme",
     textKO: "일일 수분 섭취량",
-    options: [{ label: "1–2 glasses", value: 1 }, { label: "3–5 glasses", value: 2 }, { label: "6+ glasses", value: 3 }],
+    options: [
+      { label: { en: "1–2 glasses", de: "1–2 Gläser", ko: "1-2잔"    }, value: 1 },
+      { label: { en: "3–5 glasses", de: "3–5 Gläser", ko: "3-5잔"    }, value: 2 },
+      { label: { en: "6+ glasses",  de: "6+ Gläser",  ko: "6잔 이상" }, value: 3 },
+    ],
   },
   {
     id: "stress", icon: "🧠",
     text: "Current stress level",
     textDE: "Aktuelles Stresslevel",
     textKO: "현재 스트레스 수준",
-    options: [{ label: "Low", value: 1 }, { label: "Moderate", value: 2 }, { label: "High", value: 3 }],
+    options: [
+      { label: { en: "Low",      de: "Niedrig", ko: "낮음" }, value: 1 },
+      { label: { en: "Moderate", de: "Mittel",  ko: "보통" }, value: 2 },
+      { label: { en: "High",     de: "Hoch",    ko: "높음" }, value: 3 },
+    ],
   },
   {
     id: "seasonal_change", icon: "🍂",
@@ -115,10 +132,10 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Viele Europäer haben im Sommer fettigere und im Winter trockenere Haut — Ihre Routine sollte sich anpassen",
     hintKO: "유럽에서는 여름에 더 유분지고 겨울에 더 건조해지는 분들이 많아요 — 루틴도 따라 바뀌어야 합니다",
     options: [
-      { label: "Yes — oilier in summer, drier in winter", value: 1 },
-      { label: "Yes — dry year-round, but worse in winter", value: 2 },
-      { label: "Yes — oily year-round, but worse in summer", value: 3 },
-      { label: "No significant change", value: 0 },
+      { label: { en: "Yes — oilier in summer, drier in winter",   de: "Ja — im Sommer fettiger, im Winter trockener",   ko: "네 — 여름엔 유분, 겨울엔 건조"    }, value: 1 },
+      { label: { en: "Yes — dry year-round, worse in winter",     de: "Ja — ganzjährig trocken, im Winter schlimmer",   ko: "네 — 연중 건조, 겨울에 더 심함"   }, value: 2 },
+      { label: { en: "Yes — oily year-round, worse in summer",    de: "Ja — ganzjährig fettig, im Sommer schlimmer",    ko: "네 — 연중 유분, 여름에 더 심함"   }, value: 3 },
+      { label: { en: "No significant change",                     de: "Keine wesentliche Veränderung",                  ko: "큰 변화 없음"                    }, value: 0 },
     ],
   },
   {
@@ -130,10 +147,10 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Wir empfehlen Produkte, die sich für SIE gut anfühlen — eine schwere Creme nützt nichts, wenn Sie das Gefühl nicht mögen",
     hintKO: "피부에 맞으면서 발림감도 좋아야 꾸준히 쓸 수 있어요 — 선호도를 반영합니다",
     options: [
-      { label: "Light gel or water-based", value: 0 },
-      { label: "Medium lotion", value: 1 },
-      { label: "Rich cream", value: 2 },
-      { label: "Depends on season", value: 3 },
+      { label: { en: "Light gel or water-based", de: "Leichtes Gel oder wasserbasiert",    ko: "가벼운 젤 또는 수분 베이스" }, value: 0 },
+      { label: { en: "Medium lotion",            de: "Mittlere Lotion",                     ko: "보통 로션"               }, value: 1 },
+      { label: { en: "Rich cream",               de: "Reichhaltige Creme",                  ko: "리치 크림"               }, value: 2 },
+      { label: { en: "Depends on season",        de: "Kommt auf die Jahreszeit an",         ko: "계절에 따라 다름"         }, value: 3 },
     ],
   },
 ];
@@ -184,6 +201,144 @@ function MiniRadarChart({ scores }: { scores: Record<string, number> }) {
   );
 }
 
+// ─── Mobile Foundation Stepper (one question at a time) ───────────────────────
+const TOTAL_MOBILE_STEPS = FOUNDATION_QUESTIONS.length + 1; // +1 for climate
+
+function MobileFoundationStepper({
+  currentIndex, selectedAnswers, onAnswer, onNext, onBack, lang, isDark, GOLD, onClimateChange,
+}: {
+  currentIndex: number;
+  selectedAnswers: Record<string, number>;
+  onAnswer: (id: string, value: number) => void;
+  onNext: () => void;
+  onBack: () => void;
+  lang: Lang;
+  isDark: boolean;
+  GOLD: string;
+  onClimateChange: (ct: string) => void;
+}) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isClimateStep = currentIndex === FOUNDATION_QUESTIONS.length;
+  const q = isClimateStep ? null : FOUNDATION_QUESTIONS[currentIndex];
+
+  const handleAnswer = (id: string, value: number) => {
+    onAnswer(id, value);
+    // Auto-advance after 300ms
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(onNext, 300);
+  };
+
+  return (
+    <div style={{ padding: "0 4px", maxWidth: 440, margin: "0 auto" }}>
+      {/* Progress bar */}
+      <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
+        {Array.from({ length: TOTAL_MOBILE_STEPS }).map((_, i) => (
+          <div key={i} style={{
+            flex: 1, height: 3, borderRadius: 2,
+            background: i <= currentIndex
+              ? GOLD
+              : (isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"),
+            transition: "background 0.3s ease",
+          }} />
+        ))}
+      </div>
+
+      {/* Counter */}
+      <div style={{
+        fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase",
+        color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+        fontFamily: "'DM Sans', sans-serif", marginBottom: 16,
+      }}>
+        {currentIndex + 1} / {TOTAL_MOBILE_STEPS}
+      </div>
+
+      {isClimateStep ? (
+        /* Climate step */
+        <div style={{
+          background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+          border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
+          borderRadius: 16, padding: "20px 16px",
+          backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+        }}>
+          <div style={{ fontSize: 22, marginBottom: 8 }}>🌍</div>
+          <div style={{
+            fontSize: 17, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)",
+            fontFamily: "'DM Sans', sans-serif", marginBottom: 16,
+          }}>
+            {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
+          </div>
+          <CityClimateInput
+            lang={lang}
+            onLegacyChange={onClimateChange}
+          />
+        </div>
+      ) : q ? (
+        /* Foundation question step */
+        <>
+          <div style={{ fontSize: 26, marginBottom: 8 }}>{q.icon}</div>
+          <h3 style={{
+            fontSize: 18, fontWeight: 400, marginBottom: 6, lineHeight: 1.4,
+            color: isDark ? "#fff" : "#111", fontFamily: "'DM Sans', sans-serif",
+          }}>
+            {fqText(q, lang)}
+          </h3>
+          {fqHint(q, lang) && (
+            <p style={{
+              fontSize: 13, lineHeight: 1.5, marginBottom: 20,
+              color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
+              fontFamily: "'DM Sans', sans-serif", fontStyle: "italic",
+            }}>
+              {fqHint(q, lang)}
+            </p>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {q.options.map(opt => {
+              const isSelected = selectedAnswers[q.id] === opt.value;
+              return (
+                <motion.button
+                  key={opt.value}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleAnswer(q.id, opt.value)}
+                  style={{
+                    padding: "14px 20px", borderRadius: 14,
+                    textAlign: "left", cursor: "pointer",
+                    fontSize: 15, fontFamily: "'DM Sans', sans-serif",
+                    transition: "all 0.2s ease", border: "none",
+                    borderWidth: 1, borderStyle: "solid",
+                    borderColor: isSelected ? GOLD : (isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"),
+                    background: isSelected
+                      ? (isDark ? "rgba(201,169,110,0.1)" : "rgba(122,162,115,0.08)")
+                      : "transparent",
+                    color: isSelected ? GOLD : (isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)"),
+                    fontWeight: isSelected ? 500 : 400,
+                  }}
+                >
+                  {optLabel(opt, lang)}
+                </motion.button>
+              );
+            })}
+          </div>
+        </>
+      ) : null}
+
+      {/* Back button */}
+      {currentIndex > 0 && (
+        <button
+          onClick={onBack}
+          style={{
+            marginTop: 20, padding: "8px 0", background: "transparent",
+            border: "none", cursor: "pointer",
+            fontSize: 13, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          ← {lang === "ko" ? "이전" : lang === "de" ? "Zurück" : "Back"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ─── Main page ────────────────────────────────────────────────────────────────
 const DiagnosisPage: React.FC = () => {
   const navigate = useNavigate();
@@ -201,6 +356,7 @@ const DiagnosisPage: React.FC = () => {
   const [phase, setPhase] = useState<Phase>("foundation");
   const [foundationAnswers, setFounds] = useState<Record<string, number>>({});
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileQ, setMobileQ] = useState(0);  // current question index in mobile stepper
   const [showRetestModal, setShowRetestModal] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const hasCheckedHistory = useRef(false);
@@ -492,67 +648,87 @@ const DiagnosisPage: React.FC = () => {
                   : lang === "ko" ? "피부를 형성하는 가장 기본적인 생활 습관부터 시작합니다."
                     : "We start with your lifestyle — the foundation that shapes your skin every day."}
               </p>
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4, 1fr)",
-                gap: 16, marginBottom: 44
-              }}>
-                {FOUNDATION_QUESTIONS.map((fq, i) => (
-                  <motion.div key={fq.id}
+              {/* ── Mobile: one question at a time ── */}
+              {isMobile ? (
+                <div style={{ marginBottom: 36 }}>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={mobileQ}
+                      initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                    >
+                      <MobileFoundationStepper
+                        currentIndex={mobileQ}
+                        selectedAnswers={foundationAnswers}
+                        onAnswer={(id, val) => setFounds(p => ({ ...p, [id]: val }))}
+                        onNext={() => setMobileQ(q => Math.min(q + 1, TOTAL_MOBILE_STEPS - 1))}
+                        onBack={() => setMobileQ(q => Math.max(q - 1, 0))}
+                        lang={lang} isDark={isDark} GOLD={GOLD}
+                        onClimateChange={(ct) => store.setAxisAnswer("EXP_CLIMATE", ct)}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              ) : (
+                /* ── Desktop: 4-column grid ── */
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 44 }}>
+                  {FOUNDATION_QUESTIONS.map((fq, i) => (
+                    <motion.div key={fq.id}
+                      initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                      style={{
+                        background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+                        border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
+                        borderRadius: 16, padding: "20px 16px",
+                        backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
+                      }}>
+                      <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
+                      <div style={{
+                        fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 6,
+                        fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5
+                      }}>{fqText(fq, lang)}</div>
+                      {fqHint(fq, lang) && (
+                        <div style={{
+                          fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+                          fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4, marginBottom: 10, fontStyle: "italic"
+                        }}>{fqHint(fq, lang)}</div>
+                      )}
+                      <div style={{ display: "flex", flexWrap: "wrap" }}>
+                        {fq.options.map(opt => (
+                          <div key={opt.value}
+                            onClick={() => setFounds(p => ({ ...p, [fq.id]: opt.value }))}
+                            style={pillStyle(foundationAnswers[fq.id] === opt.value, isDark)}>
+                            {optLabel(opt, lang)}
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {/* Climate card — desktop */}
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                    transition={{ delay: FOUNDATION_QUESTIONS.length * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                     style={{
-                      background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)", border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
+                      background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+                      border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
                       borderRadius: 16, padding: "20px 16px",
                       backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
                     }}>
-                    <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
+                    <div style={{ fontSize: 24, marginBottom: 8 }}>🌍</div>
                     <div style={{
-                      fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 6,
+                      fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 14,
                       fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5
-                    }}>{fqText(fq, lang)}</div>
-                    {fqHint(fq, lang) && (
-                      <div style={{
-                        fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
-                        fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4, marginBottom: 10, fontStyle: "italic"
-                      }}>{fqHint(fq, lang)}</div>
-                    )}
-                    <div style={{ display: "flex", flexWrap: "wrap" }}>
-                      {fq.options.map(opt => (
-                        <div key={opt.value}
-                          onClick={() => setFounds(p => ({ ...p, [fq.id]: opt.value }))}
-                          style={pillStyle(foundationAnswers[fq.id] === opt.value, isDark)}>
-                          {opt.label}
-                        </div>
-                      ))}
+                    }}>
+                      {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
                     </div>
+                    <CityClimateInput
+                      lang={lang}
+                      onLegacyChange={(climateType) => store.setAxisAnswer("EXP_CLIMATE", climateType)}
+                    />
                   </motion.div>
-                ))}
-
-                {/* Climate card — city search input */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: FOUNDATION_QUESTIONS.length * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                  style={{
-                    gridColumn: isMobile ? "span 2" : "auto",
-                    background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                    border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
-                    borderRadius: 16, padding: "20px 16px",
-                    backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
-                  }}>
-                  <div style={{ fontSize: 24, marginBottom: 8 }}>🌍</div>
-                  <div style={{
-                    fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 14,
-                    fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5
-                  }}>
-                    {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
-                  </div>
-                  <CityClimateInput
-                    lang={lang}
-                    onLegacyChange={(climateType) => store.setAxisAnswer("EXP_CLIMATE", climateType)}
-                  />
-                </motion.div>
-              </div>
+                </div>
+              )}
               <div style={{ textAlign: "center" }}>
                 <motion.button onClick={handleBeginFaceMapping}
                   whileTap={foundationComplete ? { scale: 0.97 } : {}}

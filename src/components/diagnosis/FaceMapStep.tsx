@@ -667,6 +667,87 @@ function InlineQuestionRenderer({
   );
 }
 
+// ─── GlossaryBadge — click/tap popover replacing broken title attribute ────────
+function GlossaryBadge({
+  glossaryText, isDark,
+}: {
+  glossaryText: string;
+  isDark: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <span style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}>
+      {/* ⓘ trigger */}
+      <span
+        onClick={(e) => { e.stopPropagation(); setIsOpen(o => !o); }}
+        style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          width: 18, height: 18, borderRadius: "50%",
+          fontSize: 10, fontWeight: 600,
+          color: isOpen
+            ? (isDark ? "#c9a96e" : "#7A9E82")
+            : (isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)"),
+          border: `1px solid ${isOpen
+            ? (isDark ? "rgba(201,169,110,0.5)" : "rgba(122,162,115,0.5)")
+            : (isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)")}`,
+          background: isOpen
+            ? (isDark ? "rgba(201,169,110,0.1)" : "rgba(122,162,115,0.08)")
+            : "transparent",
+          cursor: "pointer", marginLeft: 5, transition: "all 0.15s ease",
+        }}
+      >
+        i
+      </span>
+
+      {/* Popover */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Click-away backdrop */}
+            <div
+              onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+              style={{ position: "fixed", inset: 0, zIndex: 99, background: "transparent" }}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 4, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 4, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              onClick={e => e.stopPropagation()}
+              style={{
+                position: "absolute",
+                bottom: "calc(100% + 10px)", left: "50%",
+                transform: "translateX(-50%)",
+                width: 240, padding: "12px 14px",
+                borderRadius: 12, zIndex: 100,
+                background: isDark ? "rgba(24,24,28,0.97)" : "rgba(255,255,255,0.98)",
+                border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
+                backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+                boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.45)" : "0 8px 32px rgba(0,0,0,0.1)",
+                fontSize: 12, lineHeight: 1.6,
+                color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.65)",
+                fontFamily: "'DM Sans', sans-serif", fontWeight: 400,
+              }}
+            >
+              {glossaryText}
+              {/* Arrow pointing down */}
+              <div style={{
+                position: "absolute", bottom: -5, left: "50%",
+                transform: "translateX(-50%) rotate(45deg)",
+                width: 10, height: 10,
+                background: isDark ? "rgba(24,24,28,0.97)" : "rgba(255,255,255,0.98)",
+                borderRight: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
+                borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
+              }} />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </span>
+  );
+}
+
 // ─── Step 2: ConcernItem — 3-level severity ───────────────────────────────────
 const SEVERITY_LABELS: Record<1 | 2 | 3, Record<Lang, string>> = {
   1: { en: "Mild",     de: "Leicht", ko: "약간" },
@@ -718,21 +799,8 @@ function ConcernItem({
     >
       <span style={{ display: "flex", alignItems: "center", gap: 4, flex: 1 }}>
         <span>{concern.label[lang]}</span>
-        {concern.glossary && (
-          <span
-            title={concern.glossary[lang]}
-            onClick={e => e.stopPropagation()}
-            style={{
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              width: 16, height: 16, borderRadius: "50%",
-              fontSize: 10, fontWeight: 600,
-              color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.25)",
-              border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
-              cursor: "help", flexShrink: 0,
-            }}
-          >
-            i
-          </span>
+        {concern.glossary?.[lang] && (
+          <GlossaryBadge glossaryText={concern.glossary[lang]} isDark={isDark} />
         )}
       </span>
       <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, opacity: severity > 0 ? 0.85 : 0.4, flexShrink: 0 }}>

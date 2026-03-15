@@ -335,7 +335,7 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
         >
-          {language === "de" ? "Ihr Hautvektor" : language === "ko" ? "피부 벡터" : "Your skin vector"}
+          {language === "de" ? "Mein Hautprofil" : language === "ko" ? "나의 피부 프로필" : "My Skin Profile"}
         </motion.h2>
         <motion.p
           className="slide-body mb-6"
@@ -344,10 +344,10 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
           transition={{ delay: 0.1 }}
         >
           {language === "de"
-            ? "Keine zwei Vektoren sind identisch. Dies ist genau Ihrer."
+            ? "Keine zwei Hautbilder sind gleich — das ist Ihre persönliche Hautanalyse."
             : language === "ko"
-            ? "두 벡터는 동일하지 않습니다. 이것이 바로 당신의 피부입니다."
-            : "No two vectors are identical. This is precisely yours."}
+            ? "세상에 같은 피부는 없습니다 — 이것이 바로 당신만의 피부 분석 결과입니다."
+            : "No two skin profiles are the same — this is your personal skin analysis."}
         </motion.p>
 
         {/* Radar + axis bars */}

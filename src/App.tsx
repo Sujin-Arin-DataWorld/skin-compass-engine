@@ -26,6 +26,7 @@ import Wishlist from "./pages/Wishlist";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
+import LabSelectionPage from "./pages/LabSelectionPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BottomNav } from "./components/BottomNav";
 
@@ -148,6 +149,7 @@ function AppInner() {
         {/* ProtectedRoute temporarily removed for local dev */}
         <Route path="/diagnosis" element={<Diagnosis />} />
         <Route path="/results" element={<Results />} />
+        <Route path="/lab" element={<LabSelectionPage />} />
         <Route path="/formula/:id" element={<FormulaDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route

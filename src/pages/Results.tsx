@@ -279,6 +279,35 @@ const ResultsPage = () => {
       {/* Debug panel */}
       {isDebug && result?._debug && <DebugPanel debugData={result._debug} />}
 
+      {/* Lab CTA — shown on last slide for logged-in users */}
+      {isLoggedIn && current === slides.length - 1 && (
+        <motion.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.4, ease: "easeOut" }}
+          className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-3 px-5 py-3
+                     bg-white/95 dark:bg-[#0D0D0D]/95 backdrop-blur-sm
+                     border-t border-[#C8A951]/30 dark:border-[#C8A951]/20"
+        >
+          <p className="text-xs font-medium text-[#947E5C] dark:text-[#C8A951]/80 leading-snug">
+            {language === "ko"
+              ? "진단 결과를 바탕으로 맞춤 제품 루틴을 설계하세요."
+              : language === "de"
+              ? "Erstellen Sie Ihre persönliche Produktroutine basierend auf Ihren Ergebnissen."
+              : "Build your personalised product routine from your results."}
+          </p>
+          <Link
+            to="/lab"
+            className="shrink-0 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase transition-all
+                       bg-[#C8A951] text-white border border-[#C8A951] shadow-md hover:shadow-lg hover:bg-[#b8973f]
+                       dark:bg-transparent dark:text-[#C8A951] dark:border-[#C8A951]
+                       dark:shadow-[0_0_10px_rgba(200,169,81,0.2)] dark:hover:shadow-[0_0_18px_rgba(200,169,81,0.45)]"
+          >
+            {language === "ko" ? "연구소 입장 →" : language === "de" ? "Labor →" : "Enter Lab →"}
+          </Link>
+        </motion.div>
+      )}
+
       {/* Guest save banner — shown when user is not logged in */}
       {!isLoggedIn && (
         <motion.div

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Navigate, Link, useSearchParams } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
+import { getPendingDiagnosis } from "@/utils/diagnosisPersistence";
 import { useI18nStore } from "@/store/i18nStore";
 import { buildRoutineV5 } from "@/engine/routineEngineV5";
 import type { RoutineOutputV5 } from "@/engine/routineEngineV5";
@@ -152,18 +153,29 @@ function makeMockResult(products: Product[]): DiagnosisResult {
 }
 
 const ResultsPage = () => {
-  const { result: storeResult, implicitFlags } = useDiagnosisStore();
+  const { result: storeResult, implicitFlags, setResult } = useDiagnosisStore();
   const { products } = useProductStore();
   const [searchParams] = useSearchParams();
   const isDebug = searchParams.get("debug") === "true";
   const { language } = useI18nStore();
 
-  // Use mock data in dev when no real result exists
+  // Use mock data in dev when no real result exists.
+  // Fallback to localStorage pending diagnosis (survives guest→login page reload).
   const result = useMemo(() => {
     if (storeResult) return storeResult;
+    const pending = getPendingDiagnosis();
+    if (pending?.fullResult) return pending.fullResult;
     if (import.meta.env.DEV) return makeMockResult(products);
     return null;
   }, [storeResult, products]);
+
+  // Restore pending diagnosis into Zustand store so navigating away and back works.
+  // Don't clear localStorage here — AuthCallback needs it to sync to Supabase.
+  useEffect(() => {
+    if (storeResult) return;
+    const pending = getPendingDiagnosis();
+    if (pending?.fullResult) setResult(pending.fullResult);
+  }, [storeResult, setResult]);
 
   // B-1 + B-2: compute personalised routine from V5 result (pure, no side-effects)
   const routineOutput = useMemo<RoutineOutputV5 | null>(() => {

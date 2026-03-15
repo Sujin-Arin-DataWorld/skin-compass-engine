@@ -16,6 +16,7 @@ import Navbar from "@/components/Navbar";
 import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
 import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
+import { savePendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const GOLD_DARK = "#c9a96e";
@@ -459,6 +460,17 @@ const DiagnosisPage: React.FC = () => {
         (prods ?? []).map(p => ({ id: p.id, name: p.name?.en ?? "", phase }))
       );
 
+      // Persist to localStorage immediately — survives guest→login page reload
+      savePendingDiagnosis({
+        completedAt: new Date().toISOString(),
+        axisScores: result.axis_scores as Record<string, number>,
+        axisSeverity: (result.axis_severity ?? {}) as Record<string, string>,
+        skinTier: TIER_MAP[store.selectedTier] ?? "Entry",
+        recommendedProducts: flatProducts,
+        fullResult: result,
+        engineVersion: "v5.1",
+      });
+
       // saveDiagnosis failure is non-fatal — navigate regardless
       try {
         await saveDiagnosis(
@@ -466,6 +478,8 @@ const DiagnosisPage: React.FC = () => {
           TIER_MAP[store.selectedTier] ?? "Entry",
           flatProducts
         );
+        // Authenticated save succeeded — no need to keep the localStorage copy
+        clearPendingDiagnosis();
       } catch (saveErr) {
         console.warn("[handleCompleteAnalysis] saveDiagnosis failed (non-fatal):", saveErr);
       }

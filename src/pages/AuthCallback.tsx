@@ -14,6 +14,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+import { getPendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
+import { useDiagnosisStore } from "@/store/diagnosisStore";
 
 const GOLD    = "#c9a96e";
 const ROSE    = "#b76e79";
@@ -27,9 +29,36 @@ export default function AuthCallback() {
   useEffect(() => {
     let resolved = false;
 
-    const go = () => {
+    const go = async () => {
       if (resolved) return;
       resolved = true;
+
+      // Sync any pending guest diagnosis to Supabase now that user is authenticated
+      const pending = getPendingDiagnosis();
+      if (pending) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: { user } } = await (supabase as any).auth.getUser();
+          if (user) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase as any)
+              .from("diagnosis_history")
+              .insert({
+                user_id: user.id,
+                radar_data: pending.axisScores,
+                skin_tier: pending.skinTier,
+                recommended_products: pending.recommendedProducts,
+              });
+          }
+          // Restore result to Zustand store so Results.tsx renders immediately
+          useDiagnosisStore.getState().setResult(pending.fullResult);
+          clearPendingDiagnosis();
+        } catch (syncErr) {
+          console.warn("[AuthCallback] pending diagnosis sync failed (non-fatal):", syncErr);
+          // Non-fatal — Results.tsx will still restore from localStorage
+        }
+      }
+
       const dest = searchParams.get("redirect");
       // Guard against open-redirect: only allow relative paths
       const to = dest && dest.startsWith("/") ? decodeURIComponent(dest) : "/account";

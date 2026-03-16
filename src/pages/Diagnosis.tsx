@@ -4,12 +4,11 @@
 // foundation & atopy store wiring, and the full "Complete Analysis" → runDiagnosis → /results flow.
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { X } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
-import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
 import { useDiagnosis } from "@/hooks/useDiagnosis";
 import Navbar from "@/components/Navbar";
@@ -344,7 +343,6 @@ function MobileFoundationStepper({
 const DiagnosisPage: React.FC = () => {
   const navigate = useNavigate();
   const store = useDiagnosisStore();
-  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const { language } = useI18nStore();
   const lang = language as Lang;
   const { resolvedTheme } = useTheme();
@@ -353,11 +351,75 @@ const DiagnosisPage: React.FC = () => {
   const GOLD_DEEP   = isDark ? "#947E5C" : FOREST;
   const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
 
-  // ── Local state ──
-  const [phase, setPhase] = useState<Phase>("foundation");
+  // ── URL-synced navigation state ──────────────────────────────────────────────
+  // Each phase change (foundation ↔ facemap) creates a browser history entry,
+  // so the browser back/forward buttons work naturally.
+  // "scanning" is a transient 1.8 s animation — it gets its own local boolean
+  // so it does NOT create a history entry (pressing back during scanning would
+  // feel broken).
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isScanning, setIsScanning] = useState(false);
+
+  // Derive phase from URL; fall back to "foundation"
+  const urlPhase = searchParams.get("phase");
+  const phase: Phase = isScanning
+    ? "scanning"
+    : urlPhase === "facemap"
+    ? "facemap"
+    : "foundation";
+
+  // Mobile question index from URL (0-based)
+  const mobileQ = Math.max(
+    0,
+    Math.min(
+      parseInt(searchParams.get("q") || "0", 10),
+      TOTAL_MOBILE_STEPS - 1
+    )
+  );
+
+  const setPhase = useCallback(
+    (newPhase: Phase) => {
+      if (newPhase === "scanning") {
+        setIsScanning(true);
+        return;
+      }
+      setIsScanning(false);
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (newPhase === "foundation") {
+            next.delete("phase");
+            next.delete("q");
+          } else {
+            next.set("phase", newPhase);
+          }
+          return next;
+        },
+        { replace: false }
+      );
+    },
+    [setSearchParams]
+  );
+
+  const setMobileQ = useCallback(
+    (updater: number | ((prev: number) => number)) => {
+      const next =
+        typeof updater === "function" ? updater(mobileQ) : updater;
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          params.set("q", String(next));
+          return params;
+        },
+        { replace: false }
+      );
+    },
+    [setSearchParams, mobileQ]
+  );
+
+  // ── Other local state ─────────────────────────────────────────────────────
   const [foundationAnswers, setFounds] = useState<Record<string, number>>({});
   const [isMobile, setIsMobile] = useState(false);
-  const [mobileQ, setMobileQ] = useState(0);  // current question index in mobile stepper
   const [showRetestModal, setShowRetestModal] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const hasCheckedHistory = useRef(false);
@@ -380,12 +442,12 @@ const DiagnosisPage: React.FC = () => {
     if (history.length > 0) setShowRetestModal(true);
   }, [historyLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Scanning transition auto-advance
+  // Scanning transition auto-advance (isScanning is local — no URL history entry)
   useEffect(() => {
-    if (phase !== "scanning") return;
+    if (!isScanning) return;
     const t = setTimeout(() => setPhase("facemap"), 1800);
     return () => clearTimeout(t);
-  }, [phase]);
+  }, [isScanning, setPhase]);
 
   // Retest modal data
   const lastRecord = history[0] ?? null;
@@ -422,11 +484,13 @@ const DiagnosisPage: React.FC = () => {
 
     const { selectedZones } = useDiagnosisStore.getState();
 
-    // facemapConcerns — safe even if selectedZones is undefined
+    // Warn but don't silently block — user clicked the button, so proceed regardless
     const facemapConcerns = Object.values(selectedZones ?? {})
       .reduce((sum, z) => sum + (z?.concerns?.length ?? 0), 0);
 
-    if (facemapConcerns === 0) return;
+    if (facemapConcerns === 0) {
+      console.warn("[handleCompleteAnalysis] No face map concerns found — proceeding with axis answers only");
+    }
 
     setAnalyzing(true);
 
@@ -442,8 +506,8 @@ const DiagnosisPage: React.FC = () => {
       });
 
       if (!result) {
-        console.error("[handleCompleteAnalysis] runDiagnosisV5 returned null/undefined");
-        setAnalyzing(false);
+        console.error("[handleCompleteAnalysis] runDiagnosisV5 returned null/undefined — navigating to results with empty state");
+        navigate("/results");
         return;
       }
 
@@ -487,6 +551,8 @@ const DiagnosisPage: React.FC = () => {
       navigate("/results");
     } catch (err) {
       console.error("[handleCompleteAnalysis] fatal error:", err);
+      navigate("/results");
+    } finally {
       setAnalyzing(false);
     }
   }, [analyzing, store, saveDiagnosis, navigate]);
@@ -830,7 +896,7 @@ const DiagnosisPage: React.FC = () => {
             <motion.div key="facemap"
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}>
-              <FaceMapStep onNext={handleCompleteAnalysis} />
+              <FaceMapStep onNext={handleCompleteAnalysis} isAnalyzing={analyzing} />
             </motion.div>
           )}
 

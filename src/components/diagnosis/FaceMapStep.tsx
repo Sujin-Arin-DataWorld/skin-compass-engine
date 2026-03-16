@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight } from "lucide-react";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
@@ -667,7 +668,9 @@ function InlineQuestionRenderer({
   );
 }
 
-// ─── GlossaryBadge — click/tap popover replacing broken title attribute ────────
+// ─── GlossaryBadge — viewport-aware popover via createPortal ──────────────────
+// Uses position:fixed rendered at document.body so overflow:hidden / overflowY:auto
+// parent containers (e.g. the mobile bottom-sheet) can never clip it.
 function GlossaryBadge({
   glossaryText, isDark,
 }: {
@@ -675,12 +678,34 @@ function GlossaryBadge({
   isDark: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
+
+  const TOOLTIP_W = 240;
+  const PADDING   = 12;
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isOpen && triggerRef.current) {
+      const r = triggerRef.current.getBoundingClientRect();
+      // Center tooltip on trigger, clamped inside viewport
+      let left = r.left + r.width / 2 - TOOLTIP_W / 2;
+      if (left + TOOLTIP_W > window.innerWidth - PADDING) {
+        left = window.innerWidth - TOOLTIP_W - PADDING;
+      }
+      if (left < PADDING) left = PADDING;
+      // Place above the trigger (tooltip will translateY(-100%-8px))
+      setPos({ left, top: r.top });
+    }
+    setIsOpen(o => !o);
+  };
 
   return (
     <span style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}>
       {/* ⓘ trigger */}
       <span
-        onClick={(e) => { e.stopPropagation(); setIsOpen(o => !o); }}
+        ref={triggerRef}
+        onClick={handleOpen}
         style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           width: 18, height: 18, borderRadius: "50%",
@@ -700,50 +725,60 @@ function GlossaryBadge({
         i
       </span>
 
-      {/* Popover */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Click-away backdrop */}
-            <div
-              onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
-              style={{ position: "fixed", inset: 0, zIndex: 99, background: "transparent" }}
-            />
-            <motion.div
-              initial={{ opacity: 0, y: 4, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 4, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              onClick={e => e.stopPropagation()}
-              style={{
-                position: "absolute",
-                bottom: "calc(100% + 10px)", left: "50%",
-                transform: "translateX(-50%)",
-                width: 240, padding: "12px 14px",
-                borderRadius: 12, zIndex: 100,
-                background: isDark ? "rgba(24,24,28,0.97)" : "rgba(255,255,255,0.98)",
-                border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
-                backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-                boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.45)" : "0 8px 32px rgba(0,0,0,0.1)",
-                fontSize: 12, lineHeight: 1.6,
-                color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.65)",
-                fontFamily: "'DM Sans', sans-serif", fontWeight: 400,
-              }}
-            >
-              {glossaryText}
-              {/* Arrow pointing down */}
-              <div style={{
-                position: "absolute", bottom: -5, left: "50%",
-                transform: "translateX(-50%) rotate(45deg)",
-                width: 10, height: 10,
-                background: isDark ? "rgba(24,24,28,0.97)" : "rgba(255,255,255,0.98)",
-                borderRight: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
-                borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
-              }} />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Popover — rendered at document.body via portal so it escapes overflow containers */}
+      {isOpen && pos && createPortal(
+        <>
+          {/* Click-away backdrop */}
+          <div
+            onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+            style={{ position: "fixed", inset: 0, zIndex: 9998, background: "transparent" }}
+          />
+          <motion.div
+            initial={{ opacity: 0, y: 4, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.95 }}
+            transition={{ duration: 0.15 }}
+            onClick={e => e.stopPropagation()}
+            style={{
+              position: "fixed",
+              left: pos.left,
+              top: pos.top,
+              transform: "translateY(calc(-100% - 8px))",
+              width: TOOLTIP_W,
+              maxWidth: `calc(100vw - ${PADDING * 2}px)`,
+              padding: "12px 14px",
+              borderRadius: 12,
+              zIndex: 9999,
+              background: isDark ? "rgba(24,24,28,0.97)" : "rgba(255,255,255,0.98)",
+              border: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
+              backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
+              boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.45)" : "0 8px 32px rgba(0,0,0,0.1)",
+              fontSize: 12, lineHeight: 1.6,
+              color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.65)",
+              fontFamily: "'DM Sans', sans-serif", fontWeight: 400,
+              wordWrap: "break-word",
+            }}
+          >
+            {glossaryText}
+            {/* Arrow pointing down */}
+            <div style={{
+              position: "absolute", bottom: -5,
+              left: Math.min(
+                Math.max(PADDING, triggerRef.current
+                  ? triggerRef.current.getBoundingClientRect().left + 9 - pos.left
+                  : TOOLTIP_W / 2),
+                TOOLTIP_W - PADDING
+              ),
+              transform: "rotate(45deg)",
+              width: 10, height: 10,
+              background: isDark ? "rgba(24,24,28,0.97)" : "rgba(255,255,255,0.98)",
+              borderRight: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
+              borderBottom: `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}`,
+            }} />
+          </motion.div>
+        </>,
+        document.body
+      )}
     </span>
   );
 }
@@ -1074,7 +1109,7 @@ export function getAxisLabel(axis: string, lang: Lang, gender: number): string {
 }
 
 // ─── Main export ───────────────────────────────────────────────────────────────
-export function FaceMapStep({ onNext }: { onNext: () => void }) {
+export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => void; isAnalyzing?: boolean }) {
   const { language }      = useI18nStore();
   const lang              = language as Lang;
   const store             = useDiagnosisStore();
@@ -1084,7 +1119,32 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
   const GOLD   = isDark ? "#c9a96e" : "#7A9E82";
 
   // ── Step 2: severity map ──────────────────────────────────────────────────
-  const [concernSeverity, setConcernSeverity] = useState<Record<string, 1 | 2 | 3>>({});
+  // Initialise from the Zustand store so selections survive back/forward navigation.
+  // The store persists selectedZones (including per-concern severity) to localStorage.
+  const [concernSeverity, setConcernSeverity] = useState<Record<string, 1 | 2 | 3>>(() => {
+    const zones = useDiagnosisStore.getState().selectedZones ?? {};
+    const out: Record<string, 1 | 2 | 3> = {};
+    for (const zone of Object.values(zones)) {
+      if (zone.severity) Object.assign(out, zone.severity);
+    }
+    return out;
+  });
+
+  // Keep store in sync on every chip change so mid-selection state is preserved
+  // even if the user navigates away before hitting "Complete".
+  const setAllZones = store.actions.setAllZones;
+  useEffect(() => {
+    const zoneMap: Record<string, { concerns: string[]; severity?: Record<string, 1 | 2 | 3> }> = {};
+    for (const [zid, arr] of Object.entries(ZONE_CONCERNS)) {
+      const sel = arr.filter(c => (concernSeverity[c.id] ?? 0) > 0);
+      if (sel.length) {
+        const sevMap: Record<string, 1 | 2 | 3> = {};
+        sel.forEach(c => { sevMap[c.id] = concernSeverity[c.id]; });
+        zoneMap[zid] = { concerns: sel.map(c => c.id), severity: sevMap };
+      }
+    }
+    setAllZones(zoneMap);
+  }, [concernSeverity, setAllZones]);
   const [activeZone, setActiveZone]           = useState<ZoneId | null>(null);
   const [isMobile, setIsMobile]               = useState(false);
   const [severityHintShown, setSeverityHintShown] = useState(false);
@@ -1420,8 +1480,8 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
             <div style={{ marginLeft: "auto" }}>
               <motion.button
                 onClick={handleMappingDone}
-                disabled={!totalSelected}
-                animate={allZonesDone ? {
+                disabled={!totalSelected || isAnalyzing}
+                animate={allZonesDone && !isAnalyzing ? {
                   boxShadow: isDark ? [
                     "0 8px 24px rgba(201,169,110,0.4)",
                     "0 8px 40px rgba(201,169,110,0.85)",
@@ -1444,11 +1504,25 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
                       ? (isDark ? "linear-gradient(135deg, rgba(201,169,110,0.45), rgba(163,133,85,0.45))" : "linear-gradient(135deg, rgba(142,162,115,0.55), rgba(45,79,57,0.55))")
                       : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
                   color: totalSelected > 0 ? "#fff" : isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
-                  cursor: totalSelected > 0 ? "pointer" : "not-allowed",
-                  transition: "background 0.4s ease",
+                  cursor: (totalSelected > 0 && !isAnalyzing) ? "pointer" : "not-allowed",
+                  opacity: isAnalyzing ? 0.65 : 1,
+                  transition: "background 0.4s ease, opacity 0.2s ease",
                 }}>
-                {copy.completeMappingCta}
-                <ChevronRight size={18} />
+                {isAnalyzing ? (
+                  <>
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      style={{ display: "inline-block", width: 16, height: 16, border: "2px solid currentColor", borderTopColor: "transparent", borderRadius: "50%" }}
+                    />
+                    {lang === "ko" ? "분석 중…" : lang === "de" ? "Analysiere…" : "Analysing…"}
+                  </>
+                ) : (
+                  <>
+                    {copy.completeMappingCta}
+                    <ChevronRight size={18} />
+                  </>
+                )}
               </motion.button>
             </div>
           </div>
@@ -1467,9 +1541,10 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
           />
           <div style={{ marginTop: 8, display: "flex", justifyContent: "flex-end" }}>
             <motion.button
-              onClick={() => buildAndSubmit()}
-              whileTap={{ scale: 0.97 }}
-              animate={{
+              onClick={() => !isAnalyzing && buildAndSubmit()}
+              disabled={isAnalyzing}
+              whileTap={{ scale: isAnalyzing ? 1 : 0.97 }}
+              animate={!isAnalyzing ? {
                 boxShadow: isDark ? [
                   "0 8px 24px rgba(201,169,110,0.4)",
                   "0 8px 40px rgba(201,169,110,0.85)",
@@ -1479,7 +1554,7 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
                   "0 8px 40px rgba(45,79,57,0.7)",
                   "0 8px 24px rgba(45,79,57,0.35)",
                 ],
-              }}
+              } : { boxShadow: "none" }}
               transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
               style={{
                 display: "flex", alignItems: "center", gap: 10,
@@ -1488,10 +1563,25 @@ export function FaceMapStep({ onNext }: { onNext: () => void }) {
                 fontFamily: "'DM Sans', sans-serif", border: "none",
                 background: isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)",
                 color: isDark ? "#0d0d12" : "#fff",
-                cursor: "pointer",
+                cursor: isAnalyzing ? "not-allowed" : "pointer",
+                opacity: isAnalyzing ? 0.65 : 1,
+                transition: "opacity 0.2s ease",
               }}>
-              {copy.seeResultsCta}
-              <ChevronRight size={18} />
+              {isAnalyzing ? (
+                <>
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    style={{ display: "inline-block", width: 16, height: 16, border: "2px solid currentColor", borderTopColor: "transparent", borderRadius: "50%" }}
+                  />
+                  {lang === "ko" ? "분석 중…" : lang === "de" ? "Analysiere…" : "Analysing…"}
+                </>
+              ) : (
+                <>
+                  {copy.seeResultsCta}
+                  <ChevronRight size={18} />
+                </>
+              )}
             </motion.button>
           </div>
         </>

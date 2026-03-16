@@ -31,7 +31,7 @@ import {
   DiagnosisAxis,
   scoreToSeverity,
 } from '@/features/lab-selection/types';
-import type { DiagnosisResult } from '@/engine/types';
+import type { DiagnosisResult, AxisKey } from '@/engine/types';
 
 // ── Bridge: DiagnosisResult → ZoneDiagnosis[] ────────────────────────────────
 
@@ -42,6 +42,21 @@ const ZONE_ID_MAP: Record<string, FaceZone> = {
   cheeks:   'cheeks',
   mouth:    'chin',
   jawline:  'jawline',
+};
+
+/**
+ * Maps engine AxisKey (seb, hyd, bar…) → lab-selection DiagnosisAxis (sebum, hydration, barrier…).
+ * Keys not listed here are irrelevant to ingredient selection and are dropped.
+ */
+const ENGINE_TO_LAB_AXIS: Partial<Record<AxisKey, DiagnosisAxis>> = {
+  seb:     'sebum',
+  hyd:     'hydration',
+  bar:     'barrier',
+  sen:     'sensitivity',
+  acne:    'pores',        // acne concerns map to pore/BHA ingredients
+  pigment: 'pigmentation',
+  aging:   'aging',
+  texture: 'texture',
 };
 
 /** Pick the best SkinProfile match from axis scores */
@@ -59,15 +74,15 @@ function inferProfile(axisScores: AxisScore[]): SkinProfile {
 }
 
 function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
-  // Build global axis scores
-  const globalAxisScores: AxisScore[] = Object.entries(result.axis_scores ?? {})
-    .filter(([axis]) =>
-      ['sebum','hydration','pores','sensitivity','barrier','pigmentation','aging'].includes(axis)
-    )
-    .map(([axis, score]) => ({
-      axis: axis as DiagnosisAxis,
-      score: score as number,
-      severity: scoreToSeverity(score as number),
+  // Build global axis scores — translate engine keys to lab-selection axis names
+  const globalAxisScores: AxisScore[] = (
+    Object.entries(result.axis_scores ?? {}) as [AxisKey, number][]
+  )
+    .filter(([engineKey]) => ENGINE_TO_LAB_AXIS[engineKey] !== undefined)
+    .map(([engineKey, score]) => ({
+      axis: ENGINE_TO_LAB_AXIS[engineKey]!,
+      score,
+      severity: scoreToSeverity(score),
     }));
 
   // If zone_heatmap exists, build per-zone diagnoses
@@ -87,9 +102,10 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
         return { ...a, score: clamped, severity: scoreToSeverity(clamped) };
       });
 
-      // Also elevate the dominant axis for this zone
+      // Elevate the dominant axis for this zone (translate engine key first)
+      const dominantLabAxis = ENGINE_TO_LAB_AXIS[entry.dominantAxis];
       const withDominant = scaledScores.map((a) =>
-        a.axis === entry.dominantAxis
+        dominantLabAxis && a.axis === dominantLabAxis
           ? { ...a, score: Math.min(100, a.score + 15), severity: scoreToSeverity(Math.min(100, a.score + 15)) }
           : a
       );

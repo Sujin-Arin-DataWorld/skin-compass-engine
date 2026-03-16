@@ -7,7 +7,8 @@
       "Read(//Users/sujinpark/Downloads/**)",
       "Bash(ls src/engine/axisAnswerBridge*)",
       "Bash(npx tsc --noEmit --project tsconfig.json)",
-      "Bash(node -e \"const p = require\\(''/Users/sujinpark/Desktop/skin-compass-engine/package.json''\\); console.log\\(JSON.stringify\\({zustand: p.dependencies?.zustand, immer: p.dependencies?.immer}, null, 2\\)\\)\")"
+      "Bash(node -e \"const p = require\\(''/Users/sujinpark/Desktop/skin-compass-engine/package.json''\\); console.log\\(JSON.stringify\\({zustand: p.dependencies?.zustand, immer: p.dependencies?.immer}, null, 2\\)\\)\")",
+      "Read(//Users/sujinpark/Desktop/**)"
     ]
   }
 }

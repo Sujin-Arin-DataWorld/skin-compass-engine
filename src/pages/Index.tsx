@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CookieConsent from "@/components/CookieConsent";
+import RecheckBanner from "@/features/results/components/RecheckBanner";
 import { useI18nStore, phase1T } from "@/store/i18nStore";
 import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
@@ -723,6 +724,7 @@ export default function Index() {
     <div className="min-h-screen bg-white dark:bg-transparent">
       <Navbar />
       <div className="h-16" />
+      <RecheckBanner />
 
       <main>
         <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} lang={language} accent={accent} accentDeep={accentDeep} isDark={isDark} />

@@ -9,6 +9,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import AddressManager from "@/pages/AddressManager";
 import WishlistGrid from "@/pages/WishlistGrid";
 import OrdersPage from "@/pages/OrdersPage";
+import RecheckBanner from "@/features/results/components/RecheckBanner";
 
 
 // ── Skeleton loader ───────────────────────────────────────────────────────
@@ -111,6 +112,7 @@ export default function Account() {
 
     return (
         <AccountLayout activeTab={activeTab} onTabChange={setActiveTab}>
+            <RecheckBanner />
             <AnimatePresence mode="wait">
                 <motion.div
                     key={activeTab}

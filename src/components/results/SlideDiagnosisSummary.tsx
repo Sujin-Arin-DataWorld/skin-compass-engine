@@ -4,6 +4,9 @@ import { useDiagnosisStore } from "@/store/diagnosisStore";
 import type { DiagnosisResult, AxisKey, ZoneId, ZoneHeatmapEntry } from "@/engine/types";
 import { computeSkinAge, AGE_MIDPOINTS } from "@/engine/diagnosisComparison";
 import { SkinAgeCard } from "@/features/results/components/SkinAgeCard";
+import DiagnosisComparisonView from "@/features/results/components/DiagnosisComparisonView";
+import { useDiagnosisComparison } from "@/features/results/hooks/useDiagnosisComparison";
+import RecheckBanner from "@/features/results/components/RecheckBanner";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // i18n maps
@@ -270,6 +273,8 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
   const realAge     = AGE_MIDPOINTS[ageBracket] ?? 35;
   const skinAgeData = computeSkinAge(realAge, result.axis_scores, menoStatus);
 
+  const comparisonState = useDiagnosisComparison();
+
   const patternNameEN = result.detected_patterns[0]?.pattern.name_en ?? "Balanced Profile";
   const p = result.detected_patterns[0]?.pattern as unknown as Record<string, string> | undefined;
   const patternName   = language === "de"
@@ -293,6 +298,9 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
   return (
     <div className="results-slide flex flex-1 flex-col px-6 py-10 overflow-y-auto">
       <div className="mx-auto w-full max-w-xl">
+
+        {/* ── Re-check reminder banner (Phase 6 Step 3) ── */}
+        <RecheckBanner />
 
         {/* ── Section A: Empathy hook ── */}
         <motion.div
@@ -520,6 +528,22 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
                 ? "✓ 추천: 히알루론산 젤, 수분 세럼, 오일프리 보습제 · ✗ 피해야 할 것: 무거운 크림, 세정력 강한 클렌저"
                 : "✓ Look for: Hyaluronic acid gel, water-based serums, oil-free moisturizers · ✗ Avoid: Heavy creams, stripping foam cleansers"}
             </p>
+          </motion.div>
+        )}
+
+        {/* ── Section E2b: Re-Diagnosis Comparison (Phase 6 Step 2) ── */}
+        {comparisonState.hasPrevious && comparisonState.comparison && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: hasHeatmap ? 0.52 : 0.46, duration: 0.4 }}
+          >
+            <DiagnosisComparisonView
+              result={result}
+              comparison={comparisonState.comparison}
+              engineVersionMismatch={comparisonState.engineVersionMismatch}
+              previousDiagnosisAgeDays={comparisonState.previousDiagnosisAgeDays}
+            />
           </motion.div>
         )}
 

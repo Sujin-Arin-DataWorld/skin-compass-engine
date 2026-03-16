@@ -35,7 +35,7 @@ const AXIS_META: Record<string, { ko: string; en: string; de: string; color: str
   pores:           { ko: '모공',         en: 'Pores',          de: 'Poren',             color: '#A78BFA' },
   texture:         { ko: '피부결',       en: 'Texture',        de: 'Textur',            color: '#34D399' },
   sensitivity:     { ko: '민감도',       en: 'Sensitivity',    de: 'Empfindlichkeit',   color: '#F87171' },
-  aging:           { ko: '노화',         en: 'Aging',          de: 'Alterung',          color: '#C8A951' },
+  aging:           { ko: '노화',         en: 'Aging',          de: 'Alterung',          color: 'hsl(var(--accent-gold))' },
   pigmentation:    { ko: '색소침착',     en: 'Pigmentation',   de: 'Pigmentierung',     color: '#818CF8' },
   barrier:         { ko: '장벽',         en: 'Barrier',        de: 'Barriere',          color: '#F0997B' },
   neurodermatitis: { ko: '신경성 피부염',en: 'Neurodermatitis',de: 'Neurodermitis',     color: '#EC4899' },
@@ -179,7 +179,7 @@ function IngredientRow({
         {/* Priority indicator */}
         <span style={{
           fontSize: isMustHave ? 13 : 9,
-          color: isMustHave ? '#C8A951' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'),
+          color: isMustHave ? 'hsl(var(--accent-gold))' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'),
           flexShrink: 0, lineHeight: 1,
         }}>
           {isMustHave ? '★' : '·'}
@@ -207,7 +207,7 @@ function IngredientRow({
         {ing.min_concentration !== null && (
           <span style={{
             flexShrink: 0, fontSize: 12, fontWeight: 700,
-            color: '#C8A951', fontFamily: "'DM Sans', monospace",
+            color: 'hsl(var(--accent-gold))', fontFamily: "'DM Sans', monospace",
             letterSpacing: '-0.02em',
           }}>
             {tUI('conc_min', lang)}{ing.min_concentration}%

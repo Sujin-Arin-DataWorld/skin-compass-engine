@@ -71,7 +71,7 @@ function ProductBadge({ product, language }: { product: Product; language: strin
         borderRadius: 6,
         padding: '2px 6px',
         fontSize: 9,
-        color: '#C8A951',
+        color: 'hsl(var(--accent-gold))',
         maxWidth: 90,
         overflow: 'hidden',
         textOverflow: 'ellipsis',

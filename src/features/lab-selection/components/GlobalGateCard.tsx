@@ -113,7 +113,7 @@ function RecoveryProductCard({
       <div style={{ textAlign: 'right' }}>
         <div style={{
           fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
-          color: '#C8A951', background: 'rgba(200,169,81,0.12)',
+          color: 'hsl(var(--accent-gold))', background: 'rgba(200,169,81,0.12)',
           padding: '2px 8px', borderRadius: 20, marginBottom: 4,
         }}>
           {tierLabel}
@@ -284,7 +284,7 @@ export default function GlobalGateCard() {
         boxShadow: isDark
           ? '0 0 20px rgba(240,153,123,0.3)'
           : '0 4px 24px rgba(240,153,123,0.15)',
-        background: isDark ? '#1A1A2E' : '#FFF5F2',
+        background: isDark ? 'hsl(var(--background))' : '#FFF5F2',
       }}
     >
       {/* Warning stripe */}
@@ -387,9 +387,9 @@ export default function GlobalGateCard() {
             padding: '12px 32px', borderRadius: 32, cursor: 'pointer',
             fontSize: 13, fontWeight: 700, letterSpacing: '0.08em',
             fontFamily: "'DM Sans', sans-serif",
-            border: '1.5px solid #C8A951',
+            border: '1.5px solid hsl(var(--accent-gold))',
             background: isDark ? 'transparent' : 'rgba(200,169,81,0.08)',
-            color: '#C8A951',
+            color: 'hsl(var(--accent-gold))',
             boxShadow: isDark ? '0 0 12px rgba(200,169,81,0.2)' : 'none',
             transition: 'box-shadow 0.2s',
           }}

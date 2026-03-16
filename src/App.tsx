@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
+import { useI18nStore } from "@/store/i18nStore";
 import GdprConsentModal from "./components/GdprConsentModal";
 import Index from "./pages/Index";
 import Diagnosis from "./pages/Diagnosis";
@@ -37,6 +38,12 @@ function AppInner() {
   const setSession = useAuthStore((s) => s.setSession);
   const { logout } = useAuthStore();
   const location = useLocation();
+  const { language } = useI18nStore();
+
+  // Sync HTML lang attribute for i18n CSS rules ([lang="ko"], etc.)
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   // ── GDPR gate state ──────────────────────────────────────────────────────
   const [showGdpr, setShowGdpr] = useState(false);

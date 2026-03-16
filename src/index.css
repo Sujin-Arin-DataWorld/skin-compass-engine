@@ -31,54 +31,64 @@
 
 @layer base {
   :root {
-    /* ── Light mode — Serene Clinical ── */
-    --background: 210 11% 95%;
-    /* #F2F4F5 — Pale Fog */
+    /* ===== WHITE MODE: Clean Clinical Lab ===== */
+
+    /* Base */
+    --background: 210 33% 98%;        /* #F8FAFC - Ice Pearl */
+    --foreground: 160 14% 12%;        /* #1C2421 - Charcoal Green */
     --background-2: 210 8% 91%;
+
+    /* Cards & Popovers */
     --card: 0 0% 100%;
-    /* pure white — clean card surface */
-    --card-foreground: 210 30% 24%;
-    /* #2C3E50 — Deep Slate */
+    --card-foreground: 160 14% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 14% 12%;
 
-    --foreground: 0 0% 10%;
-    /* #1A1A1A — Deep Charcoal — primary heading */
-    --foreground-body: 210 30% 24%;
-    /* #2C3E50 — Slate Blue — body text */
-    --foreground-hint: 210 20% 35%;
-    /* muted slate — labels/hints */
+    /* Extended foreground variants (used by existing components) */
+    --foreground-body: 210 30% 24%;   /* #2C3E50 — body text */
+    --foreground-hint: 210 20% 35%;   /* muted labels/hints */
 
-    --popover: 210 11% 95%;
-    --popover-foreground: 210 30% 24%;
-
-    --primary: 76 26% 48%;
-    /* #8A9A5B — Sage Green */
+    /* Tier 1: Sage Green (Clinical Trust) */
+    --primary: 100 22% 48%;           /* #769362 */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 34 44% 69%;
-    /* #D2B48C — Warm Sand */
-    --secondary-foreground: 210 30% 18%;
+    /* Tier 2: Dusty Aqua (Science & Data) */
+    --secondary: 187 26% 63%;         /* #87B6BC */
+    --secondary-foreground: 160 14% 12%;
 
-    --muted: 210 8% 90%;
-    --muted-foreground: 210 20% 35%;
+    /* Tier 3: Gold Accent */
+    --accent-gold: 43 58% 55%;        /* #D2AC47 */
+    --accent-gold-foreground: 160 14% 12%;
 
-    --accent: 76 30% 94%;
-    --accent-foreground: 76 26% 38%;
+    /* Semantic: Muted */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --destructive: 0 72% 50%;
-    --destructive-foreground: 0 85% 97%;
+    /* Semantic: Accent (Hover/Selected) */
+    --accent: 100 22% 95%;
+    --accent-foreground: 160 14% 12%;
 
-    --border: 210 10% 85%;
-    --input: 210 10% 88%;
-    --ring: 76 26% 48%;
+    /* Clinical Safety States */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    /* Borders & Focus */
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 100 22% 48%;
 
     --radius: 0.75rem;
 
-    /* Custom tokens — light */
+    /* ── Preserved custom tokens (used by existing components) ── */
     --accent-sand: 34 44% 69%;
     --accent-champagne: 34 40% 85%;
     --accent-rose: 8 40% 52%;
 
-    --gradient-start: 76 20% 90%;
+    --gradient-start: 100 20% 90%;
     --gradient-end: 210 11% 95%;
 
     --severity-clear: 145 40% 34%;
@@ -98,26 +108,26 @@
     --hydration-soft: 200 60% 85%;
 
     --glow-sand: 0 0 24px hsla(34, 44%, 69%, 0.15);
-    --glow-champagne: 0 0 20px hsla(76, 26%, 48%, 0.1);
+    --glow-champagne: 0 0 20px hsla(100, 22%, 48%, 0.1);
 
     --font-display: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
     --font-body: 'DM Sans', system-ui, sans-serif;
 
     --sidebar-background: 210 8% 93%;
     --sidebar-foreground: 210 30% 24%;
-    --sidebar-primary: 76 26% 48%;
+    --sidebar-primary: 100 22% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 34 44% 69%;
+    --sidebar-accent: 43 58% 55%;
     --sidebar-accent-foreground: 210 30% 18%;
-    --sidebar-border: 210 10% 85%;
-    --sidebar-ring: 76 26% 48%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 100 22% 48%;
 
     /* Diagnosis text tokens — WCAG AA compliant */
     --diagnosis-text-primary: 0 0% 10%;
     --diagnosis-text-secondary: 210 30% 24%;
     --diagnosis-text-hint: 210 20% 35%;
 
-    /* Typography scale — Part C */
+    /* Typography scale */
     --text-base: 16px;
     --text-sm: 14px;
     --text-xs: 12px;
@@ -128,7 +138,6 @@
     --tracking-wide: 0.06em;
     --tracking-ko: -0.02em;
 
-    /* Typography scale */
     --text-hero: clamp(2.8rem, 7vw, 5.5rem);
     --text-display: clamp(2rem, 4vw, 3.2rem);
     --text-title: clamp(1.5rem, 2.5vw, 2rem);
@@ -138,15 +147,18 @@
     --text-small: 0.9375rem;
     --text-label: 0.8125rem;
     --text-micro: 0.75rem;
-    --chart-1: 76 40% 50%;
-    --chart-2: 34 50% 56%;
+
+    --chart-1: 100 40% 50%;
+    --chart-2: 187 50% 56%;
     --chart-3: 145 40% 45%;
     --chart-4: 200 50% 50%;
     --chart-5: 210 10% 55%;
+
     --sidebar: 0 0% 98%;
     --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-serif: 'RIDIBatang', 'Libre Caslon Text', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
@@ -160,55 +172,62 @@
   }
 
   .dark {
-    /* ── Dark mode — App-matched Navy Slate ── */
-    --background: 220 22% 12%;
-    /* #151b27 — dark navy, matches app bg */
+    /* ===== DARK MODE: Deep Hydration & Premium Aesthetic ===== */
+
+    /* Base */
+    --background: 222 33% 11%;        /* #111827 - Deep Navy Slate */
+    --foreground: 220 13% 91%;        /* #E5E7EB - Soft Off-White */
     --background-2: 220 20% 14%;
-    /* #19202e */
-    --card: 220 18% 17%;
-    /* #1f2636 — card lift, matches app card surface */
-    --card-foreground: 210 10% 88%;
-    /* #D9DDE1 */
 
-    --foreground: 210 10% 88%;
-    /* #D9DDE1 — soft white */
+    /* Cards & Popovers (Dark Elevation: bg < card < popover) */
+    --card: 222 27% 17%;              /* #1F2636 */
+    --card-foreground: 220 13% 91%;
+    --popover: 222 23% 21%;           /* #2A3142 */
+    --popover-foreground: 220 13% 91%;
+
+    /* Extended foreground variants */
     --foreground-body: 210 8% 72%;
-    /* #ABB2B9 */
     --foreground-hint: 210 8% 50%;
-    /* #747D86 */
 
-    --popover: 220 18% 17%;
-    --popover-foreground: 210 10% 88%;
+    /* Tier 1: Luminating Sage */
+    --primary: 104 24% 61%;           /* #98B486 */
+    --primary-foreground: 222 33% 11%;
 
-    --primary: 76 30% 55%;
-    /* #96AD66 — brighter sage for dark bg */
-    --primary-foreground: 220 22% 12%;
+    /* Tier 2: Glowing Aqua */
+    --secondary: 189 36% 73%;         /* #A5D0D6 */
+    --secondary-foreground: 222 33% 11%;
 
-    --secondary: 34 35% 60%;
-    /* Warm Sand brightened */
-    --secondary-foreground: 220 22% 12%;
+    /* Tier 3: Gold */
+    --accent-gold: 43 58% 55%;        /* #D2AC47 */
+    --accent-gold-foreground: 222 33% 11%;
 
-    --muted: 220 16% 20%;
-    /* #232d3f */
-    --muted-foreground: 210 8% 50%;
+    /* Semantic: Muted */
+    --muted: 222 27% 17%;
+    --muted-foreground: 215 14% 65%;
 
-    --accent: 76 20% 18%;
-    --accent-foreground: 76 30% 65%;
+    /* Semantic: Accent */
+    --accent: 222 27% 20%;
+    --accent-foreground: 220 13% 91%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 85% 97%;
+    /* Clinical Safety (muted for dark) */
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 60% 40%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 80% 45%;
+    --warning-foreground: 0 0% 100%;
 
-    --border: 220 14% 22%;
-    /* #282f3e */
-    --input: 220 16% 20%;
-    --ring: 76 30% 55%;
+    /* Borders & Focus */
+    --border: 220 20% 25%;
+    --input: 220 20% 25%;
+    --ring: 104 24% 61%;
 
-    /* Custom tokens — dark */
+    /* ── Preserved custom tokens ── */
     --accent-sand: 34 35% 60%;
     --accent-champagne: 34 30% 40%;
     --accent-rose: 8 40% 58%;
 
-    --gradient-start: 76 20% 18%;
+    --gradient-start: 104 20% 18%;
     --gradient-end: 210 18% 10%;
 
     --severity-clear: 145 40% 38%;
@@ -228,26 +247,28 @@
     --hydration-soft: 200 40% 25%;
 
     --glow-sand: 0 0 24px hsla(34, 35%, 60%, 0.12);
-    --glow-champagne: 0 0 20px hsla(76, 30%, 55%, 0.1);
+    --glow-champagne: 0 0 20px hsla(104, 24%, 61%, 0.1);
 
     --sidebar-background: 210 14% 12%;
     --sidebar-foreground: 210 10% 88%;
-    --sidebar-primary: 76 30% 55%;
+    --sidebar-primary: 104 24% 61%;
     --sidebar-primary-foreground: 210 18% 10%;
-    --sidebar-accent: 34 35% 60%;
+    --sidebar-accent: 43 58% 55%;
     --sidebar-accent-foreground: 210 14% 14%;
-    --sidebar-border: 210 10% 22%;
-    --sidebar-ring: 76 30% 55%;
+    --sidebar-border: 220 20% 25%;
+    --sidebar-ring: 104 24% 61%;
 
     /* Diagnosis text tokens — dark */
     --diagnosis-text-primary: 210 12% 90%;
     --diagnosis-text-secondary: 210 8% 72%;
     --diagnosis-text-hint: 210 8% 50%;
-    --chart-1: 76 40% 60%;
-    --chart-2: 34 45% 65%;
+
+    --chart-1: 104 40% 60%;
+    --chart-2: 189 45% 65%;
     --chart-3: 145 35% 55%;
     --chart-4: 200 45% 60%;
     --chart-5: 210 10% 50%;
+
     --sidebar: 0 0% 14%;
     --radius: 0.75rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
@@ -267,20 +288,20 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
     background-image:
-      radial-gradient(ellipse 80% 50% at 20% 10%, hsl(76 26% 85% / 0.25) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, hsl(210 11% 90% / 0.3) 0%, transparent 55%),
-      radial-gradient(ellipse 100% 60% at 50% 50%, hsl(34 44% 90% / 0.15) 0%, transparent 70%);
+      radial-gradient(ellipse 80% 50% at 20% 10%, hsl(100 22% 88% / 0.22) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, hsl(187 26% 90% / 0.25) 0%, transparent 55%),
+      radial-gradient(ellipse 100% 60% at 50% 50%, hsl(43 58% 92% / 0.12) 0%, transparent 70%);
     background-attachment: fixed;
   }
 
   .dark body {
     background-image:
-      radial-gradient(ellipse 80% 60% at 10% 0%, hsl(220 30% 20% / 0.65) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 50% at 90% 100%, hsl(215 25% 16% / 0.55) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, hsl(220 20% 14% / 0.3) 0%, transparent 65%);
+      radial-gradient(ellipse 80% 60% at 10% 0%, hsl(222 30% 18% / 0.65) 0%, transparent 55%),
+      radial-gradient(ellipse 60% 50% at 90% 100%, hsl(222 25% 14% / 0.55) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, hsl(222 20% 12% / 0.3) 0%, transparent 65%);
   }
 
   h1,
@@ -362,6 +383,101 @@
     border-radius: inherit;
     pointer-events: none;
   }
+}
+
+/* ===== i18n TYPOGRAPHY RULES ===== */
+
+[lang="ko"] {
+  word-break: keep-all;
+}
+
+[lang="de"] {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+}
+
+[lang="en"] {
+  overflow-wrap: break-word;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+p, li, dd, figcaption {
+  text-wrap: pretty;
+}
+
+/* ===== REUSABLE TEXTURE CLASSES ===== */
+
+/* Champagne Gold gradient (for surfaces, badges, borders — NOT text) */
+.gold-gradient {
+  background: linear-gradient(135deg, #AE8625 0%, #F7EF8A 40%, #D2AC47 70%, #EDC967 100%);
+}
+
+/* Gold text (flat color for accessibility — contrast ratio safe) */
+.gold-text {
+  color: #D2AC47;
+}
+
+/* Dark mode gold glow effect (for cards, badges) */
+.dark .gold-glow {
+  filter: drop-shadow(0 0 12px rgba(254, 189, 17, 0.35));
+}
+
+/* Light mode gold shimmer (subtle) */
+.gold-glow {
+  filter: drop-shadow(0 0 8px rgba(210, 172, 71, 0.2));
+}
+
+/* ===== FLUID TYPOGRAPHY SCALE (Step E) ===== */
+
+.text-title {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.text-heading {
+  font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.text-card-title {
+  font-size: clamp(0.9375rem, 2vw, 1.125rem);
+  line-height: 1.4;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.text-body {
+  font-size: clamp(0.875rem, 1.5vw + 0.25rem, 1rem);
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.text-caption {
+  font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+  line-height: 1.5;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Safe container for multilingual text */
+.i18n-safe {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  min-height: 0;
+}
+
+/* Buttons/chips: never fixed height */
+.i18n-button {
+  min-height: 2.75rem;
+  padding: 0.5rem 1rem;
+  white-space: normal;
 }
 
 /* ── Landing page — Hero Serif (Playfair Display) ── */

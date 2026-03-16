@@ -179,7 +179,7 @@ function ZonePanel({
             fontSize: 14,
           }}
         >
-          <FlaskConical size={15} color="#C8A951" />
+          <FlaskConical size={15} color="hsl(var(--accent-gold))" />
         </div>
 
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -427,7 +427,7 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
             <motion.div
               style={{
                 height: '100%',
-                background: 'linear-gradient(90deg, #C8A951, #5DCAA5)',
+                background: 'linear-gradient(90deg, hsl(var(--accent-gold)), #5DCAA5)',
                 borderRadius: 4,
               }}
               animate={{ width: zones.length > 0 ? `${(completedCount / zones.length) * 100}%` : '0%' }}
@@ -469,7 +469,7 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
                   gap: 10,
                   fontSize: 14,
                   fontWeight: 600,
-                  color: '#C8A951',
+                  color: 'hsl(var(--accent-gold))',
                   letterSpacing: '0.04em',
                   transition: 'background 0.15s',
                 }}

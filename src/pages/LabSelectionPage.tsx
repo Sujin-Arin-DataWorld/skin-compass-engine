@@ -197,7 +197,7 @@ export default function LabSelectionPage() {
                 fontSize: 11,
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
-                color: '#C8A951',
+                color: 'hsl(var(--accent-gold))',
                 marginBottom: 8,
                 fontFamily: 'DM Sans, sans-serif',
               }}

@@ -126,12 +126,12 @@ function TierTabs({
               padding: '4px 14px', borderRadius: 20, fontSize: 11,
               fontWeight: 700, letterSpacing: '0.06em', cursor: isAvail ? 'pointer' : 'default',
               border: isActive
-                ? '1.5px solid #C8A951'
+                ? '1.5px solid hsl(var(--accent-gold))'
                 : `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
               background: isActive
                 ? 'rgba(200,169,81,0.12)'
                 : isDark ? 'transparent' : 'rgba(0,0,0,0.02)',
-              color: isActive ? '#C8A951'
+              color: isActive ? 'hsl(var(--accent-gold))'
                 : isAvail
                 ? (isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)')
                 : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.18)'),
@@ -162,7 +162,7 @@ function ProductCard({
   selectedTier: PriceTier;
 }) {
   const { product, compliance } = scored;
-  const GOLD  = '#C8A951';
+  const GOLD  = 'hsl(var(--accent-gold))';
   const ROSE  = '#b76e79';
 
   const name = lang === 'ko' ? product.name_kr : lang === 'de' ? product.name_de : product.name_en;
@@ -286,7 +286,7 @@ function ProductCard({
           background: isSelected
             ? (isDark ? 'rgba(200,169,81,0.2)' : 'rgba(200,169,81,0.15)')
             : 'transparent',
-          color: isSelected ? GOLD : (isDark ? 'rgba(200,169,81,0.8)' : '#8B6914'),
+          color: isSelected ? GOLD : (isDark ? 'rgba(200,169,81,0.8)' : 'hsl(var(--accent-gold) / 0.65)'),
           transition: 'all 0.15s',
         }}
       >
@@ -514,7 +514,7 @@ export default function DuelCard({
       }}>
         <div style={{
           fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: isDark ? 'rgba(200,169,81,0.7)' : '#8B6914',
+          color: isDark ? 'rgba(200,169,81,0.7)' : 'hsl(var(--accent-gold) / 0.65)',
           fontFamily: "'DM Sans', sans-serif",
         }}>
           {t('title', lang)}

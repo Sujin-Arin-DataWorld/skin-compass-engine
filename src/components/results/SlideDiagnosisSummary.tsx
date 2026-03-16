@@ -3,6 +3,7 @@ import { useI18nStore } from "@/store/i18nStore";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import type { DiagnosisResult, AxisKey, ZoneId, ZoneHeatmapEntry } from "@/engine/types";
 import { computeSkinAge, AGE_MIDPOINTS } from "@/engine/diagnosisComparison";
+import { SkinAgeCard } from "@/features/results/components/SkinAgeCard";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // i18n maps
@@ -522,68 +523,18 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           </motion.div>
         )}
 
-        {/* ── Section E3: Skin Age Card ── */}
+        {/* ── Section E3: Skin Age Card (Phase 6 Step 1) ── */}
         <motion.div
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: hasHeatmap ? 0.54 : 0.48, duration: 0.4 }}
-          style={{
-            padding: "20px 24px", borderRadius: 20, textAlign: "center",
-            background: "linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--card)))",
-            border: "1px solid hsl(var(--primary) / 0.15)",
-            marginBottom: 20,
-          }}
         >
-          <div style={{
-            fontSize: 12, letterSpacing: "0.15em", textTransform: "uppercase",
-            color: "hsl(var(--foreground-hint))",
-            fontFamily: "'DM Sans', sans-serif", marginBottom: 8,
-          }}>
-            {language === "ko" ? "피부 나이" : language === "de" ? "Ihr Hautalter" : "Your Skin Age"}
-          </div>
-          <div style={{
-            fontSize: 42, fontWeight: 300,
-            color: "hsl(var(--primary))",
-            fontFamily: "'DM Sans', sans-serif",
-          }}>
-            {skinAgeData.skinAge}
-          </div>
-          <div style={{
-            fontSize: 13, color: "hsl(var(--foreground-hint))",
-            fontFamily: "'DM Sans', sans-serif", marginTop: 4,
-          }}>
-            {language === "ko"
-              ? `실제 나이: ${realAge}세`
-              : language === "de"
-              ? `Tatsächliches Alter: ${realAge}`
-              : `Actual age: ${realAge}`}
-          </div>
-          {skinAgeData.comparison === "older" && (
-            <div style={{
-              fontSize: 12, marginTop: 10,
-              color: "hsl(var(--foreground-hint))",
-              fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5,
-            }}>
-              {language === "ko"
-                ? "맞춤 관리 12주로 피부 나이를 실제 나이에 맞출 수 있어요."
-                : language === "de"
-                ? "Mit gezielter Pflege können wir Ihr Hautalter in 12 Wochen angleichen."
-                : "With targeted care, we can bring your skin age back in line within 12 weeks."}
-            </div>
-          )}
-          {skinAgeData.comparison === "younger" && (
-            <div style={{
-              fontSize: 12, marginTop: 10,
-              color: "hsl(var(--foreground-hint))",
-              fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5,
-            }}>
-              {language === "ko"
-                ? "피부 나이가 실제보다 어려요 — 지금 관리를 유지하세요!"
-                : language === "de"
-                ? "Ihr Hautalter ist jünger als Ihr tatsächliches Alter — weiter so!"
-                : "Your skin age is younger than your actual age — your routine is working!"}
-            </div>
-          )}
+          <SkinAgeCard
+            realAge={realAge}
+            skinAge={skinAgeData.skinAge}
+            comparison={skinAgeData.comparison}
+            lang={language}
+          />
         </motion.div>
 
         {/* ── Section E3: Clinical Trust Banner ── */}

@@ -107,7 +107,7 @@ function RoutineStepRow({
           justifyContent: 'center',
           fontSize: 10,
           fontWeight: 700,
-          color: '#C8A951',
+          color: 'hsl(var(--accent-gold))',
           flexShrink: 0,
           fontFamily: 'monospace',
         }}
@@ -164,7 +164,7 @@ function RoutineStepRow({
       <span
         style={{
           fontSize: 11,
-          color: '#C8A951',
+          color: 'hsl(var(--accent-gold))',
           fontFamily: 'monospace',
           flexShrink: 0,
         }}
@@ -550,7 +550,7 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
             style={{
               fontSize: 22,
               fontWeight: 700,
-              color: '#C8A951',
+              color: 'hsl(var(--accent-gold))',
               fontFamily: 'monospace',
             }}
           >
@@ -579,7 +579,7 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
               ? '#EF4444'
               : saveState === 'saved'
               ? '#5DCAA5'
-              : '#C8A951',
+              : 'hsl(var(--accent-gold))',
             display: 'flex',
             alignItems: 'center',
             gap: 8,

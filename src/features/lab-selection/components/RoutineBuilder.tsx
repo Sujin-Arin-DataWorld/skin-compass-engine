@@ -109,7 +109,7 @@ function RoutineStepRow({
           fontWeight: 700,
           color: 'hsl(var(--accent-gold))',
           flexShrink: 0,
-          fontFamily: 'monospace',
+          fontFamily: "var(--font-numeric)",
         }}
       >
         {step.order}
@@ -165,7 +165,7 @@ function RoutineStepRow({
         style={{
           fontSize: 11,
           color: 'hsl(var(--accent-gold))',
-          fontFamily: 'monospace',
+          fontFamily: "var(--font-numeric)",
           flexShrink: 0,
         }}
       >
@@ -410,7 +410,7 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
             fontSize: 22,
             fontWeight: 700,
             color: isDark ? '#f5f0e8' : '#1a1a2e',
-            fontFamily: 'Cormorant Garamond, Georgia, serif',
+            fontFamily: "var(--font-display)",
             margin: 0,
           }}
         >
@@ -551,7 +551,7 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
               fontSize: 22,
               fontWeight: 700,
               color: 'hsl(var(--accent-gold))',
-              fontFamily: 'monospace',
+              fontFamily: "var(--font-numeric)",
             }}
           >
             €{routine.total_cost_eur.toFixed(2)}

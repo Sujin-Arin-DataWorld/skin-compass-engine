@@ -442,9 +442,7 @@ function FaceSVG({
                 textAnchor={lp.anchor}
                 fill={statusColor}
                 style={{
-                  fontFamily: lang === "ko"
-                    ? "'Pretendard', 'Noto Sans KR', sans-serif"
-                    : "'DM Sans', sans-serif",
+                  fontFamily: "var(--font-sans)",
                   fontSize: "16px",
                   fontWeight: (isSelected || isActive) ? 600 : 400,
                   opacity: dotOp,
@@ -574,7 +572,7 @@ function InlineQuestionRenderer({
   const pillSt = (sel: boolean): React.CSSProperties => ({
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
-    borderRadius: 24, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+    borderRadius: 24, fontSize: 13, fontFamily: "var(--font-sans)",
     cursor: "pointer", minHeight: 44, lineHeight: "1.2",
     border: sel ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
     background: sel ? (isDark ? "rgba(201,169,110,0.15)" : "rgba(122,162,115,0.15)") : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
@@ -640,7 +638,7 @@ function InlineQuestionRenderer({
               onChange={e => onChange(q.id, Number(e.target.value))}
               style={{ width: "100%", accentColor: trackColor, cursor: "pointer" }}
             />
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.5)", fontFamily: "'DM Sans', sans-serif", marginTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.5)", fontFamily: "var(--font-sans)", marginTop: 8 }}>
               <span>{gt(q.slider.labelMin, lang)}</span>
               <span style={{ color: trackColor, fontWeight: isTouched ? 600 : 400 }}>{currentVal}</span>
               <span>{gt(q.slider.labelMax, lang)}</span>
@@ -654,7 +652,7 @@ function InlineQuestionRenderer({
           animate={{ opacity: 1, height: "auto" }}
           style={{ marginTop: 16, paddingLeft: 16, borderLeft: `2px solid ${isDark ? "#c9a96e33" : "#7A9E8233"}`, overflow: "hidden" }}
         >
-          <div style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)", marginBottom: 12, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5 }}>
+          <div style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.7)", marginBottom: 12, fontFamily: "var(--font-sans)", lineHeight: 1.5 }}>
             {gt(q.conditional.inject.text, lang)}
           </div>
           <InlineQuestionRenderer
@@ -755,7 +753,7 @@ function GlossaryBadge({
               boxShadow: isDark ? "0 8px 32px rgba(0,0,0,0.45)" : "0 8px 32px rgba(0,0,0,0.1)",
               fontSize: 12, lineHeight: 1.6,
               color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.65)",
-              fontFamily: "'DM Sans', sans-serif", fontWeight: 400,
+              fontFamily: "var(--font-sans)", fontWeight: 400,
               wordWrap: "break-word",
             }}
           >
@@ -828,7 +826,7 @@ function ConcernItem({
         color: severity > 0
           ? GOLD
           : (isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)"),
-        fontFamily: "'DM Sans', sans-serif", fontSize: 14,
+        fontFamily: "var(--font-sans)", fontSize: 14,
         fontWeight: severity > 0 ? 500 : 400,
       }}
     >
@@ -888,12 +886,12 @@ function ConcernAndQuestionPanel({
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             {/* Step 3: "Select Your Concerns" instead of "Clinical Area" */}
-            <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+            <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "var(--font-sans)", fontWeight: 600 }}>
               {lang === "ko" ? "피부 고민 선택"
                 : lang === "de" ? "Beschwerden auswählen"
                 : "Select Your Concerns"}
             </p>
-            <h3 style={{ fontSize: 22, fontWeight: 400, color: isDark ? "#fff" : "#111", fontFamily: "'DM Sans', system-ui, sans-serif", margin: 0, lineHeight: 1.2 }}>
+            <h3 style={{ fontSize: 22, fontWeight: 400, color: isDark ? "#fff" : "#111", fontFamily: "var(--font-sans)", margin: 0, lineHeight: 1.2 }}>
               {ZONE_LABELS[zone][lang]}
             </h3>
           </div>
@@ -918,7 +916,7 @@ function ConcernAndQuestionPanel({
               border: `1px solid ${isDark ? "rgba(201,169,110,0.2)" : "rgba(122,162,115,0.2)"}`,
               fontSize: 13,
               color: isDark ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.55)",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans)",
               lineHeight: 1.5,
             }}
           >
@@ -941,7 +939,7 @@ function ConcernAndQuestionPanel({
       </AnimatePresence>
 
       {/* Concern list */}
-      <h4 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>
+      <h4 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", marginBottom: 12, fontFamily: "var(--font-sans)" }}>
         {lang === "ko" ? "피부 고민 선택" : lang === "de" ? "Beschwerden auswählen" : "Select Concerns"}
       </h4>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -965,7 +963,7 @@ function ConcernAndQuestionPanel({
           border: `1px dashed ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
           background: "transparent", cursor: "pointer",
           color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
-          fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+          fontSize: 13, fontFamily: "var(--font-sans)",
           marginBottom: 8, transition: "all 0.2s ease",
         }}
       >
@@ -983,7 +981,7 @@ function ConcernAndQuestionPanel({
         style={{
           width: "100%", padding: "14px 0",
           borderRadius: 24, fontSize: 14, fontWeight: 600,
-          fontFamily: "'DM Sans', sans-serif", border: "none",
+          fontFamily: "var(--font-sans)", border: "none",
           background: isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)",
           color: isDark ? "#0d0d12" : "#fff", cursor: "pointer",
           boxShadow: isDark ? "0 6px 20px rgba(201,169,110,0.3)" : "0 6px 20px rgba(45,79,57,0.25)",
@@ -1026,7 +1024,7 @@ function TailQuestionSection({
       <h3 style={{
         fontSize: 20, fontWeight: 400,
         color: isDark ? "#fff" : "#111",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans)",
         marginBottom: 6,
       }}>
         {lang === "ko" ? "마지막 몇 가지만 확인할게요"
@@ -1036,7 +1034,7 @@ function TailQuestionSection({
       <p style={{
         fontSize: 13,
         color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans)",
         marginBottom: 28, lineHeight: 1.5,
       }}>
         {lang === "ko" ? "피부 지도에서 알 수 없는 것만 여쭤볼게요"
@@ -1058,7 +1056,7 @@ function TailQuestionSection({
         >
           <div style={{
             fontSize: 15, color: isDark ? "#fff" : "#111",
-            marginBottom: 8, fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5,
+            marginBottom: 8, fontFamily: "var(--font-sans)", lineHeight: 1.5,
           }}>
             {gt(q.text, lang)}
           </div>
@@ -1067,7 +1065,7 @@ function TailQuestionSection({
               fontSize: 12,
               color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
               marginBottom: 14, fontStyle: "italic",
-              fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5,
+              fontFamily: "var(--font-sans)", lineHeight: 1.5,
             }}>
               {gt(q.hint, lang)}
             </div>
@@ -1078,7 +1076,7 @@ function TailQuestionSection({
             lang={lang} allAnswers={axisAnswers}
           />
           {(q as unknown as { clinicalBasis?: { method: string } }).clinicalBasis && (
-            <div style={{ fontSize: 10, color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.25)", marginTop: 8, fontFamily: "'DM Sans', sans-serif" }}>
+            <div style={{ fontSize: 10, color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.25)", marginTop: 8, fontFamily: "var(--font-sans)" }}>
               🔬 {(q as unknown as { clinicalBasis: { method: string } }).clinicalBasis.method}
             </div>
           )}
@@ -1086,7 +1084,7 @@ function TailQuestionSection({
       ))}
 
       {/* Progress indicator */}
-      <div style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)", fontFamily: "'DM Sans', sans-serif", textAlign: "center", marginBottom: 12 }}>
+      <div style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)", fontFamily: "var(--font-sans)", textAlign: "center", marginBottom: 12 }}>
         {lang === "ko"
           ? `${tailQuestions.length}개 질문`
           : lang === "de"
@@ -1266,7 +1264,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
           {/* Header */}
           <h2 style={{
             fontSize: isMobile ? 26 : 30, fontWeight: 300,
-            fontFamily: "'Cormorant Garamond',Georgia,serif",
+            fontFamily: "var(--font-display)",
             color: isDark ? "#fff" : "#111", marginBottom: 8,
           }}>
             {copy.title}
@@ -1274,7 +1272,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
           <p style={{
             fontSize: 14, marginBottom: 32,
             color: isDark ? "rgba(185, 182, 141, 0.76)" : "rgba(0,0,0,0.6)",
-            fontFamily: "'DM Sans',sans-serif",
+            fontFamily: "var(--font-sans)",
           }}>
             {copy.subtitle}
           </p>
@@ -1363,12 +1361,12 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                     {allZonesDone ? (
                       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
                         <div style={{ fontSize: 22, marginBottom: 10 }}>✨</div>
-                        <div style={{ fontSize: 15, color: GOLD, fontFamily: "'DM Sans', sans-serif", fontWeight: 500 }}>
+                        <div style={{ fontSize: 15, color: GOLD, fontFamily: "var(--font-sans)", fontWeight: 500 }}>
                           {lang === "ko" ? "피부 분석 준비 완료!"
                             : lang === "de" ? "Hautanalyse bereit!"
                             : "Skin Analysis Ready!"}
                         </div>
-                        <div style={{ fontSize: 13, marginTop: 6, fontFamily: "'DM Sans', sans-serif", color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>
+                        <div style={{ fontSize: 13, marginTop: 6, fontFamily: "var(--font-sans)", color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>
                           {lang === "ko" ? "결과를 확인하세요"
                             : lang === "de" ? "Ergebnisse ansehen"
                             : "Check your results"}
@@ -1376,10 +1374,10 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                       </motion.div>
                     ) : (
                       <>
-                        <p style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "'DM Sans', sans-serif" }}>
+                        <p style={{ fontSize: 13, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", fontFamily: "var(--font-sans)" }}>
                           {copy.hint}
                         </p>
-                        <div style={{ marginTop: 12, fontSize: 12, fontFamily: "'DM Sans', sans-serif", color: isDark ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.28)" }}>
+                        <div style={{ marginTop: 12, fontSize: 12, fontFamily: "var(--font-sans)", color: isDark ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.28)" }}>
                           {lang === "ko"
                             ? `완료 ${selectedZones.size} / 전체 ${ZONES_DEF.length} 구역`
                             : lang === "de"
@@ -1453,14 +1451,14 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                     <div style={{
                       fontSize: 12, fontWeight: 600, letterSpacing: "0.03em",
                       color: isDark ? "#c9a96e" : "#7A9E82",
-                      fontFamily: "'DM Sans', sans-serif", marginBottom: 4,
+                      fontFamily: "var(--font-sans)", marginBottom: 4,
                     }}>
                       🔍 {content.title}
                     </div>
                     <div style={{
                       fontSize: 13,
                       color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.5)",
-                      fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5,
+                      fontFamily: "var(--font-sans)", lineHeight: 1.5,
                     }}>
                       {content.body}
                     </div>
@@ -1473,7 +1471,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
           {/* Submit button — mapping phase */}
           <div style={{ marginTop: 40, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             {totalSelected > 0 && (
-              <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "'DM Sans', sans-serif" }}>
+              <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)", fontFamily: "var(--font-sans)" }}>
                 {copy.selected(totalSelected)}
               </p>
             )}
@@ -1497,7 +1495,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                   display: "flex", alignItems: "center", gap: 10,
                   padding: "14px 32px", borderRadius: 32,
                   fontSize: 14, fontWeight: 600,
-                  fontFamily: "'DM Sans', sans-serif", border: "none",
+                  fontFamily: "var(--font-sans)", border: "none",
                   background: allZonesDone
                     ? (isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)")
                     : totalSelected > 0
@@ -1560,7 +1558,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "14px 32px", borderRadius: 32,
                 fontSize: 14, fontWeight: 600,
-                fontFamily: "'DM Sans', sans-serif", border: "none",
+                fontFamily: "var(--font-sans)", border: "none",
                 background: isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)",
                 color: isDark ? "#0d0d12" : "#fff",
                 cursor: isAnalyzing ? "not-allowed" : "pointer",

@@ -104,7 +104,7 @@ export default function AuthCallback() {
         minHeight: "100vh", background: PAGE_BG,
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center", gap: 20,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans)",
       }}>
         <p style={{ color: ROSE, fontSize: 14, textAlign: "center", maxWidth: 300, lineHeight: 1.6 }}>
           {error}
@@ -128,10 +128,6 @@ export default function AuthCallback() {
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center", gap: 28,
     }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=DM+Sans:wght@300;400&display=swap');
-      `}</style>
-
       {/* Dual-ring spinner — matches Phase 03 scanning animation style */}
       <div style={{ position: "relative", width: 64, height: 64 }}>
         <div style={{
@@ -158,14 +154,14 @@ export default function AuthCallback() {
 
       <div style={{ textAlign: "center" }}>
         <p style={{
-          fontFamily: "'RIDIBatang', 'Cormorant Garamond', serif",
+          fontFamily: "var(--font-display)",
           fontSize: 20, fontWeight: 300, color: GOLD,
           letterSpacing: "0.06em", marginBottom: 8,
         }}>
           로그인 처리 중…
         </p>
         <p style={{
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
           fontSize: 12, color: "rgba(255,255,255,0.3)",
           letterSpacing: "0.1em",
         }}>

@@ -203,7 +203,7 @@ function EmptyState({ de }: { de: boolean }) {
                 <FlaskConical className="w-7 h-7" style={{ color: GOLD }} strokeWidth={1} />
             </div>
             <p style={{
-                fontFamily: "'RIDIBatang', 'Georgia', serif",
+                fontFamily: "var(--font-display)",
                 fontSize: "1.15rem",
                 color: "#e8e8e8",
                 marginBottom: "0.5rem",

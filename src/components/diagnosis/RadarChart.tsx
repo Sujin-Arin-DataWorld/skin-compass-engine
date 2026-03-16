@@ -126,7 +126,7 @@ export default function RadarChart({ result, highlightAxis, comparisonScores }: 
                             textAnchor="middle" dominantBaseline="central"
                             style={{
                                 fontSize: "10px",
-                                fontFamily: "'DM Sans', system-ui, sans-serif",
+                                fontFamily: "var(--font-sans)",
                                 fontWeight: a.key === highlightAxis ? 700 : 500,
                                 fill: a.key === highlightAxis ? POLYGON_STROKE : "hsl(var(--foreground))",
                                 opacity: 0.85,
@@ -142,7 +142,7 @@ export default function RadarChart({ result, highlightAxis, comparisonScores }: 
                 <div style={{
                     display: "flex", justifyContent: "space-between",
                     padding: "4px 16px 0",
-                    fontSize: 10, fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 10, fontFamily: "var(--font-sans)",
                     color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)",
                 }}>
                     <span>{language === "ko" ? "관리 필요" : language === "de" ? "Pflegebedarf" : "Needs care"}</span>

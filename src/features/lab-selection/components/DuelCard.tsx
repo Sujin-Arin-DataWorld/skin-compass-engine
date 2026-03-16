@@ -59,7 +59,7 @@ function ComplianceIndicator({ score, isDark }: { score: number; isDark: boolean
       <span style={{ fontSize: 13, color }}>{symbol}</span>
       <span style={{
         fontSize: 13, fontWeight: 700, color,
-        fontFamily: "'DM Sans', monospace",
+        fontFamily: "var(--font-numeric)",
       }}>
         {score}%
       </span>
@@ -79,7 +79,7 @@ function IngredientMatchRow({
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 5,
-      fontSize: 10, fontFamily: "'DM Sans', sans-serif",
+      fontSize: 10, fontFamily: "var(--font-sans)",
     }}>
       <span style={{ color: config.color, fontSize: 11, flexShrink: 0 }}>{config.symbol}</span>
       <span style={{
@@ -135,7 +135,7 @@ function TierTabs({
                 : isAvail
                 ? (isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)')
                 : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.18)'),
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans)",
               transition: 'all 0.15s',
             }}
           >
@@ -197,7 +197,7 @@ function ProductCard({
           background: GOLD, color: '#1a1a1a',
           fontSize: 9, fontWeight: 800, letterSpacing: '0.08em',
           padding: '2px 10px', borderRadius: 20,
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
           whiteSpace: 'nowrap',
         }}>
           ★ {lang === 'ko' ? '우위' : lang === 'de' ? 'SIEGER' : 'WINNER'}
@@ -210,7 +210,7 @@ function ProductCard({
         <span style={{
           fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase',
           color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
         }}>
           {product.brand}
         </span>
@@ -220,7 +220,7 @@ function ProductCard({
       <div style={{
         fontSize: 13, fontWeight: 700, lineHeight: 1.3,
         color: isDark ? '#fff' : '#1a1a1a',
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans)",
       }}>
         {name}
       </div>
@@ -230,7 +230,7 @@ function ProductCard({
         <div style={{
           fontSize: 11, lineHeight: 1.5,
           color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
         }}>
           {oneLiner}
         </div>
@@ -241,7 +241,7 @@ function ProductCard({
         <div style={{
           fontSize: 9, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase',
           color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
-          marginBottom: 5, fontFamily: "'DM Sans', sans-serif",
+          marginBottom: 5, fontFamily: "var(--font-sans)",
         }}>
           {t('compliance', lang)}
         </div>
@@ -258,7 +258,7 @@ function ProductCard({
       {/* Price + volume */}
       <div style={{
         display: 'flex', gap: 12,
-        fontSize: 11, fontFamily: "'DM Sans', sans-serif",
+        fontSize: 11, fontFamily: "var(--font-sans)",
         color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.5)',
       }}>
         <span>
@@ -281,7 +281,7 @@ function ProductCard({
         style={{
           width: '100%', padding: '9px 0', borderRadius: 8, cursor: 'pointer',
           fontSize: 12, fontWeight: 700, letterSpacing: '0.06em',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
           border: isSelected ? 'none' : `1.5px solid ${isDark ? 'rgba(200,169,81,0.5)' : GOLD}`,
           background: isSelected
             ? (isDark ? 'rgba(200,169,81,0.2)' : 'rgba(200,169,81,0.15)')
@@ -307,7 +307,7 @@ function EmptySide({ message, isDark }: { message: string; isDark: boolean }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       textAlign: 'center', fontSize: 11,
       color: isDark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.3)',
-      fontFamily: "'DM Sans', sans-serif",
+      fontFamily: "var(--font-sans)",
     }}>
       {message}
     </div>
@@ -326,7 +326,7 @@ function VsDivider({ isDark }: { isDark: boolean }) {
       <div style={{
         fontSize: 11, fontWeight: 900, letterSpacing: '0.06em',
         color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans)",
         writingMode: 'vertical-rl',
         transform: 'rotate(180deg)',
       }}>
@@ -376,7 +376,7 @@ function VerdictBanner({
       <div style={{
         fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
         color: winnerColor, flexShrink: 0, paddingTop: 1,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans)",
       }}>
         {winnerLabel}
       </div>
@@ -384,7 +384,7 @@ function VerdictBanner({
         <div style={{
           fontSize: 11, lineHeight: 1.5,
           color: isDark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.5)',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
         }}>
           {reason}
         </div>
@@ -515,7 +515,7 @@ export default function DuelCard({
         <div style={{
           fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
           color: isDark ? 'rgba(200,169,81,0.7)' : 'hsl(var(--accent-gold) / 0.65)',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
         }}>
           {t('title', lang)}
         </div>
@@ -546,7 +546,7 @@ export default function DuelCard({
           <div style={{
             textAlign: 'center', padding: '20px 0',
             fontSize: 12, color: '#F87171',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
           }}>
             <div style={{ marginBottom: 8 }}>{error}</div>
             <button
@@ -566,7 +566,7 @@ export default function DuelCard({
             textAlign: 'center', padding: '20px 0',
             fontSize: 12,
             color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
           }}>
             {t('no_products', lang)}
           </div>

@@ -365,7 +365,7 @@ export function ExposomeStep({ lang, answers, onChange, onNext, onBack }: Exposo
         </p>
         <h2
           className="text-2xl sm:text-3xl font-light text-foreground leading-tight break-keep"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: "var(--font-display)" }}
         >
           {tx(L.title, lang)}
         </h2>

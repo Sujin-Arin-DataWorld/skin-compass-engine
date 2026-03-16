@@ -1,30 +1,56 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap");
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+/* ── Local font loading only — no external requests ── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Fraunces (EN/DE display) — variable font ── */
 @font-face {
-  font-family: 'ClipartKoreaLight';
-  src: url('./assets/fonts/clipartkorea_Light.ttf') format('truetype');
-  font-weight: 300;
+  font-family: 'Fraunces';
+  src: url('./assets/fonts/Fraunces/Fraunces-VariableFont_SOFT,WONK,opsz,wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Fraunces';
+  src: url('./assets/fonts/Fraunces/Fraunces-Italic-VariableFont_SOFT,WONK,opsz,wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ── Plus Jakarta Sans (body + numeric) — variable font ── */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('./assets/fonts/Plus_Jakarta_Sans/PlusJakartaSans-VariableFont_wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('./assets/fonts/Plus_Jakarta_Sans/PlusJakartaSans-Italic-VariableFont_wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ── Hahmlet (KO display) — variable font ── */
+@font-face {
+  font-family: 'Hahmlet';
+  src: url('./assets/fonts/Hahmlet/Hahmlet-VariableFont_wght.woff2') format('woff2-variations');
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
+/* ── SUIT (KO body) — variable font ── */
 @font-face {
-  font-family: 'RIDIBatang';
-  src: url('./assets/fonts/RIDIBatang.otf') format('opentype');
-  font-weight: 400;
+  font-family: 'SUIT';
+  src: url('./assets/fonts/SUIT/SUIT-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F;
 }
 
 
@@ -110,8 +136,52 @@
     --glow-sand: 0 0 24px hsla(34, 44%, 69%, 0.15);
     --glow-champagne: 0 0 20px hsla(100, 22%, 48%, 0.1);
 
-    --font-display: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
-    --font-body: 'DM Sans', system-ui, sans-serif;
+    /* ── Typography system (EN/DE defaults) ── */
+    --font-display:  'Fraunces', serif;
+    --font-sans:     'Plus Jakarta Sans', sans-serif;
+    --font-numeric:  'Plus Jakarta Sans', sans-serif; /* NEVER override — always PJS */
+
+    /* Hero Title */
+    --fs-hero:    clamp(2rem, 5vw, 3.5rem);
+    --fw-hero:    600;
+    --lh-hero:    1.3;
+    --ls-hero:    -0.03em;
+
+    /* Section Header */
+    --fs-section: clamp(1.375rem, 3vw, 2rem);
+    --fw-section: 600;
+    --lh-section: 1.4;
+    --ls-section: -0.02em;
+
+    /* Sub Header */
+    --fs-sub:     clamp(1.0625rem, 2vw, 1.375rem);
+    --fw-sub:     700;
+    --lh-sub:     1.5;
+    --ls-sub:     -0.02em;
+
+    /* Body Text */
+    --fs-body:    1rem;
+    --fw-body:    400;
+    --lh-body:    1.7;
+    --ls-body:    -0.02em;
+
+    /* UI Elements (buttons, nav, labels) */
+    --fs-ui:      0.875rem;
+    --fw-ui:      500;
+    --lh-ui:      1;
+    --ls-ui:      -0.04em;
+
+    /* Analysis Data (score values — always Plus Jakarta Sans) */
+    --fs-data:    clamp(1.375rem, 3vw, 2rem);
+    --fw-data:    600;
+    --lh-data:    1.4;
+    --ls-data:    -0.03em;
+
+    /* Technical Label */
+    --fs-label:   0.6875rem;
+    --fw-label:   500;
+    --lh-label:   1.2;
+    --ls-label:   0.05em;
 
     --sidebar-background: 210 8% 93%;
     --sidebar-foreground: 210 30% 24%;
@@ -155,9 +225,7 @@
     --chart-5: 210 10% 55%;
 
     --sidebar: 0 0% 98%;
-    --font-sans: 'Roboto', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
-    --font-serif: 'RIDIBatang', 'Libre Caslon Text', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-    --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Courier New', monospace;
 
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
@@ -289,7 +357,9 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-body);
+    font-family: var(--font-sans);
+    word-break: keep-all;
+    overflow-wrap: break-word;
     background-image:
       radial-gradient(ellipse 80% 50% at 20% 10%, hsl(100 22% 88% / 0.22) 0%, transparent 60%),
       radial-gradient(ellipse 60% 40% at 80% 80%, hsl(187 26% 90% / 0.25) 0%, transparent 55%),
@@ -304,10 +374,17 @@
       radial-gradient(ellipse 50% 40% at 50% 50%, hsl(222 20% 12% / 0.3) 0%, transparent 65%);
   }
 
-  h1,
-  h2,
-  h3 {
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+  }
+
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  p, li, td, th {
+    font-size: max(var(--fs-body), 0.875rem);
   }
 }
 
@@ -386,6 +463,55 @@
 }
 
 /* ===== i18n TYPOGRAPHY RULES ===== */
+
+/* ── Korean font override ── */
+:root[lang="ko"] {
+  --font-display: 'Hahmlet', serif;
+  --font-sans:    'SUIT', sans-serif;
+  /* --font-numeric is NEVER overridden — always Plus Jakarta Sans */
+
+  --lh-hero:    1.3;  --ls-hero:    -0.03em;
+  --lh-section: 1.4;  --ls-section: -0.02em;  --fw-section: 600;
+  --lh-sub:     1.5;  --ls-sub:     -0.02em;
+  --lh-body:    1.7;  --ls-body:    -0.02em;
+  --lh-ui:      1;    --ls-ui:      -0.04em;
+  --lh-data:    1.4;  --ls-data:    -0.03em;
+  --lh-label:   1.2;  --ls-label:   0.05em;
+}
+
+/* ── Mobile (max-width: 639px) ── */
+@media (max-width: 639px) {
+  :root {
+    --fs-hero:    clamp(1.625rem, 8vw, 2.25rem);
+    --fs-section: clamp(1.25rem,  6vw, 1.5rem);
+    --fs-sub:     1.0625rem;
+    --fs-body:    0.9375rem;
+    --fs-ui:      0.875rem;
+    --fs-data:    clamp(1.25rem,  7vw, 1.75rem);
+    --fs-label:   0.625rem;
+    --lh-body:    1.75;
+    --lh-ui:      1.2;
+  }
+  :root[lang="ko"] {
+    --lh-body: 1.85;
+    --lh-hero: 1.4;
+  }
+}
+
+/* ── Tablet (640px – 1023px) ── */
+@media (min-width: 640px) and (max-width: 1023px) {
+  :root {
+    --fs-hero:    clamp(2rem, 4.5vw, 2.75rem);
+    --fs-section: clamp(1.375rem, 3.5vw, 1.75rem);
+    --fs-data:    clamp(1.375rem, 3.5vw, 1.75rem);
+  }
+}
+
+/* ── Mobile-first base rules ── */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 
 [lang="ko"] {
   word-break: keep-all;
@@ -480,9 +606,9 @@ p, li, dd, figcaption {
   white-space: normal;
 }
 
-/* ── Landing page — Hero Serif (Playfair Display) ── */
+/* ── Landing page — Hero Serif ── */
 .hero-serif {
-  font-family: 'RIDIBatang', 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--font-display);
 }
 
 .hero-headline {
@@ -504,7 +630,7 @@ p, li, dd, figcaption {
 
 /* ── Landing page — Brand seal ── */
 .brand-seal-text {
-  font-family: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--font-display);
   font-size: 0.875rem;
   font-weight: 400;
   letter-spacing: 0.12em;
@@ -514,7 +640,7 @@ p, li, dd, figcaption {
 
 /* ── Landing page — Radar scanner labels ── */
 .radar-label {
-  font-family: 'DM Sans', 'Space Grotesk', system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.6rem;
   font-weight: 500;
   letter-spacing: 0.08em;
@@ -524,7 +650,8 @@ p, li, dd, figcaption {
 }
 
 .radar-value {
-  font-family: 'Roboto Mono', 'Space Mono', monospace;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
   font-size: 0.65rem;
   font-weight: 600;
   color: #947E5C;
@@ -622,7 +749,7 @@ p, li, dd, figcaption {
 /* ── Diagnosis page contrast classes ── */
 
 .category-title {
-  font-family: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--font-display);
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 500;
   line-height: 1.2;
@@ -633,7 +760,7 @@ p, li, dd, figcaption {
 }
 
 .category-description {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.0625rem;
   line-height: 1.65;
   color: hsl(var(--diagnosis-text-secondary));
@@ -642,7 +769,7 @@ p, li, dd, figcaption {
 }
 
 .category-badge {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -651,7 +778,7 @@ p, li, dd, figcaption {
 }
 
 .question-label {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 1.0625rem;
   font-weight: 500;
   color: hsl(var(--diagnosis-text-primary));
@@ -661,7 +788,7 @@ p, li, dd, figcaption {
 }
 
 .section-header {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -674,7 +801,7 @@ p, li, dd, figcaption {
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   color: hsl(var(--foreground));
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.9375rem;
   font-weight: 500;
   min-height: 48px;
@@ -694,14 +821,14 @@ p, li, dd, figcaption {
 
 /* ── Result slide base typography ─────────── */
 .results-slide {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans);
   color: hsl(var(--foreground));
 }
 
 .results-slide h1,
 .results-slide h2,
 .results-slide h3 {
-  font-family: 'RIDIBatang', 'Cormorant Garamond', Georgia, serif;
+  font-family: var(--font-display);
 }
 
 .slide-eyebrow {
@@ -727,6 +854,7 @@ p, li, dd, figcaption {
 }
 
 .score-number {
+  font-family: var(--font-numeric);
   font-size: 1.125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -869,5 +997,5 @@ p, li, dd, figcaption {
 
 /* ── Part C: Font stack ─────────────────────────────────────────────────── */
 .font-primary {
-  font-family: 'DM Sans', 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  font-family: var(--font-sans);
 }

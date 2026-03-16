@@ -14,89 +14,34 @@ export default {
   	},
   	extend: {
   		fontFamily: {
-  			display: [
-  				'Cormorant Garamond',
-  				'Georgia',
-  				'serif'
-  			],
-  			body: [
-  				'DM Sans',
-  				'system-ui',
-  				'sans-serif'
-  			],
-  			sans: [
-  				'Roboto',
-  				'ui-sans-serif',
-  				'system-ui',
-  				'-apple-system',
-  				'BlinkMacSystemFont',
-  				'Segoe UI',
-  				'Helvetica Neue',
-  				'Arial',
-  				'Noto Sans',
-  				'sans-serif'
-  			],
-  			serif: [
-  				'Libre Caslon Text',
-  				'ui-serif',
-  				'Georgia',
-  				'Cambria',
-  				'Times New Roman',
-  				'Times',
-  				'serif'
-  			],
+  			display: ['var(--font-display)'],
+  			sans:    ['var(--font-sans)'],
+  			numeric: ['var(--font-numeric)'],
   			mono: [
-  				'Roboto Mono',
   				'ui-monospace',
   				'SFMono-Regular',
   				'Menlo',
   				'Monaco',
   				'Consolas',
-  				'Liberation Mono',
   				'Courier New',
   				'monospace'
   			]
   		},
   		fontSize: {
-  			'display-xl': [
-  				'clamp(3rem, 7vw, 6rem)',
-  				{
-  					lineHeight: '1.05',
-  					letterSpacing: '-0.02em'
-  				}
-  			],
-  			'display-lg': [
-  				'clamp(2.2rem, 5vw, 4rem)',
-  				{
-  					lineHeight: '1.1',
-  					letterSpacing: '-0.015em'
-  				}
-  			],
-  			'display-md': [
-  				'clamp(1.6rem, 3vw, 2.5rem)',
-  				{
-  					lineHeight: '1.2'
-  				}
-  			],
-  			'body-lg': [
-  				'1.125rem',
-  				{
-  					lineHeight: '1.7'
-  				}
-  			],
-  			'body-md': [
-  				'1rem',
-  				{
-  					lineHeight: '1.65'
-  				}
-  			],
-  			label: [
-  				'0.75rem',
-  				{
-  					lineHeight: '1.4',
-  					letterSpacing: '0.1em'
-  				}
-  			]
+  			/* ── New spec-aligned tokens ── */
+  			'hero':    ['var(--fs-hero)',    { lineHeight: 'var(--lh-hero)',    letterSpacing: 'var(--ls-hero)',    fontWeight: 'var(--fw-hero)' }],
+  			'section': ['var(--fs-section)', { lineHeight: 'var(--lh-section)', letterSpacing: 'var(--ls-section)', fontWeight: 'var(--fw-section)' }],
+  			'sub':     ['var(--fs-sub)',     { lineHeight: 'var(--lh-sub)',     letterSpacing: 'var(--ls-sub)',     fontWeight: 'var(--fw-sub)' }],
+  			'body':    ['var(--fs-body)',    { lineHeight: 'var(--lh-body)',    letterSpacing: 'var(--ls-body)',    fontWeight: 'var(--fw-body)' }],
+  			'ui':      ['var(--fs-ui)',      { lineHeight: 'var(--lh-ui)',      letterSpacing: 'var(--ls-ui)',      fontWeight: 'var(--fw-ui)' }],
+  			'data':    ['var(--fs-data)',    { lineHeight: 'var(--lh-data)',    letterSpacing: 'var(--ls-data)',    fontWeight: 'var(--fw-data)' }],
+  			'label':   ['var(--fs-label)',   { lineHeight: 'var(--lh-label)',   letterSpacing: 'var(--ls-label)',   fontWeight: 'var(--fw-label)' }],
+  			/* ── Legacy aliases (kept for backward compat) ── */
+  			'display-xl': ['clamp(3rem, 7vw, 6rem)',   { lineHeight: '1.05', letterSpacing: '-0.02em' }],
+  			'display-lg': ['clamp(2.2rem, 5vw, 4rem)', { lineHeight: '1.1',  letterSpacing: '-0.015em' }],
+  			'display-md': ['clamp(1.6rem, 3vw, 2.5rem)', { lineHeight: '1.2' }],
+  			'body-lg':    ['1.125rem', { lineHeight: '1.7' }],
+  			'body-md':    ['1rem',     { lineHeight: '1.65' }],
   		},
   		colors: {
   			border: 'hsl(var(--border))',

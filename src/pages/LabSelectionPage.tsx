@@ -199,7 +199,7 @@ export default function LabSelectionPage() {
                 textTransform: 'uppercase',
                 color: 'hsl(var(--accent-gold))',
                 marginBottom: 8,
-                fontFamily: 'DM Sans, sans-serif',
+                fontFamily: "var(--font-sans)",
               }}
             >
               {language === 'ko' ? '스킨케어 연구소' : language === 'de' ? 'Das Labor' : 'The Lab'}
@@ -209,7 +209,7 @@ export default function LabSelectionPage() {
                 fontSize: 32,
                 fontWeight: 700,
                 color: isDark ? '#f5f0e8' : '#1a1a2e',
-                fontFamily: 'Cormorant Garamond, Georgia, serif',
+                fontFamily: "var(--font-display)",
                 margin: 0,
                 lineHeight: 1.2,
               }}
@@ -323,7 +323,7 @@ export default function LabSelectionPage() {
                         fontSize: 9,
                         fontWeight: 700,
                         color: active ? '#C8A951' : done ? '#5DCAA5' : 'inherit',
-                        fontFamily: 'monospace',
+                        fontFamily: "var(--font-numeric)",
                       }}
                     >
                       {done ? '✓' : i + 1}

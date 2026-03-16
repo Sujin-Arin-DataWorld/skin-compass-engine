@@ -92,7 +92,7 @@ export function AxisQuestionStep({
         </p>
         <h2
           className="text-2xl sm:text-3xl font-light text-foreground leading-tight"
-          style={{ fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: "var(--font-display)" }}
         >
           {getText(axis.name, lang)}
         </h2>

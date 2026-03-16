@@ -79,7 +79,7 @@ function CountPill({ count, dir, lang }: { count: number; dir: Direction; lang: 
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 5,
       padding: "3px 10px", borderRadius: 20, fontSize: 11,
-      fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
+      fontFamily: "var(--font-sans)", fontWeight: 600,
       color: DIR_COLOR[dir], background: DIR_BG[dir],
     }}>
       <span style={{ fontSize: 14, lineHeight: 1 }}>{count}</span>
@@ -129,7 +129,7 @@ function AxisChangeCard({
       <p style={{
         fontSize: 9, fontWeight: 700, letterSpacing: "0.07em",
         textTransform: "uppercase", color: "hsl(var(--muted-foreground))",
-        fontFamily: "'DM Sans', sans-serif", marginBottom: 6,
+        fontFamily: "var(--font-sans)", marginBottom: 6,
       }}>
         {axisName}
       </p>
@@ -138,12 +138,12 @@ function AxisChangeCard({
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
         <span style={{
           fontSize: 17, fontWeight: 700, color: DIR_COLOR[dir],
-          lineHeight: 1, fontFamily: "'DM Sans', sans-serif",
+          lineHeight: 1, fontFamily: "var(--font-sans)",
         }}>
           {DIR_ARROW[dir]}
         </span>
         <span style={{
-          fontSize: 11, fontFamily: "'DM Sans', monospace",
+          fontSize: 11, fontFamily: "var(--font-numeric)",
           color: isDark ? "rgba(245,240,232,0.65)" : "rgba(26,26,46,0.6)",
         }}>
           {prev} → {curr}
@@ -152,7 +152,7 @@ function AxisChangeCard({
           fontSize: 10, fontWeight: 700,
           padding: "1px 6px", borderRadius: 8,
           color: DIR_COLOR[dir], background: DIR_BG[dir],
-          fontFamily: "'DM Sans', monospace",
+          fontFamily: "var(--font-numeric)",
         }}>
           {deltaBadge}
         </span>
@@ -162,7 +162,7 @@ function AxisChangeCard({
       <p style={{
         fontSize: 10, lineHeight: 1.5,
         color: "hsl(var(--muted-foreground))",
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-sans)",
       }}>
         {change.message[lang]}
       </p>
@@ -217,7 +217,7 @@ export default function DiagnosisComparisonView({
 
         {/* Summary text */}
         <p style={{
-          fontSize: 13, lineHeight: 1.55, fontFamily: "'DM Sans', sans-serif",
+          fontSize: 13, lineHeight: 1.55, fontFamily: "var(--font-sans)",
           color: isDark ? "rgba(245,240,232,0.75)" : "rgba(26,26,46,0.72)",
           marginBottom: majorityWorsened ? 10 : 0,
         }}>
@@ -248,7 +248,7 @@ export default function DiagnosisComparisonView({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
           style={{
-            fontSize: 11, lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif",
+            fontSize: 11, lineHeight: 1.5, fontFamily: "var(--font-sans)",
             color: "hsl(var(--muted-foreground))",
             padding: "8px 12px", borderRadius: 8, marginBottom: 10,
             background: "hsl(var(--muted))",
@@ -270,7 +270,7 @@ export default function DiagnosisComparisonView({
           animate={{ opacity: 1 }}
           transition={{ delay: 0.15 }}
           style={{
-            fontSize: 11, lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif",
+            fontSize: 11, lineHeight: 1.5, fontFamily: "var(--font-sans)",
             color: "hsl(var(--muted-foreground))",
             padding: "8px 12px", borderRadius: 8, marginBottom: 10,
             background: "hsl(var(--muted))",
@@ -302,7 +302,7 @@ export default function DiagnosisComparisonView({
         {/* Comparison legend */}
         <div style={{
           display: "flex", justifyContent: "center", gap: 20, marginTop: 8, marginBottom: 20,
-          fontSize: 10, fontFamily: "'DM Sans', sans-serif",
+          fontSize: 10, fontFamily: "var(--font-sans)",
         }}>
           {/* Previous — gray dashed */}
           <span style={{ display: "flex", alignItems: "center", gap: 6, color: "rgba(140,150,165,0.9)" }}>

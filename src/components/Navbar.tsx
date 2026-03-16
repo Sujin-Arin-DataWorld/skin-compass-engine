@@ -18,7 +18,7 @@ function Logo() {
     <Link to="/" className="flex flex-col items-start leading-none group" aria-label="Skin Strategy Lab">
       <span
         className="font-display text-[1.05rem] md:text-[1.3rem] font-light tracking-[0.12em] text-gray-900 dark:text-white transition-colors group-hover:text-[#947E5C] dark:group-hover:text-[#D4AF37]"
-        style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", letterSpacing: "0.14em" }}
+        style={{ fontFamily: "var(--font-display)", letterSpacing: "0.14em" }}
       >
         SKIN STRATEGY
       </span>
@@ -99,7 +99,7 @@ const Navbar = () => {
   // Shared link style
   const navLink =
     "px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap";
-  const navFont = { fontFamily: language === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" };
+  const navFont = { fontFamily: "var(--font-sans)" };
 
 
   return (

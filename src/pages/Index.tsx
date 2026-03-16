@@ -52,7 +52,7 @@ const HERO_IMAGES = [
 type CartBtnState = "idle" | "adding" | "added";
 
 // ── Hero Slider ───────────────────────────────────────────────────────────────
-function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { headline: string; sub: string; cta: string }[], lang: string, accent: string, accentDeep: string, isDark: boolean }) {
+function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline: string; sub: string; cta: string }[], accent: string, accentDeep: string, isDark: boolean }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [current, setCurrent] = useState(0);
 
@@ -112,7 +112,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                   className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4"
-                  style={{ color: accent, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
+                  style={{ color: accent, fontFamily: "var(--font-sans)" }}
                 >
                   Skin Strategy Lab
                 </motion.p>
@@ -121,7 +121,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
                   transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
                   className="text-white text-4xl md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] mb-5 font-light break-keep"
-                  style={{ fontFamily: lang === 'ko' ? "'RIDIBatang', serif" : "'Cormorant Garamond', Georgia, serif" }}
+                  style={{ fontFamily: "var(--font-display)" }}
                 >
                   {slides[i]?.headline?.split('\n').map((line, idx, arr) => (
                     <span key={idx}>
@@ -140,7 +140,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
                   className="text-white/80 text-base md:text-lg leading-relaxed mb-8 max-w-lg break-keep"
-                  style={{ fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
+                  style={{ fontFamily: "var(--font-sans)" }}
                 >
                   {slides[i]?.sub?.split('\n').map((line, idx, arr) => (
                     <span key={idx}>
@@ -167,7 +167,7 @@ function HeroSlider({ slides, lang, accent, accentDeep, isDark }: { slides: { he
                         background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
                         color: isDark ? "#0a0a0a" : "#fff",
                         boxShadow: isDark ? "0 6px 24px rgba(212,175,55,0.35)" : "0 6px 24px rgba(45,79,57,0.3)",
-                        fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif",
+                        fontFamily: "var(--font-sans)",
                       }}
                     >
                       {slides[i]?.cta}
@@ -240,7 +240,7 @@ function UspStrip({ items }: { items: { label: string }[] }) {
 
 // ── 9 Skin Concerns ───────────────────────────────────────────────────────────
 function ConcernSection({
-  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart, lang, accent, accentDeep,
+  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart, accent,
 }: {
   title: string; sub: string;
   concernLabels: Record<ConcernKey, string>;
@@ -248,7 +248,7 @@ function ConcernSection({
   products: Product[];
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
-  lang: string; accent: string; accentDeep: string;
+  accent: string;
 }) {
   const [active, setActive] = useState<ConcernKey | null>(null);
 
@@ -265,7 +265,7 @@ function ConcernSection({
           </p>
           <h2
             className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
-            style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
+            style={{ fontFamily: "var(--font-display)" }}
           >
             {title}
           </h2>
@@ -383,13 +383,13 @@ const ROUTINE_MOOD_IMAGES = [
   "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&w=800&q=80",
 ];
 
-function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, lang, accent, accentDeep }: {
+function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, accent }: {
   title: string; sub: string;
   cards: { badge: string; title: string; desc: string; cta: string }[];
   products: Product[];
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
-  lang: string; accent: string; accentDeep: string;
+  accent: string;
 }) {
   const routineSlices = [
     products.slice(0, Math.min(products.length, 6)),
@@ -406,7 +406,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
           </p>
           <h2
             className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
-            style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
+            style={{ fontFamily: "var(--font-display)" }}
           >
             {title}
           </h2>
@@ -443,13 +443,13 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                   <div className="absolute bottom-0 left-0 p-6 md:p-8">
                     <span
                       className="text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase font-semibold block mb-2 drop-shadow-md"
-                      style={{ color: accent, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
+                      style={{ color: accent, fontFamily: "var(--font-sans)" }}
                     >
                       {card.badge}
                     </span>
                     <h3
                       className="text-3xl lg:text-4xl font-light text-white whitespace-nowrap"
-                      style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
+                      style={{ fontFamily: "var(--font-display)" }}
                     >
                       {card.title}
                     </h3>
@@ -457,7 +457,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                     <Link
                       to="/diagnosis"
                       className="inline-flex items-center mt-5 text-sm md:text-base font-medium tracking-wide hover:opacity-75 transition-opacity drop-shadow-md"
-                      style={{ color: accent, fontFamily: lang === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" }}
+                      style={{ color: accent, fontFamily: "var(--font-sans)" }}
                     >
                       {card.cta} →
                     </Link>
@@ -534,7 +534,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
 }
 
 // ── Diagnosis Banner ──────────────────────────────────────────────────────────
-function DiagnosisBanner({ headline, sub, cta, lang, accent, accentDeep, isDark }: { headline: string; sub: string; cta: string, lang: string, accent: string, accentDeep: string, isDark: boolean }) {
+function DiagnosisBanner({ headline, sub, cta, accent, accentDeep, isDark }: { headline: string; sub: string; cta: string, accent: string, accentDeep: string, isDark: boolean }) {
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "420px" }}>
       <img
@@ -564,7 +564,7 @@ function DiagnosisBanner({ headline, sub, cta, lang, accent, accentDeep, isDark 
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           className="text-white text-4xl md:text-5xl font-light mb-5 leading-tight whitespace-nowrap break-keep"
-          style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: "var(--font-display)" }}
         >
           {headline}
         </motion.h2>
@@ -610,9 +610,9 @@ function DiagnosisBanner({ headline, sub, cta, lang, accent, accentDeep, isDark 
 
 // ── Newsletter ────────────────────────────────────────────────────────────────
 function Newsletter({
-  headline, sub, placeholder, submit, gdprText, lang, accent, accentDeep, isDark,
+  headline, sub, placeholder, submit, gdprText, accent, accentDeep, isDark,
 }: {
-  headline: string; sub: string; placeholder: string; submit: string; gdprText: string; lang: string; accent: string; accentDeep: string; isDark: boolean;
+  headline: string; sub: string; placeholder: string; submit: string; gdprText: string; accent: string; accentDeep: string; isDark: boolean;
 }) {
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -639,7 +639,7 @@ function Newsletter({
         </p>
         <h2
           className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
-          style={{ fontFamily: lang === 'ko' ? "'ClipartKoreaLight', serif" : "'Cormorant Garamond', Georgia, serif" }}
+          style={{ fontFamily: "var(--font-display)" }}
         >
           {headline}
         </h2>
@@ -727,7 +727,7 @@ export default function Index() {
       <RecheckBanner />
 
       <main>
-        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} lang={language} accent={accent} accentDeep={accentDeep} isDark={isDark} />
+        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} accent={accent} accentDeep={accentDeep} isDark={isDark} />
         <UspStrip items={p1.home.usp as unknown as { label: string }[]} />
         {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
         <ConcernSection
@@ -738,9 +738,7 @@ export default function Index() {
           products={products}
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
-          lang={language}
           accent={accent}
-          accentDeep={accentDeep}
         />
         {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
         <RoutineShowcase
@@ -750,15 +748,12 @@ export default function Index() {
           products={products}
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
-          lang={language}
           accent={accent}
-          accentDeep={accentDeep}
         />
         <DiagnosisBanner
           headline={p1.home.bannerHeadline}
           sub={p1.home.bannerSub}
           cta={p1.home.bannerCta}
-          lang={language}
           accent={accent}
           accentDeep={accentDeep}
           isDark={isDark}
@@ -769,7 +764,6 @@ export default function Index() {
           placeholder={p1.home.newsletterPlaceholder}
           submit={p1.home.newsletterSubmit}
           gdprText={p1.home.newsletterGdpr}
-          lang={language}
           accent={accent}
           accentDeep={accentDeep}
           isDark={isDark}

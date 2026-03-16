@@ -83,7 +83,7 @@ const Checkout = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
               style={{
-                fontFamily: "'RIDIBatang', 'Georgia', 'Times New Roman', serif",
+                fontFamily: "var(--font-display)",
                 fontStyle: "italic",
                 fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
                 fontWeight: 400,
@@ -148,7 +148,7 @@ const Checkout = () => {
                   <p
                     className="mt-2 text-xs"
                     style={{
-                      fontFamily: "'Courier New', Courier, monospace",
+                      fontFamily: "var(--font-numeric)",
                       color: "hsl(var(--primary))",
                       letterSpacing: "0.05em",
                     }}

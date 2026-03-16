@@ -46,7 +46,7 @@ function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
   return {
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
-    borderRadius: 24, fontSize: 14, fontFamily: "'DM Sans', sans-serif",
+    borderRadius: 24, fontSize: 14, fontFamily: "var(--font-sans)",
     cursor: "pointer", minHeight: 44, lineHeight: "1",
     border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
     background: selected ? "rgba(201,169,110,0.15)" : "transparent",
@@ -247,7 +247,7 @@ function MobileFoundationStepper({
       <div style={{
         fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase",
         color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
-        fontFamily: "'DM Sans', sans-serif", marginBottom: 16,
+        fontFamily: "var(--font-sans)", marginBottom: 16,
       }}>
         {currentIndex + 1} / {TOTAL_MOBILE_STEPS}
       </div>
@@ -263,7 +263,7 @@ function MobileFoundationStepper({
           <div style={{ fontSize: 22, marginBottom: 8 }}>🌍</div>
           <div style={{
             fontSize: 17, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)",
-            fontFamily: "'DM Sans', sans-serif", marginBottom: 16,
+            fontFamily: "var(--font-sans)", marginBottom: 16,
           }}>
             {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
           </div>
@@ -278,7 +278,7 @@ function MobileFoundationStepper({
           <div style={{ fontSize: 26, marginBottom: 8 }}>{q.icon}</div>
           <h3 style={{
             fontSize: 18, fontWeight: 400, marginBottom: 6, lineHeight: 1.4,
-            color: isDark ? "#fff" : "#111", fontFamily: "'DM Sans', sans-serif",
+            color: isDark ? "#fff" : "#111", fontFamily: "var(--font-sans)",
           }}>
             {fqText(q, lang)}
           </h3>
@@ -286,7 +286,7 @@ function MobileFoundationStepper({
             <p style={{
               fontSize: 13, lineHeight: 1.5, marginBottom: 20,
               color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
-              fontFamily: "'DM Sans', sans-serif", fontStyle: "italic",
+              fontFamily: "var(--font-sans)", fontStyle: "italic",
             }}>
               {fqHint(q, lang)}
             </p>
@@ -302,7 +302,7 @@ function MobileFoundationStepper({
                   style={{
                     padding: "14px 20px", borderRadius: 14,
                     textAlign: "left", cursor: "pointer",
-                    fontSize: 15, fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 15, fontFamily: "var(--font-sans)",
                     transition: "all 0.2s ease", border: "none",
                     borderWidth: 1, borderStyle: "solid",
                     borderColor: isSelected ? GOLD : (isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"),
@@ -329,7 +329,7 @@ function MobileFoundationStepper({
             marginTop: 20, padding: "8px 0", background: "transparent",
             border: "none", cursor: "pointer",
             fontSize: 13, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
           }}
         >
           ← {lang === "ko" ? "이전" : lang === "de" ? "Zurück" : "Back"}
@@ -560,11 +560,10 @@ const DiagnosisPage: React.FC = () => {
   return (
     <div style={{
       minHeight: "100vh", color: isDark ? "#e8e4df" : "hsl(210,30%,24%)",
-      fontFamily: "'RIDIBatang', 'Cormorant Garamond', Georgia, serif"
+      fontFamily: "var(--font-display)"
     }}
       className={isDark ? "" : "bg-background"}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap');
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:4px}
         ::-webkit-scrollbar-thumb{background:${isDark ? 'rgba(201,169,110,0.2)' : 'rgba(45,79,57,0.15)'};border-radius:4px}
@@ -603,7 +602,7 @@ const DiagnosisPage: React.FC = () => {
               <div style={{ padding: "20px 24px 24px" }}>
                 <p style={{
                   fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase",
-                  fontFamily: "'DM Sans', sans-serif", color: GOLD, marginBottom: 10
+                  fontFamily: "var(--font-sans)", color: GOLD, marginBottom: 10
                 }}>
                   {lang === "ko" ? "피부 분석 기록" : lang === "de" ? "Hautanalyse-Verlauf" : "Skin Analysis History"}
                 </p>
@@ -615,7 +614,7 @@ const DiagnosisPage: React.FC = () => {
                 {lastDiagnosedAt && (
                   <p style={{
                     fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", marginBottom: 16,
-                    fontFamily: "'DM Sans', sans-serif", fontWeight: 300
+                    fontFamily: "var(--font-sans)", fontWeight: 300
                   }}>
                     {lang === "de" ? `Letzte Analyse: ${formatDiagnosisDate(lastDiagnosedAt, "de")}`
                       : lang === "ko" ? `마지막 분석: ${formatDiagnosisDate(lastDiagnosedAt, "ko")}`
@@ -632,13 +631,13 @@ const DiagnosisPage: React.FC = () => {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
                         fontSize: "0.6rem", letterSpacing: "0.16em", textTransform: "uppercase",
-                        color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif", marginBottom: 4
+                        color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "var(--font-sans)", marginBottom: 4
                       }}>
                         {lang === "ko" ? "피부 프로필" : lang === "de" ? "Hautprofil" : "Skin Profile"}
                       </p>
-                      {lastTier && <p style={{ fontSize: 14, fontFamily: "'DM Sans', sans-serif", color: isDark ? "#e8e4df" : "#1a1a1a", marginBottom: 6 }}>{lastTier}</p>}
+                      {lastTier && <p style={{ fontSize: 14, fontFamily: "var(--font-sans)", color: isDark ? "#e8e4df" : "#1a1a1a", marginBottom: 6 }}>{lastTier}</p>}
                       <p style={{
-                        fontSize: 11, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "'DM Sans', sans-serif",
+                        fontSize: 11, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "var(--font-sans)",
                         lineHeight: 1.5, fontWeight: 300
                       }}>
                         {lang === "ko" ? "변화를 추적하면 더 정밀한 맞춤 프로토콜이 가능합니다."
@@ -654,7 +653,7 @@ const DiagnosisPage: React.FC = () => {
                     style={{
                       width: "100%", padding: "14px 24px", borderRadius: 14, border: "none",
                       background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DEEP})`,
-                      color: "#0d0d12", fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                      color: "#0d0d12", fontSize: 13, fontFamily: "var(--font-sans)",
                       letterSpacing: "0.1em", fontWeight: 600, cursor: "pointer",
                       boxShadow: `0 6px 24px ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.25)"}`
                     }}>
@@ -665,7 +664,7 @@ const DiagnosisPage: React.FC = () => {
                     style={{
                       width: "100%", padding: "12px 24px", borderRadius: 14,
                       border: `1px solid ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.2)"}`, background: "transparent",
-                      color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)", fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                      color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)", fontSize: 13, fontFamily: "var(--font-sans)",
                       letterSpacing: "0.06em", cursor: "pointer"
                     }}>
                     {lang === "ko" ? "내 피부 여정 보기" : lang === "de" ? "Meine Hautreise ansehen" : "View My Skin Journey"}
@@ -703,7 +702,7 @@ const DiagnosisPage: React.FC = () => {
         </div>
         <p style={{
           fontSize: 12, letterSpacing: "0.22em", color: isDark ? "rgba(201,169,110,0.6)" : "rgba(45,79,57,0.65)",
-          textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif", marginBottom: 36
+          textTransform: "uppercase", fontFamily: "var(--font-sans)", marginBottom: 36
         }}>
           {phase === "foundation" && (lang === "de" ? "Phase 01 · Basis-Scan" : lang === "ko" ? "Phase 01 · 기초 스캔" : "Phase 01 · Foundation Scan")}
           {phase === "scanning" && (lang === "de" ? "Scan wird initialisiert…" : lang === "ko" ? "스캔 초기화 중…" : "Initiating Skin Scan…")}
@@ -722,7 +721,7 @@ const DiagnosisPage: React.FC = () => {
               </h1>
               <p style={{
                 fontSize: 15, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.45)", marginBottom: 36,
-                fontFamily: "'DM Sans', sans-serif", maxWidth: 480, lineHeight: 1.6
+                fontFamily: "var(--font-sans)", maxWidth: 480, lineHeight: 1.6
               }}>
                 {lang === "de" ? "Wir beginnen mit Ihrem Lebensstil — dem Fundament, das Ihre Haut täglich prägt."
                   : lang === "ko" ? "피부를 형성하는 가장 기본적인 생활 습관부터 시작합니다."
@@ -765,12 +764,12 @@ const DiagnosisPage: React.FC = () => {
                       <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
                       <div style={{
                         fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 6,
-                        fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5
+                        fontFamily: "var(--font-sans)", lineHeight: 1.5
                       }}>{fqText(fq, lang)}</div>
                       {fqHint(fq, lang) && (
                         <div style={{
                           fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
-                          fontFamily: "'DM Sans', sans-serif", lineHeight: 1.4, marginBottom: 10, fontStyle: "italic"
+                          fontFamily: "var(--font-sans)", lineHeight: 1.4, marginBottom: 10, fontStyle: "italic"
                         }}>{fqHint(fq, lang)}</div>
                       )}
                       <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -798,7 +797,7 @@ const DiagnosisPage: React.FC = () => {
                     <div style={{ fontSize: 24, marginBottom: 8 }}>🌍</div>
                     <div style={{
                       fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 14,
-                      fontFamily: "'DM Sans', sans-serif", lineHeight: 1.5
+                      fontFamily: "var(--font-sans)", lineHeight: 1.5
                     }}>
                       {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
                     </div>
@@ -816,7 +815,7 @@ const DiagnosisPage: React.FC = () => {
                     display: "inline-block", padding: "16px 40px", borderRadius: 32, border: "none",
                     background: foundationComplete ? `linear-gradient(135deg, ${GOLD}, ${ROSE})` : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
                     color: foundationComplete ? "#fafafdff" : isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
-                    fontSize: 15, fontFamily: "'DM Sans', sans-serif",
+                    fontSize: 15, fontFamily: "var(--font-sans)",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: foundationComplete ? "pointer" : "default",
                     boxShadow: foundationComplete ? `0 8px 32px ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.25)"}` : "none",
@@ -827,7 +826,7 @@ const DiagnosisPage: React.FC = () => {
                 {!foundationComplete && (
                   <p style={{
                     marginTop: 10, fontSize: 12, color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)",
-                    fontFamily: "'DM Sans', sans-serif"
+                    fontFamily: "var(--font-sans)"
                   }}>
                     {lang === "de" ? "Bitte alle 4 Fragen beantworten" : lang === "ko" ? "4개 질문을 모두 답해주세요" : "Answer all 4 questions to continue"}
                   </p>
@@ -885,7 +884,7 @@ const DiagnosisPage: React.FC = () => {
                 transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
                 {lang === "de" ? "Haut-Scan wird initialisiert…" : lang === "ko" ? "피부 스캔 초기화 중…" : "Initiating Skin Scan…"}
               </motion.p>
-              <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.12em" }}>
+              <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontFamily: "var(--font-sans)", letterSpacing: "0.12em" }}>
                 {lang === "de" ? "Biometrische Gesichtsanalyse wird vorbereitet" : lang === "ko" ? "생체 인식 얼굴 분석 준비 중" : "Preparing biometric facial analysis"}
               </p>
             </motion.div>

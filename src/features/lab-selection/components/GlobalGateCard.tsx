@@ -163,7 +163,7 @@ export default function GlobalGateCard() {
         <span style={{
           fontSize: 12, fontWeight: 500, letterSpacing: '0.04em',
           color: isDark ? 'rgba(93,202,165,0.9)' : '#085041',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
         }}>
           {t('clear', lang)}
         </span>
@@ -192,14 +192,14 @@ export default function GlobalGateCard() {
             <div style={{
               fontSize: 14, fontWeight: 700, letterSpacing: '0.03em',
               color: isDark ? '#F59E0B' : '#92400E',
-              fontFamily: "'DM Sans', sans-serif", marginBottom: 4,
+              fontFamily: "var(--font-sans)", marginBottom: 4,
             }}>
               {t('caution_title', lang)}
             </div>
             <div style={{
               fontSize: 12, lineHeight: 1.6,
               color: isDark ? 'rgba(245,158,11,0.8)' : '#78350F',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans)",
             }}>
               {t('caution_message', lang)}
             </div>
@@ -218,7 +218,7 @@ export default function GlobalGateCard() {
               padding: '10px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               color: isDark ? '#F59E0B' : '#92400E',
               fontSize: 12, fontWeight: 600, letterSpacing: '0.06em',
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-sans)",
             }}
           >
             <span>{cautionOpen ? t('caution_details_collapse', lang) : t('caution_details_toggle', lang)}</span>
@@ -246,7 +246,7 @@ export default function GlobalGateCard() {
                       display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                       padding: '6px 10px', borderRadius: 6,
                       background: isDark ? 'rgba(245,158,11,0.06)' : 'rgba(245,158,11,0.08)',
-                      fontSize: 11, fontFamily: "'DM Sans', sans-serif",
+                      fontSize: 11, fontFamily: "var(--font-sans)",
                     }}>
                       <span style={{ color: isDark ? 'rgba(255,255,255,0.7)' : '#78350F' }}>
                         {cap.ingredient}
@@ -308,14 +308,14 @@ export default function GlobalGateCard() {
           <div style={{
             fontSize: 16, fontWeight: 700, letterSpacing: '0.03em',
             color: isDark ? '#F0997B' : '#B55C3A',
-            fontFamily: "'Cormorant Garamond', serif", marginBottom: 6,
+            fontFamily: "var(--font-display)", marginBottom: 6,
           }}>
             {t('recovery_title', lang)}
           </div>
           <div style={{
             fontSize: 12, lineHeight: 1.7,
             color: isDark ? 'rgba(240,153,123,0.85)' : '#7C3B20',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
           }}>
             {t('recovery_message', lang)}
           </div>
@@ -331,14 +331,14 @@ export default function GlobalGateCard() {
         <div style={{
           fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
           color: isDark ? 'rgba(240,153,123,0.6)' : '#B55C3A',
-          marginBottom: 6, fontFamily: "'DM Sans', sans-serif",
+          marginBottom: 6, fontFamily: "var(--font-sans)",
         }}>
           {t('recovery_why_title', lang)}
         </div>
         <div style={{
           fontSize: 12, lineHeight: 1.7,
           color: isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.55)',
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
         }}>
           {t('recovery_why_body', lang)}
         </div>
@@ -353,7 +353,7 @@ export default function GlobalGateCard() {
           <div style={{
             fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
             color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.45)',
-            marginBottom: 10, fontFamily: "'DM Sans', sans-serif",
+            marginBottom: 10, fontFamily: "var(--font-sans)",
           }}>
             {t('recovery_products_title', lang)}
           </div>
@@ -386,7 +386,7 @@ export default function GlobalGateCard() {
           style={{
             padding: '12px 32px', borderRadius: 32, cursor: 'pointer',
             fontSize: 13, fontWeight: 700, letterSpacing: '0.08em',
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
             border: '1.5px solid hsl(var(--accent-gold))',
             background: isDark ? 'transparent' : 'rgba(200,169,81,0.08)',
             color: 'hsl(var(--accent-gold))',

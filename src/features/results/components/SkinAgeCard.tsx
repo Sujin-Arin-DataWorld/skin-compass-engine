@@ -158,7 +158,7 @@ export function SkinAgeCard({ realAge, skinAge, comparison, lang }: SkinAgeCardP
           letterSpacing: "0.15em",
           textTransform: "uppercase",
           color: labelColor,
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
           marginBottom: 8,
         }}
       >
@@ -171,7 +171,7 @@ export function SkinAgeCard({ realAge, skinAge, comparison, lang }: SkinAgeCardP
           fontSize: 42,
           fontWeight: 300,
           color: "hsl(var(--accent-gold))",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
           lineHeight: 1.05,
           marginBottom: 10,
           fontVariantNumeric: "tabular-nums",
@@ -189,7 +189,7 @@ export function SkinAgeCard({ realAge, skinAge, comparison, lang }: SkinAgeCardP
           fontSize: 13,
           fontWeight: comparison !== "matches" ? 500 : 400,
           color: accentColor,
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
           marginBottom: 22,
           lineHeight: 1.4,
           minHeight: "1.4em",
@@ -263,7 +263,7 @@ export function SkinAgeCard({ realAge, skinAge, comparison, lang }: SkinAgeCardP
         style={{
           fontSize: 11,
           color: isDark ? "rgba(245,240,232,0.35)" : "rgba(26,26,46,0.35)",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "var(--font-sans)",
           lineHeight: 1.65,
           textAlign: "center",
         }}
@@ -327,7 +327,7 @@ function GaugeMarker({
             letterSpacing: "0.10em",
             textTransform: "uppercase",
             color: labelColor,
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
             marginBottom: 2,
           }}
         >
@@ -338,7 +338,7 @@ function GaugeMarker({
             fontSize: 12,
             fontWeight: bold ? 600 : 500,
             color: valueColor,
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
           }}
         >
           {value}

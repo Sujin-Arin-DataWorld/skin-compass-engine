@@ -572,7 +572,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
             border: "1px solid hsl(var(--primary) / 0.12)",
             fontSize: 12,
             color: "hsl(var(--foreground-hint))",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
             lineHeight: 1.6,
           }}
         >

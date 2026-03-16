@@ -172,7 +172,7 @@ export default function RecheckBanner() {
             alignItems: "center",
             gap: 12,
             flexWrap: "wrap",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-sans)",
             borderRadius: "0 8px 8px 0",
           }}
         >

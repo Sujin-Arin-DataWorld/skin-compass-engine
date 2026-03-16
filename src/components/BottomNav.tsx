@@ -4,16 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Home, Heart, LayoutGrid, User, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useNavStore } from "@/store/navStore";
-import { useI18nStore } from "@/store/i18nStore";
-
 export function BottomNav() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const location = useLocation();
   const cartCount = useCartStore((s) => s.totalItems());
   const { openMobileMenu } = useNavStore();
-  const { language } = useI18nStore();
-  const navFont = { fontFamily: language === 'ko' ? "'Pretendard', sans-serif" : "'DM Sans', system-ui, sans-serif" };
+  const navFont = { fontFamily: "var(--font-sans)" };
 
   useEffect(() => {
     const handleScroll = () => {

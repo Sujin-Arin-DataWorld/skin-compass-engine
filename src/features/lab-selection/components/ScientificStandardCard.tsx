@@ -35,7 +35,7 @@ const AXIS_META: Record<string, { ko: string; en: string; de: string; color: str
   pores:           { ko: '모공',         en: 'Pores',          de: 'Poren',             color: '#A78BFA' },
   texture:         { ko: '피부결',       en: 'Texture',        de: 'Textur',            color: '#34D399' },
   sensitivity:     { ko: '민감도',       en: 'Sensitivity',    de: 'Empfindlichkeit',   color: '#F87171' },
-  aging:           { ko: '노화',         en: 'Aging',          de: 'Alterung',          color: 'hsl(var(--accent-gold))' },
+  aging:           { ko: '노화',         en: 'Aging',          de: 'Alterung',          color: '#C8A951' },
   pigmentation:    { ko: '색소침착',     en: 'Pigmentation',   de: 'Pigmentierung',     color: '#818CF8' },
   barrier:         { ko: '장벽',         en: 'Barrier',        de: 'Barriere',          color: '#F0997B' },
   neurodermatitis: { ko: '신경성 피부염',en: 'Neurodermatitis',de: 'Neurodermitis',     color: '#EC4899' },
@@ -75,7 +75,7 @@ const UI = {
 } as const;
 
 function tUI(key: keyof typeof UI, lang: Lang, vars?: Record<string, string>): string {
-  let str = UI[key][lang];
+  let str: string = UI[key][lang];
   if (vars) {
     for (const [k, v] of Object.entries(vars)) {
       str = str.replace(`{${k}}`, v);
@@ -105,7 +105,7 @@ function AxisBar({
       {/* Axis label */}
       <span style={{
         width: 72, fontSize: 10, fontWeight: 600, color: meta.color,
-        fontFamily: "var(--font-sans)", letterSpacing: '0.04em', flexShrink: 0,
+        fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.04em', flexShrink: 0,
       }}>
         {meta[lang]}
       </span>
@@ -128,7 +128,7 @@ function AxisBar({
       <span style={{
         width: 24, fontSize: 10, textAlign: 'right', flexShrink: 0,
         color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-        fontFamily: "var(--font-numeric)",
+        fontFamily: "'DM Sans', monospace",
       }}>
         {axisScore.score}
       </span>
@@ -138,7 +138,7 @@ function AxisBar({
         padding: '1px 7px', borderRadius: 10, fontSize: 9, fontWeight: 700,
         letterSpacing: '0.06em', flexShrink: 0,
         color: sev.color, background: sev.bg,
-        fontFamily: "var(--font-sans)",
+        fontFamily: "'DM Sans', sans-serif",
       }}>
         {sev[lang]}
       </span>
@@ -179,7 +179,7 @@ function IngredientRow({
         {/* Priority indicator */}
         <span style={{
           fontSize: isMustHave ? 13 : 9,
-          color: isMustHave ? 'hsl(var(--accent-gold))' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'),
+          color: isMustHave ? '#C8A951' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'),
           flexShrink: 0, lineHeight: 1,
         }}>
           {isMustHave ? '★' : '·'}
@@ -189,7 +189,7 @@ function IngredientRow({
         <span style={{
           flex: 1, fontSize: 12, fontWeight: 600,
           color: isDark ? 'rgba(255,255,255,0.88)' : '#1a1a1a',
-          fontFamily: "var(--font-sans)",
+          fontFamily: "'DM Sans', sans-serif",
         }}>
           {displayName}
           {/* Show EN name in parentheses when viewing in KO/DE if different */}
@@ -207,7 +207,7 @@ function IngredientRow({
         {ing.min_concentration !== null && (
           <span style={{
             flexShrink: 0, fontSize: 12, fontWeight: 700,
-            color: 'hsl(var(--accent-gold))', fontFamily: "var(--font-numeric)",
+            color: '#C8A951', fontFamily: "'DM Sans', monospace",
             letterSpacing: '-0.02em',
           }}>
             {tUI('conc_min', lang)}{ing.min_concentration}%
@@ -226,7 +226,7 @@ function IngredientRow({
               fontSize: 9, padding: '2px 6px', borderRadius: 4,
               background: isDark ? 'rgba(248,113,113,0.1)' : 'rgba(248,113,113,0.1)',
               color: isDark ? '#F87171' : '#B91C1C',
-              fontFamily: "var(--font-sans)", letterSpacing: '0.04em',
+              fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.04em',
             }}>
               ✕ {c}
             </span>
@@ -299,7 +299,7 @@ export default function ScientificStandardCard({
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 14, fontWeight: 700,
           color: isDark ? '#93C5FD' : '#1D4ED8',
-          fontFamily: "var(--font-numeric)",
+          fontFamily: "'DM Sans', monospace",
         }}>
           {zoneMeta.icon}
         </div>
@@ -309,7 +309,7 @@ export default function ScientificStandardCard({
             fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: isDark ? 'rgba(147,197,253,0.6)' : 'rgba(29,78,216,0.6)',
-            fontFamily: "var(--font-sans)", marginBottom: 3,
+            fontFamily: "'DM Sans', sans-serif", marginBottom: 3,
           }}>
             {/* Clinical chart label */}
             {lang === 'ko' ? '임상 분석' : lang === 'de' ? 'Klinische Analyse' : 'Clinical Analysis'}
@@ -317,7 +317,7 @@ export default function ScientificStandardCard({
           <div style={{
             fontSize: 15, fontWeight: 700,
             color: isDark ? '#E0F2FE' : '#1D4ED8',
-            fontFamily: "var(--font-display)",
+            fontFamily: "'Cormorant Garamond', serif",
             letterSpacing: '0.01em',
           }}>
             {tUI('header', lang, { zone: zoneLabel })}
@@ -335,7 +335,7 @@ export default function ScientificStandardCard({
           <div style={{
             fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
             color: isDark ? 'rgba(147,197,253,0.5)' : 'rgba(29,78,216,0.45)',
-            fontFamily: "var(--font-sans)", marginBottom: 8,
+            fontFamily: "'DM Sans', sans-serif", marginBottom: 8,
           }}>
             {tUI('axis_label', lang)}
           </div>
@@ -359,7 +359,7 @@ export default function ScientificStandardCard({
               background: isDark ? 'rgba(248,113,113,0.08)' : 'rgba(254,226,226,0.8)',
               border: '1px solid rgba(248,113,113,0.3)',
               fontSize: 12, lineHeight: 1.5,
-              fontFamily: "var(--font-sans)",
+              fontFamily: "'DM Sans', sans-serif",
             }}
           >
             <div style={{ fontWeight: 700, color: isDark ? '#F87171' : '#B91C1C', marginBottom: 2 }}>
@@ -376,7 +376,7 @@ export default function ScientificStandardCard({
           <div style={{
             fontSize: 10, fontWeight: 600, letterSpacing: '0.06em',
             color: isDark ? 'rgba(147,197,253,0.6)' : 'rgba(29,78,216,0.55)',
-            fontFamily: "var(--font-sans)", marginBottom: 10,
+            fontFamily: "'DM Sans', sans-serif", marginBottom: 10,
             textTransform: 'uppercase',
           }}>
             {tUI('subheader', lang)}
@@ -387,7 +387,7 @@ export default function ScientificStandardCard({
         {sorted.length > 0 && (
           <div style={{
             display: 'flex', gap: 12, marginBottom: 10,
-            fontSize: 10, fontFamily: "var(--font-sans)",
+            fontSize: 10, fontFamily: "'DM Sans', sans-serif",
             color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.4)',
           }}>
             <span>★ {tUI('must_have', lang)}</span>
@@ -412,7 +412,7 @@ export default function ScientificStandardCard({
           <div style={{
             textAlign: 'center', fontSize: 12,
             color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)',
-            fontFamily: "var(--font-sans)", padding: '8px 0',
+            fontFamily: "'DM Sans', sans-serif", padding: '8px 0',
           }}>
             {tUI('no_concerns', lang)}
           </div>

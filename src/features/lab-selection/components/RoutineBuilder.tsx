@@ -214,7 +214,6 @@ function RoutineSection({
             fontWeight: 600,
             color: isDark ? '#f5f0e8' : '#1a1a2e',
             letterSpacing: '0.04em',
-            textTransform: 'uppercase',
           }}
         >
           {label}
@@ -506,7 +505,6 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
                 fontSize: 11,
                 fontWeight: 600,
                 color: isDark ? '#FCA5A5' : '#991B1B',
-                textTransform: 'uppercase',
                 letterSpacing: '0.04em',
               }}
             >
@@ -540,7 +538,6 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
               fontSize: 11,
               color: isDark ? 'rgba(245,240,232,0.45)' : 'rgba(26,26,46,0.45)',
               marginBottom: 3,
-              textTransform: 'uppercase',
               letterSpacing: '0.06em',
             }}
           >

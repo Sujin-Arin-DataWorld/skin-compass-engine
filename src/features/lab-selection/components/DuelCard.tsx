@@ -35,7 +35,7 @@ const T = {
   volume:      { ko: '용량',       en: 'Volume',         de: 'Inhalt'   },
   no_kr:       { ko: '이 부위에 맞는 한국 제품이 없습니다', en: 'No KR match for this zone', de: 'Kein KR-Match für diese Zone' },
   no_de:       { ko: '이 부위에 맞는 독일 제품이 없습니다', en: 'No DE match for this zone', de: 'Kein DE-Match für diese Zone' },
-  no_products: { ko: '이 티어에 해당하는 제품이 없습니다', en: 'No products at this tier',   de: 'Keine Produkte in dieser Stufe' },
+  no_products: { ko: '이 부위의 추천 성분에 맞는 제품을 준비 중입니다', en: 'Preparing matched products for this zone…',   de: 'Passende Produkte werden vorbereitet…' },
   winner_kr:   { ko: '한국 제품 우위', en: 'K-Beauty wins this duel', de: 'K-Beauty gewinnt' },
   winner_de:   { ko: '독일 제품 우위', en: 'G-Beauty wins this duel', de: 'G-Beauty gewinnt' },
   draw:        { ko: '동점',          en: 'Draw',                      de: 'Unentschieden'  },
@@ -507,17 +507,36 @@ export default function DuelCard({
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'}`,
       background: isDark ? 'rgba(255,255,255,0.02)' : '#FAFAFA',
     }}>
-      {/* Header */}
       <div style={{
-        padding: '14px 20px 0',
-        display: 'flex', alignItems: 'center', gap: 10,
+        padding: '16px 20px 0',
       }}>
         <div style={{
-          fontSize: 9, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: isDark ? 'rgba(200,169,81,0.7)' : 'hsl(var(--accent-gold) / 0.65)',
+          fontSize: 9, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase',
+          color: isDark ? 'rgba(200,169,81,0.6)' : 'hsl(var(--accent-gold) / 0.55)',
           fontFamily: "var(--font-sans)",
+          marginBottom: 4,
+        }}>
+          {lang === 'ko' ? '제품 추천' : lang === 'de' ? 'Produktempfehlung' : 'Product Recommendation'}
+        </div>
+        <div style={{
+          fontSize: 22, fontWeight: 700,
+          color: isDark ? '#f5f0e8' : '#1a1a2e',
+          fontFamily: "var(--font-display)",
+          lineHeight: 1.2,
+          marginBottom: 4,
         }}>
           {t('title', lang)}
+        </div>
+        <div style={{
+          fontSize: 12, lineHeight: 1.5,
+          color: isDark ? 'rgba(245,240,232,0.4)' : 'rgba(26,26,46,0.45)',
+          fontFamily: "var(--font-sans)",
+        }}>
+          {lang === 'ko'
+            ? '같은 성분, 다른 철학 — 어느 쪽이 당신의 피부에 맞을까?'
+            : lang === 'de'
+            ? 'Gleiche Wirkstoffe, andere Philosophie — was passt zu Ihrer Haut?'
+            : 'Same ingredients, different philosophy — which suits your skin?'}
         </div>
       </div>
 

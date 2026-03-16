@@ -95,12 +95,10 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
       const faceZone = ZONE_ID_MAP[zoneId];
       if (!faceZone) continue;
 
-      // Scale global scores by this zone's intensity
-      const scaledScores: AxisScore[] = globalAxisScores.map((a) => {
-        const scaled = Math.round(a.score * entry.intensity * 1.5);
-        const clamped = Math.min(100, scaled);
-        return { ...a, score: clamped, severity: scoreToSeverity(clamped) };
-      });
+      // Use global axis scores directly — multiplying by zone intensity crushed
+      // moderate scores (26-50) into the mild (<26) range, hiding all ingredients.
+      // Zone differentiation is handled by the dominant-axis +15 boost below.
+      const scaledScores: AxisScore[] = globalAxisScores.map((a) => ({ ...a }));
 
       // Elevate the dominant axis for this zone (translate engine key first)
       const dominantLabAxis = ENGINE_TO_LAB_AXIS[entry.dominantAxis];

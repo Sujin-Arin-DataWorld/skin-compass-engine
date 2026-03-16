@@ -41,6 +41,10 @@ export const AXIS_INGREDIENT_MAP: AxisMap = {
       { name_en: 'Salicylic Acid (BHA)', name_kr: '살리실산(BHA)', min_concentration: 0.5, max_concentration: 2.0, unit: '%', priority: 'must_have', contraindicated_with: [] },
       { name_en: 'Niacinamide', name_kr: '나이아신아마이드', min_concentration: 5.0, max_concentration: null, unit: '%', priority: 'nice_to_have', contraindicated_with: [] },
     ],
+    moderate: [
+      { name_en: 'Niacinamide', name_kr: '나이아신아마이드', min_concentration: 2.0, max_concentration: 5.0, unit: '%', priority: 'nice_to_have', contraindicated_with: [] },
+      { name_en: 'Tea Tree Oil', name_kr: '티트리 오일', min_concentration: null, max_concentration: null, unit: '%', priority: 'nice_to_have', contraindicated_with: [] },
+    ],
   },
   sensitivity: {
     extreme: [
@@ -66,6 +70,10 @@ export const AXIS_INGREDIENT_MAP: AxisMap = {
     ],
     severe: [
       { name_en: 'Ceramide NP', name_kr: '세라마이드', min_concentration: null, max_concentration: null, unit: '%', priority: 'must_have', contraindicated_with: [] },
+      { name_en: 'Squalane', name_kr: '스쿠알란', min_concentration: null, max_concentration: null, unit: '%', priority: 'nice_to_have', contraindicated_with: [] },
+    ],
+    moderate: [
+      { name_en: 'Panthenol', name_kr: '판테놀', min_concentration: null, max_concentration: null, unit: '%', priority: 'nice_to_have', contraindicated_with: [] },
       { name_en: 'Squalane', name_kr: '스쿠알란', min_concentration: null, max_concentration: null, unit: '%', priority: 'nice_to_have', contraindicated_with: [] },
     ],
   },

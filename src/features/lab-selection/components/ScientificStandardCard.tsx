@@ -91,142 +91,238 @@ function translateRole(role: string, lang: Lang): string {
   return role.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── Progress Ring ─────────────────────────────────────────────────────────────
 
-function AxisBar({
+/** Get ring fill color by severity score */
+function getRingColor(score: number): string {
+  if (score <= 25) return '#34D399'; // teal — mild
+  if (score <= 55) return '#C9A96E'; // gold — moderate
+  return '#F87171';                  // rose — severe
+}
+
+function AxisRing({
   axisScore, lang, isDark,
 }: { axisScore: AxisScore; lang: Lang; isDark: boolean }) {
-  const meta  = AXIS_META[axisScore.axis];
-  const sev   = SEVERITY_META[axisScore.severity];
+  const meta = AXIS_META[axisScore.axis];
+  const sev  = SEVERITY_META[axisScore.severity];
   if (!meta || !sev) return null;
 
+  const score = axisScore.score;
+  const showDash = score < 10;
+
+  // SVG circle params
+  const size = 48;
+  const strokeWidth = 4;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const fillPercent = showDash ? 0 : Math.min(score, 100);
+  const dashOffset = circumference * (1 - fillPercent / 100);
+  const ringColor = getRingColor(score);
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+      {/* Ring */}
+      <div style={{ position: 'relative', width: size, height: size }}>
+        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
+          {/* Track */}
+          <circle
+            cx={size / 2} cy={size / 2} r={radius}
+            fill="none"
+            stroke={isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
+            strokeWidth={strokeWidth}
+          />
+          {/* Fill */}
+          {!showDash && (
+            <motion.circle
+              cx={size / 2} cy={size / 2} r={radius}
+              fill="none"
+              stroke={ringColor}
+              strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              initial={{ strokeDashoffset: circumference }}
+              animate={{ strokeDashoffset: dashOffset }}
+              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            />
+          )}
+        </svg>
+        {/* Score inside ring */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: showDash ? 14 : 16,
+            fontWeight: 600,
+            fontFamily: 'var(--font-numeric)',
+            fontVariantNumeric: 'tabular-nums',
+            color: showDash
+              ? isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)'
+              : isDark ? '#f5f0e8' : '#1a1a2e',
+          }}
+        >
+          {showDash ? '—' : score}
+        </div>
+      </div>
+
       {/* Axis label */}
       <span style={{
-        width: 72, fontSize: 10, fontWeight: 600, color: meta.color,
-        fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.04em', flexShrink: 0,
+        fontSize: 10,
+        fontWeight: 500,
+        color: meta.color,
+        fontFamily: 'var(--font-sans)',
+        lineHeight: 1.1,
+        textAlign: 'center',
       }}>
         {meta[lang]}
       </span>
 
-      {/* Progress track */}
-      <div style={{
-        flex: 1, height: 4, borderRadius: 2,
-        background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)',
-        overflow: 'hidden',
-      }}>
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${axisScore.score}%` }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          style={{ height: '100%', background: meta.color, borderRadius: 2 }}
-        />
-      </div>
-
-      {/* Score */}
-      <span style={{
-        width: 24, fontSize: 10, textAlign: 'right', flexShrink: 0,
-        color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-        fontFamily: "'DM Sans', monospace",
-      }}>
-        {axisScore.score}
-      </span>
-
-      {/* Severity pill */}
-      <span style={{
-        padding: '1px 7px', borderRadius: 10, fontSize: 9, fontWeight: 700,
-        letterSpacing: '0.06em', flexShrink: 0,
-        color: sev.color, background: sev.bg,
-        fontFamily: "'DM Sans', sans-serif",
-      }}>
-        {sev[lang]}
-      </span>
+      {/* Severity badge */}
+      {!showDash && (
+        <span style={{
+          padding: '1px 6px',
+          borderRadius: 8,
+          fontSize: 8,
+          fontWeight: 600,
+          color: sev.color,
+          background: sev.bg,
+          fontFamily: 'var(--font-sans)',
+          letterSpacing: '0.04em',
+        }}>
+          {sev[lang]}
+        </span>
+      )}
     </div>
   );
 }
 
-function IngredientRow({
+// ── Ingredient Card ───────────────────────────────────────────────────────────
+
+function IngredientCard({
   ing, lang, isDark, index,
 }: { ing: RequiredIngredient; lang: Lang; isDark: boolean; index: number }) {
   const isMustHave = ing.priority === 'must_have';
   const isHold     = ing.name_en === 'HOLD_ALL_ACTIVES';
 
-  // HOLD_ALL_ACTIVES is handled at the card level — skip here
+  // HOLD_ALL_ACTIVES is handled at the card level
   if (isHold) return null;
 
   const displayName = lang === 'ko' && ing.name_kr ? ing.name_kr : ing.name_en;
+  const accentColor = isMustHave ? '#C9A96E' : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+
+  // Concentration range bar calculation
+  const minConc = ing.min_concentration ?? 0;
+  const maxConc = ing.max_concentration ?? minConc;
+  const hasConcentration = ing.min_concentration !== null;
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.06 }}
       style={{
-        padding: '10px 14px',
-        borderRadius: 8,
+        padding: '14px 16px',
+        borderRadius: 10,
         background: isDark
-          ? (isMustHave ? 'rgba(200,169,81,0.06)' : 'rgba(255,255,255,0.03)')
-          : (isMustHave ? 'rgba(200,169,81,0.07)' : 'rgba(0,0,0,0.02)'),
+          ? (isMustHave ? 'rgba(200,169,81,0.05)' : 'rgba(255,255,255,0.02)')
+          : (isMustHave ? 'rgba(200,169,81,0.04)' : 'rgba(0,0,0,0.015)'),
         border: `1px solid ${isDark
-          ? (isMustHave ? 'rgba(200,169,81,0.2)' : 'rgba(255,255,255,0.06)')
-          : (isMustHave ? 'rgba(200,169,81,0.25)' : 'rgba(0,0,0,0.06)')}`,
-        display: 'flex', flexDirection: 'column', gap: 6,
+          ? (isMustHave ? 'rgba(200,169,81,0.18)' : 'rgba(255,255,255,0.06)')
+          : (isMustHave ? 'rgba(200,169,81,0.2)' : 'rgba(0,0,0,0.06)')}`,
+        borderLeft: `3px solid ${accentColor}`,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
       }}
     >
-      {/* Row 1: priority indicator + name + concentration */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {/* Priority indicator */}
-        <span style={{
-          fontSize: isMustHave ? 13 : 9,
-          color: isMustHave ? '#C8A951' : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)'),
-          flexShrink: 0, lineHeight: 1,
-        }}>
-          {isMustHave ? '★' : '·'}
-        </span>
+      {/* Row 1: Priority tag */}
+      <div style={{
+        fontSize: 9,
+        fontWeight: 700,
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        color: isMustHave ? '#C9A96E' : isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+        fontFamily: 'var(--font-sans)',
+      }}>
+        {isMustHave ? `★ ${tUI('must_have', lang)}` : `· ${tUI('nice', lang)}`}
+      </div>
 
-        {/* Ingredient name */}
-        <span style={{
-          flex: 1, fontSize: 12, fontWeight: 600,
-          color: isDark ? 'rgba(255,255,255,0.88)' : '#1a1a1a',
-          fontFamily: "'DM Sans', sans-serif",
+      {/* Row 2: Ingredient name + INCI */}
+      <div>
+        <div style={{
+          fontSize: 15,
+          fontWeight: 600,
+          color: isDark ? 'rgba(255,255,255,0.9)' : '#1a1a2e',
+          fontFamily: 'var(--font-sans)',
+          lineHeight: 1.3,
         }}>
           {displayName}
-          {/* Show EN name in parentheses when viewing in KO/DE if different */}
-          {lang !== 'en' && displayName !== ing.name_en && (
-            <span style={{
-              marginLeft: 6, fontSize: 10, fontWeight: 400,
-              color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)',
-            }}>
-              {ing.name_en}
-            </span>
-          )}
-        </span>
-
-        {/* Concentration badge */}
-        {ing.min_concentration !== null && (
-          <span style={{
-            flexShrink: 0, fontSize: 12, fontWeight: 700,
-            color: '#C8A951', fontFamily: "'DM Sans', monospace",
-            letterSpacing: '-0.02em',
+        </div>
+        {lang !== 'en' && displayName !== ing.name_en && (
+          <div style={{
+            fontSize: 12,
+            fontWeight: 400,
+            fontStyle: 'italic',
+            color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)',
+            fontFamily: 'var(--font-sans)',
+            marginTop: 2,
           }}>
-            {tUI('conc_min', lang)}{ing.min_concentration}%
-            {ing.max_concentration !== null && ing.max_concentration !== ing.min_concentration
-              ? `–${ing.max_concentration}%`
-              : ''}
-          </span>
+            {ing.name_en}
+          </div>
         )}
       </div>
 
-      {/* Row 2: contraindication tags */}
+      {/* Row 3: Concentration range bar */}
+      {hasConcentration && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{
+            fontSize: 10,
+            color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
+            fontFamily: 'var(--font-sans)',
+            flexShrink: 0,
+          }}>
+            {lang === 'ko' ? '권장 농도' : lang === 'de' ? 'Konzentration' : 'Concentration'}
+          </span>
+          <div style={{
+            flex: 1, height: 3, borderRadius: 2,
+            background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              position: 'absolute',
+              left: `${Math.min(minConc, 100) / 100 * 100}%`,
+              width: `${Math.max((maxConc - minConc), 0.5) / 100 * 100}%`,
+              height: '100%',
+              background: '#C9A96E',
+              borderRadius: 2,
+              minWidth: 8,
+            }} />
+          </div>
+          <span style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: '#C9A96E',
+            fontFamily: 'var(--font-numeric)',
+            fontVariantNumeric: 'tabular-nums',
+            flexShrink: 0,
+          }}>
+            {minConc}%{maxConc !== minConc ? `–${maxConc}%` : ''}
+          </span>
+        </div>
+      )}
+
+      {/* Row 4: Contraindication tags */}
       {ing.contraindicated_with.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, paddingLeft: 20 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
           {ing.contraindicated_with.map((c) => (
             <span key={c} style={{
               fontSize: 9, padding: '2px 6px', borderRadius: 4,
-              background: isDark ? 'rgba(248,113,113,0.1)' : 'rgba(248,113,113,0.1)',
+              background: isDark ? 'rgba(248,113,113,0.1)' : 'rgba(248,113,113,0.08)',
               color: isDark ? '#F87171' : '#B91C1C',
-              fontFamily: "'DM Sans', sans-serif", letterSpacing: '0.04em',
+              fontFamily: 'var(--font-sans)', letterSpacing: '0.04em',
             }}>
               ✕ {c}
             </span>
@@ -259,11 +355,10 @@ export default function ScientificStandardCard({
     ...visibleIngredients.filter((i) => i.priority === 'nice_to_have'),
   ];
 
-  // Lab aesthetic: subtle horizontal rule lines for dark mode (blueprint feel)
+  // Design tokens
   const CARD_BG    = isDark ? '#0D1B2A' : '#FFFFFF';
   const ACCENT     = isDark ? 'rgba(96,165,250,0.12)' : 'rgba(219,234,254,0.7)';
   const BORDER     = isDark ? 'rgba(96,165,250,0.18)' : 'rgba(147,197,253,0.4)';
-  const LINE_COLOR = isDark ? 'rgba(96,165,250,0.04)' : 'rgba(191,219,254,0.6)';
 
   return (
     <motion.div
@@ -278,15 +373,12 @@ export default function ScientificStandardCard({
         boxShadow: isDark
           ? '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(96,165,250,0.08)'
           : '0 2px 16px rgba(147,197,253,0.15)',
-        // Blueprint horizontal lines (dark mode only)
-        backgroundImage: isDark
-          ? `repeating-linear-gradient(0deg, transparent, transparent 23px, ${LINE_COLOR} 23px, ${LINE_COLOR} 24px)`
-          : 'none',
+        maxWidth: 640,
       }}
     >
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div style={{
-        padding: '16px 20px 12px',
+        padding: '16px 20px 14px',
         background: ACCENT,
         borderBottom: `1px solid ${BORDER}`,
         display: 'flex', alignItems: 'center', gap: 12,
@@ -299,7 +391,7 @@ export default function ScientificStandardCard({
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 14, fontWeight: 700,
           color: isDark ? '#93C5FD' : '#1D4ED8',
-          fontFamily: "'DM Sans', monospace",
+          fontFamily: 'var(--font-numeric)',
         }}>
           {zoneMeta.icon}
         </div>
@@ -309,63 +401,70 @@ export default function ScientificStandardCard({
             fontSize: 9, fontWeight: 700, letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: isDark ? 'rgba(147,197,253,0.6)' : 'rgba(29,78,216,0.6)',
-            fontFamily: "'DM Sans', sans-serif", marginBottom: 3,
+            fontFamily: 'var(--font-sans)', marginBottom: 3,
           }}>
-            {/* Clinical chart label */}
             {lang === 'ko' ? '임상 분석' : lang === 'de' ? 'Klinische Analyse' : 'Clinical Analysis'}
           </div>
           <div style={{
-            fontSize: 15, fontWeight: 700,
+            fontSize: 18, fontWeight: 700,
             color: isDark ? '#E0F2FE' : '#1D4ED8',
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: 'var(--font-display)',
             letterSpacing: '0.01em',
+            lineHeight: 1.2,
           }}>
             {tUI('header', lang, { zone: zoneLabel })}
           </div>
         </div>
       </div>
 
-      {/* ── Axis bars ──────────────────────────────────────────────────────── */}
+      {/* ── Axis progress rings (2×4 grid) ──────────────────────────────────── */}
       {axisScores.length > 0 && (
         <div style={{
-          padding: '12px 20px',
+          padding: '16px 20px',
           borderBottom: `1px solid ${BORDER}`,
           background: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(248,250,252,0.8)',
         }}>
           <div style={{
-            fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase',
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase',
             color: isDark ? 'rgba(147,197,253,0.5)' : 'rgba(29,78,216,0.45)',
-            fontFamily: "'DM Sans', sans-serif", marginBottom: 8,
+            fontFamily: 'var(--font-sans)', marginBottom: 14,
           }}>
             {tUI('axis_label', lang)}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+
+          {/* Progress rings grid: 4 columns */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 12,
+            justifyItems: 'center',
+          }}>
             {axisScores.map((a) => (
-              <AxisBar key={a.axis} axisScore={a} lang={lang} isDark={isDark} />
+              <AxisRing key={a.axis} axisScore={a} lang={lang} isDark={isDark} />
             ))}
           </div>
         </div>
       )}
 
       {/* ── Ingredients section ────────────────────────────────────────────── */}
-      <div style={{ padding: '14px 20px 18px' }}>
+      <div style={{ padding: '16px 20px 20px' }}>
         {/* HOLD banner */}
         {hasHoldFlag && (
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             style={{
-              padding: '10px 14px', borderRadius: 8, marginBottom: 12,
+              padding: '12px 16px', borderRadius: 10, marginBottom: 14,
               background: isDark ? 'rgba(248,113,113,0.08)' : 'rgba(254,226,226,0.8)',
               border: '1px solid rgba(248,113,113,0.3)',
-              fontSize: 12, lineHeight: 1.5,
-              fontFamily: "'DM Sans', sans-serif",
+              fontSize: 13, lineHeight: 1.5,
+              fontFamily: 'var(--font-sans)',
             }}
           >
-            <div style={{ fontWeight: 700, color: isDark ? '#F87171' : '#B91C1C', marginBottom: 2 }}>
+            <div style={{ fontWeight: 700, color: isDark ? '#F87171' : '#B91C1C', marginBottom: 4 }}>
               {tUI('hold_title', lang)}
             </div>
-            <div style={{ color: isDark ? 'rgba(248,113,113,0.8)' : '#7F1D1D' }}>
+            <div style={{ color: isDark ? 'rgba(248,113,113,0.8)' : '#7F1D1D', fontSize: 12 }}>
               {tUI('hold_body', lang)}
             </div>
           </motion.div>
@@ -374,32 +473,20 @@ export default function ScientificStandardCard({
         {/* Subheader */}
         {sorted.length > 0 && (
           <div style={{
-            fontSize: 10, fontWeight: 600, letterSpacing: '0.06em',
+            fontSize: 10, fontWeight: 600, letterSpacing: '0.08em',
             color: isDark ? 'rgba(147,197,253,0.6)' : 'rgba(29,78,216,0.55)',
-            fontFamily: "'DM Sans', sans-serif", marginBottom: 10,
+            fontFamily: 'var(--font-sans)', marginBottom: 12,
             textTransform: 'uppercase',
           }}>
             {tUI('subheader', lang)}
           </div>
         )}
 
-        {/* Legend */}
-        {sorted.length > 0 && (
-          <div style={{
-            display: 'flex', gap: 12, marginBottom: 10,
-            fontSize: 10, fontFamily: "'DM Sans', sans-serif",
-            color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.4)',
-          }}>
-            <span>★ {tUI('must_have', lang)}</span>
-            <span>· {tUI('nice', lang)}</span>
-          </div>
-        )}
-
-        {/* Ingredient rows */}
+        {/* Ingredient cards */}
         {sorted.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {sorted.map((ing, idx) => (
-              <IngredientRow
+              <IngredientCard
                 key={ing.name_en}
                 ing={ing}
                 lang={lang}
@@ -410,9 +497,9 @@ export default function ScientificStandardCard({
           </div>
         ) : !hasHoldFlag && (
           <div style={{
-            textAlign: 'center', fontSize: 12,
+            textAlign: 'center', fontSize: 13,
             color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.35)',
-            fontFamily: "'DM Sans', sans-serif", padding: '8px 0',
+            fontFamily: 'var(--font-sans)', padding: '12px 0',
           }}>
             {tUI('no_concerns', lang)}
           </div>

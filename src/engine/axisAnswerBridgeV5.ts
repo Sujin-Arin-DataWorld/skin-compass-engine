@@ -343,11 +343,24 @@ export function buildScoringInput(
  * and suitable for store.setResult() and navigation to /results.
  */
 export function runDiagnosisV5(input: BridgeInput): SkinVectorResult {
-  // Step 1 — Scoring
+  // ── Step 1 — Build scoring input ──────────────────────────────────────────
+  console.log("[V5] Step 1: buildScoringInput…");
   const scoringInput  = buildScoringInput(input);
-  const scoringOutput = computeScores(scoringInput);
+  console.log("[V5] Step 1 OK — zoneData keys:", Object.keys(scoringInput.zoneData),
+    "| concern count:", Object.values(scoringInput.zoneData).reduce((n, z) => n + Object.keys(z).length, 0),
+    "| foundation.age_bracket:", scoringInput.foundation.age_bracket,
+    "| foundation.gender:", scoringInput.foundation.gender,
+    "| foundation.sleep:", scoringInput.foundation.sleep,
+    "| foundation.water:", scoringInput.foundation.water,
+    "| foundation.stress:", scoringInput.foundation.stress,
+  );
 
-  // Step 2 — Vector assembly
+  // ── Step 2 — Compute scores ───────────────────────────────────────────────
+  console.log("[V5] Step 2: computeScores…");
+  const scoringOutput = computeScores(scoringInput);
+  console.log("[V5] Step 2 OK — scores:", JSON.stringify(scoringOutput.scores));
+
+  // ── Step 3 — Vector assembly ──────────────────────────────────────────────
   // Flatten zoneData from Record<zone, Record<concern, severity>> → Record<zone, string[]>
   // for skinVectorEngineV5 which only needs concern IDs, not severity
   const flatZoneData: Record<string, string[]> = {};
@@ -363,23 +376,31 @@ export function runDiagnosisV5(input: BridgeInput): SkinVectorResult {
     activeFlags:   scoringOutput.activeFlags,
     products:      input.products ?? [],
   };
+  console.log("[V5] Step 3: buildSkinVector…");
   const result = buildSkinVector(vectorInput);
+  console.log("[V5] Step 3 OK — primary_concerns:", result.primary_concerns);
 
-  // Step 3 — Routine / product bundle
+  // ── Step 4 — Routine / product bundle ────────────────────────────────────
+  console.log("[V5] Step 4: buildProductBundleV5…");
   const productBundle = buildProductBundleV5(result, input.implicitFlags, input.tier ?? "Full");
+  console.log("[V5] Step 4 OK — bundle phases:", Object.keys(productBundle ?? {}));
 
-  // Step 4 — Seasonal guidance + axis explanations (Phase 3.5C/D)
+  // ── Step 5 — Seasonal guidance + axis explanations (Phase 3.5C/D) ────────
   const foundation = scoringInput.foundation;
   const climateLat = (input.lifestyle as { climateProfile?: { lat?: number } } | undefined)
     ?.climateProfile?.lat ?? 50;
+  console.log("[V5] Step 5: computeSeasonalGuidance…");
   const seasonalGuidance = computeSeasonalGuidance(result.axis_scores, foundation, climateLat);
 
+  console.log("[V5] Step 6: generateAxisExplanations…");
   const axis_explanations = generateAxisExplanations(
     result.axis_scores,
     foundation,
     seasonalGuidance.currentSeason,
   );
+  console.log("[V5] Step 6 OK — axis_explanations count:", axis_explanations?.length ?? 0);
 
+  console.log("[V5] runDiagnosisV5 complete ✓");
   return {
     ...result,
     product_bundle: productBundle,

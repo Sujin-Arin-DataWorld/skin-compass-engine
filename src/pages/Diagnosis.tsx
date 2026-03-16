@@ -464,8 +464,9 @@ const DiagnosisPage: React.FC = () => {
   const handleBeginFaceMapping = useCallback(() => {
     if (!foundationComplete) return;
     store.setAxisAnswer("EXP_SLEEP", (foundationAnswers.sleep ?? 1) - 1);
-    store.setAxisAnswer("EXP_WATER", (foundationAnswers.water ?? 1) - 1);
-    store.setAxisAnswer("EXP_STRESS", (foundationAnswers.stress ?? 1) - 1);
+    // water/stress must be stored as string keys that buildFoundation's WATER_MAP / STRESS_MAP expect
+    store.setAxisAnswer("EXP_WATER",  (["water_low", "water_mid", "water_high"] as const)[(foundationAnswers.water ?? 1) - 1] ?? "water_mid");
+    store.setAxisAnswer("EXP_STRESS", (["stress_low", "stress_mod", "stress_high"] as const)[(foundationAnswers.stress ?? 1) - 1] ?? "stress_low");
     if (foundationAnswers.age_bracket !== undefined)
       store.setAxisAnswer("EXP_AGE", foundationAnswers.age_bracket);
     if (foundationAnswers.gender !== undefined)
@@ -497,11 +498,14 @@ const DiagnosisPage: React.FC = () => {
     try {
       await new Promise(r => setTimeout(r, 400));
 
+      // Use getState() to guarantee we read the latest Zustand state,
+      // not the potentially-stale React hook snapshot captured in this closure.
+      const freshState = useDiagnosisStore.getState();
       const result = runDiagnosisV5({
-        axisAnswers:   store.axisAnswers,
-        selectedZones: store.selectedZones ?? {},
-        implicitFlags: store.implicitFlags,
-        lifestyle:     store.lifestyle,
+        axisAnswers:   freshState.axisAnswers,
+        selectedZones: freshState.selectedZones ?? {},
+        implicitFlags: freshState.implicitFlags,
+        lifestyle:     freshState.lifestyle,
         products:      [],
       });
 
@@ -535,13 +539,18 @@ const DiagnosisPage: React.FC = () => {
         engineVersion: "v5.1",
       });
 
-      // saveDiagnosis failure is non-fatal — navigate regardless
+      // saveDiagnosis failure is non-fatal — navigate regardless.
+      // Race against an 8-second timeout so a Supabase hang never freezes the spinner.
       try {
-        await saveDiagnosis(
+        const savePromise = saveDiagnosis(
           result.axis_scores as Record<string, number>,
-          TIER_MAP[store.selectedTier] ?? "Entry",
+          TIER_MAP[freshState.selectedTier] ?? "Entry",
           flatProducts
         );
+        const timeoutPromise = new Promise<never>((_, rej) =>
+          setTimeout(() => rej(new Error("save_timeout")), 8000)
+        );
+        await Promise.race([savePromise, timeoutPromise]);
         // Authenticated save succeeded — no need to keep the localStorage copy
         clearPendingDiagnosis();
       } catch (saveErr) {

@@ -69,16 +69,16 @@ function computeRequiredIngredients(axisScores: AxisScore[]): RequiredIngredient
 // ── Zone panel header ─────────────────────────────────────────────────────────
 
 const ZONE_LABEL: Record<string, { ko: string; en: string; de: string }> = {
-  forehead:   { ko: '이마',    en: 'Forehead',  de: 'Stirn' },
-  eye_area:   { ko: '눈가',    en: 'Eye Area',  de: 'Augenpartie' },
-  nose:       { ko: '코',      en: 'Nose',      de: 'Nase' },
-  cheeks:     { ko: '볼',      en: 'Cheeks',    de: 'Wangen' },
-  chin:       { ko: '턱',      en: 'Chin',      de: 'Kinn' },
-  jawline:    { ko: '턱선',    en: 'Jawline',   de: 'Kiefer' },
-  t_zone:     { ko: 'T존',     en: 'T-Zone',    de: 'T-Zone' },
+  forehead: { ko: '이마', en: 'Forehead', de: 'Stirn' },
+  eye_area: { ko: '눈가', en: 'Eye Area', de: 'Augenpartie' },
+  nose: { ko: '코', en: 'Nose', de: 'Nase' },
+  cheeks: { ko: '볼', en: 'Cheeks', de: 'Wangen' },
+  chin: { ko: '턱', en: 'Chin', de: 'Kinn' },
+  jawline: { ko: '턱선', en: 'Jawline', de: 'Kiefer' },
+  t_zone: { ko: 'T존', en: 'T-Zone', de: 'T-Zone' },
   whole_face: { ko: '전체 얼굴', en: 'Whole Face', de: 'Gesamtes Gesicht' },
-  spot_only:  { ko: '트러블 부위', en: 'Spot Areas', de: 'Problemzonen' },
-  dry_areas_only:  { ko: '건조 부위', en: 'Dry Areas',  de: 'Trockene Partien' },
+  spot_only: { ko: '트러블 부위', en: 'Spot Areas', de: 'Problemzonen' },
+  dry_areas_only: { ko: '건조 부위', en: 'Dry Areas', de: 'Trockene Partien' },
   oily_areas_only: { ko: '유분 부위', en: 'Oily Areas', de: 'Fettige Partien' },
 };
 
@@ -137,7 +137,7 @@ function ZonePanel({
 
   const headerBorder = isDark
     ? isActive ? 'rgba(201,169,110,0.35)' : 'rgba(255,255,255,0.08)'
-    : isActive ? 'rgba(201,169,110,0.4)'  : 'rgba(0,0,0,0.08)';
+    : isActive ? 'rgba(201,169,110,0.4)' : 'rgba(0,0,0,0.08)';
 
   return (
     <div
@@ -203,8 +203,8 @@ function ZonePanel({
             {language === 'ko'
               ? `${matched_profile} 프로필`
               : language === 'de'
-              ? `Profil: ${matched_profile}`
-              : `Profile: ${matched_profile}`}
+                ? `Profil: ${matched_profile}`
+                : `Profile: ${matched_profile}`}
           </div>
         </div>
 
@@ -330,8 +330,8 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
         {language === 'ko'
           ? '진단 결과를 불러오는 중입니다…'
           : language === 'de'
-          ? 'Diagnosedaten werden geladen…'
-          : 'Loading diagnosis data…'}
+            ? 'Diagnosedaten werden geladen…'
+            : 'Loading diagnosis data…'}
       </div>
     );
   }
@@ -387,8 +387,8 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
             {language === 'ko'
               ? '각 존의 성분 농도가 피부 상태에 맞게 조정되었습니다.'
               : language === 'de'
-              ? 'Wirkstoffkonzentrationen wurden für Ihre Hautbarriere angepasst.'
-              : 'Ingredient concentrations have been adjusted for your current barrier state.'}
+                ? 'Wirkstoffkonzentrationen wurden für Ihre Hautbarriere angepasst.'
+                : 'Ingredient concentrations have been adjusted for your current barrier state.'}
           </div>
         )}
 
@@ -485,8 +485,8 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
                 {language === 'ko'
                   ? '루틴 빌더로 계속하기'
                   : language === 'de'
-                  ? 'Weiter zum Routine-Builder'
-                  : 'Continue to Routine Builder'}
+                    ? 'Weiter zum Routine-Builder'
+                    : 'Continue to Routine Builder'}
                 <ArrowRight size={16} />
               </button>
             </motion.div>

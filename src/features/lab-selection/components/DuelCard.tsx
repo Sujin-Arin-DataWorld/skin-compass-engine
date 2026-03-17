@@ -25,23 +25,23 @@ interface ScoredProduct {
 // ── i18n ──────────────────────────────────────────────────────────────────────
 
 const T = {
-  title:       { ko: 'The Lab Duel: K-Beauty vs G-Beauty', en: 'The Lab Duel: K-Beauty vs G-Beauty', de: 'The Lab Duel: K-Beauty vs G-Beauty' },
-  kr_label:    { ko: '한국 제품', en: 'K-Beauty',   de: 'K-Beauty'   },
-  de_label:    { ko: '독일 제품', en: 'G-Beauty',   de: 'G-Beauty'   },
-  compliance:  { ko: '성분 적합도', en: 'Compliance', de: 'Compliance' },
-  add_btn:     { ko: '루틴에 추가', en: 'Add to Routine', de: 'Zur Routine' },
-  added_btn:   { ko: '추가됨 ✓',   en: 'Added ✓',        de: 'Hinzugefügt ✓' },
-  price:       { ko: '가격',       en: 'Price',          de: 'Preis'    },
-  volume:      { ko: '용량',       en: 'Volume',         de: 'Inhalt'   },
-  no_kr:       { ko: '이 부위에 맞는 한국 제품이 없습니다', en: 'No KR match for this zone', de: 'Kein KR-Match für diese Zone' },
-  no_de:       { ko: '이 부위에 맞는 독일 제품이 없습니다', en: 'No DE match for this zone', de: 'Kein DE-Match für diese Zone' },
-  no_products: { ko: '이 부위의 추천 성분에 맞는 제품을 준비 중입니다', en: 'Preparing matched products for this zone…',   de: 'Passende Produkte werden vorbereitet…' },
-  winner_kr:   { ko: '한국 제품 우위', en: 'K-Beauty wins this duel', de: 'K-Beauty gewinnt' },
-  winner_de:   { ko: '독일 제품 우위', en: 'G-Beauty wins this duel', de: 'G-Beauty gewinnt' },
-  draw:        { ko: '동점',          en: 'Draw',                      de: 'Unentschieden'  },
-  loading:     { ko: '제품 로딩 중…', en: 'Loading products…',         de: 'Lade Produkte…' },
-  error_retry: { ko: '다시 시도',     en: 'Retry',                     de: 'Wiederholen'    },
-  per_ml:      { ko: '/ml',           en: '/ml',                       de: '/ml'            },
+  title: { ko: 'The Lab Duel: K-Beauty vs G-Beauty', en: 'The Lab Duel: K-Beauty vs G-Beauty', de: 'The Lab Duel: K-Beauty vs G-Beauty' },
+  kr_label: { ko: '한국 제품', en: 'K-Beauty', de: 'K-Beauty' },
+  de_label: { ko: '독일 제품', en: 'G-Beauty', de: 'G-Beauty' },
+  compliance: { ko: '성분 적합도', en: 'Compliance', de: 'Compliance' },
+  add_btn: { ko: '루틴에 추가', en: 'Add to Routine', de: 'Zur Routine' },
+  added_btn: { ko: '추가됨 ✓', en: 'Added ✓', de: 'Hinzugefügt ✓' },
+  price: { ko: '가격', en: 'Price', de: 'Preis' },
+  volume: { ko: '용량', en: 'Volume', de: 'Inhalt' },
+  no_kr: { ko: '이 부위에 맞는 한국 제품이 없습니다', en: 'No KR match for this zone', de: 'Kein KR-Match für diese Zone' },
+  no_de: { ko: '이 부위에 맞는 독일 제품이 없습니다', en: 'No DE match for this zone', de: 'Kein DE-Match für diese Zone' },
+  no_products: { ko: '이 부위의 추천 성분에 맞는 제품을 준비 중입니다', en: 'Preparing matched products for this zone…', de: 'Passende Produkte werden vorbereitet…' },
+  winner_kr: { ko: '한국 제품 우위', en: 'K-Beauty wins this duel', de: 'K-Beauty gewinnt' },
+  winner_de: { ko: '독일 제품 우위', en: 'G-Beauty wins this duel', de: 'G-Beauty gewinnt' },
+  draw: { ko: '동점', en: 'Draw', de: 'Unentschieden' },
+  loading: { ko: '제품 로딩 중…', en: 'Loading products…', de: 'Lade Produkte…' },
+  error_retry: { ko: '다시 시도', en: 'Retry', de: 'Wiederholen' },
+  per_ml: { ko: '/ml', en: '/ml', de: '/ml' },
 } as const;
 
 function t(key: keyof typeof T, lang: Lang): string {
@@ -71,7 +71,7 @@ function IngredientMatchRow({
   name, status, isDark,
 }: { name: string; status: 'full' | 'partial' | 'missing'; isDark: boolean }) {
   const config = {
-    full:    { symbol: '◎', color: '#34D399' },
+    full: { symbol: '◎', color: '#34D399' },
     partial: { symbol: '△', color: '#F59E0B' },
     missing: { symbol: '✗', color: '#F87171' },
   }[status];
@@ -104,9 +104,9 @@ function TierTabs({
   lang: Lang;
 }) {
   const TIER_LABELS: Record<PriceTier, { ko: string; en: string; de: string }> = {
-    entry:   { ko: '기본',   en: 'Entry',   de: 'Basis'    },
-    full:    { ko: '풀',     en: 'Full',    de: 'Voll'     },
-    premium: { ko: '프리미엄',en: 'Premium', de: 'Premium'  },
+    entry: { ko: '기본', en: 'Entry', de: 'Basis' },
+    full: { ko: '풀', en: 'Full', de: 'Voll' },
+    premium: { ko: '프리미엄', en: 'Premium', de: 'Premium' },
   };
 
   return (
@@ -133,8 +133,8 @@ function TierTabs({
                 : isDark ? 'transparent' : 'rgba(0,0,0,0.02)',
               color: isActive ? 'hsl(var(--accent-gold))'
                 : isAvail
-                ? (isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)')
-                : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.18)'),
+                  ? (isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.45)')
+                  : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.18)'),
               fontFamily: "var(--font-sans)",
               transition: 'all 0.15s',
             }}
@@ -162,8 +162,8 @@ function ProductCard({
   selectedTier: PriceTier;
 }) {
   const { product, compliance } = scored;
-  const GOLD  = 'hsl(var(--accent-gold))';
-  const ROSE  = '#b76e79';
+  const GOLD = 'hsl(var(--accent-gold))';
+  const ROSE = '#b76e79';
 
   const name = lang === 'ko' ? product.name_kr : lang === 'de' ? product.name_de : product.name_en;
   const oneLiner = lang === 'ko' ? product.one_liner_kr : product.one_liner_en;
@@ -351,8 +351,8 @@ function VerdictBanner({
   const winnerLabel = krScore > deScore
     ? t('winner_kr', lang)
     : deScore > krScore
-    ? t('winner_de', lang)
-    : t('draw', lang);
+      ? t('winner_de', lang)
+      : t('draw', lang);
 
   const winnerColor = krScore > deScore ? '#EF4444' : '#3B82F6'; // KR=red, DE=blue
 
@@ -535,8 +535,8 @@ export default function DuelCard({
           {lang === 'ko'
             ? '같은 성분, 다른 철학 — 어느 쪽이 당신의 피부에 맞을까?'
             : lang === 'de'
-            ? 'Gleiche Wirkstoffe, andere Philosophie — was passt zu Ihrer Haut?'
-            : 'Same ingredients, different philosophy — which suits your skin?'}
+              ? 'Gleiche Wirkstoffe, andere Philosophie — was passt zu Ihrer Haut?'
+              : 'Same ingredients, different philosophy — which suits your skin?'}
         </div>
       </div>
 

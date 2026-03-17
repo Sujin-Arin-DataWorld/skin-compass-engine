@@ -18,33 +18,33 @@ import { ZONE_COLORS } from '../data/textureRules';
 // ── Labels ────────────────────────────────────────────────────────────────────
 
 const ZONE_LABEL: Record<string, { ko: string; en: string; de: string }> = {
-  forehead:   { ko: '이마',    en: 'Forehead', de: 'Stirn' },
-  eye_area:   { ko: '눈가',    en: 'Eye Area', de: 'Augenpartie' },
-  nose:       { ko: '코',      en: 'Nose',     de: 'Nase' },
-  cheeks:     { ko: '볼',      en: 'Cheeks',   de: 'Wangen' },
-  chin:       { ko: '턱',      en: 'Chin',     de: 'Kinn' },
-  jawline:    { ko: '턱선',    en: 'Jawline',  de: 'Kiefer' },
-  t_zone:     { ko: 'T존',     en: 'T-Zone',   de: 'T-Zone' },
-  whole_face: { ko: '전체',    en: 'All',      de: 'Gesamt' },
+  forehead: { ko: '이마', en: 'Forehead', de: 'Stirn' },
+  eye_area: { ko: '눈가', en: 'Eye Area', de: 'Augenpartie' },
+  nose: { ko: '코', en: 'Nose', de: 'Nase' },
+  cheeks: { ko: '볼', en: 'Cheeks', de: 'Wangen' },
+  chin: { ko: '턱', en: 'Chin', de: 'Kinn' },
+  jawline: { ko: '턱선', en: 'Jawline', de: 'Kiefer' },
+  t_zone: { ko: 'T존', en: 'T-Zone', de: 'T-Zone' },
+  whole_face: { ko: '전체', en: 'All', de: 'Gesamt' },
 };
 
 const AXIS_LABEL: Record<string, { ko: string; en: string; de: string }> = {
-  sebum:           { ko: '피지',         en: 'Sebum',         de: 'Talg' },
-  hydration:       { ko: '수분',         en: 'Hydration',     de: 'Feuchtigkeit' },
-  pores:           { ko: '모공',         en: 'Pores',         de: 'Poren' },
-  texture:         { ko: '피부결',       en: 'Texture',       de: 'Textur' },
-  sensitivity:     { ko: '민감도',       en: 'Sensitivity',   de: 'Empfindlichkeit' },
-  aging:           { ko: '노화',         en: 'Aging',         de: 'Alterung' },
-  pigmentation:    { ko: '색소침착',     en: 'Pigmentation',  de: 'Pigmentierung' },
-  barrier:         { ko: '장벽',         en: 'Barrier',       de: 'Barriere' },
-  neurodermatitis: { ko: '신경성 피부염',en: 'Neurodermatitis',de: 'Neurodermitis' },
+  sebum: { ko: '피지', en: 'Sebum', de: 'Talg' },
+  hydration: { ko: '수분', en: 'Hydration', de: 'Feuchtigkeit' },
+  pores: { ko: '모공', en: 'Pores', de: 'Poren' },
+  texture: { ko: '피부결', en: 'Texture', de: 'Textur' },
+  sensitivity: { ko: '민감도', en: 'Sensitivity', de: 'Empfindlichkeit' },
+  aging: { ko: '노화', en: 'Aging', de: 'Alterung' },
+  pigmentation: { ko: '색소침착', en: 'Pigmentation', de: 'Pigmentierung' },
+  barrier: { ko: '장벽', en: 'Barrier', de: 'Barriere' },
+  neurodermatitis: { ko: '신경성 피부염', en: 'Neurodermatitis', de: 'Neurodermitis' },
 };
 
 const SEVERITY_LABEL: Record<string, { ko: string; en: string; de: string; color: string }> = {
-  mild:     { ko: '경미', en: 'mild',     de: 'mild',    color: '#34D399' },
+  mild: { ko: '경미', en: 'mild', de: 'mild', color: '#34D399' },
   moderate: { ko: '보통', en: 'moderate', de: 'moderat', color: '#F59E0B' },
-  severe:   { ko: '심각', en: 'severe',   de: 'schwer',  color: '#F87171' },
-  extreme:  { ko: '매우 심각', en: 'extreme', de: 'extrem', color: '#EF4444' },
+  severe: { ko: '심각', en: 'severe', de: 'schwer', color: '#F87171' },
+  extreme: { ko: '매우 심각', en: 'extreme', de: 'extrem', color: '#EF4444' },
 };
 
 const NO_CONCERNS_LABEL = {
@@ -68,8 +68,8 @@ export interface FaceMapOverlayProps {
 function ProductBadge({ product, language }: { product: Product; language: string }) {
   const name =
     language === 'ko' ? product.name_kr
-    : language === 'de' ? product.name_de
-    : product.name_en;
+      : language === 'de' ? product.name_de
+        : product.name_en;
 
   return (
     <div
@@ -184,15 +184,15 @@ export default function FaceMapOverlay({ zones, activeZone, onZoneClick }: FaceM
                 border: isActive
                   ? `1.5px solid ${colors.light}`
                   : sel
-                  ? '1px solid rgba(93,202,165,0.35)'
-                  : `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                    ? '1px solid rgba(93,202,165,0.35)'
+                    : `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
                 background: isActive
                   ? isDark
                     ? `${color}22`
                     : `${colors.light}18`
                   : sel
-                  ? isDark ? 'rgba(93,202,165,0.06)' : 'rgba(93,202,165,0.04)'
-                  : 'transparent',
+                    ? isDark ? 'rgba(93,202,165,0.06)' : 'rgba(93,202,165,0.04)'
+                    : 'transparent',
                 cursor: 'pointer',
                 textAlign: 'left',
                 width: '100%',

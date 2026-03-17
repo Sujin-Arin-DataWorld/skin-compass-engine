@@ -176,7 +176,7 @@ export function useProducts(filters: ProductFilters = {}): UseProductsResult {
     fetchProducts();
 
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     filters.country,
     filters.priceTier,
@@ -191,7 +191,7 @@ export function useProducts(filters: ProductFilters = {}): UseProductsResult {
   const products = useMemo(() => {
     if (dbProducts !== null) return dbProducts;
     return applyFiltersLocally(STATIC_PRODUCTS, filters);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dbProducts, JSON.stringify(filters)]);
 
   return { products, isLoading, error, refetch };

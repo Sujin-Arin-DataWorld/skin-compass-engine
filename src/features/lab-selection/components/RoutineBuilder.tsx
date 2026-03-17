@@ -22,26 +22,26 @@ import { RoutineStep, PhConflict, TimeOfDay } from '../types';
 // ── i18n ──────────────────────────────────────────────────────────────────────
 
 const T = {
-  title:             { ko: '나의 루틴', en: 'My Routine', de: 'Meine Routine' },
-  am_title:          { ko: '아침 루틴 (AM)', en: 'Morning Routine (AM)', de: 'Morgenroutine (AM)' },
-  pm_title:          { ko: '저녁 루틴 (PM)', en: 'Evening Routine (PM)', de: 'Abendroutine (PM)' },
-  weekly_title:      { ko: '주간 마스크', en: 'Weekly Masks', de: 'Wöchentliche Masken' },
-  conflicts_title:   { ko: 'pH 충돌 경고', en: 'pH Conflict Warnings', de: 'pH-Konflikthinweise' },
-  total_cost:        { ko: '총 비용', en: 'Total Cost', de: 'Gesamtkosten' },
-  save_btn:          { ko: '루틴 저장', en: 'Save Routine', de: 'Routine speichern' },
-  saving:            { ko: '저장 중…', en: 'Saving…', de: 'Speichern…' },
-  saved:             { ko: '저장됨 ✓', en: 'Saved ✓', de: 'Gespeichert ✓' },
-  blocked_save:      { ko: '안전 문제로 인해 저장이 차단되었습니다', en: 'Save blocked due to safety issues', de: 'Speichern wegen Sicherheitsproblemen blockiert' },
-  irritation_warn:   { ko: '⚠ 자극 성분 경고: 동일 루틴에 2가지 전환 성분 포함', en: '⚠ Irritation Warning: 2 turnover actives in the same routine', de: '⚠ Reizwarnung: 2 Turnover-Wirkstoffe in derselben Routine' },
-  irritation_block:  { ko: '🚫 자극 차단: 동일 루틴에 3가지 이상 전환 성분 — 제품을 교체하세요', en: '🚫 Irritation Blocked: 3+ turnover actives in one routine — swap a product', de: '🚫 Reizsperre: 3+ Turnover-Wirkstoffe in einer Routine — Produkt tauschen' },
-  spf_required:      { ko: '🚫 SPF 필수: PM에 광감작 성분이 있지만 AM에 SPF가 없습니다', en: '🚫 SPF Required: PM has photosensitizing ingredients but AM lacks SPF', de: '🚫 SPF erforderlich: PM enthält photosensibilisierende Stoffe, aber AM fehlt SPF' },
-  wait_10min:        { ko: '10분 간격 두기', en: 'Wait 10 min between', de: '10 Min. Pause einhalten' },
-  split_am_pm:       { ko: 'AM/PM 분리 사용', en: 'Split AM/PM use', de: 'AM/PM trennen' },
-  pm_only:           { ko: 'PM 전용', en: 'PM only', de: 'Nur PM' },
+  title: { ko: '나의 루틴', en: 'My Routine', de: 'Meine Routine' },
+  am_title: { ko: '아침 루틴 (AM)', en: 'Morning Routine (AM)', de: 'Morgenroutine (AM)' },
+  pm_title: { ko: '저녁 루틴 (PM)', en: 'Evening Routine (PM)', de: 'Abendroutine (PM)' },
+  weekly_title: { ko: '주간 마스크', en: 'Weekly Masks', de: 'Wöchentliche Masken' },
+  conflicts_title: { ko: 'pH 충돌 경고', en: 'pH Conflict Warnings', de: 'pH-Konflikthinweise' },
+  total_cost: { ko: '총 비용', en: 'Total Cost', de: 'Gesamtkosten' },
+  save_btn: { ko: '루틴 저장', en: 'Save Routine', de: 'Routine speichern' },
+  saving: { ko: '저장 중…', en: 'Saving…', de: 'Speichern…' },
+  saved: { ko: '저장됨 ✓', en: 'Saved ✓', de: 'Gespeichert ✓' },
+  blocked_save: { ko: '안전 문제로 인해 저장이 차단되었습니다', en: 'Save blocked due to safety issues', de: 'Speichern wegen Sicherheitsproblemen blockiert' },
+  irritation_warn: { ko: '⚠ 자극 성분 경고: 동일 루틴에 2가지 전환 성분 포함', en: '⚠ Irritation Warning: 2 turnover actives in the same routine', de: '⚠ Reizwarnung: 2 Turnover-Wirkstoffe in derselben Routine' },
+  irritation_block: { ko: '🚫 자극 차단: 동일 루틴에 3가지 이상 전환 성분 — 제품을 교체하세요', en: '🚫 Irritation Blocked: 3+ turnover actives in one routine — swap a product', de: '🚫 Reizsperre: 3+ Turnover-Wirkstoffe in einer Routine — Produkt tauschen' },
+  spf_required: { ko: '🚫 SPF 필수: PM에 광감작 성분이 있지만 AM에 SPF가 없습니다', en: '🚫 SPF Required: PM has photosensitizing ingredients but AM lacks SPF', de: '🚫 SPF erforderlich: PM enthält photosensibilisierende Stoffe, aber AM fehlt SPF' },
+  wait_10min: { ko: '10분 간격 두기', en: 'Wait 10 min between', de: '10 Min. Pause einhalten' },
+  split_am_pm: { ko: 'AM/PM 분리 사용', en: 'Split AM/PM use', de: 'AM/PM trennen' },
+  pm_only: { ko: 'PM 전용', en: 'PM only', de: 'Nur PM' },
   avoid_combination: { ko: '병용 금지', en: 'Avoid combining', de: 'Kombination vermeiden' },
-  zone_apply:        { ko: '적용 부위', en: 'Apply to', de: 'Auftragen auf' },
-  no_products:       { ko: '선택된 제품이 없습니다', en: 'No products selected', de: 'Keine Produkte ausgewählt' },
-  empty_routine:     { ko: '이 시간대에 해당하는 제품이 없습니다', en: 'No products for this time slot', de: 'Keine Produkte für diesen Zeitraum' },
+  zone_apply: { ko: '적용 부위', en: 'Apply to', de: 'Auftragen auf' },
+  no_products: { ko: '선택된 제품이 없습니다', en: 'No products selected', de: 'Keine Produkte ausgewählt' },
+  empty_routine: { ko: '이 시간대에 해당하는 제품이 없습니다', en: 'No products for this time slot', de: 'Keine Produkte für diesen Zeitraum' },
 };
 
 function t(key: keyof typeof T, lang: string): string {
@@ -53,9 +53,9 @@ function t(key: keyof typeof T, lang: string): string {
 
 function conflictLabel(type: PhConflict['conflict_type'], lang: string): string {
   switch (type) {
-    case 'wait_10min':        return t('wait_10min', lang);
-    case 'split_am_pm':       return t('split_am_pm', lang);
-    case 'pm_only':           return t('pm_only', lang);
+    case 'wait_10min': return t('wait_10min', lang);
+    case 'split_am_pm': return t('split_am_pm', lang);
+    case 'pm_only': return t('pm_only', lang);
     case 'avoid_combination': return t('avoid_combination', lang);
   }
 }
@@ -73,8 +73,8 @@ function RoutineStepRow({
 }) {
   const name =
     language === 'ko' ? step.product.name_kr
-    : language === 'de' ? step.product.name_de
-    : step.product.name_en;
+      : language === 'de' ? step.product.name_de
+        : step.product.name_en;
 
   const brand = step.product.brand;
   const slot = step.product.routine_slot.replace(/_/g, ' ');
@@ -264,8 +264,8 @@ function ConflictRow({ conflict, isDark, language }: { conflict: PhConflict; isD
     conflict.conflict_type === 'avoid_combination'
       ? '#EF4444'
       : conflict.conflict_type === 'split_am_pm' || conflict.conflict_type === 'pm_only'
-      ? '#F59E0B'
-      : '#60A5FA';
+        ? '#F59E0B'
+        : '#60A5FA';
 
   return (
     <div
@@ -567,16 +567,16 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
             background: isSaveBlocked
               ? 'rgba(239,68,68,0.08)'
               : saveState === 'saved'
-              ? 'rgba(93,202,165,0.14)'
-              : 'linear-gradient(135deg, rgba(201,169,110,0.18), rgba(201,169,110,0.08))',
+                ? 'rgba(93,202,165,0.14)'
+                : 'linear-gradient(135deg, rgba(201,169,110,0.18), rgba(201,169,110,0.08))',
             cursor: isSaveBlocked ? 'not-allowed' : 'pointer',
             fontSize: 13,
             fontWeight: 600,
             color: isSaveBlocked
               ? '#EF4444'
               : saveState === 'saved'
-              ? '#5DCAA5'
-              : 'hsl(var(--accent-gold))',
+                ? '#5DCAA5'
+                : 'hsl(var(--accent-gold))',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
@@ -587,10 +587,10 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
           {saveState === 'saved'
             ? <><Check size={14} /> {t('saved', language)}</>
             : saveState === 'saving'
-            ? t('saving', language)
-            : isSaveBlocked
-            ? t('blocked_save', language)
-            : <><Save size={14} /> {t('save_btn', language)}</>
+              ? t('saving', language)
+              : isSaveBlocked
+                ? t('blocked_save', language)
+                : <><Save size={14} /> {t('save_btn', language)}</>
           }
         </button>
       </div>

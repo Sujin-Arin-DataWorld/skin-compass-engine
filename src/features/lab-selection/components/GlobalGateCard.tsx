@@ -68,7 +68,7 @@ const T = {
     de: 'Hautbarriere gesund — vollständige Inhaltsstoffpalette verfügbar',
   },
   entry: { ko: '기본', en: 'Entry', de: 'Basis' },
-  full:  { ko: '풀', en: 'Full',  de: 'Voll' },
+  full: { ko: '풀', en: 'Full', de: 'Voll' },
   price: { ko: '가격', en: 'Price', de: 'Preis' },
 } as const;
 
@@ -255,8 +255,8 @@ export default function GlobalGateCard() {
                         {lang === 'ko'
                           ? `최대 ${cap.max}%${cap.note_ko ? ` (${cap.note_ko})` : ''}`
                           : lang === 'de'
-                          ? `max. ${cap.max}%${cap.note_de ? ` (${cap.note_de})` : ''}`
-                          : `capped at ${cap.max}%${cap.note_en ? ` (${cap.note_en})` : ''}`}
+                            ? `max. ${cap.max}%${cap.note_de ? ` (${cap.note_de})` : ''}`
+                            : `capped at ${cap.max}%${cap.note_en ? ` (${cap.note_en})` : ''}`}
                       </span>
                     </div>
                   ))}
@@ -271,7 +271,7 @@ export default function GlobalGateCard() {
 
   // ── Case 1: recovery_only — full warning card ──────────────────────────────
   const entryProducts = recoveryProducts.filter((p) => p.price_tier === 'entry').slice(0, 3);
-  const fullProducts  = recoveryProducts.filter((p) => p.price_tier === 'full').slice(0, 2);
+  const fullProducts = recoveryProducts.filter((p) => p.price_tier === 'full').slice(0, 2);
 
   return (
     <motion.div

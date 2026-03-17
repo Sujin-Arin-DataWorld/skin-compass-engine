@@ -16,61 +16,61 @@ interface ScientificStandardCardProps {
 // ── Static maps ───────────────────────────────────────────────────────────────
 
 const ZONE_META: Record<string, { ko: string; en: string; de: string; icon: string }> = {
-  whole_face:     { ko: '전체 얼굴',    en: 'Full Face',     de: 'Gesamtes Gesicht',   icon: '◉' },
-  t_zone:         { ko: 'T존',          en: 'T-Zone',        de: 'T-Zone',             icon: 'T' },
-  forehead:       { ko: '이마',          en: 'Forehead',      de: 'Stirn',              icon: '↑' },
-  nose:           { ko: '코',            en: 'Nose',          de: 'Nase',               icon: '▽' },
-  cheeks:         { ko: '볼',            en: 'Cheeks',        de: 'Wangen',             icon: '◈' },
-  chin:           { ko: '턱',            en: 'Chin',          de: 'Kinn',               icon: '▼' },
-  jawline:        { ko: '턱선',          en: 'Jawline',       de: 'Kieferlinie',        icon: '⌣' },
-  eye_area:       { ko: '눈가',          en: 'Eye Area',      de: 'Augenbereich',       icon: '◎' },
-  spot_only:      { ko: '트러블 부위',   en: 'Spot Only',     de: 'Problemzonen',       icon: '●' },
-  dry_areas_only: { ko: '건조 부위',     en: 'Dry Areas',     de: 'Trockene Stellen',   icon: '○' },
-  oily_areas_only:{ ko: '유분 부위',     en: 'Oily Areas',    de: 'Fettige Stellen',    icon: '◆' },
+  whole_face: { ko: '전체 얼굴', en: 'Full Face', de: 'Gesamtes Gesicht', icon: '◉' },
+  t_zone: { ko: 'T존', en: 'T-Zone', de: 'T-Zone', icon: 'T' },
+  forehead: { ko: '이마', en: 'Forehead', de: 'Stirn', icon: '↑' },
+  nose: { ko: '코', en: 'Nose', de: 'Nase', icon: '▽' },
+  cheeks: { ko: '볼', en: 'Cheeks', de: 'Wangen', icon: '◈' },
+  chin: { ko: '턱', en: 'Chin', de: 'Kinn', icon: '▼' },
+  jawline: { ko: '턱선', en: 'Jawline', de: 'Kieferlinie', icon: '⌣' },
+  eye_area: { ko: '눈가', en: 'Eye Area', de: 'Augenbereich', icon: '◎' },
+  spot_only: { ko: '트러블 부위', en: 'Spot Only', de: 'Problemzonen', icon: '●' },
+  dry_areas_only: { ko: '건조 부위', en: 'Dry Areas', de: 'Trockene Stellen', icon: '○' },
+  oily_areas_only: { ko: '유분 부위', en: 'Oily Areas', de: 'Fettige Stellen', icon: '◆' },
 };
 
 const AXIS_META: Record<string, { ko: string; en: string; de: string; color: string }> = {
-  sebum:           { ko: '피지',         en: 'Sebum',          de: 'Talg',              color: '#F59E0B' },
-  hydration:       { ko: '수분',         en: 'Hydration',      de: 'Feuchtigkeit',      color: '#60A5FA' },
-  pores:           { ko: '모공',         en: 'Pores',          de: 'Poren',             color: '#A78BFA' },
-  texture:         { ko: '피부결',       en: 'Texture',        de: 'Textur',            color: '#34D399' },
-  sensitivity:     { ko: '민감도',       en: 'Sensitivity',    de: 'Empfindlichkeit',   color: '#F87171' },
-  aging:           { ko: '노화',         en: 'Aging',          de: 'Alterung',          color: '#C8A951' },
-  pigmentation:    { ko: '색소침착',     en: 'Pigmentation',   de: 'Pigmentierung',     color: '#818CF8' },
-  barrier:         { ko: '장벽',         en: 'Barrier',        de: 'Barriere',          color: '#F0997B' },
-  neurodermatitis: { ko: '신경성 피부염',en: 'Neurodermatitis',de: 'Neurodermitis',     color: '#EC4899' },
+  sebum: { ko: '피지', en: 'Sebum', de: 'Talg', color: '#F59E0B' },
+  hydration: { ko: '수분', en: 'Hydration', de: 'Feuchtigkeit', color: '#60A5FA' },
+  pores: { ko: '모공', en: 'Pores', de: 'Poren', color: '#A78BFA' },
+  texture: { ko: '피부결', en: 'Texture', de: 'Textur', color: '#34D399' },
+  sensitivity: { ko: '민감도', en: 'Sensitivity', de: 'Empfindlichkeit', color: '#F87171' },
+  aging: { ko: '노화', en: 'Aging', de: 'Alterung', color: '#C8A951' },
+  pigmentation: { ko: '색소침착', en: 'Pigmentation', de: 'Pigmentierung', color: '#818CF8' },
+  barrier: { ko: '장벽', en: 'Barrier', de: 'Barriere', color: '#F0997B' },
+  neurodermatitis: { ko: '신경성 피부염', en: 'Neurodermatitis', de: 'Neurodermitis', color: '#EC4899' },
 };
 
 const SEVERITY_META: Record<string, { ko: string; en: string; de: string; color: string; bg: string }> = {
-  mild:     { ko: '경미',       en: 'Mild',     de: 'Mild',     color: '#34D399', bg: 'rgba(52,211,153,0.12)'  },
-  moderate: { ko: '보통',       en: 'Moderate', de: 'Moderat',  color: '#F59E0B', bg: 'rgba(245,158,11,0.12)'  },
-  severe:   { ko: '심각',       en: 'Severe',   de: 'Schwer',   color: '#F87171', bg: 'rgba(248,113,113,0.12)' },
-  extreme:  { ko: '매우 심각',  en: 'Extreme',  de: 'Extrem',   color: '#EF4444', bg: 'rgba(239,68,68,0.14)'   },
+  mild: { ko: '경미', en: 'Mild', de: 'Mild', color: '#34D399', bg: 'rgba(52,211,153,0.12)' },
+  moderate: { ko: '보통', en: 'Moderate', de: 'Moderat', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)' },
+  severe: { ko: '심각', en: 'Severe', de: 'Schwer', color: '#F87171', bg: 'rgba(248,113,113,0.12)' },
+  extreme: { ko: '매우 심각', en: 'Extreme', de: 'Extrem', color: '#EF4444', bg: 'rgba(239,68,68,0.14)' },
 };
 
 // Translate ingredient role strings (from product_db / axisIngredientMap)
 const ROLE_META: Record<string, { ko: string; en: string; de: string }> = {
-  exfoliant:            { ko: '각질 제거',   en: 'Exfoliant',      de: 'Exfoliant'      },
-  sebum_control:        { ko: '피지 조절',   en: 'Sebum Control',  de: 'Talgkontrolle'  },
-  hydration:            { ko: '보습',        en: 'Hydration',      de: 'Feuchtigkeit'   },
-  soothing:             { ko: '진정',        en: 'Soothing',       de: 'Beruhigung'     },
-  brightening:          { ko: '미백',        en: 'Brightening',    de: 'Aufhellung'     },
-  barrier_repair:       { ko: '장벽 복구',   en: 'Barrier Repair', de: 'Barriererep.'   },
-  anti_aging:           { ko: '노화 방지',   en: 'Anti-Aging',     de: 'Anti-Aging'     },
-  pore_minimizing:      { ko: '모공 관리',   en: 'Pore Minimizing',de: 'Porenminimierung'},
-  antioxidant:          { ko: '항산화',      en: 'Antioxidant',    de: 'Antioxidans'    },
-  'sebum control':      { ko: '피지 조절',   en: 'Sebum Control',  de: 'Talgkontrolle'  },
+  exfoliant: { ko: '각질 제거', en: 'Exfoliant', de: 'Exfoliant' },
+  sebum_control: { ko: '피지 조절', en: 'Sebum Control', de: 'Talgkontrolle' },
+  hydration: { ko: '보습', en: 'Hydration', de: 'Feuchtigkeit' },
+  soothing: { ko: '진정', en: 'Soothing', de: 'Beruhigung' },
+  brightening: { ko: '미백', en: 'Brightening', de: 'Aufhellung' },
+  barrier_repair: { ko: '장벽 복구', en: 'Barrier Repair', de: 'Barriererep.' },
+  anti_aging: { ko: '노화 방지', en: 'Anti-Aging', de: 'Anti-Aging' },
+  pore_minimizing: { ko: '모공 관리', en: 'Pore Minimizing', de: 'Porenminimierung' },
+  antioxidant: { ko: '항산화', en: 'Antioxidant', de: 'Antioxidans' },
+  'sebum control': { ko: '피지 조절', en: 'Sebum Control', de: 'Talgkontrolle' },
 };
 
 const UI = {
-  header:    { ko: '{zone} 분석 결과', en: '{zone} Analysis',          de: '{zone}-Analyse'                    },
+  header: { ko: '{zone} 분석 결과', en: '{zone} Analysis', de: '{zone}-Analyse' },
   subheader: { ko: '이 부위에 필요한 성분:', en: 'Required ingredients for this zone:', de: 'Benötigte Inhaltsstoffe für diese Zone:' },
   must_have: { ko: '필수', en: 'Must have', de: 'Muss haben' },
-  nice:      { ko: '권장', en: 'Nice to have', de: 'Empfohlen' },
-  conc_min:  { ko: '최소 ', en: 'min ', de: 'mind. ' },
-  hold_title:{ ko: '🛑 활성 성분 일시 중단', en: '🛑 Actives on hold', de: '🛑 Wirkstoffe pausiert' },
+  nice: { ko: '권장', en: 'Nice to have', de: 'Empfohlen' },
+  conc_min: { ko: '최소 ', en: 'min ', de: 'mind. ' },
+  hold_title: { ko: '🛑 활성 성분 일시 중단', en: '🛑 Actives on hold', de: '🛑 Wirkstoffe pausiert' },
   hold_body: { ko: '현재 피부 상태에서는 모든 활성 성분을 중단하고 장벽 복구에 집중해야 합니다.', en: 'All active ingredients are on hold for this zone. Focus on barrier repair first.', de: 'Alle Wirkstoffe sind für diese Zone pausiert. Fokus auf Barrierereparatur.' },
-  no_concerns:{ ko: '이 부위는 별도 처방이 필요하지 않습니다.', en: 'No specific concerns for this zone.', de: 'Keine besonderen Anforderungen für diese Zone.' },
+  no_concerns: { ko: '이 부위는 별도 처방이 필요하지 않습니다.', en: 'No specific concerns for this zone.', de: 'Keine besonderen Anforderungen für diese Zone.' },
   axis_label: { ko: '진단 축', en: 'Diagnosis axes', de: 'Diagnoseachsen' },
 } as const;
 
@@ -104,7 +104,7 @@ function AxisRing({
   axisScore, lang, isDark,
 }: { axisScore: AxisScore; lang: Lang; isDark: boolean }) {
   const meta = AXIS_META[axisScore.axis];
-  const sev  = SEVERITY_META[axisScore.severity];
+  const sev = SEVERITY_META[axisScore.severity];
   if (!meta || !sev) return null;
 
   const score = axisScore.score;
@@ -204,7 +204,7 @@ function IngredientCard({
   ing, lang, isDark, index,
 }: { ing: RequiredIngredient; lang: Lang; isDark: boolean; index: number }) {
   const isMustHave = ing.priority === 'must_have';
-  const isHold     = ing.name_en === 'HOLD_ALL_ACTIVES';
+  const isHold = ing.name_en === 'HOLD_ALL_ACTIVES';
 
   // HOLD_ALL_ACTIVES is handled at the card level
   if (isHold) return null;
@@ -343,7 +343,7 @@ export default function ScientificStandardCard({
   const { language } = useI18nStore();
   const lang = (language as Lang) ?? 'en';
 
-  const zoneMeta  = ZONE_META[zone] ?? ZONE_META.whole_face;
+  const zoneMeta = ZONE_META[zone] ?? ZONE_META.whole_face;
   const zoneLabel = zoneMeta[lang];
 
   const hasHoldFlag = requiredIngredients.some((i) => i.name_en === 'HOLD_ALL_ACTIVES');
@@ -356,9 +356,9 @@ export default function ScientificStandardCard({
   ];
 
   // Design tokens
-  const CARD_BG    = isDark ? '#0D1B2A' : '#FFFFFF';
-  const ACCENT     = isDark ? 'rgba(96,165,250,0.12)' : 'rgba(219,234,254,0.7)';
-  const BORDER     = isDark ? 'rgba(96,165,250,0.18)' : 'rgba(147,197,253,0.4)';
+  const CARD_BG = isDark ? '#0D1B2A' : '#FFFFFF';
+  const ACCENT = isDark ? 'rgba(96,165,250,0.12)' : 'rgba(219,234,254,0.7)';
+  const BORDER = isDark ? 'rgba(96,165,250,0.18)' : 'rgba(147,197,253,0.4)';
 
   return (
     <motion.div

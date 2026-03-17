@@ -37,11 +37,11 @@ import type { DiagnosisResult, AxisKey } from '@/engine/types';
 
 const ZONE_ID_MAP: Record<string, FaceZone> = {
   forehead: 'forehead',
-  eyes:     'eye_area',
-  nose:     'nose',
-  cheeks:   'cheeks',
-  mouth:    'chin',
-  jawline:  'jawline',
+  eyes: 'eye_area',
+  nose: 'nose',
+  cheeks: 'cheeks',
+  mouth: 'chin',
+  jawline: 'jawline',
 };
 
 /**
@@ -49,13 +49,13 @@ const ZONE_ID_MAP: Record<string, FaceZone> = {
  * Keys not listed here are irrelevant to ingredient selection and are dropped.
  */
 const ENGINE_TO_LAB_AXIS: Partial<Record<AxisKey, DiagnosisAxis>> = {
-  seb:     'sebum',
-  hyd:     'hydration',
-  bar:     'barrier',
-  sen:     'sensitivity',
-  acne:    'pores',        // acne concerns map to pore/BHA ingredients
+  seb: 'sebum',
+  hyd: 'hydration',
+  bar: 'barrier',
+  sen: 'sensitivity',
+  acne: 'pores',        // acne concerns map to pore/BHA ingredients
   pigment: 'pigmentation',
-  aging:   'aging',
+  aging: 'aging',
   texture: 'texture',
 };
 
@@ -208,10 +208,10 @@ export default function LabSelectionPage() {
           >
             <div
               style={{
-                fontSize: 11,
+                fontSize: 13,
                 letterSpacing: '0.2em',
                 textTransform: 'uppercase',
-                color: 'hsl(var(--accent-gold))',
+                color: isDark ? 'hsl(var(--accent-gold))' : '#8B7355',
                 marginBottom: 8,
                 fontFamily: "var(--font-sans)",
               }}
@@ -231,8 +231,8 @@ export default function LabSelectionPage() {
               {language === 'ko'
                 ? '맞춤 루틴 설계'
                 : language === 'de'
-                ? 'Ihre persönliche Routine'
-                : 'Build Your Routine'}
+                  ? 'Ihre persönliche Routine'
+                  : 'Build Your Routine'}
             </h1>
             <p
               style={{
@@ -246,8 +246,8 @@ export default function LabSelectionPage() {
               {language === 'ko'
                 ? '진단 결과를 기반으로 각 부위에 맞는 제품을 선택하고, 안전한 루틴을 완성하세요.'
                 : language === 'de'
-                ? 'Wählen Sie Produkte basierend auf Ihren Diagnoseergebnissen und erstellen Sie Ihre sichere Routine.'
-                : 'Select products matched to your diagnosis, zone by zone, and build a clinically safe routine.'}
+                  ? 'Wählen Sie Produkte basierend auf Ihren Diagnoseergebnissen und erstellen Sie Ihre sichere Routine.'
+                  : 'Select products matched to your diagnosis, zone by zone, and build a clinically safe routine.'}
             </p>
           </motion.div>
         </div>
@@ -306,8 +306,8 @@ export default function LabSelectionPage() {
                       border: active
                         ? '1.5px solid rgba(201,169,110,0.6)'
                         : done
-                        ? '1px solid rgba(93,202,165,0.4)'
-                        : `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
+                          ? '1px solid rgba(93,202,165,0.4)'
+                          : `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
                       background: active
                         ? 'rgba(201,169,110,0.1)'
                         : 'transparent',
@@ -317,8 +317,8 @@ export default function LabSelectionPage() {
                       color: active
                         ? '#C8A951'
                         : done
-                        ? '#5DCAA5'
-                        : isDark ? 'rgba(245,240,232,0.45)' : 'rgba(26,26,46,0.45)',
+                          ? '#5DCAA5'
+                          : isDark ? 'rgba(245,240,232,0.45)' : 'rgba(26,26,46,0.45)',
                     }}
                   >
                     <span
@@ -329,8 +329,8 @@ export default function LabSelectionPage() {
                         background: active
                           ? 'rgba(201,169,110,0.2)'
                           : done
-                          ? 'rgba(93,202,165,0.2)'
-                          : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)',
+                            ? 'rgba(93,202,165,0.2)'
+                            : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',

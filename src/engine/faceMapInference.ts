@@ -26,7 +26,7 @@ export interface FaceMapInference {
 
 // ─── Concern → Axis mapping (mirrors scoringEngineV5 CONCERN_AXIS_MAP) ────────
 
-const CONCERN_TO_AXIS: Record<string, AxisKey> = {
+export const CONCERN_TO_AXIS: Record<string, AxisKey> = {
   // Forehead
   oily_f:       "seb",
   blackheads_f: "texture",

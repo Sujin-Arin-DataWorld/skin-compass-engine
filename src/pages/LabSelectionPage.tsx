@@ -30,8 +30,12 @@ import {
   FaceZone,
   DiagnosisAxis,
   scoreToSeverity,
+  RequiredIngredient,
 } from '@/features/lab-selection/types';
 import type { DiagnosisResult, AxisKey } from '@/engine/types';
+import { CONCERN_TO_AXIS } from '@/engine/faceMapInference';
+import type { SelectedZones } from '@/store/diagnosisStore';
+import { AXIS_INGREDIENT_MAP } from '@/features/lab-selection/data/axisIngredientMap';
 
 // ── Bridge: DiagnosisResult → ZoneDiagnosis[] ────────────────────────────────
 
@@ -40,8 +44,9 @@ const ZONE_ID_MAP: Record<string, FaceZone> = {
   eyes: 'eye_area',
   nose: 'nose',
   cheeks: 'cheeks',
-  mouth: 'chin',
+  mouth: 'mouth',
   jawline: 'jawline',
+  neck: 'neck',
 };
 
 /**
@@ -73,7 +78,48 @@ function inferProfile(axisScores: AxisScore[]): SkinProfile {
   return 'combination';
 }
 
-function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
+function computeZoneAxisScores(
+  zoneConcerns: string[],
+  concernSeverity: Record<string, 1 | 2 | 3>
+): AxisScore[] {
+  const scores: Partial<Record<DiagnosisAxis, number>> = {};
+
+  for (const concernId of zoneConcerns) {
+    const engineAxis = CONCERN_TO_AXIS[concernId];
+    if (!engineAxis) continue;
+    const labAxis = ENGINE_TO_LAB_AXIS[engineAxis];
+    if (!labAxis) continue;
+
+    const severity = concernSeverity[concernId] ?? 1;
+    scores[labAxis] = Math.min(100, Math.round((scores[labAxis] ?? 0) + (severity / 3) * 100));
+  }
+
+  return Object.entries(scores).map(([axis, score]) => ({
+    axis: axis as DiagnosisAxis,
+    score,
+    severity: scoreToSeverity(score),
+  }));
+}
+
+function computeRequiredIngredients(zoneAxisScores: AxisScore[]): RequiredIngredient[] {
+  const ingredientsMap = new Map<string, RequiredIngredient>();
+  
+  for (const { axis, score, severity } of zoneAxisScores) {
+    if (score <= 0) continue;
+    
+    const axisIngredients = AXIS_INGREDIENT_MAP[axis]?.[severity] ?? [];
+    
+    for (const ing of axisIngredients) {
+      if (!ingredientsMap.has(ing.name_en)) {
+        ingredientsMap.set(ing.name_en, ing);
+      }
+    }
+  }
+  
+  return Array.from(ingredientsMap.values());
+}
+
+function diagnosisToZoneDiagnoses(result: DiagnosisResult, selectedZones: SelectedZones): ZoneDiagnosis[] {
   // Build global axis scores — translate engine keys to lab-selection axis names
   const globalAxisScores: AxisScore[] = (
     Object.entries(result.axis_scores ?? {}) as [AxisKey, number][]
@@ -81,8 +127,8 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
     .filter(([engineKey]) => ENGINE_TO_LAB_AXIS[engineKey] !== undefined)
     .map(([engineKey, score]) => ({
       axis: ENGINE_TO_LAB_AXIS[engineKey]!,
-      score,
-      severity: scoreToSeverity(score),
+      score: Math.round(score),
+      severity: scoreToSeverity(Math.round(score)),
     }));
 
   // If zone_heatmap exists, build per-zone diagnoses
@@ -95,10 +141,18 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
       const faceZone = ZONE_ID_MAP[zoneId];
       if (!faceZone) continue;
 
-      // Use global axis scores directly — multiplying by zone intensity crushed
-      // moderate scores (26-50) into the mild (<26) range, hiding all ingredients.
-      // Zone differentiation is handled by the dominant-axis +15 boost below.
-      const scaledScores: AxisScore[] = globalAxisScores.map((a) => ({ ...a }));
+      let scaledScores: AxisScore[] = globalAxisScores.map((a) => ({ ...a, score: 0, severity: scoreToSeverity(0) }));
+      const zoneData = selectedZones[zoneId];
+
+      if (zoneData && zoneData.concerns.length > 0) {
+        const computed = computeZoneAxisScores(zoneData.concerns, zoneData.severity ?? {});
+        scaledScores = scaledScores.map(a => {
+           const found = computed.find(c => c.axis === a.axis);
+           return found ? found : a;
+        });
+      } else {
+        scaledScores = globalAxisScores.map((a) => ({ ...a }));
+      }
 
       // Elevate the dominant axis for this zone (translate engine key first)
       const dominantLabAxis = ENGINE_TO_LAB_AXIS[entry.dominantAxis];
@@ -112,7 +166,7 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
         zone: faceZone,
         axis_scores: withDominant,
         matched_profile: inferProfile(withDominant),
-        required_ingredients: [],
+        required_ingredients: computeRequiredIngredients(withDominant),
       });
     }
 
@@ -124,9 +178,10 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult): ZoneDiagnosis[] {
     zone: 'whole_face',
     axis_scores: globalAxisScores,
     matched_profile: inferProfile(globalAxisScores),
-    required_ingredients: [],
+    required_ingredients: computeRequiredIngredients(globalAxisScores),
   }];
 }
+
 
 // ── Step enum ─────────────────────────────────────────────────────────────────
 
@@ -151,9 +206,10 @@ export default function LabSelectionPage() {
   const [step, setStep] = useState<Step>('zone_selection');
 
   // Seed zone diagnoses from diagnosis result
+  const selectedZones = useDiagnosisStore((s) => s.selectedZones);
   const zoneDiagnosesMemo = useMemo(
-    () => (result ? diagnosisToZoneDiagnoses(result) : []),
-    [result]
+    () => (result ? diagnosisToZoneDiagnoses(result, selectedZones) : []),
+    [result, selectedZones]
   );
 
   useEffect(() => {

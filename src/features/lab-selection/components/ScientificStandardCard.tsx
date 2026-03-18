@@ -21,8 +21,9 @@ const ZONE_META: Record<string, { ko: string; en: string; de: string; icon: stri
   forehead: { ko: '이마', en: 'Forehead', de: 'Stirn', icon: '↑' },
   nose: { ko: '코', en: 'Nose', de: 'Nase', icon: '▽' },
   cheeks: { ko: '볼', en: 'Cheeks', de: 'Wangen', icon: '◈' },
-  chin: { ko: '턱', en: 'Chin', de: 'Kinn', icon: '▼' },
+  mouth: { ko: '입가/턱', en: 'Mouth', de: 'Mund', icon: '▼' },
   jawline: { ko: '턱선', en: 'Jawline', de: 'Kieferlinie', icon: '⌣' },
+  neck: { ko: '목', en: 'Neck', de: 'Hals', icon: '‖' },
   eye_area: { ko: '눈가', en: 'Eye Area', de: 'Augenbereich', icon: '◎' },
   spot_only: { ko: '트러블 부위', en: 'Spot Only', de: 'Problemzonen', icon: '●' },
   dry_areas_only: { ko: '건조 부위', en: 'Dry Areas', de: 'Trockene Stellen', icon: '○' },
@@ -216,6 +217,7 @@ function IngredientCard({
   const minConc = ing.min_concentration ?? 0;
   const maxConc = ing.max_concentration ?? minConc;
   const hasConcentration = ing.min_concentration !== null;
+  const description = lang === 'ko' ? ing.description_ko : lang === 'de' ? ing.description_de : ing.description_en;
 
   return (
     <motion.div
@@ -327,6 +329,21 @@ function IngredientCard({
               ✕ {c}
             </span>
           ))}
+        </div>
+      )}
+
+      {/* Row 5: Description */}
+      {description && (
+        <div style={{
+          marginTop: 2,
+          paddingTop: 8,
+          borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'}`,
+          fontSize: 12,
+          lineHeight: 1.5,
+          color: isDark ? 'rgba(245,240,232,0.7)' : 'rgba(26,26,46,0.7)',
+          fontFamily: 'var(--font-sans)',
+        }}>
+          {description}
         </div>
       )}
     </motion.div>

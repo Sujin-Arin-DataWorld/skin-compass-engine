@@ -132,45 +132,8 @@ export function useProducts(filters: ProductFilters = {}): UseProductsResult {
     let cancelled = false;
 
     const fetchProducts = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let query = (supabase as any).from('products').select('*');
-
-        if (filters.country) query = query.eq('country', filters.country);
-        if (filters.priceTier) query = query.eq('price_tier', filters.priceTier);
-        if (filters.fragranceFree === true) query = query.eq('fragrance_free', true);
-        if (filters.alcoholFree === true) query = query.eq('alcohol_free', true);
-        if (filters.profiles && filters.profiles.length > 0)
-          query = query.overlaps('target_profiles', filters.profiles);
-        if (filters.concerns && filters.concerns.length > 0)
-          query = query.overlaps('skin_concerns', filters.concerns);
-
-        const { data, error: fetchErr } = await query;
-
-        if (cancelled) return;
-
-        if (!fetchErr && data && data.length > 0) {
-          // Supabase returned real data — use it
-          setDbProducts(data as Product[]);
-        } else {
-          // Table not seeded or doesn't exist — fall back to local JSON
-          setDbProducts(null);
-          if (fetchErr) {
-            // Silently fall back; only surface errors that aren't "table not found"
-            const isTableMissing =
-              fetchErr.code === '42P01' ||
-              fetchErr.message?.includes('does not exist');
-            if (!isTableMissing) setError(fetchErr.message);
-          }
-        }
-      } catch {
-        if (!cancelled) setDbProducts(null);
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
+      setDbProducts(null);
+      setIsLoading(false);
     };
 
     fetchProducts();
@@ -189,8 +152,11 @@ export function useProducts(filters: ProductFilters = {}): UseProductsResult {
 
   // When Supabase has no data, apply filters to static local catalogue
   const products = useMemo(() => {
-    if (dbProducts !== null) return dbProducts;
-    return applyFiltersLocally(STATIC_PRODUCTS, filters);
+    console.log('[useProducts] dbProducts null?', dbProducts === null);
+    const result = dbProducts !== null ? dbProducts : applyFiltersLocally(STATIC_PRODUCTS, filters);
+    console.log('[useProducts] products count:', result.length);
+    console.log('[useProducts] first product:', result[0]?.name_en);
+    return result;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dbProducts, JSON.stringify(filters)]);
 

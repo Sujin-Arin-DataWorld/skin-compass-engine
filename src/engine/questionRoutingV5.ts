@@ -203,7 +203,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         options: [
           opt("zone_forehead", 1, "Forehead", "Stirn",   "이마"),
           opt("zone_nose",     1, "Nose",     "Nase",    "코"),
-          opt("zone_chin",     1, "Chin",     "Kinn",    "턱"),
+          opt("zone_mouth",    1, "Mouth",    "Mund",    "입가/턱"),
           opt("zone_cheeks",   1, "Cheeks",   "Wangen",  "볼"),
         ],
       },
@@ -492,7 +492,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         ],
         conditional: {
           ifQuestionId: "facemap_zones",
-          ifValues: ["chin_neck_shaving"],
+          ifValues: ["jawline_neck_shaving"],
           inject: {
             id: "AX5_Q1_COND",
             type: "single",

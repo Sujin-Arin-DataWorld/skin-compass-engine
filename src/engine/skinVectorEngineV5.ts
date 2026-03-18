@@ -130,7 +130,7 @@ const V5_PATTERNS: V5RiskPattern[] = [
     v5Gates:    { acne: 60 },
     requiresFlag: "HORMONAL_ACNE",
     clinical_en:
-      "Androgen-driven sebaceous hyperactivity concentrated in jaw, chin, and lower cheek zones. Breakout cycle correlates with hormonal fluctuation.",
+      "Androgen-driven sebaceous hyperactivity concentrated in jaw, mouth, and lower cheek zones. Breakout cycle correlates with hormonal fluctuation.",
     clinical_de:
       "Androgen-getriebene Talgdrüsenhyperaktivität in Kiefer-, Kinn- und Untergesichtsbereichen. Ausbruchszyklus korreliert mit hormonellen Schwankungen.",
     clinical_ko:

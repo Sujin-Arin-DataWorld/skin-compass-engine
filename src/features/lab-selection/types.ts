@@ -23,7 +23,7 @@ export type RoutineSlot =
 
 export type FaceZone =
   | 'whole_face' | 't_zone' | 'forehead' | 'nose'
-  | 'cheeks' | 'chin' | 'jawline' | 'eye_area'
+  | 'cheeks' | 'mouth' | 'jawline' | 'eye_area' | 'neck'
   | 'spot_only' | 'dry_areas_only' | 'oily_areas_only';
 
 export type ApplicationMethod =
@@ -139,6 +139,9 @@ export interface AxisScore {
 export interface RequiredIngredient {
   name_en: string;
   name_kr: string;
+  description_en?: string;
+  description_ko?: string;
+  description_de?: string;
   min_concentration: number | null;
   max_concentration: number | null;
   unit: string;

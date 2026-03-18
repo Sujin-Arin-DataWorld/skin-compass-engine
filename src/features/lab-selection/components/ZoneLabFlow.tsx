@@ -73,8 +73,9 @@ const ZONE_LABEL: Record<string, { ko: string; en: string; de: string }> = {
   eye_area: { ko: '눈가', en: 'Eye Area', de: 'Augenpartie' },
   nose: { ko: '코', en: 'Nose', de: 'Nase' },
   cheeks: { ko: '볼', en: 'Cheeks', de: 'Wangen' },
-  chin: { ko: '턱', en: 'Chin', de: 'Kinn' },
+  mouth: { ko: '입가/턱', en: 'Mouth', de: 'Mund' },
   jawline: { ko: '턱선', en: 'Jawline', de: 'Kiefer' },
+  neck: { ko: '목', en: 'Neck', de: 'Hals' },
   t_zone: { ko: 'T존', en: 'T-Zone', de: 'T-Zone' },
   whole_face: { ko: '전체 얼굴', en: 'Whole Face', de: 'Gesamtes Gesicht' },
   spot_only: { ko: '트러블 부위', en: 'Spot Areas', de: 'Problemzonen' },
@@ -258,6 +259,10 @@ function ZonePanel({
               />
 
               {/* Duel Card */}
+              {(() => {
+                console.log('[Parent→DuelCard] requiredIngredients:', requiredIngredients);
+                return null;
+              })()}
               <DuelCard
                 zone={zone}
                 matchedProfile={matched_profile}

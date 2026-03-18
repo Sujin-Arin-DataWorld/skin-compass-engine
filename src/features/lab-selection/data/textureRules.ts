@@ -81,7 +81,7 @@ export const ZONE_COLORS: Record<string, { light: string; dark: string }> = {
   forehead:  { light: '#F0997B', dark: '#712B13' },  // coral
   nose:      { light: '#F0997B', dark: '#712B13' },  // coral
   cheeks:    { light: '#85B7EB', dark: '#0C447C' },  // blue
-  chin:      { light: '#ED93B1', dark: '#72243E' },  // pink
+  mouth:     { light: '#ED93B1', dark: '#72243E' },  // pink
   jawline:   { light: '#ED93B1', dark: '#72243E' },  // pink
   eye_area:  { light: '#AFA9EC', dark: '#3C3489' },  // purple
   whole_face:{ light: '#5DCAA5', dark: '#085041' },  // teal

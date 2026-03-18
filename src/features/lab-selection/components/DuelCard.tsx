@@ -172,10 +172,7 @@ function ProductCard({
   const topMatches = compliance.matches.slice(0, 3);
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.97 }}
-      animate={{ opacity: 1, scale: 1 }}
+    <div
       style={{
         flex: 1, minWidth: 0,
         borderRadius: 12, padding: '14px 16px',
@@ -188,6 +185,7 @@ function ProductCard({
           : 'none',
         display: 'flex', flexDirection: 'column', gap: 10,
         position: 'relative',
+        opacity: 1, visibility: 'visible', minHeight: '100px'
       }}
     >
       {/* Winner badge */}
@@ -292,7 +290,7 @@ function ProductCard({
       >
         {isSelected ? t('added_btn', lang) : t('add_btn', lang)}
       </motion.button>
-    </motion.div>
+    </div>
   );
 }
 
@@ -424,9 +422,87 @@ function SkeletonCard({ isDark }: { isDark: boolean }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function DuelCard({
-  zone, matchedProfile, requiredIngredients, onProductSelect,
-}: DuelCardProps) {
+const INGREDIENT_ALIASES: Record<string, string[]> = {
+  'salicylic acid (bha)':    ['salicylic acid', 'bha', 'beta hydroxy acid'],
+  'niacinamide':             ['niacinamide', 'nicotinamide', 'vitamin b3'],
+  'zinc pca':                ['zinc pca', 'zinc', 'zinc oxide'],
+  'hyaluronic acid (multi-weight)': ['hyaluronic acid', 'sodium hyaluronate'],
+  'hyaluronic acid':         ['hyaluronic acid', 'sodium hyaluronate'],
+  'panthenol':               ['panthenol', 'dexpanthenol', 'provitamin b5', 'd-panthenol'],
+  'ectoin':                  ['ectoin'],
+  'tea tree oil':            ['tea tree', 'melaleuca'],
+  'centella asiatica extract':['centella', 'cica', 'madecassoside', 'asiaticoside', 'centella asiatica'],
+  'ceramide np':             ['ceramide', 'ceramide np', 'ceramide ap', 'ceramide eop'],
+  'madecassoside':           ['madecassoside', 'cica', 'centella'],
+  'allantoin':               ['allantoin'],
+  'squalane':                ['squalane', 'squalene'],
+  'tranexamic acid':         ['tranexamic acid', 'tranexamic'],
+  'alpha-arbutin':           ['arbutin', 'alpha-arbutin', 'alpha arbutin'],
+  'azelaic acid':            ['azelaic acid'],
+  'l-ascorbic acid':         ['ascorbic acid', 'vitamin c', 'ethyl ascorbic acid', 'ascorbyl glucoside'],
+  'aha (glycolic acid)':     ['glycolic acid', 'aha', 'lactic acid', 'alpha hydroxy acid'],
+  'retinol':                 ['retinol', 'retinal', 'retinaldehyde', 'vitamin a'],
+  'lactic acid':             ['lactic acid', 'aha'],
+  'peptides':                ['peptide', 'palmitoyl', 'matrixyl', 'argireline', 'copper peptide'],
+  'ferulic acid':            ['ferulic acid'],
+  'adenosine':               ['adenosine'],
+  'cholesterol':             ['cholesterol'],
+  'fatty acids':             ['fatty acid', 'stearic acid', 'palmitic acid'],
+  'green tea extract':       ['green tea', 'camellia sinensis', 'egcg', 'epigallocatechin'],
+};
+
+function filterProductsByIngredients(
+  products: Product[],
+  requiredIngredientIds: string[],
+): Product[] {
+  if (requiredIngredientIds.length === 0) return [];
+
+  const searchTerms: string[] = [];
+  for (const id of requiredIngredientIds) {
+    const defaultAliases = INGREDIENT_ALIASES[id.toLowerCase()];
+    if (defaultAliases) {
+      searchTerms.push(...defaultAliases);
+    } else {
+      searchTerms.push(id.replace(/_/g, ' ').toLowerCase());
+    }
+  }
+
+  const filtered = products.filter(product => {
+    const names = product.ingredients.map(i => 
+      (i.name_en || '').toLowerCase()
+    );
+    const inci = product.ingredients.map(i => 
+      // @ts-ignore
+      (i.name_inci || '').toLowerCase()
+    );
+    const roles = product.ingredients.map(i =>
+      (i.role || '').toLowerCase()
+    );
+    const concerns = (product.skin_concerns ?? []).map(
+      c => c.toLowerCase()
+    );
+
+    return searchTerms.some(term =>
+      names.some(n => n.includes(term)) ||
+      inci.some(n => n.includes(term)) ||
+      roles.some(r => r.includes(term)) ||
+      concerns.some(c => c.includes(term))
+    );
+  });
+
+  console.log('[Filter] Input ingredients:', requiredIngredientIds);
+  console.log('[Filter] Expanded search terms:', searchTerms);
+  console.log('[Filter] Products to search:', products.length);
+  console.log('[Filter] First product ingredients:', products[0]?.ingredients?.map(i => i.name_en));
+
+  return filtered;
+}
+
+export default function DuelCard(props: DuelCardProps) {
+  console.log('[DuelCard] RENDER. Props received:', {
+    requiredIngredients: props.requiredIngredients?.length,
+  });
+  const { zone, matchedProfile, requiredIngredients, onProductSelect } = props;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const { language } = useI18nStore();
@@ -435,18 +511,22 @@ export default function DuelCard({
   const [selectedTier, setSelectedTier] = useState<PriceTier>('entry');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
-  const { products: allProducts, isLoading, error, refetch } = useProducts({
-    profiles: [matchedProfile],
-  });
+  // Remove `profiles` filter to let ingredient-matching handle it across generic products
+  const { products: allProducts, isLoading, error, refetch } = useProducts({});
 
   // Client-side zone + tier filter
-  const zoneProducts = useMemo(() =>
-    allProducts.filter((p) =>
+  const zoneProducts = useMemo(() => {
+    const byZone = allProducts.filter((p) =>
       (p.application_zones as string[]).includes(zone) ||
       (p.application_zones as string[]).includes('whole_face')
-    ),
-    [allProducts, zone]
-  );
+    );
+    
+    const reqNames = requiredIngredients
+      .filter(req => req.name_en !== 'HOLD_ALL_ACTIVES')
+      .map(req => req.name_en);
+
+    return filterProductsByIngredients(byZone, reqNames);
+  }, [allProducts, zone, requiredIngredients]);
 
   const availableTiers = useMemo((): PriceTier[] =>
     (['entry', 'full', 'premium'] as PriceTier[]).filter((tier) =>
@@ -491,6 +571,11 @@ export default function DuelCard({
   const topKr = krScored[0] ?? null;
   const topDe = deScored[0] ?? null;
 
+  console.log('[DuelCard] KR products:', krScored.length, krScored.map(p => p.product.name_en));
+  console.log('[DuelCard] DE products:', deScored.length, deScored.map(p => p.product.name_en));
+  console.log('[DuelCard] selectedTier:', selectedTier);
+  console.log('[DuelCard] availableTiers:', availableTiers);
+
   const krWins = (topKr?.compliance.score ?? 0) > (topDe?.compliance.score ?? 0);
   const deWins = (topDe?.compliance.score ?? 0) > (topKr?.compliance.score ?? 0);
 
@@ -507,6 +592,7 @@ export default function DuelCard({
       border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)'}`,
       background: isDark ? 'rgba(255,255,255,0.02)' : '#FAFAFA',
     }}>
+      <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
       <div style={{
         padding: '16px 20px 0',
       }}>
@@ -591,17 +677,10 @@ export default function DuelCard({
           </div>
         ) : (
           // Main duel view
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedTier}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div style={{
-                display: 'flex', gap: 8, alignItems: 'stretch',
-              }}>
+          <div key={selectedTier} style={{ animation: 'fadeIn 0.2s ease' }}>
+            <div style={{
+              display: 'flex', gap: 8, alignItems: 'stretch',
+            }}>
                 {/* KR side */}
                 {topKr ? (
                   <ProductCard
@@ -637,17 +716,16 @@ export default function DuelCard({
                 )}
               </div>
 
-              {/* Verdict banner */}
-              <VerdictBanner
-                krScore={topKr?.compliance.score ?? 0}
-                deScore={topDe?.compliance.score ?? 0}
-                krProduct={topKr?.product ?? null}
-                deProduct={topDe?.product ?? null}
-                lang={lang}
-                isDark={isDark}
-              />
-            </motion.div>
-          </AnimatePresence>
+            {/* Verdict banner */}
+            <VerdictBanner
+              krScore={topKr?.compliance.score ?? 0}
+              deScore={topDe?.compliance.score ?? 0}
+              krProduct={topKr?.product ?? null}
+              deProduct={topDe?.product ?? null}
+              lang={lang}
+              isDark={isDark}
+            />
+          </div>
         )}
       </div>
     </div>

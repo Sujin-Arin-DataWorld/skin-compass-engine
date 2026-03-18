@@ -241,35 +241,6 @@ export interface AxisExplanation {
   expectedOutcome: { en: string; de: string; ko: string };
 }
 
-/**
- * Input shape expected by scoringEngineV5.computeScores().
- * Canonical definition lives in scoringEngineV5.ts — this is a re-export alias
- * kept here so other modules can import from one place.
- *
- * zoneData: severity-object format (NOT string[] arrays)
- *   { forehead: { oily_f: 2, lines_f: 1 }, ... }
- */
-export interface ScoringInput {
-  /** Zone concern chip selections — value 1=mild, 2=moderate, 3=severe */
-  zoneData: Record<string, Record<string, 1 | 2 | 3>>;
-  /** Deep-dive question answers from Phase 03. */
-  axisAnswers: Record<string, QuestionAnswer>;
-  /** Phase 01 lifestyle foundation values (all 0-indexed). */
-  foundation: {
-    sleep:             number;    // 0 = <5h  1 = 5-6h  2 = 7h  3 = 8h+
-    water:             number;    // 0 = 1-2 glasses  1 = 3-5  2 = 6+
-    stress:            number;    // 0 = Low  1 = Moderate  2 = High
-    climate:           string | null;
-    age_bracket:       number;    // 0=<20  1=20s  2=30s  3=40s  4=50s  5=60+
-    gender:            number;    // 0=female  1=male  2=non-binary/prefer not
-    outdoor:           number;    // 0=indoor  1=1-2hrs  2=3+hrs
-    altitude:          number;    // 0=never  1=occasional  2=regular
-    seasonal_change?:  number;    // 0=no change  1=oilier summer  2=dry yr-round  3=oily yr-round
-    texture_pref?:     number;    // 0=gel  1=lotion  2=cream  3=depends on season
-    menopause_status?: string;    // meno_pre | meno_peri | meno_post_early | meno_post_late | meno_unsure
-  };
-  implicitFlags: { atopyFlag: boolean; [key: string]: unknown };
-}
 
 /**
  * Per-axis projected improvement targets produced by routineEngineV5.

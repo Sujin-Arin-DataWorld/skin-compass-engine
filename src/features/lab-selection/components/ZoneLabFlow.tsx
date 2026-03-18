@@ -259,10 +259,6 @@ function ZonePanel({
               />
 
               {/* Duel Card */}
-              {(() => {
-                console.log('[Parent→DuelCard] requiredIngredients:', requiredIngredients);
-                return null;
-              })()}
               <DuelCard
                 zone={zone}
                 matchedProfile={matched_profile}

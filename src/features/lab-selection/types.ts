@@ -56,9 +56,9 @@ export const SEVERITY_THRESHOLDS: Record<Severity, [number, number]> = {
 };
 
 export function scoreToSeverity(score: number): Severity {
-  if (score >= 76) return 'extreme';
-  if (score >= 51) return 'severe';
-  if (score >= 26) return 'moderate';
+  if (score >= 80) return 'extreme';    // severity 3 (100) or stacked → extreme
+  if (score >= 46) return 'severe';     // severity 2 single concern (67) → severe
+  if (score > 0)   return 'moderate';   // severity 1 single concern (33) → moderate
   return 'mild';
 }
 

@@ -490,18 +490,12 @@ function filterProductsByIngredients(
     );
   });
 
-  console.log('[Filter] Input ingredients:', requiredIngredientIds);
-  console.log('[Filter] Expanded search terms:', searchTerms);
-  console.log('[Filter] Products to search:', products.length);
-  console.log('[Filter] First product ingredients:', products[0]?.ingredients?.map(i => i.name_en));
+
 
   return filtered;
 }
 
 export default function DuelCard(props: DuelCardProps) {
-  console.log('[DuelCard] RENDER. Props received:', {
-    requiredIngredients: props.requiredIngredients?.length,
-  });
   const { zone, matchedProfile, requiredIngredients, onProductSelect } = props;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -571,10 +565,7 @@ export default function DuelCard(props: DuelCardProps) {
   const topKr = krScored[0] ?? null;
   const topDe = deScored[0] ?? null;
 
-  console.log('[DuelCard] KR products:', krScored.length, krScored.map(p => p.product.name_en));
-  console.log('[DuelCard] DE products:', deScored.length, deScored.map(p => p.product.name_en));
-  console.log('[DuelCard] selectedTier:', selectedTier);
-  console.log('[DuelCard] availableTiers:', availableTiers);
+
 
   const krWins = (topKr?.compliance.score ?? 0) > (topDe?.compliance.score ?? 0);
   const deWins = (topDe?.compliance.score ?? 0) > (topKr?.compliance.score ?? 0);

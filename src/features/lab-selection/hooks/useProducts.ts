@@ -152,10 +152,7 @@ export function useProducts(filters: ProductFilters = {}): UseProductsResult {
 
   // When Supabase has no data, apply filters to static local catalogue
   const products = useMemo(() => {
-    console.log('[useProducts] dbProducts null?', dbProducts === null);
     const result = dbProducts !== null ? dbProducts : applyFiltersLocally(STATIC_PRODUCTS, filters);
-    console.log('[useProducts] products count:', result.length);
-    console.log('[useProducts] first product:', result[0]?.name_en);
     return result;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dbProducts, JSON.stringify(filters)]);

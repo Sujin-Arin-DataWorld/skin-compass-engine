@@ -101,6 +101,22 @@ function computeZoneAxisScores(
   }));
 }
 
+/**
+ * SEVERITY PIPELINE (audited 2026-03-18):
+ *
+ * Score calculation: (severity_taps / 3) * 100, stacked per axis, capped at 100
+ * Possible single-concern scores: 33, 67, 100
+ * Possible stacked scores: 33, 67, 100 (cap)
+ *
+ * Thresholds (scoreToSeverity in types.ts):
+ *   score >= 80  → 'extreme'   (severity 3 or stacked)
+ *   score >= 46  → 'severe'    (severity 2 single concern)
+ *   score > 0    → 'moderate'  (severity 1 single concern)
+ *   score == 0   → 'mild'      (no concerns on this axis)
+ *
+ * Maps to: AXIS_INGREDIENT_MAP[axis][severity]
+ * Axes: sebum, hydration, pores, sensitivity, texture, barrier, pigmentation, aging
+ */
 function computeRequiredIngredients(zoneAxisScores: AxisScore[]): RequiredIngredient[] {
   const ingredientsMap = new Map<string, RequiredIngredient>();
   

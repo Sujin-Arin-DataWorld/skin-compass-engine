@@ -1,5 +1,5 @@
 {
-  "_schema_version": "1.0",
+  "_schema_version": "3.0",
   "products": [
     {
       "id": "KR_cosrx_bha_cleanser",
@@ -19,11 +19,18 @@
       "ingredients": [
         {
           "name_en": "Salicylic Acid",
+          "name_kr": "살리실산",
+          "name_inci": "Salicylic Acid",
           "concentration_pct": 0.5,
+          "concentration_unit": "%",
           "role": "exfoliant"
         },
         {
           "name_en": "Tea Tree Extract",
+          "name_kr": "티트리추출물",
+          "name_inci": "Melaleuca Alternifolia Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "anti-inflammatory"
         }
       ],
@@ -32,8 +39,10 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
+        "acne",
+        "pores",
         "excess_sebum",
-        "pores"
+        "blackheads"
       ],
       "application_zones": [
         "whole_face"
@@ -41,7 +50,15 @@
       "application_method": "wash_off",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "물에 적신 얼굴에 거품 내어 60초 마사지 후 헹굼",
+      "application_instruction_en": "Lather on a wet face, massage for 60 seconds, and rinse off.",
+      "application_instruction_de": "Auf dem feuchten Gesicht aufschäumen, 60 Sekunden massieren und abspülen.",
+      "one_liner_kr": "살리실산 + 티트리추출물 각질/피지 케어",
+      "one_liner_en": "Salicylic Acid & Tea Tree Extract exfoliating formula",
+      "one_liner_de": "peelende Formel mit Salicylic Acid & Tea Tree Extract",
+      "name_de": "Salicylic Acid Daily Gentle Cleanser",
+      "brand_kr": "COSRX"
     },
     {
       "id": "DE_balea_bha_liquid",
@@ -61,8 +78,27 @@
       "ingredients": [
         {
           "name_en": "Salicylic Acid (BHA)",
+          "name_kr": "살리실산",
+          "name_inci": "Salicylic Acid",
           "concentration_pct": 2.0,
+          "concentration_unit": "%",
           "role": "exfoliant"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
         }
       ],
       "target_profiles": [
@@ -71,8 +107,11 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
-        "excess_sebum",
-        "blackheads"
+        "pores",
+        "barrier_damage",
+        "blackheads",
+        "acne",
+        "excess_sebum"
       ],
       "application_zones": [
         "t_zone",
@@ -84,7 +123,15 @@
       "duel_verdict": {
         "ingredient_winner": "DE",
         "reason_kr": "독일 2% 허용으로 피지 융해 압승"
-      }
+      },
+      "application_instruction_kr": "화장솜 또는 손바닥에 적당량, 피부결 따라 도포",
+      "application_instruction_en": "Apply an appropriate amount to a cotton pad or palms, smooth over skin.",
+      "application_instruction_de": "Eine angemessene Menge auf ein Wattepad oder die Hände geben und auftragen.",
+      "one_liner_kr": "살리실산 + 판테놀 각질/피지 케어",
+      "one_liner_en": "Salicylic Acid (BHA) & Panthenol exfoliating formula",
+      "one_liner_de": "peelende Formel mit Salicylic Acid (BHA) & Panthenol",
+      "name_de": "Beauty Expert Liquid Peeling 2% BHA",
+      "brand_kr": "Balea"
     },
     {
       "id": "KR_asolution_bha_cleanser",
@@ -104,16 +151,26 @@
       "ingredients": [
         {
           "name_en": "Salicylic Acid",
+          "name_kr": "살리실산",
+          "name_inci": "Salicylic Acid",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "exfoliant"
         },
         {
           "name_en": "Houttuynia Cordata",
+          "name_kr": "어성초추출물",
+          "name_inci": "Houttuynia Cordata Extract",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -122,6 +179,10 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
+        "pores",
+        "barrier_damage",
+        "blackheads",
+        "acne",
         "excess_sebum"
       ],
       "application_zones": [
@@ -130,7 +191,15 @@
       "application_method": "wash_off",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "물에 적신 얼굴에 거품 내어 60초 마사지 후 헹굼",
+      "application_instruction_en": "Lather on a wet face, massage for 60 seconds, and rinse off.",
+      "application_instruction_de": "Auf dem feuchten Gesicht aufschäumen, 60 Sekunden massieren und abspülen.",
+      "one_liner_kr": "살리실산 + 어성초추출물 각질/피지 케어",
+      "one_liner_en": "Salicylic Acid & Houttuynia Cordata exfoliating formula",
+      "one_liner_de": "peelende Formel mit Salicylic Acid & Houttuynia Cordata",
+      "name_de": "Heartleaf Trouble Cleansing Foam",
+      "brand_kr": "a.solution"
     },
     {
       "id": "KR_wisely_niacinamide_5",
@@ -150,13 +219,19 @@
       "ingredients": [
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
           "concentration_pct": 5.0,
+          "concentration_unit": "%",
           "role": "sebum_control"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -165,6 +240,9 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
+        "pores",
+        "barrier_damage",
+        "dullness",
         "excess_sebum",
         "dark_spots"
       ],
@@ -174,7 +252,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "나이아신아마이드 + 아데노신 피지 조절",
+      "one_liner_en": "Niacinamide & Adenosine sebum control formula",
+      "one_liner_de": "talgregulierende Formel mit Niacinamide & Adenosine",
+      "name_de": "Niacinamide 5% Blemish Serum",
+      "brand_kr": "Wisely"
     },
     {
       "id": "KR_daiso_deep_h_gel",
@@ -194,17 +280,27 @@
       "ingredients": [
         {
           "name_en": "Hyaluronic Acid",
+          "name_kr": "히알루론산",
+          "name_inci": "Sodium Hyaluronate",
           "concentration_pct": null,
-          "role": "hydration"
+          "concentration_unit": null,
+          "role": "hydrating"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "hydrating"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -212,6 +308,9 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
+        "irritation",
+        "fine_lines",
+        "barrier_damage",
         "dehydration"
       ],
       "application_zones": [
@@ -220,7 +319,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "히알루론산 + 판테놀 수분 충전",
+      "one_liner_en": "Hyaluronic Acid & Panthenol hydrating formula",
+      "one_liner_de": "feuchtigkeitsspendende Formel mit Hyaluronic Acid & Panthenol",
+      "name_de": "Deep H Hyaluronic Gel",
+      "brand_kr": "Daiso"
     },
     {
       "id": "KR_droracle_curesona_cream",
@@ -240,16 +347,26 @@
       "ingredients": [
         {
           "name_en": "Ceramide",
+          "name_kr": "세라마이드엔피",
+          "name_inci": "Ceramide NP",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         }
       ],
@@ -258,7 +375,9 @@
       ],
       "target_age_range": "40+",
       "skin_concerns": [
-        "barrier_damage"
+        "irritation",
+        "barrier_damage",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -266,7 +385,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "세라마이드엔피 + 아데노신 장벽 복원",
+      "one_liner_en": "Ceramide & Adenosine barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Ceramide & Adenosine",
+      "name_de": "Curesona Rejucode Rich Cream",
+      "brand_kr": "Dr.Oracle"
     },
     {
       "id": "KR_madeca21_teca_ampoule",
@@ -286,17 +413,27 @@
       "ingredients": [
         {
           "name_en": "TECA",
+          "name_kr": "센텔라정량추출물",
+          "name_inci": "Asiaticoside, Asiatic Acid, Madecassic Acid",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Madecassoside",
+          "name_kr": "마데카소사이드",
+          "name_inci": "Madecassoside",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -304,7 +441,9 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "PIH",
         "redness",
+        "barrier_damage",
         "irritation"
       ],
       "application_zones": [
@@ -314,7 +453,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "센텔라정량추출물 + 마데카소사이드 수분 진정",
+      "one_liner_en": "TECA & Madecassoside soothing formula",
+      "one_liner_de": "beruhigende Formel mit TECA & Madecassoside",
+      "name_de": "Teca Solution Soothing Capsule Ampoule",
+      "brand_kr": "Madeca21"
     },
     {
       "id": "KR_boncept_retinol_2500",
@@ -334,16 +481,26 @@
       "ingredients": [
         {
           "name_en": "Retinol",
+          "name_kr": "레티놀",
+          "name_inci": "Retinol",
           "concentration_pct": 0.075,
-          "role": "anti_aging"
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_support"
         }
       ],
@@ -352,7 +509,11 @@
       ],
       "target_age_range": "40-50",
       "skin_concerns": [
-        "wrinkles"
+        "pores",
+        "dullness",
+        "barrier_damage",
+        "wrinkles",
+        "fine_lines"
       ],
       "application_zones": [
         "spot_only",
@@ -362,7 +523,15 @@
       "application_method": "spot_treatment",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "레티놀 + 아데노신 주름 개선",
+      "one_liner_en": "Retinol & Adenosine anti-wrinkle formula",
+      "one_liner_de": "anti-falten Formel mit Retinol & Adenosine",
+      "name_de": "Retinol 2500 IU Wrinkle Shot",
+      "brand_kr": "Boncept"
     },
     {
       "id": "KR_boncept_retinol_500",
@@ -382,16 +551,26 @@
       "ingredients": [
         {
           "name_en": "Retinol",
+          "name_kr": "레티놀",
+          "name_inci": "Retinol",
           "concentration_pct": 0.015,
-          "role": "anti_aging"
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Ceramide",
+          "name_kr": "세라마이드엔피",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         }
       ],
@@ -400,7 +579,11 @@
       ],
       "target_age_range": "40-50",
       "skin_concerns": [
-        "fine_lines"
+        "pores",
+        "barrier_damage",
+        "wrinkles",
+        "fine_lines",
+        "elasticity_loss"
       ],
       "application_zones": [
         "whole_face"
@@ -408,7 +591,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "레티놀 + 아데노신 주름 개선",
+      "one_liner_en": "Retinol & Adenosine anti-wrinkle formula",
+      "one_liner_de": "anti-falten Formel mit Retinol & Adenosine",
+      "name_de": "Retinol 500 IU Cream",
+      "brand_kr": "Boncept"
     },
     {
       "id": "JP_sana_soymilk_cream",
@@ -428,8 +619,27 @@
       "ingredients": [
         {
           "name_en": "Soy Isoflavones",
+          "name_kr": "소이이소플라본",
+          "name_inci": "Soy Isoflavones",
           "concentration_pct": null,
-          "role": "phytoestrogen"
+          "concentration_unit": null,
+          "role": "cell_regeneration"
+        },
+        {
+          "name_en": "Ceramide",
+          "name_kr": "세라마이드엔피",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Retinyl Palmitate",
+          "name_kr": "레티닐팔미테이트",
+          "name_inci": "Retinyl Palmitate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -438,7 +648,10 @@
       "target_age_range": "50-60",
       "skin_concerns": [
         "hormonal_skin_thinning",
-        "density_loss"
+        "barrier_damage",
+        "density_loss",
+        "irritation",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -449,7 +662,15 @@
       "duel_verdict": {
         "ingredient_winner": "tie",
         "reason_kr": "에스트로겐 대체제로 각국 접근법 우수"
-      }
+      },
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "소이이소플라본 + 세라마이드엔피 세포 재생",
+      "one_liner_en": "Soy Isoflavones & Ceramide regenerating formula",
+      "one_liner_de": "regenerierende Formel mit Soy Isoflavones & Ceramide",
+      "name_de": "SANA Soy Milk Cream",
+      "brand_kr": "SANA"
     },
     {
       "id": "KR_boncept_vitac_3",
@@ -469,11 +690,18 @@
       "ingredients": [
         {
           "name_en": "Ascorbic Acid",
+          "name_kr": "순수비타민C",
+          "name_inci": "Ascorbic Acid",
           "concentration_pct": 3.0,
+          "concentration_unit": "%",
           "role": "brightening"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "brightening"
         }
       ],
@@ -482,8 +710,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "uneven_tone",
+        "pores",
         "dullness",
-        "dark_spots"
+        "barrier_damage",
+        "fine_lines"
       ],
       "application_zones": [
         "whole_face"
@@ -491,7 +722,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "순수비타민C + 나이아신아마이드 미백 케어",
+      "one_liner_en": "Ascorbic Acid & Niacinamide brightening formula",
+      "one_liner_de": "aufhellende Formel mit Ascorbic Acid & Niacinamide",
+      "name_de": "Vita C Freeze-dried Double Shot Ampoule",
+      "brand_kr": "Boncept"
     },
     {
       "id": "KR_drgeo_cica_allinone",
@@ -511,21 +750,35 @@
       "ingredients": [
         {
           "name_en": "Centella Asiatica",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "hydrating"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_support"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -534,7 +787,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "post_shave_irritation"
+        "PIH",
+        "pores",
+        "dark_spots",
+        "redness",
+        "barrier_damage"
       ],
       "application_zones": [
         "whole_face"
@@ -542,7 +799,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "병풀추출물 + 판테놀 수분 진정",
+      "one_liner_en": "Centella Asiatica & Panthenol soothing formula",
+      "one_liner_de": "beruhigende Formel mit Centella Asiatica & Panthenol",
+      "name_de": "Cica Calming All-in-one Milk",
+      "brand_kr": "Dr.Geo"
     },
     {
       "id": "KR_tag_sun_blue",
@@ -562,8 +827,27 @@
       "ingredients": [
         {
           "name_en": "UV Filters",
+          "name_kr": "자외선차단필터",
+          "name_inci": "UV Filters",
           "concentration_pct": null,
-          "role": "uv_protection"
+          "concentration_unit": null,
+          "role": "UV_protection"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "sebum_control"
+        },
+        {
+          "name_en": "Centella Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
         }
       ],
       "target_profiles": [
@@ -572,8 +856,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "oily_shine",
-        "uneven_tone"
+        "PIH",
+        "uneven_tone",
+        "pores",
+        "redness",
+        "dullness"
       ],
       "application_zones": [
         "whole_face"
@@ -581,7 +868,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "손가락 2마디 분량, 외출 30분 전, 2시간마다 재도포",
+      "application_instruction_en": "Apply two finger lengths 30 mins before sun exposure, reapply every 2 hours.",
+      "application_instruction_de": "Zwei Fingerlängen 30 Min vor dem Sonnen auftragen, alle 2 Stunden nachcremen.",
+      "one_liner_kr": "자외선차단필터 + 나이아신아마이드 자외선 차단",
+      "one_liner_en": "UV Filters & Niacinamide UV protection formula",
+      "one_liner_de": "UV-Schutz Formel mit UV Filters & Niacinamide",
+      "name_de": "TAG Cover Sun Base 03 Clear Blue",
+      "brand_kr": "TAG"
     },
     {
       "id": "TR_thepurest_niacinamide_5",
@@ -601,12 +896,18 @@
       "ingredients": [
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
           "concentration_pct": 5.0,
+          "concentration_unit": "%",
           "role": "sebum_control"
         },
         {
           "name_en": "Zinc PCA",
+          "name_kr": "징크피씨에이",
+          "name_inci": "Zinc PCA",
           "concentration_pct": 1.0,
+          "concentration_unit": "%",
           "role": "sebum_control"
         }
       ],
@@ -615,7 +916,11 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
-        "excess_sebum"
+        "pores",
+        "barrier_damage",
+        "dullness",
+        "excess_sebum",
+        "dark_spots"
       ],
       "application_zones": [
         "whole_face"
@@ -623,7 +928,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "나이아신아마이드 + 징크피씨에이 피지 조절",
+      "one_liner_en": "Niacinamide & Zinc PCA sebum control formula",
+      "one_liner_de": "talgregulierende Formel mit Niacinamide & Zinc PCA",
+      "name_de": "5% Niacinamide & Zinc PCA Serum",
+      "brand_kr": "The Purest Solutions"
     },
     {
       "id": "DE_baleamed_washgel",
@@ -643,11 +956,18 @@
       "ingredients": [
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -657,6 +977,8 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
+        "dehydration",
+        "barrier_damage",
         "irritation"
       ],
       "application_zones": [
@@ -665,7 +987,15 @@
       "application_method": "wash_off",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "물에 적신 얼굴에 거품 내어 60초 마사지 후 헹굼",
+      "application_instruction_en": "Lather on a wet face, massage for 60 seconds, and rinse off.",
+      "application_instruction_de": "Auf dem feuchten Gesicht aufschäumen, 60 Sekunden massieren und abspülen.",
+      "one_liner_kr": "판테놀 + 알란토인 수분 진정",
+      "one_liner_en": "Panthenol & Allantoin soothing formula",
+      "one_liner_de": "beruhigende Formel mit Panthenol & Allantoin",
+      "name_de": "Med Ultra Sensitive Washgel",
+      "brand_kr": "Balea Med"
     },
     {
       "id": "DE_no_120h_hydrator",
@@ -685,16 +1015,26 @@
       "ingredients": [
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
           "concentration_pct": 5.0,
-          "role": "hydration"
+          "concentration_unit": "%",
+          "role": "hydrating"
         },
         {
           "name_en": "Ectoin",
+          "name_kr": "엑토인",
+          "name_inci": "Ectoin",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Hyaluronic Acid",
+          "name_kr": "히알루론산",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "hydrating"
         }
       ],
@@ -704,6 +1044,9 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
+        "fine_lines",
+        "irritation",
+        "barrier_damage",
         "dehydration"
       ],
       "application_zones": [
@@ -715,7 +1058,15 @@
       "duel_verdict": {
         "ingredient_winner": "DE",
         "reason_kr": "엑토인 배합 및 120시간 속수분 임상 입증"
-      }
+      },
+      "application_instruction_kr": "화장솜 또는 손바닥에 적당량, 피부결 따라 도포",
+      "application_instruction_en": "Apply an appropriate amount to a cotton pad or palms, smooth over skin.",
+      "application_instruction_de": "Eine angemessene Menge auf ein Wattepad oder die Hände geben und auftragen.",
+      "one_liner_kr": "판테놀 + 엑토인 수분 충전",
+      "one_liner_en": "Panthenol & Ectoin hydrating formula",
+      "one_liner_de": "feuchtigkeitsspendende Formel mit Panthenol & Ectoin",
+      "name_de": "120h Liquid Hydrator",
+      "brand_kr": "No Cosmetics"
     },
     {
       "id": "DE_sunozon_med_sungel",
@@ -735,8 +1086,27 @@
       "ingredients": [
         {
           "name_en": "UV Filters",
+          "name_kr": "자외선차단필터",
+          "name_inci": "UV Filters",
           "concentration_pct": null,
-          "role": "uv_protection"
+          "concentration_unit": null,
+          "role": "UV_protection"
+        },
+        {
+          "name_en": "Tinosorb S",
+          "name_kr": "티노소브 S",
+          "name_inci": "Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "UV_protection"
+        },
+        {
+          "name_en": "Uvinul A Plus",
+          "name_kr": "유비눌 A 플러스",
+          "name_inci": "Diethylamino Hydroxybenzoyl Hexyl Benzoate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "UV_protection"
         }
       ],
       "target_profiles": [
@@ -753,7 +1123,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "손가락 2마디 분량, 외출 30분 전, 2시간마다 재도포",
+      "application_instruction_en": "Apply two finger lengths 30 mins before sun exposure, reapply every 2 hours.",
+      "application_instruction_de": "Zwei Fingerlängen 30 Min vor dem Sonnen auftragen, alle 2 Stunden nachcremen.",
+      "one_liner_kr": "자외선차단필터 + 티노소브 S 자외선 차단",
+      "one_liner_en": "UV Filters & Tinosorb S UV protection formula",
+      "one_liner_de": "UV-Schutz Formel mit UV Filters & Tinosorb S",
+      "name_de": "Sunozon Med Sun Gel SPF 50",
+      "brand_kr": "Sunozon"
     },
     {
       "id": "DE_colibri_barrier_booster",
@@ -773,20 +1151,34 @@
       "ingredients": [
         {
           "name_en": "Ceramides (5 Types)",
+          "name_kr": "5종 세라마이드",
+          "name_inci": "Ceramide NP/AP/EOP/NS/AS",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Cholesterol",
+          "name_kr": "콜레스테롤",
+          "name_inci": "Cholesterol",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_support"
         }
       ],
@@ -795,7 +1187,11 @@
       ],
       "target_age_range": "40+",
       "skin_concerns": [
-        "barrier_damage"
+        "pores",
+        "dark_spots",
+        "barrier_damage",
+        "dullness",
+        "excess_sebum"
       ],
       "application_zones": [
         "whole_face"
@@ -803,7 +1199,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "5종 세라마이드 + 콜레스테롤 장벽 복원",
+      "one_liner_en": "Ceramides (5 Types) & Cholesterol barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Ceramides (5 Types) & Cholesterol",
+      "name_de": "Barrier Booster",
+      "brand_kr": "Colibri Skincare"
     },
     {
       "id": "US_skinceuticals_triple_lipid",
@@ -823,12 +1227,18 @@
       "ingredients": [
         {
           "name_en": "Ceramides",
+          "name_kr": "세라마이드엔피",
+          "name_inci": "Ceramide NP",
           "concentration_pct": 2.0,
+          "concentration_unit": "%",
           "role": "barrier_repair"
         },
         {
           "name_en": "Cholesterol",
+          "name_kr": "콜레스테롤",
+          "name_inci": "Cholesterol",
           "concentration_pct": 4.0,
+          "concentration_unit": "%",
           "role": "barrier_repair"
         }
       ],
@@ -838,8 +1248,10 @@
       ],
       "target_age_range": "40+",
       "skin_concerns": [
+        "irritation",
+        "density_loss",
         "barrier_damage",
-        "density_loss"
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -850,7 +1262,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "한국 기술이 2:4:2 특허를 저가에 캡슐화로 완벽 대체"
-      }
+      },
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "세라마이드엔피 + 콜레스테롤 장벽 복원",
+      "one_liner_en": "Ceramides & Cholesterol barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Ceramides & Cholesterol",
+      "name_de": "Triple Lipid Restore 2:4:2",
+      "brand_kr": "SkinCeuticals"
     },
     {
       "id": "DE_no_calming_peptide",
@@ -870,22 +1290,35 @@
       "ingredients": [
         {
           "name_en": "Peptides",
+          "name_kr": "펩타이드",
+          "name_inci": "Peptides",
           "concentration_pct": null,
-          "role": "collagen_stimulator"
+          "concentration_unit": null,
+          "role": "collagen_boost"
         },
         {
           "name_en": "TECA",
+          "name_kr": "센텔라정량추출물",
+          "name_inci": "Asiaticoside, Asiatic Acid, Madecassic Acid",
           "concentration_pct": 0.2,
+          "concentration_unit": "%",
           "role": "soothing"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -894,8 +1327,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "PIH",
+        "pores",
+        "dark_spots",
         "redness",
-        "wrinkles"
+        "barrier_damage"
       ],
       "application_zones": [
         "whole_face"
@@ -903,7 +1339,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "펩타이드 + 센텔라정량추출물 콜라겐 충전",
+      "one_liner_en": "Peptides & TECA collagen boosting formula",
+      "one_liner_de": "kollagenfördernde Formel mit Peptides & TECA",
+      "name_de": "Calming Peptide Glow Serum",
+      "brand_kr": "No Cosmetics"
     },
     {
       "id": "HU_geekgorgeous_cglow",
@@ -923,7 +1367,26 @@
       "ingredients": [
         {
           "name_en": "Ascorbic Acid",
+          "name_kr": "순수비타민C",
+          "name_inci": "Ascorbic Acid",
           "concentration_pct": 15.0,
+          "concentration_unit": "%",
+          "role": "antioxidant"
+        },
+        {
+          "name_en": "Ferulic Acid",
+          "name_kr": "페룰릭애씨드",
+          "name_inci": "Ferulic Acid",
+          "concentration_pct": 0.5,
+          "concentration_unit": "%",
+          "role": "antioxidant_booster"
+        },
+        {
+          "name_en": "Vitamin E",
+          "name_kr": "비타민E",
+          "name_inci": "Tocopherol",
+          "concentration_pct": 1.0,
+          "concentration_unit": "%",
           "role": "antioxidant"
         }
       ],
@@ -933,8 +1396,10 @@
       ],
       "target_age_range": "40-50",
       "skin_concerns": [
-        "dark_spots",
-        "fine_lines"
+        "fine_lines",
+        "dullness",
+        "uneven_tone",
+        "dark_spots"
       ],
       "application_zones": [
         "whole_face"
@@ -945,7 +1410,15 @@
       "duel_verdict": {
         "ingredient_winner": "tie",
         "reason_kr": "비타민C 황금표준 양국 모두 충족"
-      }
+      },
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "순수비타민C + 페룰릭애씨드 항산화",
+      "one_liner_en": "Ascorbic Acid & Ferulic Acid antioxidant formula",
+      "one_liner_de": "antioxidative Formel mit Ascorbic Acid & Ferulic Acid",
+      "name_de": "C-Glow 15% Vitamin C Serum",
+      "brand_kr": "Geek & Gorgeous"
     },
     {
       "id": "DE_no_retinol_serum",
@@ -965,17 +1438,27 @@
       "ingredients": [
         {
           "name_en": "Retinol + HPR",
+          "name_kr": "레티놀+HPR",
+          "name_inci": "Retinol, Hydroxypinacolone Retinoate",
           "concentration_pct": null,
-          "role": "anti_aging"
+          "concentration_unit": null,
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_support"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -983,7 +1466,11 @@
       ],
       "target_age_range": "40-50",
       "skin_concerns": [
-        "wrinkles"
+        "pores",
+        "dullness",
+        "barrier_damage",
+        "wrinkles",
+        "fine_lines"
       ],
       "application_zones": [
         "whole_face"
@@ -991,7 +1478,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "레티놀+HPR + 나이아신아마이드 주름 개선",
+      "one_liner_en": "Retinol + HPR & Niacinamide anti-wrinkle formula",
+      "one_liner_de": "anti-falten Formel mit Retinol + HPR & Niacinamide",
+      "name_de": "Renew Today Retinol Serum",
+      "brand_kr": "No Cosmetics"
     },
     {
       "id": "FR_vichy_neovadiol",
@@ -1011,8 +1506,27 @@
       "ingredients": [
         {
           "name_en": "Cassia Extract",
+          "name_kr": "카시아추출물",
+          "name_inci": "Cassia Angustifolia Seed Extract",
           "concentration_pct": null,
-          "role": "phytoestrogen"
+          "concentration_unit": null,
+          "role": "cell_regeneration"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "히알루론산",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_support"
         }
       ],
       "target_profiles": [
@@ -1020,6 +1534,10 @@
       ],
       "target_age_range": "50-60",
       "skin_concerns": [
+        "pores",
+        "dullness",
+        "barrier_damage",
+        "fine_lines",
         "density_loss"
       ],
       "application_zones": [
@@ -1031,7 +1549,15 @@
       "duel_verdict": {
         "ingredient_winner": "tie",
         "reason_kr": "각국의 호르몬 대체 접근법 모두 우수"
-      }
+      },
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "카시아추출물 + 히알루론산 세포 재생",
+      "one_liner_en": "Cassia Extract & Hyaluronic Acid regenerating formula",
+      "one_liner_de": "regenerierende Formel mit Cassia Extract & Hyaluronic Acid",
+      "name_de": "Neovadiol Post-Menopause Night",
+      "brand_kr": "Vichy"
     },
     {
       "id": "DE_acmed_azelaic_20",
@@ -1051,11 +1577,18 @@
       "ingredients": [
         {
           "name_en": "Azelaic Acid",
+          "name_kr": "아젤라익애씨드",
+          "name_inci": "Azelaic Acid",
           "concentration_pct": 20.0,
-          "role": "pigment_inhibitor"
+          "concentration_unit": "%",
+          "role": "melanin_inhibitor"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -1066,7 +1599,10 @@
       "target_age_range": "all",
       "skin_concerns": [
         "PIH",
-        "acne"
+        "pores",
+        "melasma",
+        "redness",
+        "dullness"
       ],
       "application_zones": [
         "spot_only",
@@ -1078,7 +1614,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "기미 생성/전이를 원천 차단하는 한국 성분 몰빵 우세"
-      }
+      },
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "아젤라익애씨드 + 나이아신아마이드 색소 침착 케어",
+      "one_liner_en": "Azelaic Acid & Niacinamide brightening formula",
+      "one_liner_de": "aufhellende Formel mit Azelaic Acid & Niacinamide",
+      "name_de": "Acmed Azelaic Acid 20% Cream",
+      "brand_kr": "Acmed"
     },
     {
       "id": "KR_torriden_cica_serum",
@@ -1098,21 +1642,34 @@
       "ingredients": [
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "sebum_control"
         },
         {
           "name_en": "Zinc PCA",
+          "name_kr": "징크피씨에이",
+          "name_inci": "Zinc PCA",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "sebum_control"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -1122,8 +1679,11 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
-        "excess_sebum",
-        "redness"
+        "pores",
+        "redness",
+        "dullness",
+        "barrier_damage",
+        "excess_sebum"
       ],
       "application_zones": [
         "whole_face"
@@ -1131,7 +1691,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "나이아신아마이드 + 징크피씨에이 피지 조절",
+      "one_liner_en": "Niacinamide & Zinc PCA sebum control formula",
+      "one_liner_de": "talgregulierende Formel mit Niacinamide & Zinc PCA",
+      "name_de": "Balanceful Cica Control Serum",
+      "brand_kr": "Torriden"
     },
     {
       "id": "KR_beplain_mungbean_foam",
@@ -1151,7 +1719,26 @@
       "ingredients": [
         {
           "name_en": "Mungbean Extract",
+          "name_kr": "녹두추출물",
+          "name_inci": "Vigna Radiata Seed Extract",
           "concentration_pct": 33.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        },
+        {
+          "name_en": "Green Tea Extract",
+          "name_kr": "녹차추출물",
+          "name_inci": "Camellia Sinensis Leaf Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "antioxidant"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -1169,7 +1756,15 @@
       "application_method": "wash_off",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "물에 적신 얼굴에 거품 내어 60초 마사지 후 헹굼",
+      "application_instruction_en": "Lather on a wet face, massage for 60 seconds, and rinse off.",
+      "application_instruction_de": "Auf dem feuchten Gesicht aufschäumen, 60 Sekunden massieren und abspülen.",
+      "one_liner_kr": "녹두추출물 + 녹차추출물 수분 진정",
+      "one_liner_en": "Mungbean Extract & Green Tea Extract soothing formula",
+      "one_liner_de": "beruhigende Formel mit Mungbean Extract & Green Tea Extract",
+      "name_de": "Mungbean pH-Balanced Cleansing Foam",
+      "brand_kr": "beplain"
     },
     {
       "id": "KR_snature_aqua_toner",
@@ -1189,18 +1784,27 @@
       "ingredients": [
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
           "concentration_pct": null,
-          "role": "hydration"
+          "concentration_unit": null,
+          "role": "hydrating"
         },
         {
           "name_en": "8-Layer Hyaluronic Acid",
+          "name_kr": "8중 히알루론산",
+          "name_inci": "Sodium Hyaluronate Crosspolymer",
           "concentration_pct": null,
-          "role": "hydration"
+          "concentration_unit": null,
+          "role": "hydrating"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -1209,6 +1813,9 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
+        "fine_lines",
+        "irritation",
+        "barrier_damage",
         "dehydration"
       ],
       "application_zones": [
@@ -1217,7 +1824,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "화장솜 또는 손바닥에 적당량, 피부결 따라 도포",
+      "application_instruction_en": "Apply an appropriate amount to a cotton pad or palms, smooth over skin.",
+      "application_instruction_de": "Eine angemessene Menge auf ein Wattepad oder die Hände geben und auftragen.",
+      "one_liner_kr": "판테놀 + 8중 히알루론산 수분 충전",
+      "one_liner_en": "Panthenol & 8-Layer Hyaluronic Acid hydrating formula",
+      "one_liner_de": "feuchtigkeitsspendende Formel mit Panthenol & 8-Layer Hyaluronic Acid",
+      "name_de": "Aqua Oasis Toner",
+      "brand_kr": "S.Nature"
     },
     {
       "id": "KR_aestura_atobarrier_cream",
@@ -1237,20 +1852,34 @@
       "ingredients": [
         {
           "name_en": "Ceramide/Cholesterol/Fatty Acid",
+          "name_kr": "세라마이드/콜레스테롤/지방산",
+          "name_inci": "Ceramide NP, Cholesterol, Stearic Acid",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Madecassoside",
+          "name_kr": "마데카소사이드",
+          "name_inci": "Madecassoside",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -1259,7 +1888,11 @@
       ],
       "target_age_range": "40+",
       "skin_concerns": [
-        "barrier_damage"
+        "PIH",
+        "redness",
+        "barrier_damage",
+        "irritation",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -1270,7 +1903,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "150유로 특허 공식을 캡슐화로 20유로대에 완벽 대체"
-      }
+      },
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "세라마이드/콜레스테롤/지방산 + 판테놀 장벽 복원",
+      "one_liner_en": "Ceramide/Cholesterol/Fatty Acid & Panthenol barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Ceramide/Cholesterol/Fatty Acid & Panthenol",
+      "name_de": "Atobarrier 365 Cream",
+      "brand_kr": "Aestura"
     },
     {
       "id": "KR_torriden_ceramide_essence",
@@ -1290,16 +1931,26 @@
       "ingredients": [
         {
           "name_en": "Ceramides (5D)",
+          "name_kr": "5D 세라마이드",
+          "name_inci": "Ceramide NP/AP/AS/NS/EOP",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "hydrating"
         }
       ],
@@ -1308,7 +1959,9 @@
       ],
       "target_age_range": "40+",
       "skin_concerns": [
-        "barrier_damage"
+        "irritation",
+        "barrier_damage",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -1316,7 +1969,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "5D 세라마이드 + 아데노신 장벽 복원",
+      "one_liner_en": "Ceramides (5D) & Adenosine barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Ceramides (5D) & Adenosine",
+      "name_de": "Solid-in Ceramide All Day Essence",
+      "brand_kr": "Torriden"
     },
     {
       "id": "KR_beplain_cicaterol_ampoule",
@@ -1336,15 +1997,26 @@
       "ingredients": [
         {
           "name_en": "Centella Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
           "concentration_pct": 69.4,
+          "concentration_unit": "%",
           "role": "soothing"
         },
         {
           "name_en": "Madecassoside",
+          "name_kr": "마데카소사이드",
+          "name_inci": "Madecassoside",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         }
       ],
@@ -1353,7 +2025,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "redness"
+        "PIH",
+        "redness",
+        "barrier_damage",
+        "irritation",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -1364,7 +2040,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "정제수 대신 병풀 69.4% 베이스로 염증 진정 압승"
-      }
+      },
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "병풀추출물 + 마데카소사이드 수분 진정",
+      "one_liner_en": "Centella Extract & Madecassoside soothing formula",
+      "one_liner_de": "beruhigende Formel mit Centella Extract & Madecassoside",
+      "name_de": "Cicaterol Ampoule",
+      "brand_kr": "beplain"
     },
     {
       "id": "KR_hyukshin_vitac_15",
@@ -1384,16 +2068,26 @@
       "ingredients": [
         {
           "name_en": "Ascorbic Acid",
+          "name_kr": "순수비타민C",
+          "name_inci": "Ascorbic Acid",
           "concentration_pct": 15.0,
+          "concentration_unit": "%",
           "role": "antioxidant"
         },
         {
           "name_en": "Ferulic Acid",
-          "role": "antioxidant_booster",
-          "concentration_pct": 1.0
+          "name_kr": "페룰릭애씨드",
+          "name_inci": "Ferulic Acid",
+          "concentration_pct": 1.0,
+          "concentration_unit": "%",
+          "role": "antioxidant_booster"
         },
         {
           "name_en": "Vitamin E",
+          "name_kr": "비타민E",
+          "name_inci": "Tocopherol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "antioxidant"
         }
       ],
@@ -1404,6 +2098,8 @@
       "target_age_range": "40-50",
       "skin_concerns": [
         "fine_lines",
+        "dullness",
+        "uneven_tone",
         "dark_spots"
       ],
       "application_zones": [
@@ -1412,7 +2108,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "순수비타민C + 페룰릭애씨드 항산화",
+      "one_liner_en": "Ascorbic Acid & Ferulic Acid antioxidant formula",
+      "one_liner_de": "antioxidative Formel mit Ascorbic Acid & Ferulic Acid",
+      "name_de": "15% Pure Vit C E Ferulic Acid Serum",
+      "brand_kr": "Hyukshin Concept"
     },
     {
       "id": "KR_cosrx_retinol_05",
@@ -1432,13 +2136,19 @@
       "ingredients": [
         {
           "name_en": "Retinol",
+          "name_kr": "레티놀",
+          "name_inci": "Retinol",
           "concentration_pct": 0.5,
-          "role": "anti_aging"
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -1446,7 +2156,11 @@
       ],
       "target_age_range": "40-50",
       "skin_concerns": [
-        "wrinkles"
+        "pores",
+        "wrinkles",
+        "fine_lines",
+        "elasticity_loss",
+        "dark_spots"
       ],
       "application_zones": [
         "whole_face"
@@ -1457,7 +2171,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "식물성 스쿠알란 베이스에 0.5% 명확한 농도"
-      }
+      },
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "레티놀 + 아데노신 주름 개선",
+      "one_liner_en": "Retinol & Adenosine anti-wrinkle formula",
+      "one_liner_de": "anti-falten Formel mit Retinol & Adenosine",
+      "name_de": "The Retinol 0.5 Oil",
+      "brand_kr": "COSRX"
     },
     {
       "id": "KR_biohealboh_probioderm",
@@ -1477,16 +2199,26 @@
       "ingredients": [
         {
           "name_en": "Peptides (17 Types)",
+          "name_kr": "17종 펩타이드",
+          "name_inci": "Peptides",
           "concentration_pct": null,
-          "role": "collagen_stimulator"
+          "concentration_unit": null,
+          "role": "collagen_boost"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "brightening"
         }
       ],
@@ -1495,7 +2227,11 @@
       ],
       "target_age_range": "40-50",
       "skin_concerns": [
-        "sagging"
+        "sagging",
+        "pores",
+        "dullness",
+        "barrier_damage",
+        "excess_sebum"
       ],
       "application_zones": [
         "whole_face"
@@ -1503,7 +2239,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "17종 펩타이드 + 아데노신 콜라겐 충전",
+      "one_liner_en": "Peptides (17 Types) & Adenosine collagen boosting formula",
+      "one_liner_de": "kollagenfördernde Formel mit Peptides (17 Types) & Adenosine",
+      "name_de": "Probioderm 3D Lifting Cream",
+      "brand_kr": "Bioheal BOH"
     },
     {
       "id": "KR_roundlab_soybean_cream",
@@ -1523,16 +2267,26 @@
       "ingredients": [
         {
           "name_en": "Soybean Extract",
+          "name_kr": "검은콩추출물",
+          "name_inci": "Glycine Max (Soybean) Seed Extract",
           "concentration_pct": 1.0,
-          "role": "phytoestrogen"
+          "concentration_unit": "%",
+          "role": "cell_regeneration"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Peptides",
+          "name_kr": "펩타이드",
+          "name_inci": "Peptides",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "firming"
         }
       ],
@@ -1549,7 +2303,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "검은콩추출물 + 아데노신 세포 재생",
+      "one_liner_en": "Soybean Extract & Adenosine regenerating formula",
+      "one_liner_de": "regenerierende Formel mit Soybean Extract & Adenosine",
+      "name_de": "Soybean Nourishing Cream",
+      "brand_kr": "Round Lab"
     },
     {
       "id": "KR_medicube_azelaic_16",
@@ -1569,8 +2331,27 @@
       "ingredients": [
         {
           "name_en": "Azelaic Acid",
+          "name_kr": "아젤라익애씨드",
+          "name_inci": "Azelaic Acid",
           "concentration_pct": 16.0,
-          "role": "pigment_inhibitor"
+          "concentration_unit": "%",
+          "role": "melanin_inhibitor"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        },
+        {
+          "name_en": "Centella Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
         }
       ],
       "target_profiles": [
@@ -1580,7 +2361,10 @@
       "target_age_range": "all",
       "skin_concerns": [
         "PIH",
-        "redness"
+        "pores",
+        "melasma",
+        "redness",
+        "dullness"
       ],
       "application_zones": [
         "spot_only",
@@ -1589,7 +2373,15 @@
       "application_method": "spot_treatment",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "아젤라익애씨드 + 나이아신아마이드 색소 침착 케어",
+      "one_liner_en": "Azelaic Acid & Niacinamide brightening formula",
+      "one_liner_de": "aufhellende Formel mit Azelaic Acid & Niacinamide",
+      "name_de": "Azelaic 16 BB Calming Serum",
+      "brand_kr": "Medicube"
     },
     {
       "id": "KR_medicube_txa_15",
@@ -1609,18 +2401,27 @@
       "ingredients": [
         {
           "name_en": "Tranexamic Acid",
+          "name_kr": "트라넥사믹애씨드",
+          "name_inci": "Tranexamic Acid",
           "concentration_pct": 5.0,
-          "role": "pigment_inhibitor"
+          "concentration_unit": "%",
+          "role": "melanin_inhibitor"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
           "concentration_pct": 15.0,
+          "concentration_unit": "%",
           "role": "brightening"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -1628,8 +2429,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "PIH",
+        "uneven_tone",
+        "pores",
         "melasma",
-        "dark_spots"
+        "dullness"
       ],
       "application_zones": [
         "spot_only",
@@ -1638,7 +2442,15 @@
       "application_method": "spot_treatment",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "트라넥사믹애씨드 + 나이아신아마이드 색소 침착 케어",
+      "one_liner_en": "Tranexamic Acid & Niacinamide brightening formula",
+      "one_liner_de": "aufhellende Formel mit Tranexamic Acid & Niacinamide",
+      "name_de": "TXA Niacinamide 15 Serum",
+      "brand_kr": "Medicube"
     },
     {
       "id": "KR_drg_redblemish_men",
@@ -1658,21 +2470,34 @@
       "ingredients": [
         {
           "name_en": "5-Cica Complex",
+          "name_kr": "5-시카 콤플렉스",
+          "name_inci": "Centella Asiatica Extract",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "brightening"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -1682,8 +2507,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "pores",
+        "dullness",
+        "barrier_damage",
         "post_shave_irritation",
-        "dullness"
+        "excess_sebum"
       ],
       "application_zones": [
         "whole_face"
@@ -1694,7 +2522,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "단순 보습을 넘어 시카+미백 고기능성 올인원 압승"
-      }
+      },
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "5-시카 콤플렉스 + 나이아신아마이드 수분 진정",
+      "one_liner_en": "5-Cica Complex & Niacinamide soothing formula",
+      "one_liner_de": "beruhigende Formel mit 5-Cica Complex & Niacinamide",
+      "name_de": "Red Blemish For Men All-in-one Fluid",
+      "brand_kr": "Dr.G"
     },
     {
       "id": "KR_cosdebaha_niacinamide_20",
@@ -1714,18 +2550,27 @@
       "ingredients": [
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
           "concentration_pct": 20.0,
+          "concentration_unit": "%",
           "role": "sebum_control"
         },
         {
           "name_en": "Zinc PCA",
+          "name_kr": "징크피씨에이",
+          "name_inci": "Zinc PCA",
           "concentration_pct": 4.0,
+          "concentration_unit": "%",
           "role": "sebum_control"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -1734,7 +2579,10 @@
       "target_age_range": "20-30",
       "skin_concerns": [
         "pores",
-        "excess_sebum"
+        "barrier_damage",
+        "dullness",
+        "excess_sebum",
+        "dark_spots"
       ],
       "application_zones": [
         "t_zone"
@@ -1745,7 +2593,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "20% 하드코어 배합으로 극한의 피지/모공 통제"
-      }
+      },
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "나이아신아마이드 + 징크피씨에이 피지 조절",
+      "one_liner_en": "Niacinamide & Zinc PCA sebum control formula",
+      "one_liner_de": "talgregulierende Formel mit Niacinamide & Zinc PCA",
+      "name_de": "NZ Niacinamide 20 Zinc 4",
+      "brand_kr": "Cos De BAHA"
     },
     {
       "id": "KR_vt_pdrn_100",
@@ -1765,16 +2621,26 @@
       "ingredients": [
         {
           "name_en": "PDRN",
+          "name_kr": "피디알엔",
+          "name_inci": "Sodium DNA",
           "concentration_pct": null,
-          "role": "anti_aging"
+          "concentration_unit": null,
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "brightening"
         }
       ],
@@ -1783,7 +2649,11 @@
       ],
       "target_age_range": "40+",
       "skin_concerns": [
-        "elasticity_loss"
+        "pores",
+        "dark_spots",
+        "dullness",
+        "barrier_damage",
+        "excess_sebum"
       ],
       "application_zones": [
         "whole_face"
@@ -1794,7 +2664,15 @@
       "duel_verdict": {
         "ingredient_winner": "KR",
         "reason_kr": "독일에 없는 PDRN 재생 성분의 매스마켓 대중화"
-      }
+      },
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "피디알엔 + 아데노신 주름 개선",
+      "one_liner_en": "PDRN & Adenosine anti-wrinkle formula",
+      "one_liner_de": "anti-falten Formel mit PDRN & Adenosine",
+      "name_de": "PDRN Essence 100",
+      "brand_kr": "VT Cosmetics"
     },
     {
       "id": "DE_eucerin_oilcontrol_spf",
@@ -1814,11 +2692,18 @@
       "ingredients": [
         {
           "name_en": "L-Carnitine",
+          "name_kr": "엘카르니틴",
+          "name_inci": "Carnitine",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "sebum_control"
         },
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "sebum_control"
         }
       ],
@@ -1828,7 +2713,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "oily_shine"
+        "pores",
+        "dullness",
+        "barrier_damage",
+        "excess_sebum",
+        "dark_spots"
       ],
       "application_zones": [
         "whole_face"
@@ -1839,7 +2728,15 @@
       "duel_verdict": {
         "ingredient_winner": "tie",
         "reason_kr": "유럽 최고 수준 필터 vs 한국 발림성 모두 훌륭"
-      }
+      },
+      "application_instruction_kr": "손가락 2마디 분량, 외출 30분 전, 2시간마다 재도포",
+      "application_instruction_en": "Apply two finger lengths 30 mins before sun exposure, reapply every 2 hours.",
+      "application_instruction_de": "Zwei Fingerlängen 30 Min vor dem Sonnen auftragen, alle 2 Stunden nachcremen.",
+      "one_liner_kr": "엘카르니틴 + 나이아신아마이드 피지 조절",
+      "one_liner_en": "L-Carnitine & Niacinamide sebum control formula",
+      "one_liner_de": "talgregulierende Formel mit L-Carnitine & Niacinamide",
+      "name_de": "Oil Control Dry Touch SPF 50+",
+      "brand_kr": "Eucerin"
     },
     {
       "id": "KR_cellfusionc_laser_spf",
@@ -1859,8 +2756,27 @@
       "ingredients": [
         {
           "name_en": "Zinc Oxide",
+          "name_kr": "징크옥사이드",
+          "name_inci": "Zinc Oxide",
           "concentration_pct": null,
-          "role": "uv_protection"
+          "concentration_unit": null,
+          "role": "UV_protection"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        },
+        {
+          "name_en": "Centella Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
         }
       ],
       "target_profiles": [
@@ -1869,7 +2785,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "irritation"
+        "PIH",
+        "pores",
+        "dark_spots",
+        "redness",
+        "dullness"
       ],
       "application_zones": [
         "whole_face"
@@ -1877,7 +2797,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "손가락 2마디 분량, 외출 30분 전, 2시간마다 재도포",
+      "application_instruction_en": "Apply two finger lengths 30 mins before sun exposure, reapply every 2 hours.",
+      "application_instruction_de": "Zwei Fingerlängen 30 Min vor dem Sonnen auftragen, alle 2 Stunden nachcremen.",
+      "one_liner_kr": "징크옥사이드 + 나이아신아마이드 자외선 차단",
+      "one_liner_en": "Zinc Oxide & Niacinamide UV protection formula",
+      "one_liner_de": "UV-Schutz Formel mit Zinc Oxide & Niacinamide",
+      "name_de": "Laser UV Sunscreen 100",
+      "brand_kr": "Cell Fusion C"
     },
     {
       "id": "DE_isana_niacinamide_5",
@@ -1897,13 +2825,19 @@
       "ingredients": [
         {
           "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
           "concentration_pct": 5.0,
+          "concentration_unit": "%",
           "role": "sebum_control"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -1912,7 +2846,11 @@
       ],
       "target_age_range": "20-30",
       "skin_concerns": [
-        "excess_sebum"
+        "pores",
+        "barrier_damage",
+        "dullness",
+        "excess_sebum",
+        "dark_spots"
       ],
       "application_zones": [
         "whole_face"
@@ -1920,7 +2858,15 @@
       "application_method": "leave_on",
       "application_frequency": "daily_am_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "나이아신아마이드 + 아데노신 피지 조절",
+      "one_liner_en": "Niacinamide & Adenosine sebum control formula",
+      "one_liner_de": "talgregulierende Formel mit Niacinamide & Adenosine",
+      "name_de": "Pure 5% Niacinamide Serum",
+      "brand_kr": "ISANA"
     },
     {
       "id": "KR_biodance_collagen_mask",
@@ -1940,8 +2886,35 @@
       "ingredients": [
         {
           "name_en": "Low Molecular Collagen",
+          "name_kr": "저분자 콜라겐",
+          "name_inci": "Hydrolyzed Collagen",
           "concentration_pct": null,
-          "role": "collagen_stimulator"
+          "concentration_unit": null,
+          "role": "collagen_boost"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -1950,8 +2923,10 @@
       ],
       "target_age_range": "30+",
       "skin_concerns": [
-        "elasticity_loss",
         "pores",
+        "barrier_damage",
+        "irritation",
+        "elasticity_loss",
         "dehydration"
       ],
       "application_zones": [
@@ -1960,7 +2935,15 @@
       "application_method": "sheet_mask",
       "application_frequency": "1_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "저분자 콜라겐 + 판테놀 콜라겐 충전",
+      "one_liner_en": "Low Molecular Collagen & Panthenol collagen boosting formula",
+      "one_liner_de": "kollagenfördernde Formel mit Low Molecular Collagen & Panthenol",
+      "name_de": "Biodance Bio-Collagen Real Deep Mask",
+      "brand_kr": "Biodance"
     },
     {
       "id": "KR_dermafix_collagen_mask",
@@ -1980,8 +2963,35 @@
       "ingredients": [
         {
           "name_en": "500Da Micro Collagen",
+          "name_kr": "500Da 미세 콜라겐",
+          "name_inci": "Hydrolyzed Collagen",
           "concentration_pct": null,
-          "role": "anti_aging"
+          "concentration_unit": null,
+          "role": "anti-wrinkle"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -1989,8 +2999,11 @@
       ],
       "target_age_range": "40+",
       "skin_concerns": [
+        "barrier_damage",
+        "fine_lines",
+        "irritation",
         "elasticity_loss",
-        "fine_lines"
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -1998,7 +3011,15 @@
       "application_method": "sheet_mask",
       "application_frequency": "1_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "500Da 미세 콜라겐 + 판테놀 주름 개선",
+      "one_liner_en": "500Da Micro Collagen & Panthenol anti-wrinkle formula",
+      "one_liner_de": "anti-falten Formel mit 500Da Micro Collagen & Panthenol",
+      "name_de": "Dermafix Collagen Mask",
+      "brand_kr": "Dermafix"
     },
     {
       "id": "KR_ckd_retino_collagen_mask",
@@ -2018,13 +3039,19 @@
       "ingredients": [
         {
           "name_en": "Retinal",
+          "name_kr": "레티날",
+          "name_inci": "Retinal",
           "concentration_pct": null,
-          "role": "anti_aging"
+          "concentration_unit": null,
+          "role": "anti-wrinkle"
         },
         {
           "name_en": "300Da Collagen",
+          "name_kr": "300Da 콜라겐",
+          "name_inci": "Hydrolyzed Collagen",
           "concentration_pct": null,
-          "role": "collagen_stimulator"
+          "concentration_unit": null,
+          "role": "collagen_boost"
         }
       ],
       "target_profiles": [
@@ -2034,7 +3061,10 @@
       "target_age_range": "30-50",
       "skin_concerns": [
         "pores",
-        "elasticity_loss"
+        "wrinkles",
+        "fine_lines",
+        "elasticity_loss",
+        "dark_spots"
       ],
       "application_zones": [
         "whole_face"
@@ -2042,7 +3072,15 @@
       "application_method": "sheet_mask",
       "application_frequency": "1_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "레티날 + 300Da 콜라겐 주름 개선",
+      "one_liner_en": "Retinal & 300Da Collagen anti-wrinkle formula",
+      "one_liner_de": "anti-falten Formel mit Retinal & 300Da Collagen",
+      "name_de": "Retino Collagen Low Molecular 300 Mask",
+      "brand_kr": "CKD"
     },
     {
       "id": "KR_mediheal_hyper_collagen_mask",
@@ -2062,8 +3100,35 @@
       "ingredients": [
         {
           "name_en": "Collagen Extract",
+          "name_kr": "콜라겐추출물",
+          "name_inci": "Collagen Extract",
           "concentration_pct": null,
-          "role": "hydration"
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -2072,8 +3137,10 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "dehydration",
-        "elasticity_loss"
+        "irritation",
+        "elasticity_loss",
+        "barrier_damage",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -2081,7 +3148,15 @@
       "application_method": "sheet_mask",
       "application_frequency": "2-3_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "콜라겐추출물 + 판테놀 수분 충전",
+      "one_liner_en": "Collagen Extract & Panthenol hydrating formula",
+      "one_liner_de": "feuchtigkeitsspendende Formel mit Collagen Extract & Panthenol",
+      "name_de": "Mediheal Hyper Collagen Mask",
+      "brand_kr": "Mediheal"
     },
     {
       "id": "KR_medipeel_collagen_modeling",
@@ -2101,8 +3176,35 @@
       "ingredients": [
         {
           "name_en": "Hydrolyzed Collagen",
+          "name_kr": "하이드롤라이즈드콜라겐",
+          "name_inci": "Hydrolyzed Collagen",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -2110,8 +3212,10 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "elasticity_loss",
-        "irritation"
+        "dehydration",
+        "irritation",
+        "barrier_damage",
+        "elasticity_loss"
       ],
       "application_zones": [
         "whole_face"
@@ -2119,7 +3223,15 @@
       "application_method": "modeling_mask",
       "application_frequency": "1_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "하이드롤라이즈드콜라겐 + 판테놀 장벽 복원",
+      "one_liner_en": "Hydrolyzed Collagen & Panthenol barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Hydrolyzed Collagen & Panthenol",
+      "name_de": "Medipeel Modeling Pack (Collagen)",
+      "brand_kr": "Medipeel"
     },
     {
       "id": "KR_torriden_dive_in_mask",
@@ -2139,8 +3251,35 @@
       "ingredients": [
         {
           "name_en": "Low Molecular Hyaluronic Acid",
+          "name_kr": "저분자 히알루론산",
+          "name_inci": "Hydrolyzed Hyaluronic Acid",
           "concentration_pct": null,
-          "role": "hydration"
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -2149,6 +3288,9 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "irritation",
+        "fine_lines",
+        "barrier_damage",
         "dehydration"
       ],
       "application_zones": [
@@ -2157,7 +3299,15 @@
       "application_method": "sheet_mask",
       "application_frequency": "2-3_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "저분자 히알루론산 + 판테놀 수분 충전",
+      "one_liner_en": "Low Molecular Hyaluronic Acid & Panthenol hydrating formula",
+      "one_liner_de": "feuchtigkeitsspendende Formel mit Low Molecular Hyaluronic Acid & Panthenol",
+      "name_de": "DIVE-IN Low Molecule Hyaluronic Acid Mask",
+      "brand_kr": "Torriden"
     },
     {
       "id": "KR_mediheal_madecassoside_mask",
@@ -2177,8 +3327,35 @@
       "ingredients": [
         {
           "name_en": "Madecassoside",
+          "name_kr": "마데카소사이드",
+          "name_inci": "Madecassoside",
           "concentration_pct": null,
-          "role": "anti_inflammatory"
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -2187,8 +3364,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "PIH",
         "redness",
-        "PIH"
+        "barrier_damage",
+        "irritation",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -2196,7 +3376,15 @@
       "application_method": "sheet_mask",
       "application_frequency": "2-3_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "마데카소사이드 + 판테놀 수분 진정",
+      "one_liner_en": "Madecassoside & Panthenol soothing formula",
+      "one_liner_de": "beruhigende Formel mit Madecassoside & Panthenol",
+      "name_de": "Madecassoside Essential Mask Blemish Repair",
+      "brand_kr": "Mediheal"
     },
     {
       "id": "KR_biodance_ceranol_mask",
@@ -2216,12 +3404,18 @@
       "ingredients": [
         {
           "name_en": "Ceramide",
+          "name_kr": "세라마이드엔피",
+          "name_inci": "Ceramide NP",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         }
       ],
@@ -2231,8 +3425,10 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
+        "redness",
+        "irritation",
         "barrier_damage",
-        "redness"
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -2240,7 +3436,15 @@
       "application_method": "sheet_mask",
       "application_frequency": "1_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "세라마이드엔피 + 판테놀 장벽 복원",
+      "one_liner_en": "Ceramide & Panthenol barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Ceramide & Panthenol",
+      "name_de": "Hydro Cera-nol Real Deep Mask",
+      "brand_kr": "Biodance"
     },
     {
       "id": "KR_lindsay_teatree_modeling",
@@ -2260,8 +3464,35 @@
       "ingredients": [
         {
           "name_en": "Tea Tree Extract",
+          "name_kr": "티트리추출물",
+          "name_inci": "Melaleuca Alternifolia Extract",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -2271,9 +3502,11 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "irritation",
+        "redness",
+        "barrier_damage",
         "excess_sebum",
-        "redness"
+        "irritation",
+        "dehydration"
       ],
       "application_zones": [
         "whole_face"
@@ -2281,7 +3514,15 @@
       "application_method": "modeling_mask",
       "application_frequency": "2-3_per_week",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "티트리추출물 + 판테놀 수분 진정",
+      "one_liner_en": "Tea Tree Extract & Panthenol soothing formula",
+      "one_liner_de": "beruhigende Formel mit Tea Tree Extract & Panthenol",
+      "name_de": "Cool Tea Tree Modeling Mask Pack",
+      "brand_kr": "Lindsay"
     },
     {
       "id": "KR_vt_cica_sleeping",
@@ -2301,17 +3542,27 @@
       "ingredients": [
         {
           "name_en": "Cica Complex",
+          "name_kr": "시카 콤플렉스",
+          "name_inci": "Centella Asiatica Extract",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
           "role": "soothing"
         },
         {
           "name_en": "Adenosine",
-          "role": "anti-wrinkle",
-          "concentration_pct": 0.04
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
@@ -2320,8 +3571,9 @@
       ],
       "target_age_range": "all",
       "skin_concerns": [
-        "irritation",
-        "barrier_damage"
+        "dehydration",
+        "barrier_damage",
+        "irritation"
       ],
       "application_zones": [
         "whole_face"
@@ -2329,7 +3581,15 @@
       "application_method": "sleeping_mask",
       "application_frequency": "daily_pm",
       "vs_comparison": null,
-      "duel_verdict": null
+      "duel_verdict": null,
+      "application_instruction_kr": "스킨케어 마지막 단계, 얇게 도포 후 취침",
+      "application_instruction_en": "As the last step of skincare, apply thinly and leave on overnight.",
+      "application_instruction_de": "Als letzten Schritt dünn auftragen und über Nacht einwirken lassen.",
+      "one_liner_kr": "시카 콤플렉스 + 판테놀 수분 진정",
+      "one_liner_en": "Cica Complex & Panthenol soothing formula",
+      "one_liner_de": "beruhigende Formel mit Cica Complex & Panthenol",
+      "name_de": "Cica Sleeping Mask Pack",
+      "brand_kr": "VT Cosmetics"
     },
     {
       "id": "KR_vaseline_moisture_mask",
@@ -2349,12 +3609,163 @@
       "ingredients": [
         {
           "name_en": "Petrolatum",
+          "name_kr": "페트롤라툼",
+          "name_inci": "Petrolatum",
           "concentration_pct": null,
+          "concentration_unit": null,
           "role": "barrier_repair"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": 0.04,
+          "concentration_unit": "%",
+          "role": "anti-wrinkle"
         }
       ],
       "target_profiles": [
         "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "irritation",
+        "barrier_damage",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "sheet_mask",
+      "application_frequency": "1_per_week",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "세안+토너 후 15-20분 부착, 제거 후 잔여 에센스 두드려 흡수",
+      "application_instruction_en": "Apply for 15-20 mins. Remove and pat remaining essence.",
+      "application_instruction_de": "15-20 Minuten einwirken lassen. Abnehmen und verbleibende Essenz einklopfen.",
+      "one_liner_kr": "페트롤라툼 + 판테놀 장벽 복원",
+      "one_liner_en": "Petrolatum & Panthenol barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Petrolatum & Panthenol",
+      "name_de": "Vaseline Hydrating Sheet Mask",
+      "brand_kr": "Vaseline"
+    },
+    {
+      "id": "DE_cerave_cica_gel",
+      "name_kr": "시카 젤",
+      "name_en": "Cica Repair Gel",
+      "name_de": "Cica Repair Gel",
+      "brand": "CeraVe",
+      "brand_kr": "세라비",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 9.95,
+      "price_krw": null,
+      "volume_ml": 40,
+      "routine_slot": "serum_pm",
+      "texture_type": "gel",
+      "ingredients": [
+        {
+          "name_en": "Centella Asiatica Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Ceramides",
+          "name_kr": "세라마이드엔피",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "redness",
+        "irritation",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "세안 후 적당량을 취해 자극 부위에 집중 도포합니다.",
+      "application_instruction_en": "After cleansing, apply generously to irritated areas.",
+      "application_instruction_de": "Nach der Reinigung großzügig auf gereizte Stellen auftragen.",
+      "one_liner_kr": "병풀추출물 + 세라마이드엔피 수분 진정",
+      "one_liner_en": "Centella & Ceramides soothing formula",
+      "one_liner_de": "beruhigende Formel mit Centella & Ceramides",
+      "application_frequency": "daily_pm",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_baleamed_reichhaltige_creme",
+      "name_kr": "메드 울트라 센서티브 리치 크림",
+      "name_en": "Med Ultra Sensitive Rich Cream",
+      "name_de": "Med Ultra Sensitive Reichhaltige Creme",
+      "brand": "Balea Med",
+      "brand_kr": "발레아 메드",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 3.95,
+      "price_krw": null,
+      "volume_ml": 50,
+      "routine_slot": "moisturizer_rich",
+      "texture_type": "cream_rich",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier",
+        "sensitive"
       ],
       "target_age_range": "all",
       "skin_concerns": [
@@ -2364,8 +3775,454 @@
       "application_zones": [
         "whole_face"
       ],
-      "application_method": "sheet_mask",
-      "application_frequency": "1_per_week",
+      "application_method": "leave_on",
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "판테놀 + 알란토인 장벽 복원",
+      "one_liner_en": "Panthenol & Allantoin barrier repair",
+      "one_liner_de": "barriere-reparierende Formel mit Panthenol & Allantoin",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_balea_hydro_gel_creme",
+      "name_kr": "하이드로 젤 크림",
+      "name_en": "Hydro Gel Cream",
+      "name_de": "Hydro Gel Creme",
+      "brand": "Balea",
+      "brand_kr": "발레아",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 3.45,
+      "price_krw": null,
+      "volume_ml": 50,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "gel",
+      "ingredients": [
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "히알루론산",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "dehydrated_oily"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "dehydration",
+        "excess_sebum"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "히알루론산 + 판테놀 수분 충전 젤",
+      "one_liner_en": "Hyaluronic Acid & Panthenol hydrating gel",
+      "one_liner_de": "feuchtigkeitsspendendes Gel mit Hyaluronsäure & Panthenol",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_balea_men_sensitive_gel",
+      "name_kr": "맨 센서티브 케어 젤",
+      "name_en": "MEN Sensitive Care Gel",
+      "name_de": "MEN Sensitive Pflege Gel",
+      "brand": "Balea",
+      "brand_kr": "발레아",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 2.95,
+      "price_krw": null,
+      "volume_ml": 50,
+      "routine_slot": "moisturizer_allinone",
+      "texture_type": "gel",
+      "ingredients": [
+        {
+          "name_en": "Aloe Vera",
+          "name_kr": "알로에베라",
+          "name_inci": "Aloe Barbadensis Leaf Juice",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "sensitive"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "post_shave_irritation",
+        "redness"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "세안/면도 후 얼굴 전체에 얇게 펴바릅니다.",
+      "application_instruction_en": "Apply to the entire face after cleansing or shaving.",
+      "application_instruction_de": "Nach der Reinigung oder Rasur auf das Gesicht auftragen.",
+      "one_liner_kr": "알로에베라 + 판테놀 수분 진정",
+      "one_liner_en": "Aloe Vera & Panthenol soothing gel for men",
+      "one_liner_de": "beruhigende Formel mit Aloe Vera & Panthenol",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "FR_larocheposay_cicaplast_b5",
+      "name_kr": "시카플라스트 밤 B5",
+      "name_en": "Cicaplast Baume B5",
+      "name_de": "Cicaplast Baume B5",
+      "brand": "La Roche-Posay",
+      "brand_kr": "라로슈포제",
+      "country": "FR",
+      "market_tier": "medical_otc",
+      "price_tier": "full",
+      "price_eur": 12.0,
+      "price_krw": null,
+      "volume_ml": 40,
+      "routine_slot": "moisturizer_rich",
+      "texture_type": "cream_rich",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        },
+        {
+          "name_en": "Madecassoside",
+          "name_kr": "마데카소사이드",
+          "name_inci": "Madecassoside",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti-inflammatory"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "barrier_damage",
+        "redness",
+        "irritation"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "판테놀 + 마데카소사이드 수분 진정",
+      "one_liner_en": "Panthenol & Madecassoside soothing formula",
+      "one_liner_de": "beruhigende Formel mit Panthenol & Madecassoside",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_eucerin_dermopurifyer_serum",
+      "name_kr": "더모퓨리파이어 세럼",
+      "name_en": "DermoPurifyer Serum",
+      "name_de": "DermoPurifyer Serum",
+      "brand": "Eucerin",
+      "brand_kr": "유세린",
+      "country": "DE",
+      "market_tier": "medical_otc",
+      "price_tier": "full",
+      "price_eur": 18.0,
+      "price_krw": null,
+      "volume_ml": 40,
+      "routine_slot": "serum_am",
+      "texture_type": "gel",
+      "ingredients": [
+        {
+          "name_en": "AHA/BHA/PHA Complex",
+          "name_kr": "AHA/BHA/PHA 콤플렉스",
+          "name_inci": "Glycolic Acid, Salicylic Acid, Gluconolactone",
+          "concentration_pct": 10.0,
+          "concentration_unit": "%",
+          "role": "exfoliant"
+        },
+        {
+          "name_en": "Zinc PCA",
+          "name_kr": "징크피씨에이",
+          "name_inci": "Zinc PCA",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "sebum_control"
+        }
+      ],
+      "target_profiles": [
+        "oily_acne"
+      ],
+      "target_age_range": "20-30",
+      "skin_concerns": [
+        "acne",
+        "pores",
+        "excess_sebum"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "AHA/BHA/PHA 콤플렉스 + 징크피씨에이 각질/피지 케어",
+      "one_liner_en": "AHA/BHA/PHA Complex & Zinc PCA exfoliating formula",
+      "one_liner_de": "peelende Formel mit AHA/BHA/PHA Complex & Zinc PCA",
+      "application_frequency": "daily_am",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_balea_vitamin_c_serum",
+      "name_kr": "비타민 C 세럼",
+      "name_en": "Vitamin C Serum",
+      "name_de": "Vitamin C Serum",
+      "brand": "Balea",
+      "brand_kr": "발레아",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 4.95,
+      "price_krw": null,
+      "volume_ml": 30,
+      "routine_slot": "serum_am",
+      "texture_type": "liquid",
+      "ingredients": [
+        {
+          "name_en": "Vitamin C Derivative",
+          "name_kr": "비타민C유도체",
+          "name_inci": "Ascorbyl Tetraisopalmitate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        }
+      ],
+      "target_profiles": [
+        "pigmentation",
+        "dullness"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "dark_spots",
+        "dullness",
+        "uneven_tone"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "비타민C유도체 + 판테놀 미백 케어",
+      "one_liner_en": "Vitamin C Derivative & Panthenol brightening formula",
+      "one_liner_de": "aufhellende Formel mit Vitamin C Derivative & Panthenol",
+      "application_frequency": "daily_am",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_balea_aha_10_peeling",
+      "name_kr": "뷰티 엑스퍼트 AHA 10% 필링",
+      "name_en": "Beauty Expert AHA 10% Peeling",
+      "name_de": "Beauty Expert AHA 10% Peeling",
+      "brand": "Balea",
+      "brand_kr": "발레아",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 5.95,
+      "price_krw": null,
+      "volume_ml": 125,
+      "routine_slot": "toner_exfoliant",
+      "texture_type": "liquid",
+      "ingredients": [
+        {
+          "name_en": "Lactic Acid",
+          "name_kr": "락틱애씨드",
+          "name_inci": "Lactic Acid",
+          "concentration_pct": 10.0,
+          "concentration_unit": "%",
+          "role": "exfoliant"
+        },
+        {
+          "name_en": "Aloe Vera",
+          "name_kr": "알로에베라",
+          "name_inci": "Aloe Barbadensis",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier",
+        "dullness"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "dullness",
+        "fine_lines",
+        "uneven_tone"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "화장솜 또는 손바닥에 적당량, 피부결 따라 도포",
+      "application_instruction_en": "Apply an appropriate amount to a cotton pad or palms, smooth over skin.",
+      "application_instruction_de": "Eine angemessene Menge auf ein Wattepad oder die Hände geben und auftragen.",
+      "one_liner_kr": "락틱애씨드 + 알로에베라 각질/피지 케어",
+      "one_liner_en": "Lactic Acid & Aloe Vera exfoliating formula",
+      "one_liner_de": "peelende Formel mit Lactic Acid & Aloe Vera",
+      "application_frequency": "2-3_per_week",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_theordinary_squalane",
+      "name_kr": "100% 식물성 스쿠알란",
+      "name_en": "100% Plant-Derived Squalane",
+      "name_de": "100% Plant-Derived Squalane",
+      "brand": "The Ordinary",
+      "brand_kr": "디오디너리",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 9.9,
+      "price_krw": null,
+      "volume_ml": 30,
+      "routine_slot": "serum_pm",
+      "texture_type": "oil",
+      "ingredients": [
+        {
+          "name_en": "Squalane",
+          "name_kr": "스쿠알란",
+          "name_inci": "Squalane",
+          "concentration_pct": 100.0,
+          "concentration_unit": "%",
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "dehydration",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "2-3방울, 얼굴 전체에 가볍게 두드려 흡수",
+      "application_instruction_en": "Apply 2-3 drops to the entire face and pat gently until absorbed.",
+      "application_instruction_de": "2-3 Tropfen auf das gesamte Gesicht auftragen und sanft einklopfen.",
+      "one_liner_kr": "스쿠알란 장벽 복원",
+      "one_liner_en": "Squalane barrier repair formula",
+      "one_liner_de": "barriere-reparierende Formel mit Squalane",
+      "application_frequency": "daily_pm",
+      "vs_comparison": null,
+      "duel_verdict": null
+    },
+    {
+      "id": "DE_cerave_moisturizing_cream",
+      "name_kr": "모이스춰라이징 크림",
+      "name_en": "Moisturizing Cream",
+      "name_de": "Feuchtigkeitscreme",
+      "brand": "CeraVe",
+      "brand_kr": "세라비",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 14.95,
+      "price_krw": null,
+      "volume_ml": 177,
+      "routine_slot": "moisturizer_rich",
+      "texture_type": "cream_rich",
+      "ingredients": [
+        {
+          "name_en": "Ceramides (3 Types)",
+          "name_kr": "3종 세라마이드",
+          "name_inci": "Ceramide NP, AP, EOP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "히알루론산",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "dehydration",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_instruction_kr": "완두콩 크기, 얼굴+목에 도포",
+      "application_instruction_en": "Apply a pea-sized amount to the face and neck.",
+      "application_instruction_de": "Eine erbsengroße Menge auf Gesicht und Hals auftragen.",
+      "one_liner_kr": "3종 세라마이드 + 히알루론산 장벽 복원",
+      "one_liner_en": "Ceramides & Hyaluronic Acid barrier repair",
+      "one_liner_de": "Barriere-reparierende Formel mit Ceramides & Hyaluronsäure",
+      "application_frequency": "daily_am_pm",
       "vs_comparison": null,
       "duel_verdict": null
     }

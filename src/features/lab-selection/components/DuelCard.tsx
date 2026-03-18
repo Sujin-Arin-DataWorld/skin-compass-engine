@@ -50,18 +50,30 @@ function t(key: keyof typeof T, lang: Lang): string {
 
 // ── Compliance indicator ──────────────────────────────────────────────────────
 
-function ComplianceIndicator({ score, isDark }: { score: number; isDark: boolean }) {
-  const color = score >= 80 ? '#34D399' : score >= 50 ? '#F59E0B' : '#F87171';
-  const symbol = score >= 80 ? '◎' : score >= 50 ? '△' : '✗';
+function ComplianceIndicator({
+  matches, lang, isDark,
+}: {
+  matches: { name: string; status: 'full' | 'partial' | 'missing' }[];
+  lang: Lang;
+  isDark: boolean;
+}) {
+  const matchCount = matches.filter(m => m.status === 'full' || m.status === 'partial').length;
+  const total = matches.length;
+  const color = matchCount === total ? '#5DCAA5' : matchCount > 0 ? '#F59E0B' : '#B0A898';
+
+  const label = lang === 'ko'
+    ? `${matchCount}/${total} 매칭`
+    : lang === 'de'
+      ? `${matchCount}/${total} Treffer`
+      : `${matchCount}/${total} matched`;
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-      <span style={{ fontSize: 13, color }}>{symbol}</span>
       <span style={{
         fontSize: 13, fontWeight: 700, color,
         fontFamily: "var(--font-numeric)",
       }}>
-        {score}%
+        {label}
       </span>
     </div>
   );
@@ -71,9 +83,9 @@ function IngredientMatchRow({
   name, status, isDark,
 }: { name: string; status: 'full' | 'partial' | 'missing'; isDark: boolean }) {
   const config = {
-    full: { symbol: '◎', color: '#34D399' },
-    partial: { symbol: '△', color: '#F59E0B' },
-    missing: { symbol: '✗', color: '#F87171' },
+    full: { symbol: '✓', color: '#5DCAA5' },
+    partial: { symbol: '✓', color: '#5DCAA5' },
+    missing: { symbol: '—', color: '#B0A898' },
   }[status];
 
   return (
@@ -83,7 +95,9 @@ function IngredientMatchRow({
     }}>
       <span style={{ color: config.color, fontSize: 11, flexShrink: 0 }}>{config.symbol}</span>
       <span style={{
-        color: isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
+        color: status === 'missing'
+          ? (isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)')
+          : (isDark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)'),
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {name.split('(')[0].trim()}
@@ -243,7 +257,7 @@ function ProductCard({
         }}>
           {t('compliance', lang)}
         </div>
-        <ComplianceIndicator score={compliance.score} isDark={isDark} />
+        <ComplianceIndicator matches={compliance.matches} lang={lang} isDark={isDark} />
         {topMatches.length > 0 && (
           <div style={{ marginTop: 5, display: 'flex', flexDirection: 'column', gap: 3 }}>
             {topMatches.map((m) => (

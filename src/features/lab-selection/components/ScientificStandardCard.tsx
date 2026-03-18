@@ -213,10 +213,6 @@ function IngredientCard({
   const displayName = lang === 'ko' && ing.name_kr ? ing.name_kr : ing.name_en;
   const accentColor = isMustHave ? '#C9A96E' : isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
 
-  // Concentration range bar calculation
-  const minConc = ing.min_concentration ?? 0;
-  const maxConc = ing.max_concentration ?? minConc;
-  const hasConcentration = ing.min_concentration !== null;
   const description = lang === 'ko' ? ing.description_ko : lang === 'de' ? ing.description_de : ing.description_en;
 
   return (
@@ -276,42 +272,25 @@ function IngredientCard({
         )}
       </div>
 
-      {/* Row 3: Concentration range bar */}
-      {hasConcentration && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {/* Row 3: Concentration text (no bar) */}
+      {ing.min_concentration != null && (
+        <div className="concentration-info" style={{
+          fontSize: 'var(--font-size-sm, 13px)',
+          color: 'var(--color-text-muted, #8B7E6A)',
+          marginTop: '4px',
+        }}>
+          <span style={{ color: 'var(--color-text-secondary, #6B5E4A)' }}>
+            {lang === 'ko' ? '권장 농도:' : lang === 'de' ? 'Konzentration:' : 'Concentration:'}
+          </span>{' '}
           <span style={{
-            fontSize: 10,
-            color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
-            fontFamily: 'var(--font-sans)',
-            flexShrink: 0,
-          }}>
-            {lang === 'ko' ? '권장 농도' : lang === 'de' ? 'Konzentration' : 'Concentration'}
-          </span>
-          <div style={{
-            flex: 1, height: 3, borderRadius: 2,
-            background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              position: 'absolute',
-              left: `${Math.min(minConc, 100) / 100 * 100}%`,
-              width: `${Math.max((maxConc - minConc), 0.5) / 100 * 100}%`,
-              height: '100%',
-              background: '#C9A96E',
-              borderRadius: 2,
-              minWidth: 8,
-            }} />
-          </div>
-          <span style={{
-            fontSize: 13,
+            fontFamily: 'var(--font-numeric, "Plus Jakarta Sans")',
             fontWeight: 600,
-            color: '#C9A96E',
-            fontFamily: 'var(--font-numeric)',
-            fontVariantNumeric: 'tabular-nums',
-            flexShrink: 0,
+            color: 'var(--color-accent, #C9A96E)',
           }}>
-            {minConc}%{maxConc !== minConc ? `–${maxConc}%` : ''}
+            {ing.min_concentration}
+            {ing.max_concentration
+              ? `-${ing.max_concentration}%`
+              : '%+'}
           </span>
         </div>
       )}

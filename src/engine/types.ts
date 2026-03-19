@@ -177,6 +177,8 @@ export interface DiagnosisResult {
   score_provenance?: ScoreProvenance[];
   /** Per-axis projected 4-week and 12-week improvement targets. */
   projected_improvement?: ProjectedImprovement;
+  /** User-selected special care add-on products from the Lab modal (unified funnel Slide 3). */
+  special_care_picks?: Product[];
 
   _debug?: {
     rawScores: AxisScores;

@@ -463,6 +463,67 @@ export function buildRoutineV5(
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
+ * BRAND_AFFINITY_MULTIPLIER
+ *
+ * When building the routine, if the Phase 1 product has been selected,
+ * subsequent products from the SAME brand receive a 1.15× scoring boost.
+ * This prevents "Frankenstein" routines that mix too many brands,
+ * providing a more cohesive user experience and better ingredient synergy.
+ *
+ * The multiplier is applied during the post-selection reranking pass:
+ *   - Extract Phase 1 brand from the routine
+ *   - For each subsequent phase, if multiple candidates exist, prefer
+ *     the same-brand candidate by boosting its implicit priority
+ *
+ * Future maintenance: adjust this constant to tune brand cohesion vs diversity.
+ */
+const BRAND_AFFINITY_MULTIPLIER = 1.15;
+
+/**
+ * applyBrandAffinity
+ *
+ * Post-selection reranking: given a flat product list from the V4 routine,
+ * if Phase 1 product establishes a dominant brand, subsequent same-brand
+ * products are moved toward the front of their respective phase slots.
+ *
+ * This is a "soft preference" — it doesn't replace any products, it only
+ * reorders when alternatives from the same pool exist. In practice, since
+ * the V4 engine's catalog is brand-homogeneous (SkinStrategyLab), this
+ * primarily affects routines using the merged product DB with multi-brand
+ * candidates per slot.
+ */
+function applyBrandAffinity(products: Product[]): Product[] {
+  if (products.length < 2) return products;
+
+  // The first product defines the "anchor" brand
+  const anchorBrand = products[0].brand;
+  if (!anchorBrand) return products;
+
+  // Score each product: same-brand gets the multiplier boost
+  return [...products].sort((a, b) => {
+    const aBoost = a.brand === anchorBrand ? BRAND_AFFINITY_MULTIPLIER : 1.0;
+    const bBoost = b.brand === anchorBrand ? BRAND_AFFINITY_MULTIPLIER : 1.0;
+    // Higher boost = earlier position; preserve original order for ties
+    return bBoost - aBoost;
+  });
+}
+
+/**
+ * TIER_STEP_LIMITS
+ *
+ * Strict product counts per tier. After the V4 engine builds the full
+ * routine, we slice to exactly this many products per AM/PM phase.
+ *   Entry:   3 products (cleanser, serum, moisturizer)
+ *   Full:    5 products (cleanser, toner, serum, treatment, moisturizer)
+ *   Premium: 5 products + device (same as Full, device handled separately)
+ */
+const TIER_STEP_LIMITS: Record<Tier, number> = {
+  Entry: 3,
+  Full: 5,
+  Premium: 5,  // device is a separate slot, not counted here
+};
+
+/**
  * buildProductBundleV5
  *
  * Returns the product_bundle Record<string, Product[]> for DiagnosisResult.
@@ -472,6 +533,10 @@ export function buildRoutineV5(
  *   2. Premium + device cleared → advanced (5-step + device)
  *   3. Full or Premium (gated) → committed (5-step)
  *   4. Entry → minimalist (3-step)
+ *
+ * After selection, applies:
+ *   - Brand affinity reranking (1.15× same-brand boost)
+ *   - Strict array slice to match tier step count
  */
 export function buildProductBundleV5(
   result:        DiagnosisResult,
@@ -480,31 +545,53 @@ export function buildProductBundleV5(
 ): Record<string, Product[]> {
   const routine = buildRoutineV5(result, implicitFlags, tier);
 
-  // 1. SOS hard override
+  // 1. SOS hard override — no brand affinity or slicing applied
   if (routine.skinRescue?.isActive) {
     const r = routine.skinRescue.routine;
     return routineLevelToPhaseMap(r.am, r.pm);
   }
 
+  let bundle: Record<string, Product[]>;
+
   // 2. Premium + device available
   if (tier === "Premium" && routine.routines.advanced) {
-    return routineLevelToPhaseMap(
+    bundle = routineLevelToPhaseMap(
       routine.routines.advanced.am,
       routine.routines.advanced.pm,
     );
   }
-
   // 3. Full or Premium (device gated) → 5-step
-  if (tier === "Full" || tier === "Premium") {
-    return routineLevelToPhaseMap(
+  else if (tier === "Full" || tier === "Premium") {
+    bundle = routineLevelToPhaseMap(
       routine.routines.committed.am,
       routine.routines.committed.pm,
     );
   }
-
   // 4. Entry → 3-step
-  return routineLevelToPhaseMap(
-    routine.routines.minimalist.am,
-    routine.routines.minimalist.pm,
-  );
+  else {
+    bundle = routineLevelToPhaseMap(
+      routine.routines.minimalist.am,
+      routine.routines.minimalist.pm,
+    );
+  }
+
+  // ── Brand affinity reranking ──────────────────────────────────────────────
+  // Apply 1.15× boost for same-brand products within each phase
+  for (const phase of Object.keys(bundle)) {
+    if (phase === "Device") continue; // Don't rerank devices
+    bundle[phase] = applyBrandAffinity(bundle[phase]);
+  }
+
+  // ── Strict tier step count slice ──────────────────────────────────────────
+  // Ensure we return exactly the right number of products for the tier
+  const limit = TIER_STEP_LIMITS[tier];
+  for (const phase of Object.keys(bundle)) {
+    if (phase === "Device") continue; // Device is a separate slot
+    if (bundle[phase].length > limit) {
+      bundle[phase] = bundle[phase].slice(0, limit);
+    }
+  }
+
+  return bundle;
 }
+

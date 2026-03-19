@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { SkinType, ContextKey, Tier, DiagnosisResult } from "@/engine/types";
+import { SkinType, ContextKey, Tier, DiagnosisResult, Product } from "@/engine/types";
+import type { FaceZone } from "@/features/lab-selection/types";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
 import type { ClimateProfile } from "@/engine/climateEngine";
 
@@ -294,6 +295,12 @@ interface DiagnosisState {
   // Result (not persisted)
   result: DiagnosisResult | null;
 
+  // Special care picks (persisted — survives slide unmount/remount)
+  specialCarePicks: Record<string, Product>;   // keyed by zone ID
+  setSpecialCarePick: (zone: FaceZone, product: Product) => void;
+  removeSpecialCarePick: (zone: FaceZone) => void;
+  clearSpecialCarePicks: () => void;
+
   // ── Legacy flat actions (backward compat) ──
   setStep: (step: number) => void;
   setCategory: (cat: number) => void;
@@ -346,6 +353,7 @@ const initialState = {
   uiSignals: {} as Record<string, Record<string, unknown>>,
   interactiveState: { ...defaultInteractiveState },
   result: null as DiagnosisResult | null,
+  specialCarePicks: {} as Record<string, Product>,
 };
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -404,6 +412,19 @@ export const useDiagnosisStore = create<DiagnosisState>()(
           lifestyle: { ...state.lifestyle, climateProfile: profile, climate: profile.climateType },
         })),
       setResult: (result) => set({ result }),
+
+      // ── Special care picks (unified funnel — persisted) ──────────────────
+      setSpecialCarePick: (zone, product) =>
+        set((state) => ({
+          specialCarePicks: { ...state.specialCarePicks, [zone]: product },
+        })),
+      removeSpecialCarePick: (zone) =>
+        set((state) => {
+          const copy = { ...state.specialCarePicks };
+          delete copy[zone];
+          return { specialCarePicks: copy };
+        }),
+      clearSpecialCarePicks: () => set({ specialCarePicks: {} }),
 
       setUiSignals: (category, data) =>
         set((state) => ({
@@ -522,6 +543,7 @@ export const useDiagnosisStore = create<DiagnosisState>()(
         axisAnswers: state.axisAnswers,
         selectedTier: state.selectedTier,
         interactiveState: state.interactiveState,
+        specialCarePicks: state.specialCarePicks,
         // uiSignals and result are NOT persisted (derived/large)
       }),
     }

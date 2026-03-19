@@ -136,6 +136,130 @@ function SkinProgressTab() {
                     {userProfile.savedResults.length} {t.diagnosesSaved}
                 </p>
             )}
+
+            {/* ── Diagnosis Timeline ── */}
+            {userProfile && userProfile.savedResults.length > 0 && (
+                <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
+                    <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-4">
+                        {language === "ko" ? "진단 타임라인" : language === "de" ? "Diagnose-Timeline" : "Diagnosis Timeline"}
+                    </p>
+
+                    <div className="relative">
+                        {/* Vertical timeline line */}
+                        <div
+                            className="absolute left-3 top-2 bottom-2 w-px"
+                            style={{ background: "hsl(var(--border))" }}
+                        />
+
+                        <div className="space-y-4">
+                            {userProfile.savedResults.slice(0, 5).map((saved, idx) => {
+                                const date = saved.engineVersion
+                                    ? new Date().toLocaleDateString(
+                                          language === "ko" ? "ko-KR" : language === "de" ? "de-DE" : "en-GB",
+                                          { day: "numeric", month: "short", year: "numeric" }
+                                      )
+                                    : "—";
+
+                                const topAxis = saved.primary_concerns?.[0] ?? "sen";
+                                const routineProducts: Product[] = saved.product_bundle
+                                    ? Object.values(saved.product_bundle).flat()
+                                    : [];
+                                const specialCarePicks: Product[] = saved.special_care_picks ?? [];
+
+                                return (
+                                    <div key={idx} className="relative pl-8">
+                                        {/* Timeline dot */}
+                                        <div
+                                            className="absolute left-1.5 top-1.5 h-3 w-3 rounded-full border-2"
+                                            style={{
+                                                borderColor: idx === 0 ? "hsl(var(--primary))" : "hsl(var(--border))",
+                                                background: idx === 0 ? "hsl(var(--primary))" : "hsl(var(--card))",
+                                            }}
+                                        />
+
+                                        {/* Entry card */}
+                                        <div
+                                            className="rounded-xl border p-3"
+                                            style={{
+                                                borderColor: idx === 0 ? "hsl(var(--primary) / 0.3)" : "hsl(var(--border) / 0.5)",
+                                                background: idx === 0 ? "hsl(var(--primary) / 0.04)" : "transparent",
+                                            }}
+                                        >
+                                            {/* Date + Primary Axis */}
+                                            <div className="flex items-center justify-between mb-2">
+                                                <p className="text-[0.65rem] font-bold tracking-widest uppercase"
+                                                   style={{ color: idx === 0 ? "hsl(var(--primary))" : "hsl(var(--foreground-hint))" }}
+                                                >
+                                                    {date}
+                                                </p>
+                                                <span className="text-[0.6rem] font-medium px-2 py-0.5 rounded-full"
+                                                    style={{
+                                                        background: "hsl(var(--muted))",
+                                                        color: "hsl(var(--foreground-hint))",
+                                                    }}
+                                                >
+                                                    {language === "ko" ? "주요 관심사" : language === "de" ? "Hauptfokus" : "Primary"}: {topAxis}
+                                                </span>
+                                            </div>
+
+                                            {/* Base Routine */}
+                                            {routineProducts.length > 0 && (
+                                                <div className="mb-2">
+                                                    <p className="text-[0.55rem] font-bold tracking-[0.12em] uppercase mb-1"
+                                                       style={{ color: "hsl(var(--foreground-hint))" }}
+                                                    >
+                                                        {language === "ko" ? "시스템 기본 루틴" : language === "de" ? "System-Basisroutine" : "System Base Routine"}
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {routineProducts.slice(0, 5).map((p) => (
+                                                            <span
+                                                                key={p.id}
+                                                                className="text-[0.65rem] px-2 py-0.5 rounded-md"
+                                                                style={{
+                                                                    background: "hsl(var(--muted) / 0.5)",
+                                                                    color: "hsl(var(--foreground))",
+                                                                }}
+                                                            >
+                                                                {p.brand}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Special Care Add-ons */}
+                                            {specialCarePicks.length > 0 && (
+                                                <div>
+                                                    <p className="text-[0.55rem] font-bold tracking-[0.12em] uppercase mb-1"
+                                                       style={{ color: "hsl(var(--primary))" }}
+                                                    >
+                                                        {language === "ko" ? "맞춤 특수 케어" : language === "de" ? "Spezial-Pflege Add-ons" : "My Special Care Add-ons"}
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {specialCarePicks.map((p) => (
+                                                            <span
+                                                                key={p.id}
+                                                                className="text-[0.65rem] px-2 py-0.5 rounded-md"
+                                                                style={{
+                                                                    background: "hsl(var(--primary) / 0.1)",
+                                                                    color: "hsl(var(--primary))",
+                                                                    border: "1px solid hsl(var(--primary) / 0.2)",
+                                                                }}
+                                                            >
+                                                                {p.brand} — {p.name.en}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

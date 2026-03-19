@@ -254,14 +254,13 @@ function ProjectedImprovementSection({
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 interface Props {
   result: DiagnosisResult;
   routineOutput: RoutineOutput;
+  onGoToLab?: () => void;
 }
 
-export default function SlideProtocol({ result, routineOutput }: Props) {
+export default function SlideProtocol({ result, routineOutput, onGoToLab }: Props) {
   const { language } = useI18nStore();
   const lang = (language === "de" || language === "ko") ? language : "en";
 
@@ -555,6 +554,7 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
                 return (
                 <motion.div
                   key={`${step.role}-${idx}`}
+                  layoutId={`product-${step.product.id}`}
                   initial={{ opacity: 0, y: 14 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.06, type: "spring", stiffness: 280, damping: 26 }}
@@ -625,6 +625,66 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
           </motion.div>
         </AnimatePresence>
 
+        {/* ── Premium Special Care Lab Nudge Card ── */}
+        {!isSosActive && onGoToLab && (
+          <motion.button
+            onClick={onGoToLab}
+            className="w-full mt-6 rounded-2xl p-5 text-left transition-all group relative overflow-hidden"
+            style={{
+              background: "hsl(var(--card) / 0.3)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1.5px dashed transparent",
+              backgroundImage: `linear-gradient(hsl(var(--card) / 0.3), hsl(var(--card) / 0.3)), linear-gradient(135deg, hsl(var(--primary) / 0.4), hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.4))`,
+              backgroundOrigin: "border-box",
+              backgroundClip: "padding-box, border-box",
+            }}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45, type: "spring", stiffness: 260, damping: 22 }}
+            whileHover={{ scale: 1.01, y: -2 }}
+            whileTap={{ scale: 0.99 }}
+          >
+            {/* Glow background on hover */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{
+                background: "radial-gradient(circle at center, hsl(var(--primary) / 0.06), transparent 70%)",
+              }}
+            />
+
+            <div className="relative flex items-center gap-4">
+              {/* Large [ + ] icon */}
+              <div
+                className="flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-300 group-hover:scale-110"
+                style={{
+                  background: "linear-gradient(135deg, hsl(var(--primary) / 0.12), hsl(var(--primary) / 0.06))",
+                  border: "1px solid hsl(var(--primary) / 0.2)",
+                  boxShadow: "0 4px 16px hsl(var(--primary) / 0.08)",
+                }}
+              >
+                <span style={{ fontSize: "1.5rem", fontWeight: 300, color: "hsl(var(--primary))", lineHeight: 1 }}>+</span>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <p className="text-[0.6rem] font-bold tracking-[0.15em] uppercase mb-1" style={{ color: "hsl(var(--primary))" }}>
+                  {lang === "ko" ? "특수 케어 연구소" : lang === "de" ? "Spezial-Pflege Labor" : "Special Care Lab"}
+                </p>
+                <p className="text-sm font-medium" style={{ color: "hsl(var(--foreground))", lineHeight: 1.4 }}>
+                  {lang === "ko"
+                    ? "부위별 맞춤 제품을 추가하여 루틴을 강화하세요"
+                    : lang === "de"
+                      ? "Gezielte Zusatzprodukte für spezifische Zonen hinzufügen"
+                      : "Add targeted products for specific zones to enhance your routine"}
+                </p>
+                <p className="text-[0.7rem] mt-1 font-medium" style={{ color: "hsl(var(--primary) / 0.6)" }}>
+                  {lang === "ko" ? "탭하여 맞춤 선택 →" : lang === "de" ? "Tippen zum Auswählen →" : "Tap to customize →"}
+                </p>
+              </div>
+            </div>
+          </motion.button>
+        )}
+
         {/* Upgrade nudge for 3-step → 5-step (hidden during SOS override) */}
         {level === "3-step" && !isSosActive && (
           <motion.button
@@ -671,3 +731,4 @@ export default function SlideProtocol({ result, routineOutput }: Props) {
     </div>
   );
 }
+

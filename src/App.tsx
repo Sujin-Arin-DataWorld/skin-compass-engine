@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +27,8 @@ import Wishlist from "./pages/Wishlist";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
-import LabSelectionPage from "./pages/LabSelectionPage";
+// LabSelectionPage deprecated — merged into unified funnel at /results?slide=2
+// import LabSelectionPage from "./pages/LabSelectionPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BottomNav } from "./components/BottomNav";
 
@@ -156,7 +157,8 @@ function AppInner() {
         {/* ProtectedRoute temporarily removed for local dev */}
         <Route path="/diagnosis" element={<Diagnosis />} />
         <Route path="/results" element={<Results />} />
-        <Route path="/lab" element={<LabSelectionPage />} />
+        {/* /lab deprecated — redirect to unified funnel Slide 2 (Lab & Special Care) */}
+        <Route path="/lab" element={<Navigate to="/results?slide=2" replace />} />
         <Route path="/formula/:id" element={<FormulaDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route

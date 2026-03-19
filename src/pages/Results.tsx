@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Navigate, Link, useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams, useNavigate } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
 import { getPendingDiagnosis } from "@/utils/diagnosisPersistence";
@@ -9,12 +9,8 @@ import { buildRoutineV5 } from "@/engine/routineEngineV5";
 import type { RoutineOutputV5 } from "@/engine/routineEngineV5";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
-import SlideDiagnosisSummary from "@/components/results/SlideDiagnosisSummary";
-import SlideAxisBreakdown from "@/components/results/SlideAxisBreakdown";
-import SlideWhyProducts from "@/components/results/SlideWhyProducts";
-import SlideProtocol from "@/components/results/SlideProtocol";
-import SlideSubscriptionTable from "@/components/results/SlideSubscriptionTable";
-import SlideSubscribe from "@/components/results/SlideSubscribe";
+import SlideMacroDashboard from "@/components/results/SlideMacroDashboard";
+import SlideFinalDashboard from "@/components/results/SlideFinalDashboard";
 import SlideNav from "@/components/results/SlideNav";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { useProductStore } from "@/store/productStore";
@@ -23,45 +19,43 @@ import type {
   ClinicalGrade, ZoneId, ZoneHeatmapEntry, ScoreProvenance, ProjectedImprovement, AxisKey,
 } from "@/engine/types";
 
+
+// Lazy-load Slide 1 (Lab) for performance — keeps Slide 0 fast
+const SlideLabSpecialCare = lazy(() => import("@/components/results/SlideLabSpecialCare"));
+
+// ── Slide count ─────────────────────────────────────────────────────────────
+const TOTAL_SLIDES = 3;
+
+// ── Slide labels (trilingual — 3-slide funnel) ─────────────────────────────
 const SLIDE_LABELS = {
   en: [
-    { key: "diagnosis", short: "Pattern", full: "Your Skin Pattern" },
-    { key: "axes", short: "Analysis", full: "Clinical Analysis" },
-    { key: "protocol", short: "Protocol", full: "Your Routine" },
-    { key: "plans", short: "Plans", full: "Choose Your Plan" },
-    { key: "products", short: "Products", full: "Matched Products" },
-    { key: "subscribe", short: "Strategy", full: "Adaptive Strategy" },
+    { key: "macro", short: "Analysis", full: "Macro Dashboard" },
+    { key: "lab", short: "Lab", full: "Special Care Lab" },
+    { key: "plan", short: "Plan", full: "Master Plan" },
   ],
   de: [
-    { key: "diagnosis", short: "Muster", full: "Ihr Hautmuster" },
-    { key: "axes", short: "Analyse", full: "Klinische Analyse" },
-    { key: "protocol", short: "Protokoll", full: "Ihre Routine" },
-    { key: "plans", short: "Abo", full: "Plan wählen" },
-    { key: "products", short: "Produkte", full: "Passende Produkte" },
-    { key: "subscribe", short: "Strategie", full: "Adaptive Strategie" },
+    { key: "macro", short: "Analyse", full: "Makro-Dashboard" },
+    { key: "lab", short: "Labor", full: "Spezielle Pflege" },
+    { key: "plan", short: "Plan", full: "Masterplan" },
   ],
   ko: [
-    { key: "diagnosis", short: "패턴", full: "피부 패턴 분석" },
-    { key: "axes", short: "분석", full: "임상 분석 결과" },
-    { key: "protocol", short: "루틴", full: "맞춤 스킨케어 루틴" },
-    { key: "plans", short: "플랜", full: "플랜 선택" },
-    { key: "products", short: "제품", full: "맞춤 추천 제품" },
-    { key: "subscribe", short: "전략", full: "맞춤 스킨케어 전략" },
+    { key: "macro", short: "분석", full: "매크로 대시보드" },
+    { key: "lab", short: "연구소", full: "특수 케어" },
+    { key: "plan", short: "플랜", full: "마스터 플랜" },
   ],
 };
 
 const slideVariants = {
-  enter: (d: number) => ({ x: d > 0 ? "100%" : "-100%", opacity: 0 }),
+  enter: (d: number) => ({ x: d > 0 ? "80%" : "-80%", opacity: 0.3 }),
   center: { x: 0, opacity: 1 },
-  exit: (d: number) => ({ x: d > 0 ? "-100%" : "100%", opacity: 0 }),
+  exit: (d: number) => ({ x: d > 0 ? "-80%" : "80%", opacity: 0.3 }),
 };
 
-// Dev-only mock result for testing Results UI without running full diagnosis
+// ── Dev-only mock result ────────────────────────────────────────────────────
 function makeMockResult(products: Product[]): DiagnosisResult {
   const axis_scores: AxisScores    = { seb: 62, hyd: 48, bar: 74, sen: 85, ox: 33, acne: 71, pigment: 45, texture: 56, aging: 38, makeup_stability: 22 };
   const axis_severity: AxisSeverity = { seb: 2,  hyd: 1,  bar: 2,  sen: 3,  ox: 1,  acne: 2,  pigment: 1,  texture: 2,  aging: 1,  makeup_stability: 0 };
 
-  // ── V5 mock fields ──────────────────────────────────────────────────────────
   const axis_clinical_grade: Record<AxisKey, { grade: ClinicalGrade; label: { en: string; de: string; ko: string } }> = {
     seb:              { grade: "active",   label: { en: "Active",   de: "Aktiv",    ko: "활성" } },
     hyd:              { grade: "watch",    label: { en: "Watch",    de: "Beachten", ko: "주의" } },
@@ -117,7 +111,6 @@ function makeMockResult(products: Product[]): DiagnosisResult {
     aging:            { currentScore: 38, targetScore4w: 34, targetScore12w: 31 },
     makeup_stability: { currentScore: 22, targetScore4w: 19, targetScore12w: 16 },
   };
-  // ────────────────────────────────────────────────────────────────────────────
 
   return {
     engineVersion: "v5-mock",
@@ -144,7 +137,6 @@ function makeMockResult(products: Product[]): DiagnosisResult {
       Phase4: products[3] ? [products[3]] : [],
       Phase5: products[4] ? [products[4]] : [],
     },
-    // V5 fields
     axis_clinical_grade,
     zone_heatmap,
     score_provenance,
@@ -152,15 +144,21 @@ function makeMockResult(products: Product[]): DiagnosisResult {
   };
 }
 
+// ── Unified Funnel Page ─────────────────────────────────────────────────────
+
 const ResultsPage = () => {
   const { result: storeResult, implicitFlags, setResult } = useDiagnosisStore();
   const { products } = useProductStore();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const isDebug = searchParams.get("debug") === "true";
   const { language } = useI18nStore();
 
+  // Resolve the active slide from ?slide= query param
+  const slideFromUrl = parseInt(searchParams.get("slide") ?? "0", 10);
+  const initialSlide = (slideFromUrl >= 0 && slideFromUrl < TOTAL_SLIDES) ? slideFromUrl : 0;
+
   // Use mock data in dev when no real result exists.
-  // Fallback to localStorage pending diagnosis (survives guest→login page reload).
   const result = useMemo(() => {
     if (storeResult) return storeResult;
     const pending = getPendingDiagnosis();
@@ -169,34 +167,69 @@ const ResultsPage = () => {
     return null;
   }, [storeResult, products]);
 
-  // Restore pending diagnosis into Zustand store so navigating away and back works.
-  // Don't clear localStorage here — AuthCallback needs it to sync to Supabase.
+  // Restore pending diagnosis into Zustand store
   useEffect(() => {
     if (storeResult) return;
     const pending = getPendingDiagnosis();
     if (pending?.fullResult) setResult(pending.fullResult);
   }, [storeResult, setResult]);
 
-  // B-1 + B-2: compute personalised routine from V5 result (pure, no side-effects)
+  // Build personalised routine
   const routineOutput = useMemo<RoutineOutputV5 | null>(() => {
     if (!result) return null;
     return buildRoutineV5(result, implicitFlags, "Full");
   }, [result, implicitFlags]);
 
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(initialSlide);
   const [direction, setDirection] = useState(1);
 
-  // Auto-save diagnosis result to user profile if logged in
+  // Read special care picks from Zustand store (persisted)
+  const specialCarePicks = useDiagnosisStore((s) => s.specialCarePicks);
+
+  // ── URL query param sync ─────────────────────────────────────────────────
+  // Sync ?slide= param whenever current slide changes
+  useEffect(() => {
+    const currentSlideParam = searchParams.get("slide");
+    const target = current.toString();
+    if (currentSlideParam !== target) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set("slide", target);
+      // Use replaceState for forward navigation, pushState for enabling Back
+      setSearchParams(newParams, { replace: false });
+    }
+  }, [current, searchParams, setSearchParams]);
+
+  // Intercept browser Back button — navigate between slides instead of exiting
+  useEffect(() => {
+    const handler = (e: PopStateEvent) => {
+      // Read current slide from URL after popstate
+      const params = new URLSearchParams(window.location.search);
+      const urlSlide = parseInt(params.get("slide") ?? "0", 10);
+      if (urlSlide >= 0 && urlSlide < TOTAL_SLIDES) {
+        setDirection(urlSlide < current ? -1 : 1);
+        setCurrent(urlSlide);
+      }
+    };
+    window.addEventListener("popstate", handler);
+    return () => window.removeEventListener("popstate", handler);
+  }, [current]);
+
+  // Auto-save diagnosis result
   const { isLoggedIn, saveDiagnosisResult } = useAuthStore();
   useEffect(() => {
     if (isLoggedIn && result) {
-      saveDiagnosisResult(result);
+      // Attach special care picks before saving
+      const resultWithPicks = {
+        ...result,
+        special_care_picks: Object.values(specialCarePicks),
+      };
+      saveDiagnosisResult(resultWithPicks);
     }
-  }, [isLoggedIn, result, saveDiagnosisResult]);
+  }, [isLoggedIn, result, saveDiagnosisResult, specialCarePicks]);
 
   const goTo = useCallback(
     (idx: number) => {
-      if (idx < 0 || idx >= 6) return;
+      if (idx < 0 || idx >= TOTAL_SLIDES) return;
       setDirection(idx > current ? 1 : -1);
       setCurrent(idx);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -216,16 +249,36 @@ const ResultsPage = () => {
 
   if (!result) return <Navigate to="/diagnosis" replace />;
 
-  // PRODUCTS slide is at index 4
-  const PRODUCTS_SLIDE = 4;
-
+  // ── Unified 3-slide sequence ─────────────────────────────────────────────
+  //
+  // Slide 0: Macro Dashboard (Circular Axis Charts + 2-col Products + AIX Insight)
+  // Slide 1: Lab & Special Care (SlideLabSpecialCare — lazy loaded)
+  // Slide 2: Final Selection (Glassmorphism Master Plan)
+  //
   const slides = [
-    <SlideDiagnosisSummary result={result} />,
-    <SlideAxisBreakdown result={result} goToProducts={() => goTo(PRODUCTS_SLIDE)} />,
-    <SlideProtocol result={result} routineOutput={routineOutput!} />,
-    <SlideSubscriptionTable result={result} />,
-    <SlideWhyProducts result={result} />,
-    <SlideSubscribe result={result} />,
+    // Slide 0: Macro Dashboard
+    <SlideMacroDashboard key="slide-macro" result={result} onGoToLab={() => goTo(1)} />,
+
+    // Slide 1: Lab & Special Care (lazy)
+    <Suspense
+      key="slide-lab"
+      fallback={
+        <div className="flex flex-1 items-center justify-center">
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-2"
+            style={{
+              borderColor: 'hsl(var(--border))',
+              borderTopColor: 'hsl(var(--primary))',
+            }}
+          />
+        </div>
+      }
+    >
+      <SlideLabSpecialCare result={result} />
+    </Suspense>,
+
+    // Slide 2: Final Selection (Glassmorphism)
+    <SlideFinalDashboard key="slide-final" result={result} />,
   ];
 
   return (
@@ -237,12 +290,12 @@ const ResultsPage = () => {
       <div className="absolute top-[57px] left-0 right-0 z-50 h-0.5 bg-border/40">
         <motion.div
           className="h-full bg-primary"
-          animate={{ width: `${((current + 1) / 6) * 100}%` }}
+          animate={{ width: `${((current + 1) / TOTAL_SLIDES) * 100}%` }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         />
       </div>
 
-      {/* Slide content */}
+      {/* Slide content — hardware-accelerated container */}
       <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={current}
@@ -251,7 +304,7 @@ const ResultsPage = () => {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.12}
@@ -260,6 +313,7 @@ const ResultsPage = () => {
             if (info.offset.x > 60) goTo(current - 1);
           }}
           className="absolute inset-0 flex flex-col pt-[60px] pb-16"
+          style={{ willChange: "transform" }}
         >
           {slides[current]}
         </motion.div>
@@ -268,7 +322,7 @@ const ResultsPage = () => {
       {/* Navigation overlay */}
       <SlideNav
         current={current}
-        total={6}
+        total={TOTAL_SLIDES}
         labels={SLIDE_LABELS[language].map((l) => l.short)}
         fullLabels={SLIDE_LABELS[language].map((l) => l.full)}
         onPrev={() => goTo(current - 1)}
@@ -278,62 +332,6 @@ const ResultsPage = () => {
 
       {/* Debug panel */}
       {isDebug && result?._debug && <DebugPanel debugData={result._debug} />}
-
-      {/* Lab CTA — shown on last slide for logged-in users */}
-      {isLoggedIn && current === slides.length - 1 && (
-        <motion.div
-          initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.4, ease: "easeOut" }}
-          className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-3 px-5 py-3
-                     bg-white/95 dark:bg-[#0D0D0D]/95 backdrop-blur-sm
-                     border-t border-accent-gold/30 dark:border-accent-gold/20"
-        >
-          <p className="text-xs font-medium text-[#947E5C] dark:text-accent-gold/80 leading-snug">
-            {language === "ko"
-              ? "진단 결과를 바탕으로 맞춤 제품 루틴을 설계하세요."
-              : language === "de"
-              ? "Erstellen Sie Ihre persönliche Produktroutine basierend auf Ihren Ergebnissen."
-              : "Build your personalised product routine from your results."}
-          </p>
-          <Link
-            to="/lab"
-            className="shrink-0 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase transition-all
-                       bg-accent-gold text-white border border-accent-gold shadow-md hover:shadow-lg hover:bg-accent-gold/90
-                       dark:bg-transparent dark:text-accent-gold dark:border-accent-gold
-                       dark:shadow-[0_0_10px_rgba(200,169,81,0.2)] dark:hover:shadow-[0_0_18px_rgba(200,169,81,0.45)]"
-          >
-            {language === "ko" ? "연구소 입장 →" : language === "de" ? "Labor →" : "Enter Lab →"}
-          </Link>
-        </motion.div>
-      )}
-
-      {/* Guest save banner — shown when user is not logged in */}
-      {!isLoggedIn && (
-        <motion.div
-          initial={{ y: 80, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.4, ease: "easeOut" }}
-          className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-3 px-5 py-3
-                     bg-white/95 dark:bg-[#0D0D0D]/95 backdrop-blur-sm
-                     border-t border-[#947E5C]/30 dark:border-[#D4AF37]/20"
-        >
-          <p className="text-xs font-medium text-[#947E5C] dark:text-white/70 leading-snug">
-            {language === "de"
-              ? "Analyse bewahren. Jetzt in Ihr Konto einloggen."
-              : "Keep your analysis. Sign in to your account."}
-          </p>
-          <Link
-            to="/login?redirect=/results"
-            className="shrink-0 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase transition-all
-                       bg-white text-[#947E5C] border border-[#947E5C]/60 shadow-md hover:shadow-lg
-                       dark:bg-transparent dark:text-[#D4AF37] dark:border-[#D4AF37]
-                       dark:shadow-[0_0_10px_rgba(212,175,55,0.2)] dark:hover:shadow-[0_0_18px_rgba(212,175,55,0.45)]"
-          >
-            {language === "de" ? "Anmelden" : "Sign In"}
-          </Link>
-        </motion.div>
-      )}
     </div>
   );
 };

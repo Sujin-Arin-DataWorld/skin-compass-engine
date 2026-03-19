@@ -231,23 +231,46 @@ const ZONES_DEF: ZoneDef[] = [
   {
     zone: "forehead",
     outlinePath:
-      "M 129 179 C 119 102, 192 68, 260 68 C 328 68, 401 102, 391 179 C 367 174, 347 160, 328 160 C 299 160, 279 179, 260 179 C 241 179, 221 160, 192 160 C 173 160, 153 174, 129 179 Z",
-    annotLine: { x1: 200, y1: 130, x2: 70, y2: 120 },
-    hitPath: "M 95 45 L 425 45 L 425 200 L 95 200 Z",
+      // M: 왼쪽 아래 시작점 (129에서 왼쪽으로 30px 이동 -> 99)
+      "M 99 179 " +
+      // C: 왼쪽 상단 곡선 (시작점이 밀린 만큼 바깥쪽 제어점도 살짝 밀어줌 74->44)
+      "C 44 57, 192 23, 260 23 " +
+      // C: 오른쪽 상단 곡선 (끝점이 밀린 만큼 바깥쪽 제어점도 밀어줌 446->476)
+      "C 328 23, 476 57, 421 179 " +
+      // C~Z: 맨 아랫줄 곡선 시리즈
+      // 오른쪽 끝점(421)에서 눈썹 위 중앙으로 돌아오는 선 (제어점 비율 유지)
+      "C 397 174, 377 160, 328 160 C 299 160, 279 179, 260 179 " +
+      // 중앙에서 왼쪽 끝점(99)으로 이어지는 선 (제어점 비율 유지하여 완벽한 대칭 형성)
+      "C 241 179, 221 160, 192 160 C 143 160, 123 174, 99 179 Z",
+    
+    // 이마 양끝이 넓어졌으므로, 지시선이 라인에 겹치지 않도록 조금 더 왼쪽 바깥으로 뺌
+    annotLine: { x1: 150, y1: 100, x2: 20, y2: 90 },
+    
+    // 클릭 영역 박스도 넓어진 양옆을 충분히 커버하도록 x좌표 여백 확보
+    hitPath: "M 20 0 L 500 0 L 500 200 L 20 200 Z",
   },
   {
     zone: "nose",
     outlinePath:
       "M 224 193 C 232 202, 228 220, 226 249 C 224 273, 216 302, 209 326 C 204 341, 200 353, 204 365 C 212 379, 238 385, 256 386 C 274 385, 300 379, 308 365 C 312 353, 308 341, 302 326 C 296 302, 288 273, 286 249 C 284 220, 281 202, 286 193 C 278 190, 234 190, 224 193 Z",
-    annotLine: { x1: 303, y1: 270, x2: 430, y2: 250 },
+    annotLine: { x1: 260, y1: 220, x2: 260, y2: 300 },
     hitPath: "M 195 190 L 317 190 L 317 395 L 195 395 Z M 303 240 L 450 240 L 450 270 L 303 270 Z",
   },
   {
     zone: "eyes",
     outlinePath:
-      "M 148 210 C 150 200, 160 198, 175 200 C 190 202, 210 210, 220 218 C 225 222, 228 228, 225 234 C 220 248, 192 264, 172 268 C 155 270, 142 260, 140 248 C 138 236, 142 222, 148 210 Z M 372 210 C 370 200, 360 198, 345 200 C 330 202, 310 210, 300 218 C 295 222, 292 228, 295 234 C 300 248, 328 264, 348 268 C 365 270, 378 260, 380 248 C 382 236, 378 222, 372 210 Z",
-    annotLine: { x1: 380, y1: 235, x2: 440, y2: 230 },
-    hitPath: "M 130 195 L 230 195 L 230 275 L 130 275 Z M 290 195 L 390 195 L 390 275 L 290 275 Z M 380 220 L 460 220 L 460 250 L 380 250 Z",
+      // --- 왼쪽 눈 (Left Eye) ---
+      // 왼쪽으로 이동(-6) + 끝선 추가 연장(-35) + 아래로 이동(+10)
+      "M 107 220 C 109 210, 137 208, 169 210 C 184 212, 204 220, 214 228 C 219 232, 222 238, 219 244 C 214 258, 186 274, 151 278 C 124 280, 101 270, 99 258 C 97 246, 101 232, 107 220 Z " +
+      // --- 오른쪽 눈 (Right Eye) ---
+      // 아래로 이동(+10) + 오른쪽 끝선 연장(+30)
+      "M 402 220 C 400 210, 375 208, 345 210 C 330 212, 310 220, 300 228 C 295 232, 292 238, 295 244 C 300 258, 328 274, 358 278 C 390 280, 408 270, 410 258 C 412 246, 408 232, 402 220 Z",
+    
+    // 오른쪽 눈이 우측으로 늘어났으므로 지시선 시작점도 우측으로 밀고 아래로 내림
+    annotLine: { x1: 390, y1: 210, x2: 460, y2: 280 },
+
+    // 클릭 영역 박스들도 변경된 눈의 너비와 위치에 맞게 재조정
+    hitPath: "M 85 205 L 230 205 L 230 285 L 85 285 Z M 290 205 L 420 205 L 420 285 L 290 285 Z M 410 230 L 490 230 L 490 260 L 410 260 Z",
   },
   {
     zone: "cheeks",
@@ -311,8 +334,8 @@ const ZONES_DEF: ZoneDef[] = [
 // ─── SVG animation CSS ────────────────────────────────────────────────────────
 const SVG_CSS = `
   @keyframes fms-outline-idle {
-    0%, 100% { opacity: 0.30; }
-    50%      { opacity: 0.55; }
+    0%, 100% { opacity: 0.40; }
+    50%      { opacity: 0.65; }
   }
   @keyframes fms-outline-hover {
     0%, 100% { opacity: 0.55; }
@@ -323,16 +346,16 @@ const SVG_CSS = `
     50%      { opacity: 1.00; }
   }
   @keyframes fms-outline-selected {
-    0%, 100% { opacity: 0.75; }
+    0%, 100% { opacity: 0.30; }
     50%      { opacity: 1.00; }
   }
   @keyframes fms-glow-pulse {
-    0%, 100% { opacity: 0.15; }
-    50%      { opacity: 0.45; }
+    0%, 100% { opacity: 0.25; }
+    50%      { opacity: 0.55; }
   }
   @keyframes fms-label-idle {
-    0%, 100% { opacity: 0.40; }
-    50%      { opacity: 0.70; }
+    0%, 100% { opacity: 0.60; }
+    50%      { opacity: 0.80; }
   }
 `;
 
@@ -399,8 +422,8 @@ function FaceSVG({
         const lit = isActive || isSelected;
         const dimmed = activeZone !== null && !lit;
 
-        const accentColor = isDark ? "#c9a96e" : "#f5d657ff";
-        const idleColor = isDark ? "rgba(201,169,110,0.7)" : "rgba(144, 56, 29, 0.7)";
+        const accentColor = isDark ? "#e59d17ff" : "#2f1b0b4c";  /*글씨색*/
+        const idleColor = isDark ? "rgba(243, 227, 55, 0.77)" : "rgba(124, 53, 17, 0.95)";
         const strokeColor = lit ? accentColor : idleColor;
 
         const d0 = zoneIdx * 0.5;
@@ -453,7 +476,7 @@ function FaceSVG({
             onMouseEnter={() => setHoveredZone(zone)}
             onMouseLeave={() => setHoveredZone(null)}
             style={{
-              opacity: dimmed && !isSelected ? 0.35 : 1,
+              opacity: dimmed && !isSelected ? 0.7 : 1,
               transition: "opacity 0.4s ease",
               cursor: "pointer",
             }}>
@@ -1316,7 +1339,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
               aspectRatio: "600/700",
               flexShrink: 0,
               borderRadius: 28,
-              background: isDark ? "#d4bc77c2" : "#d5874bff",
+              background: isDark ? "#d4bc77c2" : "#e78344ff", /*사진배경색깔*/
               boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
               border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
               margin: isMobile ? "0 auto" : "0",

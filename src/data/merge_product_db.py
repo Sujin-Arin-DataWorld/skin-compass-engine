@@ -11,8 +11,8 @@ from typing import Any
 
 SCRIPT_DIR: Path = Path(__file__).resolve().parent
 
-db_path: Path = SCRIPT_DIR / "product_db.json"
-additions_path: Path = SCRIPT_DIR / "product_db_additions.json"
+db_path: Path = SCRIPT_DIR / "product_db_merged.json"
+additions_path: Path = SCRIPT_DIR / "product_db_golden_eggs.json"
 output_path: Path = SCRIPT_DIR / "product_db_merged.json"
 
 if not db_path.exists():
@@ -79,7 +79,7 @@ print(f"✨ 결과: 신규 추가 {added_count}개 / 기존 데이터 덮어쓰�
 
 # Step 4: Update metadata
 db["products"] = products
-db["_schema_version"] = "4.0"
+db["_schema_version"] = "5.0"
 db["_engine_last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 # Step 5: Save

@@ -1,5 +1,5 @@
 {
-  "_schema_version": "4.0",
+  "_schema_version": "5.0",
   "products": [
     {
       "id": "KR_cosrx_bha_cleanser",
@@ -4446,7 +4446,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -4528,7 +4528,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -4601,7 +4601,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -4681,7 +4681,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -4769,7 +4769,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -4849,7 +4849,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -4916,7 +4916,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -4997,7 +4997,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5020,7 +5020,7 @@
       "ingredients": [
         {
           "name_en": "PDRN",
-          "name_kr": "PDRN(연어DNA)",
+          "name_kr": "소듐디엔에이(연어추출)",
           "name_inci": "Polydeoxyribonucleotide",
           "concentration_pct": 100,
           "concentration_unit": "ppm",
@@ -5077,7 +5077,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5175,7 +5175,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5239,7 +5239,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5318,7 +5318,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5387,7 +5387,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5461,7 +5461,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5535,7 +5535,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5599,7 +5599,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5679,7 +5679,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5748,12 +5748,12 @@
       "available_in_de": true,
       "vs_comparison": null,
       "duel_verdict": null,
-      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "full_inci_list": "Purified Water, Glycerin, Behentrimonium Methosulfate and Cetearyl Alcohol, Ceramide 3, Ceramide 6-11, Ceramide 1, Hyaluronic Acid, Cholesterol, Polyoxyl 40 Stearate, Glyceryl Monostearate, Stearyl Alcohol, Polysorbate 20, Potassium Phosphate, Dipotassium Phosphate, Sodium Lauroyl Lactylate, Cetyl Alcohol, Disodium EDTA, Phytosphingosine, Methylparaben, Propylparaben, Carbomer, Xanthan Gum.",
       "cpnp_2026_compliance": {
-        "is_cpnp_2026_safe": "Unknown",
+        "is_cpnp_2026_safe": true,
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5835,7 +5835,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5918,7 +5918,7 @@
         "is_cpnp_2026_safe": "Unknown",
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
-        "note": "확인 필요"
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
     },
     {
@@ -5955,7 +5955,14 @@
         "heat_cooling",
         "dehydration"
       ],
-      "one_liner_kr": "물방울처럼 터지는 수분 선 세럼 - 끈적임 0%"
+      "one_liner_kr": "물방울처럼 터지는 수분 선 세럼 - 끈적임 0%",
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_isntree_watery_sungel",
@@ -5988,7 +5995,14 @@
       "skin_concerns": [
         "uv_protection",
         "dehydration"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_missha_aqua_sun",
@@ -6021,7 +6035,14 @@
       "skin_concerns": [
         "uv_protection",
         "excess_sebum"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_skin1004_toning_toner",
@@ -6043,7 +6064,7 @@
         },
         {
           "name_en": "PHA",
-          "name_kr": "파하",
+          "name_kr": "PHA(글루코노락톤)",
           "role": "exfoliant"
         }
       ],
@@ -6056,7 +6077,14 @@
         "acne",
         "pores",
         "dullness"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_laneige_cream_skin",
@@ -6091,7 +6119,14 @@
         "dehydration",
         "barrier_damage",
         "density_loss"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_numbuzin_nad_pdrn_toner",
@@ -6124,7 +6159,14 @@
       "skin_concerns": [
         "fine_lines",
         "elasticity_loss"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "DE_no_glow_today_toner",
@@ -6145,7 +6187,7 @@
         },
         {
           "name_en": "SpreeOne Extract",
-          "name_kr": "특허알게",
+          "name_kr": "스프리원추출물(해조류추출물)",
           "role": "barrier_repair"
         }
       ],
@@ -6158,7 +6200,14 @@
       "skin_concerns": [
         "pores",
         "dark_spots"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_dralthea_345_cream",
@@ -6193,7 +6242,14 @@
         "redness",
         "acne",
         "irritation"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_cosrx_balancium_cream",
@@ -6225,7 +6281,14 @@
       "skin_concerns": [
         "barrier_damage",
         "dehydration"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_purito_bamboo_cream",
@@ -6260,7 +6323,14 @@
         "irritation",
         "redness",
         "barrier_damage"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "EU_geekgorgeous_cheerup",
@@ -6295,7 +6365,14 @@
         "acne",
         "pores",
         "blackheads"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_ksecret_retinal_liposome",
@@ -6330,7 +6407,14 @@
         "wrinkles",
         "fine_lines",
         "elasticity_loss"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_axisy_dark_spot_serum",
@@ -6365,7 +6449,14 @@
         "dark_spots",
         "PIH",
         "acne"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_haruharu_blackrice_essence",
@@ -6398,7 +6489,14 @@
       "skin_concerns": [
         "barrier_damage",
         "dullness"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_medicube_collagen_night",
@@ -6431,7 +6529,14 @@
       "skin_concerns": [
         "elasticity_loss",
         "sagging"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_medicube_vitac_pad",
@@ -6464,7 +6569,14 @@
       "skin_concerns": [
         "dark_spots",
         "uneven_tone"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_roundlab_pine_lotion",
@@ -6499,7 +6611,14 @@
         "redness",
         "post_shave_irritation",
         "excess_sebum"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
     },
     {
       "id": "KR_easydew_egf_serum",
@@ -6528,8 +6647,1188 @@
         "fine_lines",
         "elasticity_loss",
         "sagging"
-      ]
+      ],
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
+    },
+    {
+      "id": "KR_vt_daiso_pdrn_essence",
+      "name_kr": "PDRN 에센스 100",
+      "name_en": "PDRN Essence 100",
+      "name_de": "PDRN Essence 100",
+      "brand": "VT Cosmetics",
+      "brand_kr": "VT 코스메틱",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 3.5,
+      "price_krw": 5000,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.117,
+      "routine_slot": "serum_pm",
+      "texture_type": "essence",
+      "texture_description_kr": "워터 에센스 (가볍고 빠른 흡수)",
+      "ingredients": [
+        {
+          "name_en": "PDRN (Polydeoxyribonucleotide)",
+          "name_kr": "PDRN (폴리데옥시리보뉴클레오타이드)",
+          "name_inci": "Polydeoxyribonucleotide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "cell_regeneration"
+        }
+      ],
+      "target_profiles": [
+        "post_menopause",
+        "aging_elasticity"
+      ],
+      "target_age_range": "50-60+",
+      "skin_concerns": [
+        "density_loss",
+        "elasticity_loss",
+        "fine_lines",
+        "thinning_skin"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "피부과 연어주사(리쥬란) 핵심 성분 PDRN — 다이소 5천 원",
+      "one_liner_en": "PDRN (clinic salmon injection key ingredient) at drugstore price",
+      "one_liner_de": "PDRN-Essenz — klinikäquivalente Geweberegeneration für 3,50 EUR",
+      "application_instruction_kr": "세안 후 스킨/토너 다음 단계에서 얼굴 전체에 2~3방울 가볍게 pat-in. 단독 또는 크림 전 단계로 사용.",
+      "application_instruction_en": "After toner, apply 2-3 drops and gently pat into skin. Layer before cream.",
+      "application_instruction_de": "Nach dem Toner 2-3 Tropfen sanft einklopfen. Vor der Creme anwenden.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": false,
+      "vs_comparison": {
+        "compare_to": "피부과 리쥬란/연어 주사 시술",
+        "compare_price_eur": 150.0,
+        "compare_note": "PDRN 동일 성분. 유럽 시장에서 PDRN 화장품은 극히 희귀하여 독보적 셀링 포인트."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "EU 판매 시 CPNP 등록 필요. PDRN EU 규정 적합성 별도 확인 요망."
+      }
+    },
+    {
+      "id": "KR_frankly_retinol_01_cream",
+      "name_kr": "레티놀 0.1 크림",
+      "name_en": "Retinol 0.1 Cream",
+      "name_de": "Retinol 0.1 Cream",
+      "brand": "Frankly",
+      "brand_kr": "프랭클리",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 7.0,
+      "price_krw": 9000,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.233,
+      "routine_slot": "moisturizer_night",
+      "texture_type": "cream",
+      "texture_description_kr": "크림 (안티에이징 집중 나이트 크림)",
+      "ingredients": [
+        {
+          "name_en": "Pure Retinol",
+          "name_kr": "순수 레티놀",
+          "name_inci": "Retinol",
+          "concentration_pct": 0.1,
+          "concentration_unit": "%",
+          "role": "anti_aging"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "pigmentation"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "wrinkles",
+        "fine_lines",
+        "elasticity_loss",
+        "sagging",
+        "dark_spots"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "원가 투명 공개 브랜드 — 안티에이징 황금 농도 순수 레티놀 0.1% 알루미늄 튜브",
+      "one_liner_en": "Pure Retinol 0.1% at clinical golden standard concentration — transparent pricing brand",
+      "one_liner_de": "Reines Retinol 0,1% — klinisch optimale Konzentration zum Drogerie-Preis",
+      "application_instruction_kr": "저녁 루틴 마지막 단계. 쌀알 크기만큼 취해 얼굴 전체에 얇게 펴 바름. 처음 2주는 주 2~3회, 이후 매일 사용으로 점진적 증량. SPF는 다음 날 아침 필수.",
+      "application_instruction_en": "Last step of PM routine. Rice grain amount, start 2-3x/week for 2 weeks then build to daily. Always follow with SPF next morning.",
+      "application_instruction_de": "Letzter Schritt der Abendpflege. Reiskorngroße Menge, anfangs 2-3x/Woche, dann täglich steigern. SPF am nächsten Morgen unbedingt verwenden.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": false,
+      "vs_comparison": {
+        "compare_to": "Paula's Choice Clinical 0.3% Retinol + 2% Bakuchiol",
+        "compare_price_eur": 65.0,
+        "compare_note": "레티놀 황금 표준 농도(0.1%)를 알루미늄 산화방지 튜브에 담아 1/9 가격에 제공."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "레티놀 0.1%는 EU 화장품 규정 최대 허용치 이내. PM 전용, SPF 병행 사용 권장 문구 표기 필요."
+      }
+    },
+    {
+      "id": "KR_isntree_yam_milk_toner",
+      "name_kr": "참마 비건 밀크 토너",
+      "name_en": "Yam Vegan Milk Toner",
+      "name_de": "Yam Vegan Milk Toner",
+      "brand": "Isntree",
+      "brand_kr": "이즈앤트리",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 18.0,
+      "price_krw": 25000,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.09,
+      "routine_slot": "toner",
+      "texture_type": "milky_liquid",
+      "texture_description_kr": "우윳빛 점성 밀크 토너 (고점도 영양 텍스처)",
+      "ingredients": [
+        {
+          "name_en": "Chinese Yam Extract (Phytomucin)",
+          "name_kr": "참마추출물 (파이토뮤신 80%)",
+          "name_inci": "Dioscorea Japonica Root Extract",
+          "concentration_pct": 80.0,
+          "concentration_unit": "%",
+          "role": "phytoestrogen_soothing"
+        },
+        {
+          "name_en": "Phytoestrogen (Phytomucin)",
+          "name_kr": "식물성 에스트로겐 유사체",
+          "name_inci": "Dioscorea Japonica Root Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hormone_support"
+        }
+      ],
+      "target_profiles": [
+        "post_menopause",
+        "aging_elasticity",
+        "dry_barrier"
+      ],
+      "target_age_range": "50-60+",
+      "skin_concerns": [
+        "density_loss",
+        "extreme_dryness",
+        "thinning_skin",
+        "elasticity_loss"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "참마 파이토뮤신 80% — 폐경 후 에스트로겐 감소로 얇아진 피부 밀도 복구용 첫 단계 필수템",
+      "one_liner_en": "80% Chinese yam phytomucin — essential first step for post-menopausal skin density restoration",
+      "one_liner_de": "Phytoöstrogen-Tonikum mit 80% Yamswurzel — optimale erste Pflege nach der Menopause",
+      "application_instruction_kr": "세안 후 첫 번째 단계. 피부에 충분히 pat-in 또는 화장솜으로 가볍게 닦아내듯 사용. 일반 워터 토너 대신 단독 사용 권장.",
+      "application_instruction_en": "First step after cleansing. Pat in generously or use with cotton pad. Replace watery toner entirely for this profile.",
+      "application_instruction_de": "Erster Schritt nach der Reinigung. Großzügig einpaten oder mit Wattepad auftragen. Ersetzt wässrige Toner vollständig.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": false,
+      "vs_comparison": {
+        "compare_to": "Lancôme Génifique Advanced Lotion / 설화수 자음수",
+        "compare_price_eur": 95.0,
+        "compare_note": "폐경 후 토너 슬롯 공략. 식물성 파이토에스트로겐 기능성을 1/5 가격에 제공."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_cosdebaha_peptide_toner",
+      "name_kr": "P 펩타이드 세럼 / 페이스 토너",
+      "name_en": "P Peptide Face Toner / Serum",
+      "name_de": "P Peptide Face Toner / Serum",
+      "brand": "Cos De BAHA",
+      "brand_kr": "코스데바하",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 12.0,
+      "price_krw": 15000,
+      "volume_ml": 120,
+      "price_per_ml_eur": 0.1,
+      "routine_slot": "toner",
+      "texture_type": "liquid",
+      "texture_description_kr": "워터 세럼 텍스처 (알로에베라 베이스)",
+      "ingredients": [
+        {
+          "name_en": "Matrixyl 3000 (Palmitoyl Tripeptide-1 + Palmitoyl Tetrapeptide-7)",
+          "name_kr": "매트릭실 3000 (팔미토일트리펩타이드-1 + 팔미토일테트라펩타이드-7)",
+          "name_inci": "Palmitoyl Tripeptide-1, Palmitoyl Tetrapeptide-7",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "collagen_synthesis"
+        },
+        {
+          "name_en": "Acetyl Hexapeptide-3 (Argireline)",
+          "name_kr": "아세틸헥사펩타이드-3 (아지렐린, 바르는 보톡스)",
+          "name_inci": "Acetyl Hexapeptide-3",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "expression_line_relaxation"
+        },
+        {
+          "name_en": "Aloe Vera Leaf Extract (base)",
+          "name_kr": "알로에베라잎추출물 (베이스)",
+          "name_inci": "Aloe Barbadensis Leaf Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "wrinkles",
+        "fine_lines",
+        "elasticity_loss",
+        "sagging"
+      ],
+      "application_zones": [
+        "whole_face",
+        "forehead",
+        "eye_area",
+        "nasolabial"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "한국의 디오디너리 — 매트릭실3000+아지렐린 임상 최대치 탑재 펩타이드 세럼/토너",
+      "one_liner_en": "Korea's The Ordinary — Matrixyl 3000 + Argireline at clinical max dose peptide toner",
+      "one_liner_de": "Peptid-Toner mit Matrixyl 3000 + Argireline — klinische Maximaldosis zum Sparpreis",
+      "application_instruction_kr": "토너 단계 또는 세럼 단계에서 사용. 손바닥으로 얼굴 전체에 가볍게 pat-in. 주름 부위 집중 도포 가능.",
+      "application_instruction_en": "Use as toner or serum step. Gently pat all over face. Focus on wrinkle-prone areas.",
+      "application_instruction_de": "Als Toner oder Serum verwenden. Sanft ins Gesicht einpaten. Besonders auf Faltenpartien konzentrieren.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "The Ordinary Buffet Multi-Technology Peptide Serum",
+        "compare_price_eur": 14.8,
+        "compare_note": "매트릭실3000+아지렐린 동일 배합. 알로에 베이스로 정제수 대비 진정 기능 추가."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_cosdebaha_txn_serum",
+      "name_kr": "TN 세럼 (트라넥삼산 5% + 나이아신아마이드 5%)",
+      "name_en": "TN Serum (Tranexamic Acid 5% + Niacinamide 5%)",
+      "name_de": "TN Serum (Tranexaminsäure 5% + Niacinamid 5%)",
+      "brand": "Cos De BAHA",
+      "brand_kr": "코스데바하",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 14.0,
+      "price_krw": 17000,
+      "volume_ml": 60,
+      "price_per_ml_eur": 0.233,
+      "routine_slot": "serum_am_pm",
+      "texture_type": "serum",
+      "texture_description_kr": "가벼운 워터 세럼",
+      "ingredients": [
+        {
+          "name_en": "Tranexamic Acid (TXA)",
+          "name_kr": "트라넥삼산",
+          "name_inci": "Tranexamic Acid",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "depigmentation"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "brightening"
+        }
+      ],
+      "target_profiles": [
+        "pigmentation",
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "dark_spots",
+        "melasma",
+        "PIH",
+        "uneven_tone",
+        "hyperpigmentation"
+      ],
+      "application_zones": [
+        "whole_face",
+        "pigmentation_spots"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "색소침착 1티어 — 피부과 기미약 핵심 성분 TXA 5% + 나이아신아마이드 5% 황금 비율",
+      "one_liner_en": "Pigmentation #1 tier — Tranexamic Acid 5% + Niacinamide 5% golden ratio (clinic prescription standard)",
+      "one_liner_de": "Top-Pigmentierungsserum — TXA 5% + Niacinamid 5% in klinischer Goldstandard-Ratio",
+      "application_instruction_kr": "아침/저녁 세안 후 토너 다음 단계. 기미/잡티 부위에 집중 도포. AM 사용 시 SPF 필수. 결과는 최소 8주 지속 사용 후 평가.",
+      "application_instruction_en": "After toner, AM and PM. Focus on pigmented areas. Always use SPF in AM. Evaluate results after minimum 8 weeks.",
+      "application_instruction_de": "Nach dem Toner, morgens und abends. Auf Pigmentflecken konzentrieren. Morgens immer SPF verwenden. Ergebnisse nach mind. 8 Wochen bewerten.",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "SkinCeuticals Discoloration Defense",
+        "compare_price_eur": 110.0,
+        "compare_note": "TXA 핵심 성분 농도 동일. 스킨수티컬즈 대비 1/8 가격."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_2sol_recovery_booster",
+      "name_kr": "페이셜 리커버리 부스터",
+      "name_en": "Facial Recovery Booster",
+      "name_de": "Facial Recovery Booster",
+      "brand": "2Sol",
+      "brand_kr": "투솔",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 12.0,
+      "price_krw": 15000,
+      "volume_ml": 100,
+      "price_per_ml_eur": 0.12,
+      "routine_slot": "serum_am_pm",
+      "texture_type": "essence",
+      "texture_description_kr": "물처럼 가벼운 에센스 (올인원 부스터)",
+      "ingredients": [
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": 10.0,
+          "concentration_unit": "%",
+          "role": "sebum_control_brightening"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Peptide Complex",
+          "name_kr": "펩타이드 복합체",
+          "name_inci": "Hydrolyzed Collagen, Palmitoyl Pentapeptide-4",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "dehydrated_oily",
+        "sensitive"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "excess_sebum",
+        "dehydration",
+        "barrier_damage",
+        "post_shave_irritation"
+      ],
+      "application_zones": [
+        "whole_face",
+        "t_zone"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "수부지·남성 성수(Holy Water) — 나이아신아마이드 10% + 판테놀 + 펩타이드 초경량 올인원",
+      "one_liner_en": "Dehydrated-oily & men's holy water — Niacinamide 10% + Panthenol + Peptide ultra-light booster",
+      "one_liner_de": "Leichter Allrounder für fettige Mischhaut & Männer — Niacinamid 10% + Panthenol + Peptide",
+      "application_instruction_kr": "세안 후 또는 면도 후 즉시 얼굴 전체에 가볍게 pat-in. 피지 많은 T존에 집중 도포. 단독 사용 가능(간소 루틴).",
+      "application_instruction_en": "After cleansing or shaving, pat all over face. Focus on T-zone. Can be used alone as a simplified routine.",
+      "application_instruction_de": "Nach der Reinigung oder Rasur sanft ins Gesicht einpaten. T-Zone besonders behandeln. Kann als Solo-Pflege verwendet werden.",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": false,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_makep_rem_safe_relief_cleanser",
+      "name_kr": "세이프 미 릴리프 모이스처 클렌징 폼",
+      "name_en": "Safe Me Relief Moisture Cleansing Foam",
+      "name_de": "Safe Me Relief Moisture Cleansing Foam",
+      "brand": "Make P:rem",
+      "brand_kr": "메이크프렘",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 14.0,
+      "price_krw": 18000,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.093,
+      "routine_slot": "cleanser",
+      "texture_type": "foam",
+      "texture_description_kr": "pH 5.5 약산성 크리미 폼 클렌저",
+      "ingredients": [
+        {
+          "name_en": "Amino Acid-based Surfactant",
+          "name_kr": "아미노산계 계면활성제",
+          "name_inci": "Sodium Cocoyl Glutamate, Disodium Cocoyl Glutamate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "gentle_cleansing"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier",
+        "post_menopause",
+        "aging_elasticity"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "irritation",
+        "redness",
+        "barrier_damage",
+        "last_reaction"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "극민감·장벽손상 전용 pH 5.5 약산성 아미노산 폼 클렌저 — LAST 반응 피부 필수",
+      "one_liner_en": "pH 5.5 amino acid gentle foam for extreme sensitive & barrier-damaged skin — LAST-reaction safe",
+      "one_liner_de": "pH 5,5 Aminosäure-Schaumreiniger für extrem empfindliche Haut — hautbarriere-schonend",
+      "application_instruction_kr": "손에 물을 적신 후 펌프 2회 압출. 충분히 거품을 낸 뒤 얼굴에 올려 30초 이내 부드럽게 세안. 미온수로 헹굼.",
+      "application_instruction_en": "Pump twice, lather well, apply to damp face, gentle massage under 30 seconds, rinse with lukewarm water.",
+      "application_instruction_de": "Zweimal pumpen, gut aufschäumen, sanft auf feuchtem Gesicht einmassieren (max. 30 Sek.), mit lauwarmem Wasser abspülen.",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "SLS/SLES 미함유, pH 5.5 약산성. EU 알러젠 선언 별도 확인 필요."
+      }
+    },
+    {
+      "id": "KR_cosdebaha_pha_enzyme_cleanser",
+      "name_kr": "PHA 글루코노락톤 5% + 효소 클렌저",
+      "name_en": "PHA Gluconolactone 5% + Enzyme Cleanser",
+      "name_de": "PHA Gluconolacton 5% + Enzym-Reiniger",
+      "brand": "Cos De BAHA",
+      "brand_kr": "코스데바하",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 13.0,
+      "price_krw": 16000,
+      "volume_ml": 100,
+      "price_per_ml_eur": 0.13,
+      "routine_slot": "cleanser",
+      "texture_type": "gel_foam",
+      "texture_description_kr": "약산성 젤폼 (마일드 각질케어 클렌저)",
+      "ingredients": [
+        {
+          "name_en": "PHA (Gluconolactone)",
+          "name_kr": "PHA (글루코노락톤)",
+          "name_inci": "Gluconolactone",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "exfoliant_gentle"
+        },
+        {
+          "name_en": "Enzyme (Papain / Bromelain)",
+          "name_kr": "파파인/브로멜라인 효소",
+          "name_inci": "Papain",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "enzymatic_exfoliation"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "pigmentation",
+        "dry_barrier"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "dull_skin",
+        "rough_texture",
+        "slow_cell_turnover",
+        "keratosis"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "40대+ 지연된 각질 턴오버 개선 — PHA 5% + 효소 마일드 각질 클렌저",
+      "one_liner_en": "40+ delayed cell turnover recovery — PHA 5% + enzyme mild exfoliating cleanser",
+      "one_liner_de": "Sanfter Peeling-Reiniger mit PHA 5% + Enzyme für 40+ verlangsamten Zellumsatz",
+      "application_instruction_kr": "저녁 세안 시 사용. 젖은 얼굴에 적당량 도포, 30~60초 부드럽게 마사지 후 미온수로 헹굼. 물리적 스크럽 병행 사용 금지.",
+      "application_instruction_en": "PM cleanse only. Apply to damp face, massage gently 30-60 sec, rinse with lukewarm water. Do not combine with physical scrubs.",
+      "application_instruction_de": "Nur abends verwenden. Auf feuchtes Gesicht auftragen, 30-60 Sek. sanft massieren, mit lauwarmem Wasser abspülen. Kein physisches Peeling kombinieren.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_balea_retinol_bakuchiol_night_cream",
+      "name_kr": "뷰티 엑스퍼트 나이트크림 레티놀 0.3% + 바쿠치올 2%",
+      "name_en": "Beauty Expert Night Cream Retinol 0.3% + Bakuchiol 2%",
+      "name_de": "Beauty Expert Nachtcreme Retinol 0,3% + Bakuchiol 2%",
+      "brand": "Balea",
+      "brand_kr": "발레아",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 5.95,
+      "price_krw": null,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.119,
+      "routine_slot": "moisturizer_night",
+      "texture_type": "cream",
+      "texture_description_kr": "나이트크림 (리치 텍스처)",
+      "ingredients": [
+        {
+          "name_en": "Retinol",
+          "name_kr": "레티놀",
+          "name_inci": "Retinol",
+          "concentration_pct": 0.3,
+          "concentration_unit": "%",
+          "role": "anti_aging"
+        },
+        {
+          "name_en": "Bakuchiol",
+          "name_kr": "바쿠치올",
+          "name_inci": "Bakuchiol",
+          "concentration_pct": 2.0,
+          "concentration_unit": "%",
+          "role": "anti_aging_plant_retinol"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "pigmentation"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "wrinkles",
+        "fine_lines",
+        "elasticity_loss",
+        "sagging"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "dm 역작 — 레티놀 0.3% + 바쿠치올 2% 안티에이징 끝판왕 나이트크림 6유로",
+      "one_liner_en": "dm's masterpiece — Retinol 0.3% + Bakuchiol 2% anti-aging night cream at 6 EUR",
+      "one_liner_de": "dm-Highlight — Retinol 0,3% + Bakuchiol 2% Anti-Aging-Nachtcreme für 5,95 EUR",
+      "application_instruction_kr": "저녁 루틴 마지막 단계. 쌀알 크기만큼 얼굴 전체에 얇게 펴 바름. 레티놀 초보자는 주 2~3회부터 시작. 다음 날 아침 SPF 필수.",
+      "application_instruction_en": "Last PM step. Rice grain amount over face. Retinol beginners start 2-3x/week. SPF next morning is mandatory.",
+      "application_instruction_de": "Letzter Schritt der Abendpflege. Reiskorngroße Menge gleichmäßig verteilen. Anfänger beginnen mit 2-3x/Woche. Morgens immer LSF verwenden.",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "Paula's Choice Clinical 0.3% Retinol + 2% Bakuchiol",
+        "compare_price_eur": 65.0,
+        "compare_note": "레티놀 0.3% + 바쿠치올 2% 완전 동일 배합. 폴라초이스 대비 1/11 가격."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "dm 독일 내 판매 중. 레티놀 0.3%는 EU 최대 허용 농도 이내(최신 규정 재확인 요망). 향료 포함 여부 INCI 확인 필요."
+      }
+    },
+    {
+      "id": "DE_isana_age_performance_serum",
+      "name_kr": "에이지 퍼포먼스 인텐시브 세럼 (대두 이소플라본)",
+      "name_en": "Age Performance Intensive Serum (Soy Isoflavones)",
+      "name_de": "Age Performance Intensiv Serum (Soja-Isoflavone)",
+      "brand": "ISANA",
+      "brand_kr": "이사나",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 4.99,
+      "price_krw": null,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.166,
+      "routine_slot": "serum_am_pm",
+      "texture_type": "serum",
+      "texture_description_kr": "세럼 (Rossmann 전용 숙성피부 타겟)",
+      "ingredients": [
+        {
+          "name_en": "Soy Isoflavones (Phytoestrogen)",
+          "name_kr": "대두 이소플라본 (파이토에스트로겐)",
+          "name_inci": "Soy Isoflavones, Glycine Soja Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "phytoestrogen"
+        }
+      ],
+      "target_profiles": [
+        "post_menopause",
+        "aging_elasticity"
+      ],
+      "target_age_range": "50-60+",
+      "skin_concerns": [
+        "density_loss",
+        "thinning_skin",
+        "elasticity_loss",
+        "extreme_dryness"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "Rossmann 유럽식 호르몬 대체 뷰티 — 대두 파이토에스트로겐 5유로 세럼",
+      "one_liner_en": "Rossmann's phytoestrogen serum for very mature skin — Soy Isoflavones at 5 EUR",
+      "one_liner_de": "Rossmann Phytoöstrogen-Serum für sehr reife Haut — Soja-Isoflavone für 4,99 EUR",
+      "application_instruction_kr": "세안 후 토너 전 또는 후 단계에 얼굴 전체에 pat-in. 아침저녁 사용 가능.",
+      "application_instruction_en": "Apply after cleansing before or after toner. Pat gently all over face. AM and PM use.",
+      "application_instruction_de": "Nach der Reinigung vor oder nach dem Toner sanft einpaten. Morgens und abends anwendbar.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "KR_isntree_yam_milk_toner (참마 파이토에스트로겐)",
+        "compare_price_eur": 18.0,
+        "compare_note": "유사 파이토에스트로겐 메커니즘. 유럽 현지 구매 대안으로 DE 프로파일 유저에게 매칭."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "Rossmann DE 판매 중. CPNP 등록 완료 추정. 향료 포함 여부 INCI 확인 필요."
+      }
+    },
+    {
+      "id": "DE_balea_plump_glow_toner",
+      "name_kr": "뷰티 엑스퍼트 플럼프 앤 글로우 게지히츠바서 (펩타이드 토너)",
+      "name_en": "Beauty Expert Plump & Glow Face Toner (Peptide Complex)",
+      "name_de": "Beauty Expert Plump & Glow Gesichtswasser (Peptidkomplex)",
+      "brand": "Balea",
+      "brand_kr": "발레아",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 4.95,
+      "price_krw": null,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.025,
+      "routine_slot": "toner",
+      "texture_type": "viscous_liquid",
+      "texture_description_kr": "점성 있는 액상 토너 (유럽에서 희귀한 점성 토너 포맷)",
+      "ingredients": [
+        {
+          "name_en": "Peptide Complex",
+          "name_kr": "펩타이드 복합체",
+          "name_inci": "Palmitoyl Pentapeptide-4",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "collagen_stimulation"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": 2.0,
+          "concentration_unit": "%",
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "dry_barrier"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "fine_lines",
+        "wrinkles",
+        "elasticity_loss",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "dm 펩타이드+판테놀 2% 점성 토너 — 유럽 시장 희귀 포맷, 에스티로더 마이크로 에센스 대체",
+      "one_liner_en": "dm peptide + Panthenol 2% viscous toner — rare format in EU, replaces Estée Lauder Micro Essence",
+      "one_liner_de": "dm Peptid + Panthenol 2% Gesichtswasser — seltenes viskoses Format, Estée Lauder Micro Essence Alternative",
+      "application_instruction_kr": "세안 후 첫 번째 단계. 손바닥 또는 화장솜에 충분히 덜어 얼굴 전체에 pat-in. 자연스럽게 흡수 후 다음 단계 진행.",
+      "application_instruction_en": "First step after cleansing. Pour generously onto palms or cotton pad, pat all over face. Allow absorption before next step.",
+      "application_instruction_de": "Erster Schritt nach der Reinigung. Großzügig auf Handflächen oder Wattepads geben, ins Gesicht einpaten. Einziehen lassen, dann weiterpflegen.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "Estée Lauder Micro Essence Skin Activating Treatment Lotion",
+        "compare_price_eur": 75.0,
+        "compare_note": "펩타이드+판테놀 콜라겐 부스팅 역할. 에스티로더 대비 1/15 가격."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "dm DE 판매 중. CPNP 등록 완료 추정. 향료 포함 여부 INCI 확인 필요."
+      }
+    },
+    {
+      "id": "EU_geekgorgeous_cglow_vitc15",
+      "name_kr": "C-글로우 15% 비타민C + 페룰릭산 세럼",
+      "name_en": "C-Glow 15% Vitamin C + Ferulic Acid Serum",
+      "name_de": "C-Glow 15% Vitamin C + Ferulasäure Serum",
+      "brand": "Geek & Gorgeous",
+      "brand_kr": "긱앤고져스",
+      "country": "EU",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 12.5,
+      "price_krw": null,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.417,
+      "routine_slot": "serum_am",
+      "texture_type": "serum",
+      "texture_description_kr": "가벼운 워터 세럼 (빛에 민감, 갈색 병 보관)",
+      "ingredients": [
+        {
+          "name_en": "L-Ascorbic Acid (Pure Vitamin C)",
+          "name_kr": "L-아스코르빅산 (순수 비타민C)",
+          "name_inci": "Ascorbic Acid",
+          "concentration_pct": 15.0,
+          "concentration_unit": "%",
+          "role": "brightening_antioxidant"
+        },
+        {
+          "name_en": "Ferulic Acid",
+          "name_kr": "페룰릭산",
+          "name_inci": "Ferulic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "antioxidant_stability"
+        },
+        {
+          "name_en": "Vitamin E (Tocopherol)",
+          "name_kr": "비타민E (토코페롤)",
+          "name_inci": "Tocopherol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "antioxidant"
+        }
+      ],
+      "target_profiles": [
+        "pigmentation",
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "dark_spots",
+        "melasma",
+        "dullness",
+        "UV_damage",
+        "hyperpigmentation"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am",
+      "one_liner_kr": "스킨수티컬즈 CE페룰릭 완벽 듀프 — 순수 비타민C 15% + 페룰릭산 + 비타민E EU 온라인 12유로",
+      "one_liner_en": "SkinCeuticals CE Ferulic perfect dupe — Pure Vitamin C 15% + Ferulic + Vitamin E at 12.50 EUR",
+      "one_liner_de": "SkinCeuticals CE Ferulic Dupe — reines Vitamin C 15% + Ferulasäure + Vitamin E für 12,50 EUR",
+      "application_instruction_kr": "아침 루틴 토너 다음 단계. 3~4방울 얼굴 전체에 가볍게 펴 바름. 완전 흡수 후 SPF 적용. 개봉 후 3개월 내 사용(산화 방지).",
+      "application_instruction_en": "AM routine after toner. 3-4 drops, spread gently. Allow full absorption before SPF. Use within 3 months of opening to prevent oxidation.",
+      "application_instruction_de": "Morgenroutine nach dem Toner. 3-4 Tropfen gleichmäßig verteilen. Vollständig einziehen lassen, dann LSF auftragen. Nach Öffnung innerhalb 3 Monate verbrauchen.",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "SkinCeuticals C E Ferulic",
+        "compare_price_eur": 160.0,
+        "compare_note": "L-AA 15% + 페룰릭산 + 비타민E 완전 동일 배합. 스킨수티컬즈 대비 1/13 가격."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "헝가리 기반 EU 브랜드. CPNP 등록 완료 추정. 산화 안정성을 위한 pH 확인(2.5~3.5 범위 권장) 필요."
+      }
+    },
+    {
+      "id": "DE_no_cosmetics_liquid_hydrator",
+      "name_kr": "120h 리퀴드 하이드레이터 (판테놀 5% + 엑토인)",
+      "name_en": "120h Liquid Hydrator (Panthenol 5% + Ectoin)",
+      "name_de": "120h Liquid Hydrator (Panthenol 5% + Ectoin)",
+      "brand": "Nø Cosmetics",
+      "brand_kr": "노 코스메틱스",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 9.95,
+      "price_krw": null,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.066,
+      "routine_slot": "toner",
+      "texture_type": "water_booster",
+      "texture_description_kr": "워터 부스터 토너 (액상 연고 역할, 극민감 전용)",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Ectoin",
+          "name_kr": "엑토인",
+          "name_inci": "Ectoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "extreme_hydration_microbiome_protection"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier",
+        "post_menopause"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "barrier_damage",
+        "extreme_irritation",
+        "last_reaction",
+        "rosacea",
+        "redness"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "극민감·장벽손상 전용 액상 연고 — 판테놀 5% + 엑토인 수분 부스터 토너 dm",
+      "one_liner_en": "Liquid bandage for extreme sensitive & barrier-damaged skin — Panthenol 5% + Ectoin water booster",
+      "one_liner_de": "Flüssiges Pflaster für extreme Empfindlichkeit — Panthenol 5% + Ectoin Feuchtigkeitsbooster",
+      "application_instruction_kr": "세안 후 즉시 첫 번째 단계. 손바닥에 충분히 덜어 얼굴 전체에 가볍게 pat-in. 자극 심한 날은 단독 마감 가능.",
+      "application_instruction_en": "Immediately after cleansing as first step. Pat generously all over. Can be used as final step only on highly reactive days.",
+      "application_instruction_de": "Sofort nach der Reinigung als ersten Schritt. Großzügig einpaten. An Reiz-Tagen auch als alleinige Pflege verwendbar.",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "ISANA 120h Liquid Hydrator (Rossmann)",
+        "compare_price_eur": 4.95,
+        "compare_note": "초저가 대체품: Rossmann ISANA 동명 제품 4.95 EUR. 동일 메커니즘, 농도 확인 필요."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "dm DE 판매 중. CPNP 등록 완료 추정. 무향 확인 필요."
+      }
+    },
+    {
+      "id": "DE_balea_men_ultra_sensitive_cream",
+      "name_kr": "맨 울트라 센시티브 인텐시브크림 (DAAB 인증)",
+      "name_en": "MEN Ultra Sensitive Intensive Cream (DAAB Certified)",
+      "name_de": "MEN Ultra Sensitive Intensivcreme (DAAB-zertifiziert)",
+      "brand": "Balea",
+      "brand_kr": "발레아",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 3.95,
+      "price_krw": null,
+      "volume_ml": 75,
+      "price_per_ml_eur": 0.053,
+      "routine_slot": "moisturizer",
+      "texture_type": "cream",
+      "texture_description_kr": "인텐시브 크림 (무향·무알코올·무멘톨 남성 전용)",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "sensitive",
+        "dry_barrier"
+      ],
+      "target_age_range": "30-50",
+      "skin_concerns": [
+        "post_shave_irritation",
+        "barrier_damage",
+        "redness",
+        "dryness"
+      ],
+      "application_zones": [
+        "whole_face",
+        "jaw",
+        "cheeks"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "독일알레르기천식협회(DAAB) 인증 — 무알코올·무멘톨·무향 남성 장벽 보호 크림 dm",
+      "one_liner_en": "German Allergy & Asthma Association (DAAB) certified — alcohol-free, menthol-free, fragrance-free men's barrier cream",
+      "one_liner_de": "DAAB-zertifiziert — alkohol- und mentholfrei, parfümfrei — Intensivcreme für Männerhaut nach der Rasur",
+      "application_instruction_kr": "세안 또는 면도 직후 얼굴 전체에 가볍게 펴 바름. 아침저녁 사용 가능. 간소 루틴 시 단독 마감 제품으로 사용 가능.",
+      "application_instruction_en": "Apply immediately after cleansing or shaving. Use AM and PM. Can be used as sole moisturizer in simplified routine.",
+      "application_instruction_de": "Direkt nach der Reinigung oder Rasur gleichmäßig auftragen. Morgens und abends. Kann als alleinige Feuchtigkeitspflege verwendet werden.",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "DAAB 알레르기 인증 완료 제품. 무향 확인됨. EU CPNP 등록 완료 추정."
+      }
+    },
+    {
+      "id": "KR_cosdebaha_bha_oily_toner",
+      "name_kr": "BHA 살리실산 2% 각질 토너",
+      "name_en": "BHA Salicylic Acid 2% Exfoliating Toner",
+      "name_de": "BHA Salicylsäure 2% Peeling-Toner",
+      "brand": "Cos De BAHA",
+      "brand_kr": "코스데바하",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 11.0,
+      "price_krw": 13000,
+      "volume_ml": 120,
+      "price_per_ml_eur": 0.092,
+      "routine_slot": "toner_exfoliant",
+      "texture_type": "liquid",
+      "texture_description_kr": "약산성 워터 토너 (pH 3.5~4.0 조정, 모공 침투 최적화)",
+      "ingredients": [
+        {
+          "name_en": "Salicylic Acid (BHA)",
+          "name_kr": "살리실산 (BHA)",
+          "name_inci": "Salicylic Acid",
+          "concentration_pct": 2.0,
+          "concentration_unit": "%",
+          "role": "exfoliant_comedolytic"
+        },
+        {
+          "name_en": "Zinc PCA",
+          "name_kr": "징크PCA",
+          "name_inci": "Zinc PCA",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "sebum_control"
+        },
+        {
+          "name_en": "LHA (Capryloyl Salicylic Acid)",
+          "name_kr": "LHA (카프릴로일살리실산)",
+          "name_inci": "Capryloyl Salicylic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "exfoliant_gentle"
+        }
+      ],
+      "target_profiles": [
+        "oily_acne",
+        "dehydrated_oily",
+        "mens"
+      ],
+      "target_age_range": "10-30",
+      "skin_concerns": [
+        "acne",
+        "blackheads",
+        "excess_sebum",
+        "pores",
+        "comedones"
+      ],
+      "application_zones": [
+        "whole_face",
+        "t_zone",
+        "nose"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "지성·트러블 세안 직후 1순위 — BHA 2% + 징크PCA + LHA 모공 속 피지 즉각 융해 토너",
+      "one_liner_en": "Oily & acne first-step — BHA 2% + ZincPCA + LHA for instant sebum dissolution in pores",
+      "one_liner_de": "Erster Schritt bei fettiger/Akne-Haut — BHA 2% + ZinkPCA + LHA zur sofortigen Talgauflösung in den Poren",
+      "application_instruction_kr": "저녁 세안 직후 화장솜에 덜어 얼굴 전체 닦아내듯 사용. pH가 낮으므로 레티놀과 동시 사용 금지. 주 3~4회부터 시작하여 내성 확인 후 매일 사용.",
+      "application_instruction_en": "Immediately after PM cleanse, apply with cotton pad. Do not combine with retinol (low pH). Start 3-4x/week, build tolerance before daily use.",
+      "application_instruction_de": "Direkt nach der Abendreinigung mit Wattepads auftragen. Nicht mit Retinol kombinieren (niedrigem pH-Wert). Mit 3-4x/Woche beginnen, Toleranz aufbauen.",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": {
+        "compare_to": "Paula's Choice Skin Perfecting 2% BHA Liquid Exfoliant",
+        "compare_price_eur": 32.0,
+        "compare_note": "BHA 2% + LHA 동일 메커니즘. 폴라초이스 대비 1/3 가격."
+      },
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Conditionally_safe",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "BHA(살리실산) EU 최대 허용 농도 2.0% 이내. 헹굼용 제품과 유지용 제품 규정 상이하므로 leave-on 토너로서 규정 재확인 필요."
+      }
     }
   ],
-  "_engine_last_updated": "2026-03-19T09:28:21Z"
+  "_engine_last_updated": "2026-03-19T10:10:59Z"
 }

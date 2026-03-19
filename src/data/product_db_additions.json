@@ -1,6 +1,6 @@
 {
   "_merge_instructions": {
-    "how_to_merge": "이 파일의 products 배열을 기존 product_db.json의 products 배열에 append하세요.",
+    "how_to_merge": "이 파일의 products 배열을 기존 product_db_merged.json의 products 배열에 append하세요.",
     "remove_from_existing": [
       "JP_sana_soymilk_cream",
       "TR_thepurest_niacinamide_5",

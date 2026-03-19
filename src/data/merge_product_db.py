@@ -12,7 +12,7 @@ from typing import Any
 SCRIPT_DIR: Path = Path(__file__).resolve().parent
 
 db_path: Path = SCRIPT_DIR / "product_db_merged.json"
-additions_path: Path = SCRIPT_DIR / "product_db_golden_eggs.json"
+additions_path: Path = SCRIPT_DIR / "product_db_gap_additions.json"
 output_path: Path = SCRIPT_DIR / "product_db_merged.json"
 
 if not db_path.exists():

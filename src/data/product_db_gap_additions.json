@@ -1,0 +1,1864 @@
+{
+  "_merge_instructions": {
+    "how_to_merge": "이 파일의 products 배열을 기존 product_db_merged.json의 products 배열에 append",
+    "cross_profile_additions": {
+      "KR_boj_relief_sun": {
+        "add_profile": "post_menopause",
+        "reason": "보습형 SPF50+ 폐경후 건조피부 적합"
+      },
+      "KR_isntree_watery_sungel": {
+        "add_profile": "post_menopause",
+        "reason": "무향 HA8종 수분SPF 폐경후 적합"
+      },
+      "KR_anua_cleansing_foam": {
+        "add_profile": "mens",
+        "reason": "순한 젤폼 남성 클렌저로 적합"
+      },
+      "KR_anua_heartleaf_toner": {
+        "add_profile": "mens",
+        "reason": "면도후 진정 어성초77% 토너"
+      }
+    },
+    "device_compatibility_tags": {
+      "KR_vt_reedle_100": {
+        "device_compatible": false,
+        "reason": "실리카 스피큘 — 물리적 미세상처 + 전기자극 금기"
+      },
+      "KR_vt_reedle_300": {
+        "device_compatible": false,
+        "reason": "실리카 스피큘 고농도 — 디바이스 절대 금지"
+      },
+      "KR_easydew_dw_egf_serum": {
+        "device_compatible": true,
+        "reason": "EGF 대분자 — 일렉트로포레이션으로 진피 투과"
+      }
+    },
+    "new_slot_types_added": [
+      "eye_cream",
+      "neck_cream"
+    ],
+    "total_new_products": 23
+  },
+  "products": [
+    {
+      "id": "KR_anua_retinol_eye_cream",
+      "name_kr": "레티놀 0.1 카페인 아이크림",
+      "name_en": "Retinol 0.1 Caffeine Revitalizing Eye Cream",
+      "name_de": "Retinol 0.1 Caffeine Revitalizing Eye Cream",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 20.0,
+      "price_krw": 23000,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.667,
+      "routine_slot": "eye_cream",
+      "texture_type": "cream",
+      "texture_description_kr": "아이크림",
+      "ingredients": [
+        {
+          "name_en": "Retinol",
+          "name_kr": "레티놀",
+          "name_inci": "Retinol",
+          "concentration_pct": 0.1,
+          "concentration_unit": "%",
+          "role": "anti_aging"
+        },
+        {
+          "name_en": "Caffeine",
+          "name_kr": "카페인",
+          "name_inci": "Caffeine",
+          "concentration_pct": 1.0,
+          "concentration_unit": "%",
+          "role": "vasoconstriction"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "brightening"
+        },
+        {
+          "name_en": "Ceramide Complex (6 types)",
+          "name_kr": "세라마이드 6종",
+          "name_inci": "Ceramide NP, NG, NS, AP, AS, EOP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Squalane",
+          "name_kr": "스쿠알란",
+          "name_inci": "Squalane",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "pigmentation",
+        "sensitive"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "eye_wrinkles",
+        "dark_circles",
+        "puffiness",
+        "fine_lines"
+      ],
+      "application_zones": [
+        "eye_area"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "레티놀0.1%+카페인1%+나이아신5%+세라마이드6종 아이크림 — 8주 주름13.49%↓",
+      "one_liner_en": "Retinol 0.1% + Caffeine 1% + Niacin 5% eye cream — 13.49% wrinkle reduction in 8 weeks",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": true,
+      "barcode_ean": "8809640734946",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_sulwhasoo_ginseng_eye",
+      "name_kr": "자음생 아이크림",
+      "name_en": "Concentrated Ginseng Rejuvenating Eye Cream",
+      "name_de": "Concentrated Ginseng Rejuvenating Eye Cream",
+      "brand": "Sulwhasoo",
+      "brand_kr": "설화수",
+      "country": "KR",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 110.0,
+      "price_krw": 135000,
+      "volume_ml": 20,
+      "price_per_ml_eur": 5.5,
+      "routine_slot": "eye_cream",
+      "texture_type": "cream_rich",
+      "texture_description_kr": "리치 아이크림",
+      "ingredients": [
+        {
+          "name_en": "Ginsenomics",
+          "name_kr": "진세노믹스",
+          "name_inci": "Panax Ginseng Root Extract (6000x)",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "cell_regeneration"
+        },
+        {
+          "name_en": "Ginseng Retinol",
+          "name_kr": "진생 레티놀",
+          "name_inci": "Ginseng Retinol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "deep_wrinkles",
+        "elasticity_loss",
+        "dark_circles"
+      ],
+      "application_zones": [
+        "eye_area"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "진세노믹스+진생레티놀 — 10년 연속 한국 안티에이징 1위",
+      "one_liner_en": "Ginsenomics + Ginseng Retinol — #1 anti-aging in Korea for 10 years",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "8809685802112",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_babor_hsr_eye",
+      "name_kr": "HSR 리프팅 아이크림",
+      "name_en": "HSR Lifting Anti-Wrinkle Eye Cream",
+      "name_de": "HSR Lifting Anti-Wrinkle Eye Cream",
+      "brand": "Babor",
+      "brand_kr": "바보르",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 125.0,
+      "price_krw": null,
+      "volume_ml": 15,
+      "price_per_ml_eur": 8.333,
+      "routine_slot": "eye_cream",
+      "texture_type": "cream",
+      "texture_description_kr": "리프팅 아이크림",
+      "ingredients": [
+        {
+          "name_en": "HSR Lifting Complex",
+          "name_kr": "HSR 리프팅 콤플렉스",
+          "name_inci": "Peptide Complex + Seawater + Algin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "lifting"
+        },
+        {
+          "name_en": "Matrixyl 3000",
+          "name_kr": "매트릭실 3000",
+          "name_inci": "Palmitoyl Tripeptide-1, Palmitoyl Tetrapeptide-7",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "collagen_synthesis"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "eye_bags",
+        "gravitational_sagging",
+        "expression_wrinkles"
+      ],
+      "application_zones": [
+        "eye_area"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "HSR 리프팅 6종 활성+매트릭실3000 — 4주 아이백16%↓ 주름면적39.4%↓",
+      "one_liner_en": "HSR 6 actives + Matrixyl 3000 — 16% eye bag reduction, 39.4% wrinkle area reduction in 4 weeks",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": true,
+      "barcode_ean": "4015165355601",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_susanne_kaufmann_eye",
+      "name_kr": "리주버네이팅 아이크림",
+      "name_en": "Rejuvenating Eye Cream",
+      "name_de": "Rejuvenating Eye Cream",
+      "brand": "Susanne Kaufmann",
+      "brand_kr": "수잔 카우프만",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 165.0,
+      "price_krw": null,
+      "volume_ml": 15,
+      "price_per_ml_eur": 11.0,
+      "routine_slot": "eye_cream",
+      "texture_type": "cream",
+      "texture_description_kr": "아이크림",
+      "ingredients": [
+        {
+          "name_en": "Moth Bean Seed Extract",
+          "name_kr": "모스빈씨앗추출물",
+          "name_inci": "Vigna Aconitifolia Seed Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "plant_retinol_alt"
+        },
+        {
+          "name_en": "Ectoin",
+          "name_kr": "엑토인",
+          "name_inci": "Ectoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "cell_protection"
+        },
+        {
+          "name_en": "Baobab Pulp Extract",
+          "name_kr": "바오밥추출물",
+          "name_inci": "Adansonia Digitata Pulp Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "sensitive"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "photoaging",
+        "dehydration",
+        "oxidative_stress"
+      ],
+      "application_zones": [
+        "eye_area"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "모스빈+엑토인+바오밥 — 레티놀 부작용 없는 식물성 대안 165€ 럭셔리",
+      "one_liner_en": "Moth bean + Ectoin + Baobab — plant-based retinol alternative, luxury 165€",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "9120038827725",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_ckd_guasha_neck",
+      "name_kr": "레티노 콜라겐 괄사 넥크림",
+      "name_en": "Retino Collagen Guasha Neck Cream",
+      "name_de": "Retino Collagen Guasha Neck Cream",
+      "brand": "CKD",
+      "brand_kr": "종근당건강",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 25.0,
+      "price_krw": 32000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.5,
+      "routine_slot": "neck_cream",
+      "texture_type": "cream_rich",
+      "texture_description_kr": "리치 크림+괄사 롤러",
+      "ingredients": [
+        {
+          "name_en": "Low MW Collagen 300Da",
+          "name_kr": "저분자콜라겐300Da",
+          "name_inci": "Hydrolyzed Collagen",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "collagen_penetration"
+        },
+        {
+          "name_en": "Retinal",
+          "name_kr": "레티날",
+          "name_inci": "Retinal",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging"
+        },
+        {
+          "name_en": "Adenosine",
+          "name_kr": "아데노신",
+          "name_inci": "Adenosine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "wrinkle_care"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "neck_wrinkles",
+        "tech_neck",
+        "sagging"
+      ],
+      "application_zones": [
+        "neck",
+        "decollete"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "300달톤 초저분자콜라겐+레티날+괄사롤러 — 물리적 림프 드레니지",
+      "one_liner_en": "300Da ultra-low MW collagen + retinal + guasha roller",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": true,
+      "barcode_ean": null,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_medipeel_naite_neck",
+      "name_kr": "콜라겐 나이트 쓰레드 넥크림 3.0",
+      "name_en": "Premium Collagen Naite Thread Neck Cream 3.0",
+      "name_de": "Premium Collagen Naite Thread Neck Cream 3.0",
+      "brand": "Medi-Peel",
+      "brand_kr": "메디필",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 22.0,
+      "price_krw": 28000,
+      "volume_ml": 100,
+      "price_per_ml_eur": 0.22,
+      "routine_slot": "neck_cream",
+      "texture_type": "cream_rich",
+      "texture_description_kr": "실리프팅 크림",
+      "ingredients": [
+        {
+          "name_en": "Hydrolyzed Collagen",
+          "name_kr": "가수분해콜라겐",
+          "name_inci": "Hydrolyzed Collagen",
+          "concentration_pct": 97500,
+          "concentration_unit": "ppm",
+          "role": "structural_support"
+        },
+        {
+          "name_en": "Snake Venom Peptide",
+          "name_kr": "뱀독펩타이드",
+          "name_inci": "Dipeptide Diaminobutyroyl Benzylamide Diacetate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "muscle_relaxation"
+        },
+        {
+          "name_en": "Palmitoyl Tripeptide-5",
+          "name_kr": "팔미토일트리펩타이드",
+          "name_inci": "Palmitoyl Tripeptide-5",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "collagen_synthesis"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "deep_neck_wrinkles",
+        "tech_neck",
+        "crepey_skin"
+      ],
+      "application_zones": [
+        "neck",
+        "decollete"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "콜라겐97500ppm+뱀독펩타이드 — PDO실 시술 효과를 화장품으로",
+      "one_liner_en": "Collagen 97500ppm + snake venom peptide — PDO thread effect in cream",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "8809409345550",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_babor_hsr_neck",
+      "name_kr": "HSR 리프팅 넥&데콜테 크림",
+      "name_en": "HSR Lifting Anti-Wrinkle Neck & Decollete Cream",
+      "name_de": "HSR Lifting Anti-Wrinkle Neck & Decollete Cream",
+      "brand": "Babor",
+      "brand_kr": "바보르",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 120.0,
+      "price_krw": null,
+      "volume_ml": 50,
+      "price_per_ml_eur": 2.4,
+      "routine_slot": "neck_cream",
+      "texture_type": "cream_rich",
+      "texture_description_kr": "리프팅 넥크림",
+      "ingredients": [
+        {
+          "name_en": "L-Carnosine",
+          "name_kr": "L-카르노신",
+          "name_inci": "L-Carnosine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_glycation"
+        },
+        {
+          "name_en": "White Lupin Extract",
+          "name_kr": "화이트루핀추출물",
+          "name_inci": "Lupinus Albus Seed Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "dermal_remodeling"
+        },
+        {
+          "name_en": "Polysaccharide Network",
+          "name_kr": "다당류네트워크",
+          "name_inci": "Polysaccharide Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "instant_tightening"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "neck_wrinkles",
+        "decollete_sagging",
+        "age_spots"
+      ],
+      "application_zones": [
+        "neck",
+        "decollete"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "항당화(L-카르노신)+루핀추출물+다당류 — 즉각 코르셋 리프팅",
+      "one_liner_en": "Anti-glycation + lupin + polysaccharide — instant corset lifting",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "4015165356981",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_sulwhasoo_cleanser",
+      "name_kr": "순행클렌징폼",
+      "name_en": "Gentle Cleansing Foam",
+      "name_de": "Gentle Cleansing Foam",
+      "brand": "Sulwhasoo",
+      "brand_kr": "설화수",
+      "country": "KR",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 35.0,
+      "price_krw": 42000,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.175,
+      "routine_slot": "cleanser",
+      "texture_type": "foam",
+      "texture_description_kr": "젤→폼 트랜스폼",
+      "ingredients": [
+        {
+          "name_en": "Hydra Capture Complex",
+          "name_kr": "하이드라캡처콤플렉스",
+          "name_inci": "Proprietary Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "moisture_retention"
+        },
+        {
+          "name_en": "Duckweed Extract",
+          "name_kr": "부평초추출물",
+          "name_inci": "Lemna Minor Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "pore_purifying"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "dry_barrier",
+        "sensitive"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "dehydration",
+        "pore_impurities"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "하이드라캡처+부평초 — 세안 후에도 수분인자 포획",
+      "one_liner_en": "Hydra Capture Complex — retains moisture factors even after cleansing",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "8809685800149",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_sulwhasoo_toner",
+      "name_kr": "자음수",
+      "name_en": "Essential Comfort Balancing Water",
+      "name_de": "Essential Comfort Balancing Water",
+      "brand": "Sulwhasoo",
+      "brand_kr": "설화수",
+      "country": "KR",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 38.0,
+      "price_krw": 46000,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.253,
+      "routine_slot": "toner",
+      "texture_type": "gel_essence",
+      "texture_description_kr": "젤 에센스 스킨",
+      "ingredients": [
+        {
+          "name_en": "JAUM Moisturizing Complex",
+          "name_kr": "자음보습단",
+          "name_inci": "Proprietary Complex (Goji Berry, Portulaca)",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "deep_hydration"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "dry_barrier"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "dehydration",
+        "elasticity_loss"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "자음보습단 — 후속 세럼 흡수율 극대화",
+      "one_liner_en": "JAUM Complex — maximizes subsequent serum absorption",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": null,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_sulwhasoo_first_care",
+      "name_kr": "윤조에센스 6세대",
+      "name_en": "First Care Activating Serum VI",
+      "name_de": "First Care Activating Serum VI",
+      "brand": "Sulwhasoo",
+      "brand_kr": "설화수",
+      "country": "KR",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 85.0,
+      "price_krw": 100000,
+      "volume_ml": 90,
+      "price_per_ml_eur": 0.944,
+      "routine_slot": "essence",
+      "texture_type": "essence",
+      "texture_description_kr": "부스팅 에센스",
+      "ingredients": [
+        {
+          "name_en": "LYMPHANAX",
+          "name_kr": "림파낙스",
+          "name_inci": "Gypenoside 17 (500h fermented)",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_boosting"
+        },
+        {
+          "name_en": "JAUM ACTIVATOR",
+          "name_kr": "자음활성단",
+          "name_inci": "Proprietary Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "turnover_normalization"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "dry_barrier"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "barrier_damage",
+        "dullness",
+        "fine_lines"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "림파낙스+자음활성단 — 후속 제품 효능 기하급수적 부스팅",
+      "one_liner_en": "LYMPHANAX + JAUM ACTIVATOR — exponentially boosts subsequent product efficacy",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "8809685816300",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_drsturm_cleanser",
+      "name_kr": "클렌저",
+      "name_en": "Cleanser",
+      "name_de": "Cleanser",
+      "brand": "Dr. Barbara Sturm",
+      "brand_kr": "닥터 바바라 스툼",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 75.0,
+      "price_krw": null,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.5,
+      "routine_slot": "cleanser",
+      "texture_type": "foam",
+      "texture_description_kr": "마일드 폼",
+      "ingredients": [
+        {
+          "name_en": "Purslane Extract",
+          "name_kr": "쇠비름추출물",
+          "name_inci": "Portulaca Oleracea Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_inflammatory"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Aloe Vera",
+          "name_kr": "알로에베라",
+          "name_inci": "Aloe Barbadensis Leaf Juice",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "sensitive"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "inflammaging",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "쇠비름발효추출물+판테놀 — 텔로미어 활성+항염 세안",
+      "one_liner_en": "Fermented purslane + panthenol — telomere activation + anti-inflammatory cleansing",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "4015165343363",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_augustinus_bader_essence",
+      "name_kr": "디 에센스",
+      "name_en": "The Essence",
+      "name_de": "The Essence",
+      "brand": "Augustinus Bader",
+      "brand_kr": "아우구스티누스 바더",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 73.0,
+      "price_krw": null,
+      "volume_ml": 100,
+      "price_per_ml_eur": 0.73,
+      "routine_slot": "essence",
+      "texture_type": "liquid",
+      "texture_description_kr": "에센스 토너",
+      "ingredients": [
+        {
+          "name_en": "TFC8 (Trigger Factor Complex)",
+          "name_kr": "TFC8",
+          "name_inci": "Amino Acid + Vitamin + Synthetic Molecule Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "stem_cell_activation"
+        },
+        {
+          "name_en": "Lactobacillus Ferment",
+          "name_kr": "락토바실러스발효물",
+          "name_inci": "Lactobacillus Ferment Filtrate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "gentle_exfoliation"
+        },
+        {
+          "name_en": "PHA (Gluconolactone)",
+          "name_kr": "PHA",
+          "name_inci": "Gluconolactone",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "mild_exfoliation"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "pigmentation"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "dullness",
+        "dark_spots",
+        "fine_lines"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "TFC8 줄기세포기술+락토바실러스+PHA — 세포 휴면 해제 에센스",
+      "one_liner_en": "TFC8 stem cell tech + lactobacillus + PHA — cell awakening essence",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "5060552900901",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_royalfern_cleansing_balm",
+      "name_kr": "파이토액티브 클렌징 밤",
+      "name_en": "Phytoactive Cleansing Balm",
+      "name_de": "Phytoactive Cleansing Balm",
+      "brand": "Royal Fern",
+      "brand_kr": "로얄 펀",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 70.0,
+      "price_krw": null,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.35,
+      "routine_slot": "cleanser_oil",
+      "texture_type": "balm",
+      "texture_description_kr": "클렌징 밤",
+      "ingredients": [
+        {
+          "name_en": "Fern Extract",
+          "name_kr": "고사리추출물",
+          "name_inci": "Osmunda Regalis Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "antioxidant"
+        },
+        {
+          "name_en": "Sea Buckthorn Oil",
+          "name_kr": "씨벅톤오일",
+          "name_inci": "Hippophae Rhamnoides Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "nourishing"
+        },
+        {
+          "name_en": "Wild Rose Oil",
+          "name_kr": "야생장미오일",
+          "name_inci": "Rosa Canina Seed Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "skin_renewal"
+        }
+      ],
+      "target_profiles": [
+        "post_menopause",
+        "dry_barrier",
+        "aging_elasticity"
+      ],
+      "target_age_range": "50-60+",
+      "skin_concerns": [
+        "extreme_dryness",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "고사리+씨벅톤+야생장미 — 세안과 동시에 항산화+수분 공급",
+      "one_liner_en": "Fern + sea buckthorn + wild rose — antioxidant + hydration during cleansing",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "4260407470110",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_easydew_egf_cream",
+      "name_kr": "DW-EGF 림플 컨트롤 크림",
+      "name_en": "DW-EGF Wrinkle Control Cream",
+      "name_de": "DW-EGF Wrinkle Control Cream",
+      "brand": "EasyDew",
+      "brand_kr": "이지듀",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 30.0,
+      "price_krw": 38000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.6,
+      "routine_slot": "moisturizer_night",
+      "texture_type": "cream_rich",
+      "texture_description_kr": "나이트 리치크림",
+      "ingredients": [
+        {
+          "name_en": "EGF (sh-Oligopeptide-1)",
+          "name_kr": "EGF",
+          "name_inci": "sh-Oligopeptide-1",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "cell_regeneration"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "wrinkles",
+        "barrier_damage",
+        "scar_healing"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "의약품급 EGF — 일렉트로포레이션 디바이스로 대분자 진피 직접 투과",
+      "one_liner_en": "Pharma-grade EGF — electroporation device enables macromolecule dermal penetration",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": true,
+      "barcode_ean": null,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_medicube_collagen_jelly",
+      "name_kr": "콜라겐 젤리 크림",
+      "name_en": "Age-R Collagen Niacinamide Jelly Cream",
+      "name_de": "Age-R Collagen Niacinamide Jelly Cream",
+      "brand": "medicube",
+      "brand_kr": "메디큐브",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 28.0,
+      "price_krw": 35000,
+      "volume_ml": 100,
+      "price_per_ml_eur": 0.28,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "gel",
+      "texture_description_kr": "젤리 크림",
+      "ingredients": [
+        {
+          "name_en": "Hydrolyzed Collagen",
+          "name_kr": "가수분해콜라겐",
+          "name_inci": "Hydrolyzed Collagen",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "plumping"
+        },
+        {
+          "name_en": "Squalane",
+          "name_kr": "스쿠알란",
+          "name_inci": "Squalane",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "sensitive",
+        "dehydrated_oily"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "fine_lines",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "전도성 젤리 — EMS/RF 디바이스 최적 매체, 글래스스킨 효과",
+      "one_liner_en": "Conductive jelly — optimal medium for EMS/RF devices, glass skin effect",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": true,
+      "barcode_ean": null,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_eucerin_dermopure_cleanser",
+      "name_kr": "더모퓨어 클렌징젤",
+      "name_en": "DermoPure Reinigungsgel",
+      "name_de": "DermoPure Reinigungsgel",
+      "brand": "Eucerin",
+      "brand_kr": "유세린",
+      "country": "DE",
+      "market_tier": "medical_otc",
+      "price_tier": "entry",
+      "price_eur": 12.0,
+      "price_krw": null,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.06,
+      "routine_slot": "cleanser",
+      "texture_type": "gel",
+      "texture_description_kr": "약산성 젤",
+      "ingredients": [
+        {
+          "name_en": "Soap-free Surfactant",
+          "name_kr": "무비누계면활성",
+          "name_inci": "Sodium Cocoamphoacetate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "gentle_cleansing"
+        }
+      ],
+      "target_profiles": [
+        "oily_acne",
+        "mens",
+        "dehydrated_oily"
+      ],
+      "target_age_range": "20-50",
+      "skin_concerns": [
+        "acne",
+        "excess_sebum",
+        "pores"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "유세린 약산성 무비누 젤 — 남성 지성/트러블 클렌저",
+      "one_liner_en": "Eucerin soap-free acidic gel — men's oily/acne cleanser",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "4005800180804",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_etude_soonjung_toner",
+      "name_kr": "순정 pH 5.5 릴리프 토너",
+      "name_en": "Soon Jung pH 5.5 Relief Toner",
+      "name_de": "Soon Jung pH 5.5 Relief Toner",
+      "brand": "Etude House",
+      "brand_kr": "에뛰드하우스",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 10.0,
+      "price_krw": 12000,
+      "volume_ml": 180,
+      "price_per_ml_eur": 0.056,
+      "routine_slot": "toner",
+      "texture_type": "liquid",
+      "texture_description_kr": "워터 토너",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Madecassoside",
+          "name_kr": "마데카소사이드",
+          "name_inci": "Madecassoside",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_inflammatory"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "mens",
+        "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "redness",
+        "razor_burn",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "판테놀+마데카소사이드 극미니멀 — 면도 후 스킨팩용",
+      "one_liner_en": "Panthenol + Madecassoside ultra-minimal — post-shave skin pack",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": null,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_drsturm_face_cream_men",
+      "name_kr": "페이스 크림 맨",
+      "name_en": "Face Cream Men",
+      "name_de": "Face Cream Men",
+      "brand": "Dr. Barbara Sturm",
+      "brand_kr": "닥터 바바라 스툼",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 140.0,
+      "price_krw": null,
+      "volume_ml": 50,
+      "price_per_ml_eur": 2.8,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "cream_light",
+      "texture_description_kr": "경량 크림",
+      "ingredients": [
+        {
+          "name_en": "Purslane Extract",
+          "name_kr": "쇠비름추출물",
+          "name_inci": "Portulaca Oleracea Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_inflammatory"
+        },
+        {
+          "name_en": "Skullcap Extract",
+          "name_kr": "황금추출물",
+          "name_inci": "Scutellaria Baicalensis Root Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_inflammatory"
+        },
+        {
+          "name_en": "Shea Butter (micro)",
+          "name_kr": "시어버터",
+          "name_inci": "Butyrospermum Parkii Butter",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "moisturizing"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "sensitive"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "razor_burn",
+        "inflammaging",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "쇠비름+황금추출물 — 남성 면도 자극 즉각 항염 140€ 럭셔리",
+      "one_liner_en": "Purslane + skullcap — instant anti-inflammatory for razor irritation, luxury 140€",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "4260385761012",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_babor_men_aftershave",
+      "name_kr": "맨 카밍 애프터쉐이브 세럼",
+      "name_en": "Men Calming After Shave Serum",
+      "name_de": "Men Calming After Shave Serum",
+      "brand": "Babor",
+      "brand_kr": "바보르",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 40.0,
+      "price_krw": null,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.8,
+      "routine_slot": "toner",
+      "texture_type": "serum",
+      "texture_description_kr": "세럼 토너",
+      "ingredients": [
+        {
+          "name_en": "Magnolia Bark Extract",
+          "name_kr": "매그놀리아추출물",
+          "name_inci": "Magnolia Officinalis Bark Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "calming"
+        },
+        {
+          "name_en": "TAUREC Complex",
+          "name_kr": "타우렉콤플렉스",
+          "name_inci": "Proprietary Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "wound_healing"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "sensitive"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "razor_burn",
+        "redness",
+        "micro_wounds"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "매그놀리아+타우렉콤플렉스 — 면도 후 화끈거림 즉각 소거",
+      "one_liner_en": "Magnolia + TAUREC Complex — instant razor burn relief",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "4015165349754",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_hera_homme_toner",
+      "name_kr": "옴므 파워 부스팅 토너",
+      "name_en": "Homme Power Boosting Toner",
+      "name_de": "Homme Power Boosting Toner",
+      "brand": "Hera",
+      "brand_kr": "헤라",
+      "country": "KR",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 35.0,
+      "price_krw": 42000,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.233,
+      "routine_slot": "toner",
+      "texture_type": "liquid",
+      "texture_description_kr": "워터 토너",
+      "ingredients": [
+        {
+          "name_en": "AHA",
+          "name_kr": "AHA",
+          "name_inci": "Alpha Hydroxy Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "exfoliation"
+        },
+        {
+          "name_en": "Pine Needle Extract",
+          "name_kr": "솔잎추출물",
+          "name_inci": "Pinus Densiflora Leaf Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "sebum_control"
+        },
+        {
+          "name_en": "Hyaluronic Acid Complex",
+          "name_kr": "HA콤플렉스",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "aging_elasticity"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "dullness",
+        "excess_sebum",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "AHA+솔잎+HA — 남성 거칠어진 피부 각질 제거+수분 충전",
+      "one_liner_en": "AHA + pine needle + HA — men's exfoliation + hydration",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "8801042693272",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_hera_homme_moisturizer",
+      "name_kr": "옴므 파워 부스팅 모이스처라이저",
+      "name_en": "Homme Power Boosting Moisturizer",
+      "name_de": "Homme Power Boosting Moisturizer",
+      "brand": "Hera",
+      "brand_kr": "헤라",
+      "country": "KR",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 38.0,
+      "price_krw": 45000,
+      "volume_ml": 110,
+      "price_per_ml_eur": 0.345,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "lotion",
+      "texture_description_kr": "실키 로션",
+      "ingredients": [
+        {
+          "name_en": "Acetylhexapeptide-8",
+          "name_kr": "아세틸헥사펩타이드",
+          "name_inci": "Acetylhexapeptide-8",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "lifting"
+        },
+        {
+          "name_en": "Hydrolyzed Lupine Protein",
+          "name_kr": "루핀단백질",
+          "name_inci": "Lupinus Albus Seed Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "firming"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "aging_elasticity"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "elasticity_loss",
+        "dullness"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "아세틸헥사펩타이드+루핀단백질 — 남성 탄력+윤기 회복",
+      "one_liner_en": "Acetylhexapeptide + lupine protein — men's firmness + radiance recovery",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": null,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_sulwhasoo_men_serum",
+      "name_kr": "맨 본윤에센스",
+      "name_en": "Men Recharging Serum",
+      "name_de": "Men Recharging Serum",
+      "brand": "Sulwhasoo",
+      "brand_kr": "설화수",
+      "country": "KR",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 55.0,
+      "price_krw": 68000,
+      "volume_ml": 140,
+      "price_per_ml_eur": 0.393,
+      "routine_slot": "serum_am",
+      "texture_type": "gel",
+      "texture_description_kr": "워터젤 올인원",
+      "ingredients": [
+        {
+          "name_en": "Jeongyangdan Complex",
+          "name_kr": "정양단콤플렉스",
+          "name_inci": "Proprietary Ginseng Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "vitality_boosting"
+        },
+        {
+          "name_en": "Ginseng Extract",
+          "name_kr": "인삼추출물",
+          "name_inci": "Panax Ginseng Root Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging"
+        },
+        {
+          "name_en": "Liriope Root",
+          "name_kr": "맥문동",
+          "name_inci": "Ophiopogon Japonicus Root Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "aging_elasticity"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "dullness",
+        "elasticity_loss",
+        "fatigue_skin"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "정양단+인삼+맥문동 — 스킨+에센스 올인원 140ml 럭셔리",
+      "one_liner_en": "Jeongyangdan + ginseng + liriope — toner+essence all-in-one 140ml luxury",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": false,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": "8809685803454",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_babor_men_energizing_gel",
+      "name_kr": "맨 에너자이징 젤",
+      "name_en": "Men Energizing Face & Eye Gel",
+      "name_de": "Men Energizing Face & Eye Gel",
+      "brand": "Babor",
+      "brand_kr": "바보르",
+      "country": "DE",
+      "market_tier": "luxury",
+      "price_tier": "premium",
+      "price_eur": 50.0,
+      "price_krw": null,
+      "volume_ml": 50,
+      "price_per_ml_eur": 1.0,
+      "routine_slot": "moisturizer_allinone",
+      "texture_type": "gel",
+      "texture_description_kr": "초경량 젤",
+      "ingredients": [
+        {
+          "name_en": "Taurine",
+          "name_kr": "타우린",
+          "name_inci": "Taurine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "cell_energy"
+        },
+        {
+          "name_en": "Siberian Ginseng",
+          "name_kr": "시베리안인삼",
+          "name_inci": "Eleutherococcus Senticosus Root Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "stress_defense"
+        },
+        {
+          "name_en": "African Bark Extract",
+          "name_kr": "아프리칸바크",
+          "name_inci": "Pygeum Africanum Bark Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "pore_minimizing"
+        }
+      ],
+      "target_profiles": [
+        "mens",
+        "aging_elasticity"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "dark_circles",
+        "pore_size",
+        "fatigue_skin"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "타우린+시베리안인삼+아프리칸바크 — 남성 얼굴+눈가 올인원 에너자이징",
+      "one_liner_en": "Taurine + Siberian ginseng + African bark — men's face+eye all-in-one energizing",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "device_compatible": null,
+      "barcode_ean": null,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 /**
  * src/features/lab-selection/scripts/seedProducts.ts
  *
- * Seeds the Supabase `products` table from src/data/product_db.json.
+ * Seeds the Supabase `products` table from src/data/product_db_merged.json.
  *
  * Usage (from project root):
  *   npx ts-node --project tsconfig.json src/features/lab-selection/scripts/seedProducts.ts
@@ -145,17 +145,17 @@ function normalise(raw: RawProduct): Record<string, unknown> {
 async function main() {
   const dbPath = path.resolve(
     __dirname,
-    '../../../../data/product_db.json'   // src/data/product_db.json from script dir
+    '../../../../data/product_db_merged.json'   // src/data/product_db_merged.json from script dir
   );
 
   if (!fs.existsSync(dbPath)) {
-    console.error(`ERROR: product_db.json not found at ${dbPath}`);
+    console.error(`ERROR: product_db_merged.json not found at ${dbPath}`);
     process.exit(1);
   }
 
   const raw = JSON.parse(fs.readFileSync(dbPath, 'utf-8')) as ProductDb;
   const products = raw.products;
-  console.log(`Found ${products.length} products in product_db.json`);
+  console.log(`Found ${products.length} products in product_db_merged.json`);
 
   let successCount = 0;
   let failCount = 0;

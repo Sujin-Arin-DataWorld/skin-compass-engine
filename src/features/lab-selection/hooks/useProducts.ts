@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { Product } from '../types';
 import { TEXTURE_ORDER } from '../data/textureRules';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-import productDbJson from '@/data/product_db.json';
+import productDbJson from '@/data/product_db_merged.json';
 
 export interface ProductFilters {
   country?: string;
@@ -21,7 +21,7 @@ export interface UseProductsResult {
   refetch: () => void;
 }
 
-// ── Static product catalogue (normalised from product_db.json) ────────────────
+// ── Static product catalogue (normalised from product_db_merged.json) ────────────────
 // Used as primary source when the Supabase `products` table is not yet seeded.
 
 interface RawIngredient {

@@ -1,0 +1,1907 @@
+{
+  "_merge_instructions": {
+    "how_to_merge": "이 파일의 products 배열을 기존 product_db.json의 products 배열에 append하세요.",
+    "remove_from_existing": [
+      "JP_sana_soymilk_cream",
+      "TR_thepurest_niacinamide_5",
+      "US_skinceuticals_triple_lipid"
+    ],
+    "reclassify_in_existing": {
+      "FR_vichy_neovadiol": {
+        "country": "DE",
+        "available_in_de": true
+      },
+      "FR_larocheposay_cicaplast_b5": {
+        "country": "DE",
+        "available_in_de": true
+      },
+      "HU_geekgorgeous_cglow": {
+        "country": "EU",
+        "available_in_de": true
+      }
+    },
+    "update_schema": "4.0",
+    "total_new_products": 20
+  },
+  "products": [
+    {
+      "id": "KR_anua_cleansing_oil",
+      "name_kr": "어성초 모공 클렌징 오일",
+      "name_en": "Heartleaf Pore Control Cleansing Oil",
+      "name_de": "Heartleaf Pore Control Cleansing Oil",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 18.0,
+      "price_krw": 22000,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.09,
+      "routine_slot": "cleanser_oil",
+      "texture_type": "oil",
+      "texture_description_kr": "클렌징 오일",
+      "ingredients": [
+        {
+          "name_en": "Heartleaf Extract",
+          "name_kr": "어성초추출물",
+          "name_inci": "Houttuynia Cordata Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "oily_acne",
+        "dehydrated_oily",
+        "sensitive"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "pores",
+        "excess_sebum"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "어성초 모공 클렌징 오일 — 더블클렌징 1단계",
+      "one_liner_en": "Heartleaf oil cleanser for double cleansing",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_cleansing_foam",
+      "name_kr": "어성초 퀘르세티놀 딥클렌징 폼",
+      "name_en": "Heartleaf Quercetinol Pore Deep Cleansing Foam",
+      "name_de": "Heartleaf Quercetinol Pore Deep Cleansing Foam",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 16.0,
+      "price_krw": 18000,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.107,
+      "routine_slot": "cleanser",
+      "texture_type": "foam",
+      "texture_description_kr": "크리미 폼",
+      "ingredients": [
+        {
+          "name_en": "Heartleaf Powder",
+          "name_kr": "어성초분말",
+          "name_inci": "Houttuynia Cordata Powder",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "pore_cleansing"
+        },
+        {
+          "name_en": "Quercetinol",
+          "name_kr": "퀘르세티놀",
+          "name_inci": "Quercetinol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_inflammatory"
+        },
+        {
+          "name_en": "Hyaluronic Acid 3types",
+          "name_kr": "HA 3종",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        }
+      ],
+      "target_profiles": [
+        "oily_acne",
+        "dehydrated_oily",
+        "sensitive"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "pores",
+        "acne",
+        "excess_sebum"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "어성초+퀘르세티놀 모공 딥클렌징",
+      "one_liner_en": "Heartleaf powder deep pore cleansing foam",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_heartleaf_toner",
+      "name_kr": "어성초 77% 수딩 토너",
+      "name_en": "Heartleaf 77% Soothing Toner",
+      "name_de": "Heartleaf 77% Soothing Toner",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 18.0,
+      "price_krw": 23000,
+      "volume_ml": 250,
+      "price_per_ml_eur": 0.072,
+      "routine_slot": "toner",
+      "texture_type": "liquid",
+      "texture_description_kr": "워터 토너",
+      "ingredients": [
+        {
+          "name_en": "Heartleaf Extract",
+          "name_kr": "어성초추출물",
+          "name_inci": "Houttuynia Cordata Extract",
+          "concentration_pct": 77.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_support"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "oily_acne",
+        "dehydrated_oily"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "redness",
+        "irritation",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "어성초 77% 진정 토너 — 한국 1위",
+      "one_liner_en": "77% Heartleaf soothing toner — Korea #1",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_bha_toner",
+      "name_kr": "BHA 2% 젠틀 각질 토너",
+      "name_en": "BHA 2% Gentle Exfoliating Toner",
+      "name_de": "BHA 2% Gentle Exfoliating Toner",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 16.0,
+      "price_krw": 20000,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.107,
+      "routine_slot": "toner_exfoliant",
+      "texture_type": "liquid",
+      "texture_description_kr": "리퀴드",
+      "ingredients": [
+        {
+          "name_en": "Salicylic Acid",
+          "name_kr": "살리실산",
+          "name_inci": "Salicylic Acid",
+          "concentration_pct": 2.0,
+          "concentration_unit": "%",
+          "role": "exfoliant"
+        },
+        {
+          "name_en": "Ceramide NP",
+          "name_kr": "세라마이드NP",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "HA",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        }
+      ],
+      "target_profiles": [
+        "oily_acne",
+        "dehydrated_oily"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "pores",
+        "blackheads",
+        "excess_sebum"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "2-3_per_week",
+      "one_liner_kr": "BHA 2%+세라마이드 각질/피지 케어",
+      "one_liner_en": "BHA 2% + Ceramide exfoliating toner",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_niacin_txa_serum",
+      "name_kr": "나이아신 10 TXA 4 다크스팟 세럼",
+      "name_en": "Niacinamide 10% + TXA 4% Dark Spot Serum",
+      "name_de": "Niacinamide 10% + TXA 4% Dark Spot Serum",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 19.0,
+      "price_krw": 24000,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.633,
+      "routine_slot": "serum_am",
+      "texture_type": "serum",
+      "texture_description_kr": "워터리 세럼",
+      "ingredients": [
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": 10.0,
+          "concentration_unit": "%",
+          "role": "brightening"
+        },
+        {
+          "name_en": "Tranexamic Acid",
+          "name_kr": "트라넥삼산",
+          "name_inci": "Tranexamic Acid",
+          "concentration_pct": 4.0,
+          "concentration_unit": "%",
+          "role": "dark_spot_care"
+        },
+        {
+          "name_en": "Arbutin",
+          "name_kr": "아르부틴",
+          "name_inci": "Arbutin",
+          "concentration_pct": 2.0,
+          "concentration_unit": "%",
+          "role": "melanin_inhibitor"
+        },
+        {
+          "name_en": "Ceramide NP",
+          "name_kr": "세라마이드NP",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "pigmentation",
+        "oily_acne"
+      ],
+      "target_age_range": "20-50",
+      "skin_concerns": [
+        "dark_spots",
+        "uneven_tone",
+        "pores"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "나이아신10%+TXA4%+아르부틴2% 트리플 브라이트닝",
+      "one_liner_en": "Niacin 10% + TXA 4% + Arbutin 2% triple brightening",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_azelaic_serum",
+      "name_kr": "아젤라산 10 히알루론 수딩 세럼",
+      "name_en": "Azelaic Acid 10% Hyaluron Soothing Serum",
+      "name_de": "Azelaic Acid 10% Hyaluron Soothing Serum",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 19.0,
+      "price_krw": 24000,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.633,
+      "routine_slot": "serum_am",
+      "texture_type": "serum",
+      "texture_description_kr": "젤 세럼",
+      "ingredients": [
+        {
+          "name_en": "Azelaic Acid",
+          "name_kr": "아젤라산",
+          "name_inci": "Azelaic Acid",
+          "concentration_pct": 10.0,
+          "concentration_unit": "%",
+          "role": "anti_inflammatory_brightening"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "HA",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Centella Asiatica",
+          "name_kr": "센텔라",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "pigmentation"
+      ],
+      "target_age_range": "20-50",
+      "skin_concerns": [
+        "redness",
+        "dark_spots",
+        "inflammation"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "아젤라산10%+HA 홍조/염증형 색소 케어",
+      "one_liner_en": "Azelaic Acid 10% + HA redness & pigmentation care",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_heartleaf_lotion",
+      "name_kr": "어성초 70 데일리 로션",
+      "name_en": "Heartleaf 70% Daily Lotion",
+      "name_de": "Heartleaf 70% Daily Lotion",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 20.0,
+      "price_krw": 26000,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.1,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "lotion",
+      "texture_description_kr": "가벼운 로션",
+      "ingredients": [
+        {
+          "name_en": "Heartleaf Extract",
+          "name_kr": "어성초추출물",
+          "name_inci": "Houttuynia Cordata Extract",
+          "concentration_pct": 70.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "oily_acne",
+        "dehydrated_oily",
+        "mens"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "redness",
+        "dehydration",
+        "irritation"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "어성초 70% 가벼운 수분 로션",
+      "one_liner_en": "70% Heartleaf lightweight daily lotion",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_sunscreen",
+      "name_kr": "어성초 실키 선크림 SPF50+",
+      "name_en": "Heartleaf Silky Moisture Sun Cream SPF50+",
+      "name_de": "Heartleaf Silky Moisture Sun Cream SPF50+",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 16.0,
+      "price_krw": 19000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.32,
+      "routine_slot": "spf",
+      "texture_type": "cream_light",
+      "texture_description_kr": "실키 크림",
+      "ingredients": [
+        {
+          "name_en": "SPF 50+ PA++++",
+          "name_kr": "SPF50+",
+          "name_inci": "Chemical UV Filters",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "uv_protection"
+        },
+        {
+          "name_en": "Heartleaf Extract",
+          "name_kr": "어성초",
+          "name_inci": "Houttuynia Cordata Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "oily_acne",
+        "dehydrated_oily",
+        "pigmentation"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "uv_protection"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am",
+      "one_liner_kr": "SPF50+ 어성초 진정 선크림 무향 비건",
+      "one_liner_en": "SPF50+ Heartleaf soothing sunscreen fragrance-free",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_anua_pdrn_serum",
+      "name_kr": "PDRN HA 캡슐 100 세럼",
+      "name_en": "PDRN Hyaluronic Acid Capsule 100 Serum",
+      "name_de": "PDRN Hyaluronic Acid Capsule 100 Serum",
+      "brand": "Anua",
+      "brand_kr": "어누아",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 22.0,
+      "price_krw": 28000,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.733,
+      "routine_slot": "serum_am",
+      "texture_type": "serum",
+      "texture_description_kr": "블루 에센스",
+      "ingredients": [
+        {
+          "name_en": "PDRN",
+          "name_kr": "PDRN(연어DNA)",
+          "name_inci": "Polydeoxyribonucleotide",
+          "concentration_pct": 100,
+          "concentration_unit": "ppm",
+          "role": "cell_regeneration"
+        },
+        {
+          "name_en": "Hyaluronic Acid 11types",
+          "name_kr": "HA 11종",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Hydrolyzed Collagen",
+          "name_kr": "가수분해콜라겐",
+          "name_inci": "Hydrolyzed Collagen",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "dry_barrier"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "fine_lines",
+        "elasticity_loss",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "PDRN 100ppm+HA 11종 세포재생 — 올리브영 1위",
+      "one_liner_en": "PDRN 100ppm + 11 HA types — Olive Young #1",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_illiyoon_ceramide_cream",
+      "name_kr": "세라마이드 아토 콘센트레이트 크림",
+      "name_en": "Ceramide Ato Concentrate Cream",
+      "name_de": "Ceramide Ato Concentrate Cream",
+      "brand": "Illiyoon",
+      "brand_kr": "일리윤",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 12.0,
+      "price_krw": 16000,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.06,
+      "routine_slot": "moisturizer_rich",
+      "texture_type": "cream_rich",
+      "texture_description_kr": "리치 크림(세라마이드 캡슐)",
+      "ingredients": [
+        {
+          "name_en": "Ceramide PC-104",
+          "name_kr": "세라마이드PC-104",
+          "name_inci": "Hydroxypropyl Bispalmitamide MEA",
+          "concentration_pct": 6310,
+          "concentration_unit": "ppm",
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Ceramide NP",
+          "name_kr": "세라마이드NP",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Cholesterol",
+          "name_kr": "콜레스테롤",
+          "name_inci": "Cholesterol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_lipid"
+        },
+        {
+          "name_en": "Phytosphingosine",
+          "name_kr": "피토스핑고신",
+          "name_inci": "Phytosphingosine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_lipid"
+        },
+        {
+          "name_en": "Soybean Oil",
+          "name_kr": "대두유",
+          "name_inci": "Glycine Max Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "fatty_acid"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier",
+        "sensitive",
+        "post_menopause"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "dehydration",
+        "barrier_damage",
+        "eczema"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "세라마이드PC-104 6310ppm+콜레스테롤+지방산 장벽복원 무향비건",
+      "one_liner_en": "Ceramide PC-104 6310ppm barrier repair fragrance-free vegan",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_illiyoon_ceramide_gel",
+      "name_kr": "세라마이드 아토 수딩 젤",
+      "name_en": "Ceramide Ato Soothing Gel",
+      "name_de": "Ceramide Ato Soothing Gel",
+      "brand": "Illiyoon",
+      "brand_kr": "일리윤",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 10.0,
+      "price_krw": 14000,
+      "volume_ml": 175,
+      "price_per_ml_eur": 0.057,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "gel",
+      "texture_description_kr": "수분 젤",
+      "ingredients": [
+        {
+          "name_en": "Ceramide Complex",
+          "name_kr": "세라마이드복합체",
+          "name_inci": "Hydroxypropyl Bispalmitamide MEA",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "dehydrated_oily",
+        "oily_acne",
+        "sensitive"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "dehydration",
+        "excess_sebum"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "세라마이드 수딩 젤 — 지성/수부지 여름용",
+      "one_liner_en": "Ceramide soothing gel — oily/dehydrated summer care",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "EU_geekgorgeous_agame5",
+      "name_kr": "A-게임 5 레티날 0.05%",
+      "name_en": "A-Game 5 Retinal 0.05%",
+      "name_de": "A-Game 5 Retinal 0.05%",
+      "brand": "Geek & Gorgeous",
+      "brand_kr": "긱앤고저스",
+      "country": "EU",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 9.5,
+      "price_krw": null,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.317,
+      "routine_slot": "serum_pm",
+      "texture_type": "serum",
+      "texture_description_kr": "세럼",
+      "ingredients": [
+        {
+          "name_en": "Retinal",
+          "name_kr": "레티날",
+          "name_inci": "Retinal",
+          "concentration_pct": 0.05,
+          "concentration_unit": "%",
+          "role": "anti_aging"
+        },
+        {
+          "name_en": "Squalane",
+          "name_kr": "스쿠알란",
+          "name_inci": "Squalane",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Bakuchiol",
+          "name_kr": "바쿠치올",
+          "name_inci": "Bakuchiol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging_support"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "fine_lines",
+        "wrinkles"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "레티날0.05%(레티놀10배) 입문자 — 9.5€ 가성비끝판왕",
+      "one_liner_en": "Retinal 0.05% beginner — best value at 9.5€",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "EU_geekgorgeous_agame10",
+      "name_kr": "A-게임 10 레티날 0.1%",
+      "name_en": "A-Game 10 Retinal 0.1%",
+      "name_de": "A-Game 10 Retinal 0.1%",
+      "brand": "Geek & Gorgeous",
+      "brand_kr": "긱앤고저스",
+      "country": "EU",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 12.5,
+      "price_krw": null,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.417,
+      "routine_slot": "serum_pm",
+      "texture_type": "serum",
+      "texture_description_kr": "세럼",
+      "ingredients": [
+        {
+          "name_en": "Retinal",
+          "name_kr": "레티날",
+          "name_inci": "Retinal",
+          "concentration_pct": 0.1,
+          "concentration_unit": "%",
+          "role": "anti_aging"
+        },
+        {
+          "name_en": "Squalane",
+          "name_kr": "스쿠알란",
+          "name_inci": "Squalane",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity"
+      ],
+      "target_age_range": "30-50",
+      "skin_concerns": [
+        "wrinkles",
+        "fine_lines"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "레티날0.1% 중급 — A-Game5 적응후 업그레이드",
+      "one_liner_en": "Retinal 0.1% intermediate — upgrade after A-Game 5",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_boj_relief_sun",
+      "name_kr": "라이스+프로바이오틱스 선크림 SPF50+",
+      "name_en": "Relief Sun: Rice + Probiotics SPF50+",
+      "name_de": "Relief Sun: Rice + Probiotics SPF50+",
+      "brand": "Beauty of Joseon",
+      "brand_kr": "조선미녀",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 14.0,
+      "price_krw": 18000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.28,
+      "routine_slot": "spf",
+      "texture_type": "cream_light",
+      "texture_description_kr": "가벼운 크림",
+      "ingredients": [
+        {
+          "name_en": "Rice Extract",
+          "name_kr": "쌀추출물",
+          "name_inci": "Oryza Sativa Extract",
+          "concentration_pct": 30.0,
+          "concentration_unit": "%",
+          "role": "brightening"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier",
+        "aging_elasticity",
+        "pigmentation"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "uv_protection",
+        "dullness"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am",
+      "one_liner_kr": "쌀30%+프로바이오틱스 SPF50 글로벌컬트선크림",
+      "one_liner_en": "Rice 30% + Probiotics SPF50 global cult sunscreen",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_boj_aquafresh_sun",
+      "name_kr": "아쿠아프레시 라이스+B5 SPF50+",
+      "name_en": "Aqua-fresh: Rice + B5 SPF50+",
+      "name_de": "Aqua-fresh: Rice + B5 SPF50+",
+      "brand": "Beauty of Joseon",
+      "brand_kr": "조선미녀",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 15.0,
+      "price_krw": 20000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.3,
+      "routine_slot": "spf",
+      "texture_type": "gel",
+      "texture_description_kr": "워터젤(쿨링)",
+      "ingredients": [
+        {
+          "name_en": "Rice Extract",
+          "name_kr": "쌀추출물",
+          "name_inci": "Oryza Sativa Extract",
+          "concentration_pct": 30.0,
+          "concentration_unit": "%",
+          "role": "brightening"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "dehydrated_oily",
+        "oily_acne",
+        "sensitive",
+        "mens"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "uv_protection",
+        "heat_cooling"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am",
+      "one_liner_kr": "워터젤쿨링 SPF50 — 여름 안끈적 열감↓",
+      "one_liner_en": "Water-gel cooling SPF50 — non-sticky summer",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_boj_ginseng_sun",
+      "name_kr": "인삼 모이스트 선세럼 SPF50+",
+      "name_en": "Ginseng Moist Sun Serum SPF50+",
+      "name_de": "Ginseng Moist Sun Serum SPF50+",
+      "brand": "Beauty of Joseon",
+      "brand_kr": "조선미녀",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 15.0,
+      "price_krw": 20000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.3,
+      "routine_slot": "spf",
+      "texture_type": "serum",
+      "texture_description_kr": "세럼 텍스처",
+      "ingredients": [
+        {
+          "name_en": "Ginseng Extract",
+          "name_kr": "인삼추출물",
+          "name_inci": "Panax Ginseng Root Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "dry_barrier"
+      ],
+      "target_age_range": "30-60+",
+      "skin_concerns": [
+        "uv_protection",
+        "fine_lines"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am",
+      "one_liner_kr": "인삼세럼텍스처 SPF50 — 노화/폐경후 보습형",
+      "one_liner_en": "Ginseng serum SPF50 — anti-aging moisturizing",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_eqqualberry_bakuchiol",
+      "name_kr": "바쿠치올 플럼핑 세럼",
+      "name_en": "Bakuchiol Plumping Serum",
+      "name_de": "Bakuchiol Plumping Serum",
+      "brand": "EQQUALBERRY",
+      "brand_kr": "이퀄베리",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 20.0,
+      "price_krw": 25000,
+      "volume_ml": 30,
+      "price_per_ml_eur": 0.667,
+      "routine_slot": "serum_pm",
+      "texture_type": "serum",
+      "texture_description_kr": "에센스",
+      "ingredients": [
+        {
+          "name_en": "Bakuchiol",
+          "name_kr": "바쿠치올",
+          "name_inci": "Bakuchiol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "plant_retinol"
+        },
+        {
+          "name_en": "Peptides 13types",
+          "name_kr": "펩타이드13종",
+          "name_inci": "Peptide Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "anti_aging"
+        },
+        {
+          "name_en": "Micro Ceramides",
+          "name_kr": "마이크로세라마이드",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "post_menopause",
+        "sensitive"
+      ],
+      "target_age_range": "40-60+",
+      "skin_concerns": [
+        "fine_lines",
+        "elasticity_loss"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_pm",
+      "one_liner_kr": "바쿠치올+13펩타이드+세라마이드 — 레티놀못쓰는 민감피부 대안",
+      "one_liner_en": "Bakuchiol+13Peptides+Ceramides — retinol alt for sensitive skin",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_cerave_hydrating_cleanser",
+      "name_kr": "하이드레이팅 클렌저",
+      "name_en": "Hydrating Facial Cleanser",
+      "name_de": "Hydrating Facial Cleanser",
+      "brand": "CeraVe",
+      "brand_kr": "세라비",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 11.95,
+      "price_krw": null,
+      "volume_ml": 236,
+      "price_per_ml_eur": 0.051,
+      "routine_slot": "cleanser",
+      "texture_type": "cream_gel",
+      "texture_description_kr": "크림 젤",
+      "ingredients": [
+        {
+          "name_en": "Ceramides 3Types",
+          "name_kr": "3종 세라마이드",
+          "name_inci": "Ceramide NP, AP, EOP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "HA",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier",
+        "sensitive",
+        "post_menopause",
+        "aging_elasticity"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "dehydration",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "3종세라마이드+HA 순한클렌저 비폼 SLS-free",
+      "one_liner_en": "3 Ceramides + HA gentle cleanser non-foaming SLS-free",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "DE_cerave_hydrating_toner",
+      "name_kr": "하이드레이팅 토너",
+      "name_en": "Hydrating Toner",
+      "name_de": "Hydrating Toner",
+      "brand": "CeraVe",
+      "brand_kr": "세라비",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 14.95,
+      "price_krw": null,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.075,
+      "routine_slot": "toner",
+      "texture_type": "liquid",
+      "texture_description_kr": "워터 토너",
+      "ingredients": [
+        {
+          "name_en": "Ceramides 3Types",
+          "name_kr": "3종 세라마이드",
+          "name_inci": "Ceramide NP, AP, EOP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "HA",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydrating"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_support"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier",
+        "sensitive",
+        "post_menopause",
+        "aging_elasticity",
+        "pigmentation"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "dehydration",
+        "barrier_damage"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "one_liner_kr": "3종세라마이드+HA+나이아신아마이드 토너 무향",
+      "one_liner_en": "3 Ceramides + HA + Niacinamide toner fragrance-free",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    },
+    {
+      "id": "KR_skin1004_waterfit_sun",
+      "name_kr": "센텔라 히알루-시카 워터핏 선 세럼 SPF50+",
+      "name_en": "Centella Hyalu-Cica Water-Fit Sun Serum SPF50+",
+      "brand": "SKIN1004",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 14.0,
+      "routine_slot": "spf",
+      "texture_type": "serum",
+      "ingredients": [
+        {"name_en": "Centella Asiatica", "name_kr": "병풀추출물", "role": "soothing"},
+        {"name_en": "Hyaluronic Acid", "name_kr": "히알루론산", "role": "hydrating"}
+      ],
+      "target_profiles": ["dehydrated_oily", "mens", "sensitive"],
+      "target_age_range": "all",
+      "skin_concerns": ["uv_protection", "heat_cooling", "dehydration"],
+      "one_liner_kr": "물방울처럼 터지는 수분 선 세럼 - 끈적임 0%"
+    },
+    {
+      "id": "KR_isntree_watery_sungel",
+      "name_kr": "히알루론산 워터리 선 젤 SPF50+",
+      "name_en": "Hyaluronic Acid Watery Sun Gel SPF50+",
+      "brand": "Isntree",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 16.0,
+      "routine_slot": "spf",
+      "texture_type": "gel",
+      "ingredients": [
+        {"name_en": "8 Types Hyaluronic Acid", "name_kr": "8중 히알루론산", "role": "hydrating"},
+        {"name_en": "Ceramide", "name_kr": "세라마이드", "role": "barrier_repair"}
+      ],
+      "target_profiles": ["dehydrated_oily", "dry_barrier"],
+      "target_age_range": "all",
+      "skin_concerns": ["uv_protection", "dehydration"]
+    },
+    {
+      "id": "KR_missha_aqua_sun",
+      "name_kr": "올 어라운드 세이프 블록 아쿠아 선 SPF50+",
+      "name_en": "All Around Safe Block Aqua Sun SPF50+",
+      "brand": "Missha",
+      "country": "KR",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 10.0,
+      "routine_slot": "spf",
+      "texture_type": "gel",
+      "ingredients": [
+        {"name_en": "Glacier Water", "name_kr": "빙하수", "role": "cooling"},
+        {"name_en": "Ice Plant Extract", "name_kr": "아이스플랜트", "role": "soothing"}
+      ],
+      "target_profiles": ["oily_acne", "mens"],
+      "target_age_range": "all",
+      "skin_concerns": ["uv_protection", "excess_sebum"]
+    },
+    {
+      "id": "KR_skin1004_toning_toner",
+      "name_kr": "마다가스카르 센텔라 토닝 토너",
+      "name_en": "Madagascar Centella Toning Toner",
+      "brand": "SKIN1004",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 15.0,
+      "routine_slot": "toner_exfoliant",
+      "texture_type": "liquid",
+      "ingredients": [
+        {"name_en": "Centella Extract", "name_kr": "병풀추출물", "concentration_pct": 84.0, "role": "soothing"},
+        {"name_en": "PHA", "name_kr": "파하", "role": "exfoliant"}
+      ],
+      "target_profiles": ["oily_acne", "sensitive"],
+      "target_age_range": "all",
+      "skin_concerns": ["acne", "pores", "dullness"]
+    },
+    {
+      "id": "KR_laneige_cream_skin",
+      "name_kr": "크림 스킨 세라펩타이드 리파이너",
+      "name_en": "Cream Skin Cerapeptide Refiner",
+      "brand": "Laneige",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 22.0,
+      "routine_slot": "toner",
+      "texture_type": "milky_toner",
+      "ingredients": [
+        {"name_en": "Cerapeptide", "name_kr": "세라펩타이드", "role": "barrier_repair"},
+        {"name_en": "White Leaf Tea Extract", "name_kr": "화이트리프티", "role": "soothing"}
+      ],
+      "target_profiles": ["dry_barrier", "post_menopause", "aging_elasticity"],
+      "target_age_range": "30-60+",
+      "skin_concerns": ["dehydration", "barrier_damage", "density_loss"]
+    },
+    {
+      "id": "KR_numbuzin_nad_pdrn_toner",
+      "name_kr": "9번 NAD+ PDRN 글로우 부스팅 토너",
+      "name_en": "No.9 NAD+ PDRN Glow Boosting Toner",
+      "brand": "numbuzin",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 18.0,
+      "routine_slot": "toner",
+      "texture_type": "liquid",
+      "ingredients": [
+        {"name_en": "NAD+", "name_kr": "엔에이디플러스", "role": "cell_energy"},
+        {"name_en": "PDRN", "name_kr": "연어DNA", "role": "cell_regeneration"}
+      ],
+      "target_profiles": ["aging_elasticity", "post_menopause"],
+      "target_age_range": "40-60+",
+      "skin_concerns": ["fine_lines", "elasticity_loss"]
+    },
+    {
+      "id": "DE_no_glow_today_toner",
+      "name_kr": "글로우 투데이 토너",
+      "name_en": "Glow Today Toner",
+      "brand": "Nø Cosmetics",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 8.0,
+      "routine_slot": "toner",
+      "texture_type": "liquid",
+      "ingredients": [
+        {"name_en": "Niacinamide", "name_kr": "나이아신아마이드", "role": "brightening"},
+        {"name_en": "SpreeOne Extract", "name_kr": "특허알게", "role": "barrier_repair"}
+      ],
+      "target_profiles": ["dehydrated_oily", "pigmentation", "sensitive"],
+      "target_age_range": "all",
+      "skin_concerns": ["pores", "dark_spots"]
+    },
+    {
+      "id": "KR_dralthea_345_cream",
+      "name_kr": "345 릴리프 크림",
+      "name_en": "345 Relief Cream",
+      "brand": "Dr. Althea",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 15.0,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "cream_light",
+      "ingredients": [
+        {"name_en": "Panthenol", "name_kr": "판테놀", "role": "barrier_repair"},
+        {"name_en": "Niacinamide", "name_kr": "나이아신아마이드", "role": "brightening"}
+      ],
+      "target_profiles": ["sensitive", "dehydrated_oily", "oily_acne"],
+      "target_age_range": "20-40",
+      "skin_concerns": ["redness", "acne", "irritation"]
+    },
+    {
+      "id": "KR_cosrx_balancium_cream",
+      "name_kr": "밸런시움 컴포트 세라마이드 크림",
+      "name_en": "Balancium Comfort Ceramide Cream",
+      "brand": "COSRX",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 18.0,
+      "routine_slot": "moisturizer_rich",
+      "texture_type": "cream_rich",
+      "ingredients": [
+        {"name_en": "Ceramide NP", "name_kr": "세라마이드NP", "role": "barrier_repair"},
+        {"name_en": "Centella Asiatica", "name_kr": "병풀추출물", "role": "soothing"}
+      ],
+      "target_profiles": ["dry_barrier"],
+      "target_age_range": "all",
+      "skin_concerns": ["barrier_damage", "dehydration"]
+    },
+    {
+      "id": "KR_purito_bamboo_cream",
+      "name_kr": "마이티 밤부 판테놀 크림",
+      "name_en": "Mighty Bamboo Panthenol Cream",
+      "brand": "Purito Seoul",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 14.0,
+      "routine_slot": "moisturizer_rich",
+      "texture_type": "cream_rich",
+      "ingredients": [
+        {"name_en": "Panthenol", "name_kr": "판테놀", "concentration_pct": 10.0, "role": "barrier_repair"},
+        {"name_en": "Bamboo Extract", "name_kr": "대나무추출물", "role": "soothing"}
+      ],
+      "target_profiles": ["sensitive", "dry_barrier"],
+      "target_age_range": "all",
+      "skin_concerns": ["irritation", "redness", "barrier_damage"]
+    },
+    {
+      "id": "EU_geekgorgeous_cheerup",
+      "name_kr": "치얼 업 6% 만델릭 + BHA 리퀴드",
+      "name_en": "Cheer Up 6% Mandelic + BHA Liquid",
+      "brand": "Geek & Gorgeous",
+      "country": "DE",
+      "market_tier": "drugstore",
+      "price_tier": "entry",
+      "price_eur": 8.5,
+      "routine_slot": "toner_exfoliant",
+      "texture_type": "liquid",
+      "ingredients": [
+        {"name_en": "Mandelic Acid", "name_kr": "만델릭산", "concentration_pct": 6.0, "role": "exfoliant"},
+        {"name_en": "Salicylic Acid", "name_kr": "살리실산", "role": "exfoliant"}
+      ],
+      "target_profiles": ["oily_acne", "combination"],
+      "target_age_range": "20-40",
+      "skin_concerns": ["acne", "pores", "blackheads"]
+    },
+    {
+      "id": "KR_ksecret_retinal_liposome",
+      "name_kr": "서울 1988 세럼: 레티날 리포좀 2% + 흑삼",
+      "name_en": "Seoul 1988 Serum: Retinal Liposome 2% + Black Ginseng",
+      "brand": "KSecret",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 25.0,
+      "routine_slot": "serum_pm",
+      "texture_type": "serum",
+      "ingredients": [
+        {"name_en": "Retinal Liposome", "name_kr": "레티날리포좀", "concentration_pct": 2.0, "role": "anti_aging"},
+        {"name_en": "Black Ginseng", "name_kr": "흑삼", "role": "antioxidant"}
+      ],
+      "target_profiles": ["aging_elasticity", "post_menopause"],
+      "target_age_range": "40-60+",
+      "skin_concerns": ["wrinkles", "fine_lines", "elasticity_loss"]
+    },
+    {
+      "id": "KR_axisy_dark_spot_serum",
+      "name_kr": "다크 스팟 코렉팅 글로우 세럼",
+      "name_en": "Dark Spot Correcting Glow Serum",
+      "brand": "AXIS-Y",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 15.0,
+      "routine_slot": "serum_am_pm",
+      "texture_type": "gel",
+      "ingredients": [
+        {"name_en": "Niacinamide", "name_kr": "나이아신아마이드", "concentration_pct": 5.0, "role": "brightening"},
+        {"name_en": "Squalane", "name_kr": "스쿠알란", "role": "hydrating"}
+      ],
+      "target_profiles": ["pigmentation", "oily_acne"],
+      "target_age_range": "20-40",
+      "skin_concerns": ["dark_spots", "PIH", "acne"]
+    },
+    {
+      "id": "KR_haruharu_blackrice_essence",
+      "name_kr": "블랙 라이스 프로바이오틱스 배리어 에센스",
+      "name_en": "Black Rice Probiotics Barrier Essence",
+      "brand": "Haruharu Wonder",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "entry",
+      "price_eur": 16.0,
+      "routine_slot": "essence",
+      "texture_type": "essence",
+      "ingredients": [
+        {"name_en": "Fermented Black Rice", "name_kr": "발효흑미", "role": "antioxidant"},
+        {"name_en": "Probiotics", "name_kr": "유산균", "role": "barrier_repair"}
+      ],
+      "target_profiles": ["dry_barrier", "aging_elasticity"],
+      "target_age_range": "30-50",
+      "skin_concerns": ["barrier_damage", "dullness"]
+    },
+    {
+      "id": "KR_medicube_collagen_night",
+      "name_kr": "콜라겐 나이트 랩핑 마스크",
+      "name_en": "Collagen Night Wrapping Mask",
+      "brand": "medicube",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 26.0,
+      "routine_slot": "mask_sleeping",
+      "texture_type": "sleeping_mask",
+      "ingredients": [
+        {"name_en": "Collagen Extract", "name_kr": "콜라겐추출물", "role": "anti_aging"},
+        {"name_en": "Niacinamide", "name_kr": "나이아신아마이드", "role": "brightening"}
+      ],
+      "target_profiles": ["aging_elasticity", "post_menopause"],
+      "target_age_range": "40-60+",
+      "skin_concerns": ["elasticity_loss", "sagging"]
+    },
+    {
+      "id": "KR_medicube_vitac_pad",
+      "name_kr": "딥 비타 C 토너 패드",
+      "name_en": "Deep Vita C Toner Pads",
+      "brand": "medicube",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 18.0,
+      "routine_slot": "toner_exfoliant",
+      "texture_type": "pad",
+      "ingredients": [
+        {"name_en": "Vitamin C", "name_kr": "비타민C", "role": "brightening"},
+        {"name_en": "Niacinamide", "name_kr": "나이아신아마이드", "role": "brightening"}
+      ],
+      "target_profiles": ["pigmentation", "dullness"],
+      "target_age_range": "all",
+      "skin_concerns": ["dark_spots", "uneven_tone"]
+    },
+    {
+      "id": "KR_roundlab_pine_lotion",
+      "name_kr": "소나무 진정 시카 로션",
+      "name_en": "Pine Tree Soothing Cica Lotion",
+      "brand": "Round Lab",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "full",
+      "price_eur": 20.0,
+      "routine_slot": "moisturizer_light",
+      "texture_type": "lotion",
+      "ingredients": [
+        {"name_en": "Pine Tree Extract", "name_kr": "소나무추출물", "role": "soothing"},
+        {"name_en": "LHA", "name_kr": "엘에이치에이", "role": "exfoliant"}
+      ],
+      "target_profiles": ["mens", "oily_acne", "sensitive"],
+      "target_age_range": "all",
+      "skin_concerns": ["redness", "post_shave_irritation", "excess_sebum"]
+    },
+    {
+      "id": "KR_easydew_egf_serum",
+      "name_kr": "DW-EGF 리턴 세럼",
+      "name_en": "DW-EGF Return Serum",
+      "brand": "EasyDew",
+      "country": "KR",
+      "market_tier": "medical_otc",
+      "price_tier": "full",
+      "price_eur": 35.0,
+      "routine_slot": "serum_am_pm",
+      "texture_type": "serum",
+      "ingredients": [
+        {"name_en": "sh-Oligopeptide-1", "name_kr": "EGF", "role": "cell_regeneration"}
+      ],
+      "target_profiles": ["aging_elasticity", "post_menopause"],
+      "target_age_range": "40-60+",
+      "skin_concerns": ["fine_lines", "elasticity_loss", "sagging"]
+    },
+    {
+      "id": "DE_eucerin_oil_control_spf50",
+      "name_kr": "썬 오일컨트롤 SPF50+",
+      "name_en": "Sun Oil Control Gel-Cream SPF50+",
+      "name_de": "Sun Oil Control Gel-Cream SPF50+",
+      "brand": "Eucerin",
+      "brand_kr": "유세린",
+      "country": "DE",
+      "market_tier": "medical_otc",
+      "price_tier": "full",
+      "price_eur": 19.95,
+      "price_krw": null,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.399,
+      "routine_slot": "spf",
+      "texture_type": "gel_cream",
+      "texture_description_kr": "매트 젤크림",
+      "ingredients": [
+        {
+          "name_en": "SPF50+ UVA/UVB",
+          "name_kr": "SPF50+",
+          "name_inci": "Tinosorb S + multi filters",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "uv_protection"
+        },
+        {
+          "name_en": "Licochalcone A",
+          "name_kr": "리코칼콘A",
+          "name_inci": "Glycyrrhiza Inflata Root Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "antioxidant"
+        },
+        {
+          "name_en": "Carnitine",
+          "name_kr": "카르니틴",
+          "name_inci": "Carnitine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "sebum_control"
+        }
+      ],
+      "target_profiles": [
+        "oily_acne",
+        "dehydrated_oily",
+        "pigmentation",
+        "aging_elasticity",
+        "mens"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "uv_protection",
+        "excess_sebum"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am",
+      "one_liner_kr": "오일컨트롤+매트+SPF50+ 5프로파일 커버",
+      "one_liner_en": "Oil control + matte + SPF50+ covers 5 profiles",
+      "one_liner_de": "",
+      "application_instruction_kr": "",
+      "application_instruction_en": "",
+      "application_instruction_de": "",
+      "routine_steps": [
+        "3step",
+        "5step",
+        "premium_5step"
+      ],
+      "fragrance_free": true,
+      "available_in_de": true,
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "full_inci_list": "MANUAL_CHECK_REQUIRED",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "확인 필요"
+      }
+    }
+  ]
+}

@@ -126,11 +126,11 @@ export const CLINICAL_PRODUCTS: Product[] = [
         },
         benefitSummary: {
             en: "Unclogs pores and normalizes sebum production from within the follicle.",
-            de: "Befreit die Poren und normalisiert die Talgproduktion tief im Follikel."
+            de: "Befreit die Poren und normalisiert die Hautöl-Produktion tief im Follikel."
         },
         description: {
             en: "This lipid-soluble liquid exfoliant penetrates deep into the sebaceous glands to dissolve congested follicular debris. It actively halts the acne cascade by reducing inflammation and regulating sebum discharge.",
-            de: "Dieses fettlösliche flüssige Peeling dringt tief in die Talgdrüsen ein, um verstopfte Abfallstoffe in den Follikeln aufzulösen. Es stoppt aktiv die Akne-Kaskade, indem es Entzündungen reduziert und die Talgabsonderung reguliert."
+            de: "Dieses fettlösliche flüssige Peeling dringt tief in die Öl-Drüsen ein, um verstopfte Abfallstoffe in den Follikeln aufzulösen. Es stoppt aktiv die Akne-Kaskade, indem es Entzündungen reduziert und die Ölabsonderung reguliert."
         },
         howToUse: {
             en: "Lightly soak a cotton pad and apply over the entire face, focusing on congested areas. Do not rinse. Start with PM use every other day.",

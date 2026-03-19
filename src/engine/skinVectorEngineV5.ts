@@ -109,9 +109,9 @@ const V5_PATTERNS: V5RiskPattern[] = [
     axis_gates: { seb: 55, hyd: 50 },
     v5Gates:    { seb: 55, hyd: 50 },
     clinical_en:
-      "Simultaneous excess sebum and moisture deficit — a compensatory cycle where surface oil masks underlying dehydration. Hydration-first protocol required.",
+      "Simultaneous excess skin oil and moisture deficit — a compensatory cycle where surface oil masks underlying dehydration. Hydration-first protocol required.",
     clinical_de:
-      "Gleichzeitig überschüssiger Talg und Feuchtigkeitsmangel — ein kompensatorischer Kreislauf, bei dem Oberflächenöl die zugrunde liegende Dehydrierung maskiert.",
+      "Gleichzeitig überschüssiges Hautöl und Feuchtigkeitsmangel — ein kompensatorischer Kreislauf, bei dem Oberflächenöl die zugrunde liegende Dehydrierung maskiert.",
     clinical_ko:
       "과다한 피지와 수분 부족이 동시에 나타나는 보상적 사이클. 표면 유분이 내부 탈수를 가리고 있습니다. 수분 공급 우선 프로토콜이 필요합니다.",
     flag: "HYDRATION_FIRST",
@@ -130,9 +130,9 @@ const V5_PATTERNS: V5RiskPattern[] = [
     v5Gates:    { acne: 60 },
     requiresFlag: "HORMONAL_ACNE",
     clinical_en:
-      "Androgen-driven sebaceous hyperactivity concentrated in jaw, mouth, and lower cheek zones. Breakout cycle correlates with hormonal fluctuation.",
+      "Androgen-driven oil-gland hyperactivity concentrated in jaw, mouth, and lower cheek zones. Breakout cycle correlates with hormonal fluctuation.",
     clinical_de:
-      "Androgen-getriebene Talgdrüsenhyperaktivität in Kiefer-, Kinn- und Untergesichtsbereichen. Ausbruchszyklus korreliert mit hormonellen Schwankungen.",
+      "Androgen-getriebene Öl-Drüsen-Hyperaktivität in Kiefer-, Kinn- und Untergesichtsbereichen. Ausbruchszyklus korreliert mit hormonellen Schwankungen.",
     clinical_ko:
       "안드로겐이 유발하는 피지선 과활성 — 턱선, 턱, 하부 볼에 집중. 여드름 주기가 호르몬 변동과 상관관계가 있습니다.",
     flag: "HORMONAL_ACNE_PROTOCOL",
@@ -170,9 +170,9 @@ const V5_PATTERNS: V5RiskPattern[] = [
     axis_gates: { texture: 55, seb: 45 },
     v5Gates:    { texture: 55, seb: 45 },
     clinical_en:
-      "Pore congestion and surface texture irregularity sharing the same root — excess sebum driving follicular impaction and surface roughness.",
+      "Pore congestion and surface texture irregularity sharing the same root — excess skin oil driving follicular impaction and surface roughness.",
     clinical_de:
-      "Porenblockierung und Texturunregelmäßigkeiten mit derselben Ursache — überschüssiger Talg treibt follikuläre Verstopfung und Oberflächenrauheit an.",
+      "Porenblockierung und Texturunregelmäßigkeiten mit derselben Ursache — überschüssiges Hautöl treibt follikuläre Verstopfung und Oberflächenrauheit an.",
     clinical_ko:
       "모공 막힘과 표면 질감 불균일이 같은 원인을 공유 — 과다한 피지가 모낭 막힘과 피부 거칠기를 유발합니다.",
     flag: "HYDRATION_FIRST",

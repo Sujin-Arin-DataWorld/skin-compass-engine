@@ -33,100 +33,152 @@ interface Concern {
   showForAge?: { min?: number; max?: number }; // age bracket filter
 }
 
-// ─── Colour palette ───────────────────────────────────────────────────────────
-const COLOR_PALETTE = {
-  dark_selected:  "#f7e28dff",
-  light_selected: "#8EA273",
-  dark_idle:      "rgba(174, 226, 255, 0.5)",
-  light_idle:     "#8EA273",
-};
-
 // ─── Zone labels ──────────────────────────────────────────────────────────────
 const ZONE_LABELS: Record<ZoneId, Record<Lang, string>> = {
-  forehead: { en: "Forehead",      de: "Stirn",         ko: "이마"        },
-  nose:     { en: "Nose & T-Zone", de: "Nase & T-Zone", ko: "코 & T존"    },
-  eyes:     { en: "Eye Area",      de: "Augenpartie",   ko: "눈가 & 눈밑"  },
-  cheeks:   { en: "Cheeks",        de: "Wangen",        ko: "볼"          },
-  mouth:    { en: "Mouth Area",    de: "Mundpartie",    ko: "입가"        },
-  jawline:  { en: "Jawline",       de: "Kieferlinie",   ko: "턱선"        },
-  neck:     { en: "Neck",          de: "Hals",          ko: "목"          },
+  forehead: { en: "Forehead", de: "Stirn", ko: "이마" },
+  nose: { en: "Nose & T-Zone", de: "Nase & T-Zone", ko: "코 & T존" },
+  eyes: { en: "Eye Area", de: "Augenpartie", ko: "눈가 & 눈밑" },
+  cheeks: { en: "Cheeks", de: "Wangen", ko: "볼" },
+  mouth: { en: "Mouth Area", de: "Mundpartie", ko: "입가" },
+  jawline: { en: "Jawline", de: "Kieferlinie", ko: "턱선" },
+  neck: { en: "Neck", de: "Hals", ko: "목" },
 };
 
 // ─── Zone concern data ────────────────────────────────────────────────────────
 const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
   forehead: [
-    { id: "oily_f",       label: { en: "Oily / Shiny",      de: "Ölig / Glänzend",           ko: "이마 번들거림"       }, axis: "seb",
-      glossary: { en: "Excess oil (sebum) from overactive glands. Common in the T-zone where oil glands are densest.", de: "Überschüssiger Talg aus überaktiven Drüsen. Häufig in der T-Zone, wo die Talgdrüsen am dichtesten sind.", ko: "피지샘이 활발해서 생기는 과도한 유분이에요. 피지샘이 가장 밀집한 T존에서 흔해요." } },
-    { id: "blackheads_f", label: { en: "Blackheads",         de: "Mitesser",                  ko: "까만 점 같은 모공"   }, axis: "texture",
-      glossary: { en: "Open pores clogged with oxidized oil — they turn dark when exposed to air, not because of dirt.", de: "Offene Poren, verstopft mit oxidiertem Talg — sie werden durch Luftkontakt dunkel, nicht durch Schmutz.", ko: "피지가 공기와 만나 산화되어 검게 변한 열린 모공이에요 — 때가 낀 게 아니에요." } },
-    { id: "whiteheads_f", label: { en: "Whiteheads",         de: "Hautfarbene Pickelchen",     ko: "피부 속 좁쌀 돌기"   }, axis: "texture",
-      glossary: { en: "Closed pores trapped under the skin surface — small bumps you can feel but barely see.", de: "Geschlossene Poren unter der Hautoberfläche — kleine Erhöhungen, die man fühlt, aber kaum sieht.", ko: "피부 표면 아래 막힌 모공이에요 — 만져지지만 잘 안 보이는 작은 돌기예요." } },
-    { id: "lines_f",      label: { en: "Forehead Lines",     de: "Stirnfalten",               ko: "이마 주름"           }, axis: "aging", showForAge: { min: 1 },
-      glossary: { en: "Horizontal lines on the forehead from repeated muscle movement. Deeper lines indicate collagen loss.", de: "Horizontale Linien auf der Stirn durch wiederholte Muskelbewegung. Tiefere Linien deuten auf Kollagenverlust hin.", ko: "반복적인 근육 움직임으로 생기는 이마 가로 주름이에요. 깊을수록 콜라겐 손실을 의미해요." } },
-    { id: "breakouts_f",  label: { en: "Breakouts",          de: "Unreinheiten",              ko: "트러블"              }, axis: "texture",
-      glossary: { en: "Inflamed spots from clogged pores and bacteria. Forehead breakouts often relate to oil overproduction or hair products.", de: "Entzündete Stellen durch verstopfte Poren und Bakterien. Stirn-Unreinheiten hängen oft mit Talgüberproduktion oder Haarprodukten zusammen.", ko: "모공이 막히고 세균이 번식해서 생기는 염증이에요. 이마 트러블은 피지 과다나 헤어 제품이 원인일 수 있어요." } },
+    {
+      id: "oily_f", label: { en: "Oily / Shiny", de: "Ölig / Glänzend", ko: "이마 번들거림" }, axis: "seb",
+      glossary: { en: "Excess oil from overactive glands. Common in the T-zone where oil glands are densest.", de: "Überschüssiges Hautöl aus überaktiven Drüsen. Häufig in der T-Zone, wo die Öl-Drüsen am dichtesten sind.", ko: "피지샘이 활발해서 생기는 과도한 유분이에요. 피지샘이 가장 밀집한 T존에서 흔해요." }
+    },
+    {
+      id: "blackheads_f", label: { en: "Blackheads", de: "Mitesser", ko: "까만 점 같은 모공" }, axis: "texture",
+      glossary: { en: "Open pores clogged with oxidized oil — they turn dark when exposed to air, not because of dirt.", de: "Offene Poren, verstopft mit oxidiertem Hautöl — sie werden durch Luftkontakt dunkel, nicht durch Schmutz.", ko: "피지가 공기와 만나 산화되어 검게 변한 열린 모공이에요 — 때가 낀 게 아니에요." }
+    },
+    {
+      id: "whiteheads_f", label: { en: "Whiteheads", de: "Hautfarbene Pickelchen", ko: "피부 속 좁쌀 돌기" }, axis: "texture",
+      glossary: { en: "Closed pores trapped under the skin surface — small bumps you can feel but barely see.", de: "Geschlossene Poren unter der Hautoberfläche — kleine Erhöhungen, die man fühlt, aber kaum sieht.", ko: "피부 표면 아래 막힌 모공이에요 — 만져지지만 잘 안 보이는 작은 돌기예요." }
+    },
+    {
+      id: "lines_f", label: { en: "Forehead Lines", de: "Stirnfalten", ko: "이마 주름" }, axis: "aging", showForAge: { min: 1 },
+      glossary: { en: "Horizontal lines on the forehead from repeated muscle movement. Deeper lines indicate collagen loss.", de: "Horizontale Linien auf der Stirn durch wiederholte Muskelbewegung. Tiefere Linien deuten auf Kollagenverlust hin.", ko: "반복적인 근육 움직임으로 생기는 이마 가로 주름이에요. 깊을수록 콜라겐 손실을 의미해요." }
+    },
+    {
+      id: "breakouts_f", label: { en: "Breakouts", de: "Unreinheiten", ko: "트러블" }, axis: "texture",
+      glossary: { en: "Inflamed spots from clogged pores and bacteria. Forehead breakouts often relate to oil overproduction or hair products.", de: "Entzündete Stellen durch verstopfte Poren und Bakterien. Stirn-Unreinheiten hängen oft mit übermäßiger Ölproduktion oder Haarprodukten zusammen.", ko: "모공이 막히고 세균이 번식해서 생기는 염증이에요. 이마 트러블은 피지 과다나 헤어 제품이 원인일 수 있어요." }
+    },
   ],
   nose: [
-    { id: "blackheads_n", label: { en: "Blackheads (Nose)",   de: "Mitesser (Nase)",           ko: "코 위 까만 점들"     }, axis: "texture",
-      glossary: { en: "The nose has the highest oil gland density on your face — blackheads here are extremely common and not a hygiene issue.", de: "Die Nase hat die höchste Talgdrüsendichte im Gesicht — Mitesser hier sind extrem häufig und kein Hygieneproblem.", ko: "코는 얼굴에서 피지샘이 가장 밀집한 부위예요 — 여기 블랙헤드는 매우 흔하고 위생 문제가 아니에요." } },
-    { id: "pores_n",      label: { en: "Enlarged Pores",      de: "Vergrößerte Poren",         ko: "딸기 씨 같은 모공"  }, axis: "texture",
-      glossary: { en: "Pores look larger when filled with oil or when skin loses elasticity. Round pores = oil; teardrop pores = aging.", de: "Poren wirken größer, wenn sie mit Talg gefüllt sind oder die Elastizität nachlässt. Rund = Öl; Tropfenform = Alterung.", ko: "모공은 피지로 차 있거나 탄력이 떨어지면 더 커 보여요. 둥근 모공 = 피지; 물방울 모공 = 노화 신호." } },
-    { id: "oily_n",       label: { en: "Always Shiny / Oily", de: "Immer glänzend / fettig",   ko: "코가 항상 번들거림"  }, axis: "seb",
-      glossary: { en: "The nose is the core of the T-zone — if it's always shiny, your sebum production rate is elevated.", de: "Die Nase ist das Zentrum der T-Zone — wenn sie immer glänzt, ist Ihre Talgproduktion erhöht.", ko: "코는 T존의 중심이에요 — 항상 번들거린다면 피지 분비가 활발한 상태예요." } },
-    { id: "redness_n",    label: { en: "Redness around Nose", de: "Rötung um die Nase",        ko: "코 주변 붉어짐"     }, axis: "sen",
-      glossary: { en: "Redness around the nose can signal irritation, broken capillaries, or early rosacea. Worth monitoring.", de: "Rötung um die Nase kann auf Reizung, geplatzte Kapillaren oder frühe Rosazea hindeuten.", ko: "코 주변 붉어짐은 자극, 모세혈관 확장, 초기 주사(로제이시아)의 신호일 수 있어요." } },
+    {
+      id: "blackheads_n", label: { en: "Blackheads (Nose)", de: "Mitesser (Nase)", ko: "코 위 까만 점들" }, axis: "texture",
+      glossary: { en: "The nose has the highest oil gland density on your face — blackheads here are extremely common and not a hygiene issue.", de: "Die Nase hat die höchste Öl-Drüsen-Dichte im Gesicht — Mitesser hier sind extrem häufig und kein Hygieneproblem.", ko: "코는 얼굴에서 피지샘이 가장 밀집한 부위예요 — 여기 블랙헤드는 매우 흔하고 위생 문제가 아니에요." }
+    },
+    {
+      id: "pores_n", label: { en: "Enlarged Pores", de: "Vergrößerte Poren", ko: "딸기 씨 같은 모공" }, axis: "texture",
+      glossary: { en: "Pores look larger when filled with oil or when skin loses elasticity. Round pores = oil; teardrop pores = aging.", de: "Poren wirken größer, wenn sie mit Hautöl gefüllt sind oder die Elastizität nachlässt. Rund = Öl; Tropfenform = Alterung.", ko: "모공은 피지로 차 있거나 탄력이 떨어지면 더 커 보여요. 둥근 모공 = 피지; 물방울 모공 = 노화 신호." }
+    },
+    {
+      id: "oily_n", label: { en: "Always Shiny / Oily", de: "Immer glänzend / fettig", ko: "코가 항상 번들거림" }, axis: "seb",
+      glossary: { en: "The nose is the core of the T-zone — if it's always shiny, your skin oil production rate is elevated.", de: "Die Nase ist das Zentrum der T-Zone — wenn sie immer glänzt, ist Ihre Hautöl-Produktion erhöht.", ko: "코는 T존의 중심이에요 — 항상 번들거린다면 피지 분비가 활발한 상태예요." }
+    },
+    {
+      id: "redness_n", label: { en: "Redness around Nose", de: "Rötung um die Nase", ko: "코 주변 붉어짐" }, axis: "sen",
+      glossary: { en: "Redness around the nose can signal irritation, broken capillaries, or early rosacea. Worth monitoring.", de: "Rötung um die Nase kann auf Reizung, geplatzte Kapillaren oder frühe Rosazea hindeuten.", ko: "코 주변 붉어짐은 자극, 모세혈관 확장, 초기 주사(로제이시아)의 신호일 수 있어요." }
+    },
   ],
   eyes: [
-    { id: "dark_circles_e", label: { en: "Dark Circles",          de: "Dunkle Augenringe",         ko: "다크서클"            }, axis: "pigment",
-      glossary: { en: "Dark circles are often genetic or from thin under-eye skin showing blood vessels beneath. Sleep and hydration help but may not eliminate them.", de: "Augenringe sind oft genetisch bedingt oder entstehen durch dünne Haut, die Blutgefäße durchscheinen lässt.", ko: "다크서클은 유전적이거나 얇은 눈밑 피부 아래 혈관이 비치는 거예요. 수면과 수분이 도움되지만 완전히 없애기 어려울 수 있어요." } },
-    { id: "fine_lines_e",   label: { en: "Fine Lines",            de: "Feine Linien",              ko: "잔주름"              }, axis: "aging", showForAge: { min: 1 },
-      glossary: { en: "The eye area has the thinnest skin on your face (0.5mm) — lines appear here first as collagen declines.", de: "Die Augenpartie hat die dünnste Haut im Gesicht (0,5mm) — Linien erscheinen hier zuerst bei Kollagenabbau.", ko: "눈가는 얼굴에서 가장 얇은 피부(0.5mm)예요 — 콜라겐이 줄면 이곳에서 가장 먼저 주름이 나타나요." } },
-    { id: "puffiness_e",    label: { en: "Puffiness / Swelling",  de: "Schwellungen / Tränensäcke", ko: "눈가 붓기"          }, axis: "aging",
-      glossary: { en: "Puffiness comes from fluid retention or fat pad shifting. Worse in the morning, with salt, or with allergies.", de: "Schwellungen entstehen durch Flüssigkeitsansammlungen oder Verschiebung der Fettpolster. Morgens, bei Salz oder Allergien schlimmer.", ko: "부기는 수분 정체나 지방 패드 이동으로 생겨요. 아침에, 짠 음식 후, 알레르기 시 더 심해져요." } },
-    { id: "dryness_e",      label: { en: "Dryness / Rough",       de: "Trockenheit / Rau",         ko: "눈가 당김 / 까칠함"  }, axis: "hyd",
-      glossary: { en: "The eye area lacks oil glands — it dries out faster than anywhere else on your face and needs dedicated hydration.", de: "Die Augenpartie hat kaum Talgdrüsen — sie trocknet schneller aus als jede andere Gesichtszone.", ko: "눈가에는 피지샘이 거의 없어서 얼굴 중 가장 빨리 건조해져요 — 전용 수분 관리가 필요해요." } },
+    {
+      id: "dark_circles_e", label: { en: "Dark Circles", de: "Dunkle Augenringe", ko: "다크서클" }, axis: "pigment",
+      glossary: { en: "Dark circles are often genetic or from thin under-eye skin showing blood vessels beneath. Sleep and hydration help but may not eliminate them.", de: "Augenringe sind oft genetisch bedingt oder entstehen durch dünne Haut, die Blutgefäße durchscheinen lässt.", ko: "다크서클은 유전적이거나 얇은 눈밑 피부 아래 혈관이 비치는 거예요. 수면과 수분이 도움되지만 완전히 없애기 어려울 수 있어요." }
+    },
+    {
+      id: "fine_lines_e", label: { en: "Fine Lines", de: "Feine Linien", ko: "잔주름" }, axis: "aging", showForAge: { min: 1 },
+      glossary: { en: "The eye area has the thinnest skin on your face (0.5mm) — lines appear here first as collagen declines.", de: "Die Augenpartie hat die dünnste Haut im Gesicht (0,5mm) — Linien erscheinen hier zuerst bei Kollagenabbau.", ko: "눈가는 얼굴에서 가장 얇은 피부(0.5mm)예요 — 콜라겐이 줄면 이곳에서 가장 먼저 주름이 나타나요." }
+    },
+    {
+      id: "puffiness_e", label: { en: "Puffiness / Swelling", de: "Schwellungen / Tränensäcke", ko: "눈가 붓기" }, axis: "aging",
+      glossary: { en: "Puffiness comes from fluid retention or fat pad shifting. Worse in the morning, with salt, or with allergies.", de: "Schwellungen entstehen durch Flüssigkeitsansammlungen oder Verschiebung der Fettpolster. Morgens, bei Salz oder Allergien schlimmer.", ko: "부기는 수분 정체나 지방 패드 이동으로 생겨요. 아침에, 짠 음식 후, 알레르기 시 더 심해져요." }
+    },
+    {
+      id: "dryness_e", label: { en: "Dryness / Rough", de: "Trockenheit / Rau", ko: "눈가 당김 / 까칠함" }, axis: "hyd",
+      glossary: { en: "The eye area lacks oil glands — it dries out faster than anywhere else on your face and needs dedicated hydration.", de: "Die Augenpartie hat kaum Öl-Drüsen — sie trocknet schneller aus als jede andere Gesichtszone.", ko: "눈가에는 피지샘이 거의 없어서 얼굴 중 가장 빨리 건조해져요 — 전용 수분 관리가 필요해요." }
+    },
   ],
   cheeks: [
-    { id: "redness_c",  label: { en: "Redness / Flushing",   de: "Rötung / Flush",            ko: "쉽게 붉어짐 / 열감"  }, axis: "sen",
-      glossary: { en: "Cheek redness that lingers may indicate rosacea — a chronic condition affecting facial blood vessels. Triggers include heat, alcohol, and spicy food.", de: "Anhaltende Wangenrötung kann auf Rosazea hindeuten — eine chronische Erkrankung der Gesichtsblutgefäße.", ko: "볼의 지속적인 붉어짐은 주사(로제이시아)의 신호일 수 있어요 — 열, 알코올, 매운 음식이 악화시켜요." } },
-    { id: "acne_c",     label: { en: "Breakouts / Acne",     de: "Unreinheiten / Akne",       ko: "트러블"              }, axis: "acne",
-      glossary: { en: "Cheek breakouts can be triggered by phone screens, pillowcases, or touching your face — external bacteria meeting pores.", de: "Wangen-Unreinheiten können durch Handybildschirme, Kissenbezüge oder Gesichtsberührungen ausgelöst werden.", ko: "볼 트러블은 휴대폰 화면, 베갯잇, 얼굴 만지는 습관 — 외부 세균이 모공을 만나서 생길 수 있어요." } },
-    { id: "dryness_c",  label: { en: "Dryness / Tightness",  de: "Trockenheit / Spannung",    ko: "건조 / 당김"         }, axis: "hyd",
-      glossary: { en: "Cheeks have fewer oil glands than the T-zone — they're often the first area to feel tight or flaky, especially in winter.", de: "Wangen haben weniger Talgdrüsen als die T-Zone — sie fühlen sich oft zuerst trocken oder schuppig an, besonders im Winter.", ko: "볼은 T존보다 피지샘이 적어서 건조나 각질이 가장 먼저 나타나는 부위예요 — 특히 겨울에 심해져요." } },
-    { id: "pigment_c",  label: { en: "Dark Spots / Pigment", de: "Flecken & Hautton",         ko: "잡티 / 얼룩"         }, axis: "pigment",
-      glossary: { en: "Dark spots from sun damage or post-breakout marks. UV exposure makes them darker — daily SPF is essential for fading.", de: "Dunkle Flecken durch Sonnenschäden oder nach Unreinheiten. UV-Strahlung verschlimmert sie — täglicher LSF ist zum Verblassen essenziell.", ko: "자외선 손상이나 트러블 흔적으로 생긴 잡티예요. 자외선에 노출되면 더 진해져요 — 매일 선크림이 필수예요." } },
-    { id: "pores_c",    label: { en: "Visible Pores",        de: "Sichtbare Poren",           ko: "볼 모공이 눈에 띔"   }, axis: "texture",
-      glossary: { en: "Visible pores on cheeks often have a teardrop shape — a sign of elasticity loss rather than just oil production.", de: "Sichtbare Poren auf den Wangen haben oft eine Tropfenform — ein Zeichen für Elastizitätsverlust, nicht nur Talgproduktion.", ko: "볼의 눈에 띄는 모공은 물방울 모양인 경우가 많아요 — 피지보다는 탄력 저하의 신호예요." } },
+    {
+      id: "redness_c", label: { en: "Redness / Flushing", de: "Rötung / Flush", ko: "쉽게 붉어짐 / 열감" }, axis: "sen",
+      glossary: { en: "Cheek redness that lingers may indicate rosacea — a chronic condition affecting facial blood vessels. Triggers include heat, alcohol, and spicy food.", de: "Anhaltende Wangenrötung kann auf Rosazea hindeuten — eine chronische Erkrankung der Gesichtsblutgefäße.", ko: "볼의 지속적인 붉어짐은 주사(로제이시아)의 신호일 수 있어요 — 열, 알코올, 매운 음식이 악화시켜요." }
+    },
+    {
+      id: "acne_c", label: { en: "Breakouts / Acne", de: "Unreinheiten / Akne", ko: "트러블" }, axis: "acne",
+      glossary: { en: "Cheek breakouts can be triggered by phone screens, pillowcases, or touching your face — external bacteria meeting pores.", de: "Wangen-Unreinheiten können durch Handybildschirme, Kissenbezüge oder Gesichtsberührungen ausgelöst werden.", ko: "볼 트러블은 휴대폰 화면, 베갯잇, 얼굴 만지는 습관 — 외부 세균이 모공을 만나서 생길 수 있어요." }
+    },
+    {
+      id: "dryness_c", label: { en: "Dryness / Tightness", de: "Trockenheit / Spannung", ko: "건조 / 당김" }, axis: "hyd",
+      glossary: { en: "Cheeks have fewer oil glands than the T-zone — they're often the first area to feel tight or flaky, especially in winter.", de: "Wangen haben weniger Öl-Drüsen als die T-Zone — sie fühlen sich oft zuerst trocken oder schuppig an, besonders im Winter.", ko: "볼은 T존보다 피지샘이 적어서 건조나 각질이 가장 먼저 나타나는 부위예요 — 특히 겨울에 심해져요." }
+    },
+    {
+      id: "pigment_c", label: { en: "Dark Spots / Pigment", de: "Flecken & Hautton", ko: "잡티 / 얼룩" }, axis: "pigment",
+      glossary: { en: "Dark spots from sun damage or post-breakout marks. UV exposure makes them darker — daily SPF is essential for fading.", de: "Dunkle Flecken durch Sonnenschäden oder nach Unreinheiten. UV-Strahlung verschlimmert sie — täglicher LSF ist zum Verblassen essenziell.", ko: "자외선 손상이나 트러블 흔적으로 생긴 잡티예요. 자외선에 노출되면 더 진해져요 — 매일 선크림이 필수예요." }
+    },
+    {
+      id: "pores_c", label: { en: "Visible Pores", de: "Sichtbare Poren", ko: "볼 모공이 눈에 띔" }, axis: "texture",
+      glossary: { en: "Visible pores on cheeks often have a teardrop shape — a sign of elasticity loss rather than just oil production.", de: "Sichtbare Poren auf den Wangen haben oft eine Tropfenform — ein Zeichen für Elastizitätsverlust, nicht nur Hautöl-Produktion.", ko: "볼의 눈에 띄는 모공은 물방울 모양인 경우가 많아요 — 피지보다는 탄력 저하의 신호예요." }
+    },
   ],
   mouth: [
-    { id: "nasolabial", label: { en: "Smile Lines",              de: "Nasolabialfalten",          ko: "팔자 주름"           }, axis: "aging", showForAge: { min: 1 },
-      glossary: { en: "Smile lines deepen as the cheek fat pad descends with age and collagen loss — they're a normal part of facial aging.", de: "Nasolabialfalten vertiefen sich, wenn das Wangenfettpolster mit dem Alter absinkt — ein normaler Teil der Gesichtsalterung.", ko: "팔자주름은 나이 들면서 볼 지방이 내려가고 콜라겐이 줄면 깊어져요 — 자연스러운 노화 현상이에요." } },
-    { id: "dryness_m",  label: { en: "Dryness around Mouth",     de: "Trockenheit um den Mund",   ko: "입 주변 건조 / 당김"  }, axis: "hyd",
-      glossary: { en: "The mouth area is exposed to constant movement (eating, talking) which can crack dry skin. Lip-licking makes it worse.", de: "Die Mundpartie ist ständiger Bewegung ausgesetzt (Essen, Sprechen), was trockene Haut rissig machen kann.", ko: "입 주변은 먹고 말하면서 계속 움직여서 건조한 피부가 갈라지기 쉬워요. 입술 핥는 습관은 더 악화시켜요." } },
-    { id: "pigment_m",  label: { en: "Dark Spots near Mouth",    de: "Dunkle Flecken am Mund",    ko: "입가 잡티 / 칙칙함"  }, axis: "pigment",
-      glossary: { en: "Darkening around the mouth can be hormonal (melasma) or from sun damage. Common in perimenopause.", de: "Verdunkelung um den Mund kann hormonell (Melasma) oder durch Sonnenschäden bedingt sein. Häufig in der Perimenopause.", ko: "입가 칙칙함은 호르몬(기미)이나 자외선 손상일 수 있어요. 갱년기 초기에 흔해요." } },
-    { id: "perioral_m", label: { en: "Irritation around Mouth",  de: "Reizung um den Mund",       ko: "입 주변 자극 / 따가움" }, axis: "sen",
-      glossary: { en: "Irritation around the mouth may signal perioral dermatitis — often caused by overuse of heavy creams or steroid creams in this area.", de: "Reizung um den Mund kann auf periorale Dermatitis hindeuten — oft durch übermäßigen Einsatz schwerer oder steroider Cremes.", ko: "입 주변 자극은 구주위 피부염의 신호일 수 있어요 — 이 부위에 무거운 크림이나 스테로이드 크림을 과다 사용하면 생겨요." } },
+    {
+      id: "nasolabial", label: { en: "Smile Lines", de: "Nasolabialfalten", ko: "팔자 주름" }, axis: "aging", showForAge: { min: 1 },
+      glossary: { en: "Smile lines deepen as the cheek fat pad descends with age and collagen loss — they're a normal part of facial aging.", de: "Nasolabialfalten vertiefen sich, wenn das Wangenfettpolster mit dem Alter absinkt — ein normaler Teil der Gesichtsalterung.", ko: "팔자주름은 나이 들면서 볼 지방이 내려가고 콜라겐이 줄면 깊어져요 — 자연스러운 노화 현상이에요." }
+    },
+    {
+      id: "dryness_m", label: { en: "Dryness around Mouth", de: "Trockenheit um den Mund", ko: "입 주변 건조 / 당김" }, axis: "hyd",
+      glossary: { en: "The mouth area is exposed to constant movement (eating, talking) which can crack dry skin. Lip-licking makes it worse.", de: "Die Mundpartie ist ständiger Bewegung ausgesetzt (Essen, Sprechen), was trockene Haut rissig machen kann.", ko: "입 주변은 먹고 말하면서 계속 움직여서 건조한 피부가 갈라지기 쉬워요. 입술 핥는 습관은 더 악화시켜요." }
+    },
+    {
+      id: "pigment_m", label: { en: "Dark Spots near Mouth", de: "Dunkle Flecken am Mund", ko: "입가 잡티 / 칙칙함" }, axis: "pigment",
+      glossary: { en: "Darkening around the mouth can be hormonal (melasma) or from sun damage. Common in perimenopause.", de: "Verdunkelung um den Mund kann hormonell (Melasma) oder durch Sonnenschäden bedingt sein. Häufig in der Perimenopause.", ko: "입가 칙칙함은 호르몬(기미)이나 자외선 손상일 수 있어요. 갱년기 초기에 흔해요." }
+    },
+    {
+      id: "perioral_m", label: { en: "Irritation around Mouth", de: "Reizung um den Mund", ko: "입 주변 자극 / 따가움" }, axis: "sen",
+      glossary: { en: "Irritation around the mouth may signal perioral dermatitis — often caused by overuse of heavy creams or steroid creams in this area.", de: "Reizung um den Mund kann auf periorale Dermatitis hindeuten — oft durch übermäßigen Einsatz schwerer oder steroider Cremes.", ko: "입 주변 자극은 구주위 피부염의 신호일 수 있어요 — 이 부위에 무거운 크림이나 스테로이드 크림을 과다 사용하면 생겨요." }
+    },
   ],
   jawline: [
-    { id: "hormonal_j", label: { en: "Recurring Hormonal Breakouts", de: "Wiederkehrende hormonelle Pickel", ko: "같은 자리에 반복되는 트러블" }, axis: "acne", showForAge: { max: 4 },
-      glossary: { en: "The jawline has the highest concentration of androgen receptors — recurring breakouts here strongly indicate hormonal influence.", de: "Die Kieferlinie hat die höchste Konzentration an Androgenrezeptoren — wiederkehrende Unreinheiten hier deuten stark auf hormonellen Einfluss hin.", ko: "턱선은 안드로겐 수용체가 가장 많은 곳이에요 — 이곳의 반복 트러블은 호르몬 영향을 강하게 시사해요." } },
-    { id: "cystic_j",   label: { en: "Deep Painful Bumps",           de: "Tiefe schmerzhafte Knoten",        ko: "크고 깊은 혹 같은 트러블"   }, axis: "acne",
-      glossary: { en: "Deep, painful lumps that don't come to a surface head. These form deep in the dermis and often need professional treatment.", de: "Tiefe, schmerzhafte Knoten, die nicht an die Oberfläche kommen. Sie bilden sich tief in der Dermis und brauchen oft professionelle Behandlung.", ko: "표면으로 나오지 않는 깊고 아픈 혹이에요. 진피 깊숙이 생기며 전문의 치료가 필요한 경우가 많아요." } },
-    { id: "texture_j",  label: { en: "Rough / Bumpy Texture",        de: "Raue / unebene Textur",            ko: "턱선 피부 결 거칠음"         }, axis: "texture",
-      glossary: { en: "Rough or bumpy texture along the jawline may indicate clogged pores from makeup residue, phone contact, or hormonal congestion.", de: "Raue oder unebene Textur an der Kieferlinie kann auf verstopfte Poren durch Make-up-Rückstände, Handykontakt oder hormonelle Stauung hindeuten.", ko: "턱선의 거친 피부결은 화장 잔여물, 휴대폰 접촉, 호르몬성 모공 막힘이 원인일 수 있어요." } },
-    { id: "sagging_j",  label: { en: "Loss of Jawline Definition",   de: "Verlust der Kieferkontur",         ko: "턱선 탄력 저하 / 처짐"       }, axis: "aging", showForAge: { min: 2 },
-      glossary: { en: "Loss of jawline definition is one of the earliest visible signs of collagen and elastin decline — it accelerates after 40.", de: "Der Verlust der Kieferkontur ist eines der frühesten sichtbaren Zeichen von Kollagen- und Elastinabbau — beschleunigt sich nach 40.", ko: "턱선 윤곽이 흐려지는 건 콜라겐·엘라스틴 감소의 초기 신호예요 — 40대 이후 빨라져요." } },
+    {
+      id: "hormonal_j", label: { en: "Recurring Hormonal Breakouts", de: "Wiederkehrende hormonelle Pickel", ko: "같은 자리에 반복되는 트러블" }, axis: "acne", showForAge: { max: 4 },
+      glossary: { en: "The jawline has the highest concentration of androgen receptors — recurring breakouts here strongly indicate hormonal influence.", de: "Die Kieferlinie hat die höchste Konzentration an Androgenrezeptoren — wiederkehrende Unreinheiten hier deuten stark auf hormonellen Einfluss hin.", ko: "턱선은 안드로겐 수용체가 가장 많은 곳이에요 — 이곳의 반복 트러블은 호르몬 영향을 강하게 시사해요." }
+    },
+    {
+      id: "cystic_j", label: { en: "Deep Painful Bumps", de: "Tiefe schmerzhafte Knoten", ko: "크고 깊은 혹 같은 트러블" }, axis: "acne",
+      glossary: { en: "Deep, painful lumps that don't come to a surface head. These form deep in the dermis and often need professional treatment.", de: "Tiefe, schmerzhafte Knoten, die nicht an die Oberfläche kommen. Sie bilden sich tief in der Dermis und brauchen oft professionelle Behandlung.", ko: "표면으로 나오지 않는 깊고 아픈 혹이에요. 진피 깊숙이 생기며 전문의 치료가 필요한 경우가 많아요." }
+    },
+    {
+      id: "texture_j", label: { en: "Rough / Bumpy Texture", de: "Raue / unebene Textur", ko: "턱선 피부 결 거칠음" }, axis: "texture",
+      glossary: { en: "Rough or bumpy texture along the jawline may indicate clogged pores from makeup residue, phone contact, or hormonal congestion.", de: "Raue oder unebene Textur an der Kieferlinie kann auf verstopfte Poren durch Make-up-Rückstände, Handykontakt oder hormonelle Stauung hindeuten.", ko: "턱선의 거친 피부결은 화장 잔여물, 휴대폰 접촉, 호르몬성 모공 막힘이 원인일 수 있어요." }
+    },
+    {
+      id: "sagging_j", label: { en: "Loss of Jawline Definition", de: "Verlust der Kieferkontur", ko: "턱선 탄력 저하 / 처짐" }, axis: "aging", showForAge: { min: 2 },
+      glossary: { en: "Loss of jawline definition is one of the earliest visible signs of collagen and elastin decline — it accelerates after 40.", de: "Der Verlust der Kieferkontur ist eines der frühesten sichtbaren Zeichen von Kollagen- und Elastinabbau — beschleunigt sich nach 40.", ko: "턱선 윤곽이 흐려지는 건 콜라겐·엘라스틴 감소의 초기 신호예요 — 40대 이후 빨라져요." }
+    },
   ],
   neck: [
-    { id: "neck_lines", label: { en: "Neck Lines",           de: "Halsfalten",          ko: "목 주름"             }, axis: "aging", showForAge: { min: 2 },
-      glossary: { en: "Horizontal neck lines ('tech neck') are worsened by looking down at screens. The neck gets less skincare attention but ages just as fast.", de: "Horizontale Halsfalten ('Tech-Neck') werden durch das Herunterschauen auf Bildschirme verschlimmert. Der Hals altert genauso schnell wie das Gesicht.", ko: "목 가로 주름('테크 넥')은 스마트폰을 내려다보는 습관으로 악화돼요. 목도 얼굴만큼 빨리 노화해요." } },
-    { id: "sagging",    label: { en: "Loss of Firmness",     de: "Elastizitätsverlust", ko: "목살 처짐 / 탄력 없음" }, axis: "aging", showForAge: { min: 2 },
-      glossary: { en: "Neck skin is thinner than facial skin and has fewer oil glands — firmness loss here often appears before the face.", de: "Die Halshaut ist dünner als die Gesichtshaut und hat weniger Talgdrüsen — Festigkeitsverlust zeigt sich hier oft zuerst.", ko: "목 피부는 얼굴보다 얇고 피지샘이 적어서 탄력 저하가 얼굴보다 먼저 나타날 수 있어요." } },
-    { id: "neck_red",   label: { en: "Redness / Irritation", de: "Rötung / Reizung",   ko: "목 부위 붉어짐"      }, axis: "sen",
-      glossary: { en: "Neck redness can come from friction (scarves, collars), sun exposure, or sensitivity. The neck is often neglected in SPF application.", de: "Halsrötung kann durch Reibung (Schals, Kragen), Sonneneinstrahlung oder Empfindlichkeit entstehen. Der Hals wird beim LSF-Auftragen oft vergessen.", ko: "목 붉어짐은 마찰(스카프, 옷깃), 자외선, 민감성이 원인이에요. 선크림 바를 때 목을 빼먹는 경우가 많아요." } },
-    { id: "neck_dry",   label: { en: "Dryness / Rough",      de: "Trockenheit / Rau",  ko: "목 피부 까칠함"      }, axis: "hyd",
-      glossary: { en: "The neck has very few oil glands — it depends on moisturizer more than any other area. Extend your face routine down to the neck.", de: "Der Hals hat sehr wenige Talgdrüsen — er ist auf Feuchtigkeitspflege angewiesen. Tragen Sie Ihre Gesichtspflege immer auch am Hals auf.", ko: "목에는 피지샘이 거의 없어서 보습제에 가장 의존하는 부위예요. 얼굴 루틴을 목까지 연장하세요." } },
+    {
+      id: "neck_lines", label: { en: "Neck Lines", de: "Halsfalten", ko: "목 주름" }, axis: "aging", showForAge: { min: 2 },
+      glossary: { en: "Horizontal neck lines ('tech neck') are worsened by looking down at screens. The neck gets less skincare attention but ages just as fast.", de: "Horizontale Halsfalten ('Tech-Neck') werden durch das Herunterschauen auf Bildschirme verschlimmert. Der Hals altert genauso schnell wie das Gesicht.", ko: "목 가로 주름('테크 넥')은 스마트폰을 내려다보는 습관으로 악화돼요. 목도 얼굴만큼 빨리 노화해요." }
+    },
+    {
+      id: "sagging", label: { en: "Loss of Firmness", de: "Elastizitätsverlust", ko: "목살 처짐 / 탄력 없음" }, axis: "aging", showForAge: { min: 2 },
+      glossary: { en: "Neck skin is thinner than facial skin and has fewer oil glands — firmness loss here often appears before the face.", de: "Die Halshaut ist dünner als die Gesichtshaut und hat weniger Öl-Drüsen — Festigkeitsverlust zeigt sich hier oft zuerst.", ko: "목 피부는 얼굴보다 얇고 피지샘이 적어서 탄력 저하가 얼굴보다 먼저 나타날 수 있어요." }
+    },
+    {
+      id: "neck_red", label: { en: "Redness / Irritation", de: "Rötung / Reizung", ko: "목 부위 붉어짐" }, axis: "sen",
+      glossary: { en: "Neck redness can come from friction (scarves, collars), sun exposure, or sensitivity. The neck is often neglected in SPF application.", de: "Halsrötung kann durch Reibung (Schals, Kragen), Sonneneinstrahlung oder Empfindlichkeit entstehen. Der Hals wird beim LSF-Auftragen oft vergessen.", ko: "목 붉어짐은 마찰(스카프, 옷깃), 자외선, 민감성이 원인이에요. 선크림 바를 때 목을 빼먹는 경우가 많아요." }
+    },
+    {
+      id: "neck_dry", label: { en: "Dryness / Rough", de: "Trockenheit / Rau", ko: "목 피부 까칠함" }, axis: "hyd",
+      glossary: { en: "The neck has very few oil glands — it depends on moisturizer more than any other area. Extend your face routine down to the neck.", de: "Der Hals hat sehr wenige Öl-Drüsen — er ist auf Feuchtigkeitspflege angewiesen. Tragen Sie Ihre Gesichtspflege immer auch am Hals auf.", ko: "목에는 피지샘이 거의 없어서 보습제에 가장 의존하는 부위예요. 얼굴 루틴을 목까지 연장하세요." }
+    },
   ],
 };
 
@@ -169,118 +221,89 @@ const COPY: Record<Lang, {
 // ─── SVG Geometry ──────────────────────────────────────────────────────────────
 interface ZoneDef {
   zone: ZoneId;
-  dots: { x: number; y: number }[];
-  connectors?: { x1: number; y1: number; x2: number; y2: number }[];
+  outlinePath: string;  // SVG path tracing zone boundary
   annotLine?: { x1: number; y1: number; x2: number; y2: number };
   hitPath: string;
 }
 
+// Outline paths traced over facemap_final.png (viewBox "-50 0 600 700")
 const ZONES_DEF: ZoneDef[] = [
   {
     zone: "forehead",
-    dots: [{ x: 260, y: 120 }, { x: 200, y: 150 }, { x: 320, y: 150 }],
-    connectors: [
-      { x1: 200, y1: 150, x2: 320, y2: 150 },
-      { x1: 260, y1: 120, x2: 260, y2: 150 },
-    ],
-    annotLine: { x1: 200, y1: 150, x2: 70, y2: 135 },
-    hitPath: "M 125 82 L 375 82 L 370 192 L 130 192 Z M 60 110 L 200 110 L 200 170 L 60 170 Z",
+    outlinePath:
+      "M 148 195 C 140 168, 135 138, 142 112 C 150 88, 170 74, 200 68 C 225 63, 240 62, 260 61 C 280 62, 295 63, 320 68 C 350 74, 370 88, 378 112 C 385 138, 380 168, 372 195 C 360 192, 330 188, 260 188 C 190 188, 160 192, 148 195 Z",
+    annotLine: { x1: 200, y1: 130, x2: 70, y2: 120 },
+    hitPath: "M 125 55 L 395 55 L 395 200 L 125 200 Z M 60 100 L 200 100 L 200 150 L 60 150 Z",
   },
   {
     zone: "nose",
-    dots: [{ x: 258, y: 192 }, { x: 258, y: 248 }, { x: 258, y: 305 }],
-    connectors: [
-      { x1: 258, y1: 192, x2: 258, y2: 248 },
-      { x1: 258, y1: 248, x2: 258, y2: 305 },
-    ],
-    annotLine: { x1: 258, y1: 192, x2: 440, y2: 170 },
-    hitPath: "M 215 178 L 285 178 L 290 332 L 210 332 Z M 250 150 L 450 150 L 450 200 L 250 200 Z",
+    outlinePath:
+      "M 235 192 C 240 200, 238 215, 236 240 C 234 260, 228 285, 222 305 C 218 318, 215 328, 218 338 C 225 350, 245 355, 260 356 C 275 355, 295 350, 302 338 C 305 328, 302 318, 298 305 C 292 285, 286 260, 284 240 C 282 215, 280 200, 285 192 C 278 190, 242 190, 235 192 Z",
+    annotLine: { x1: 298, y1: 270, x2: 430, y2: 250 },
+    hitPath: "M 215 185 L 305 185 L 310 360 L 210 360 Z M 300 240 L 450 240 L 450 270 L 300 270 Z",
   },
   {
     zone: "eyes",
-    dots: [{ x: 150, y: 218 }, { x: 370, y: 218 }, { x: 150, y: 270 }, { x: 370, y: 270 }],
-    connectors: [
-      { x1: 150, y1: 218, x2: 370, y2: 218 },
-      { x1: 150, y1: 218, x2: 150, y2: 270 },
-      { x1: 370, y1: 218, x2: 370, y2: 270 },
-      { x1: 150, y1: 270, x2: 370, y2: 270 },
-    ],
-    annotLine: { x1: 370, y1: 218, x2: 440, y2: 230 },
-    hitPath: "M 125 195 L 375 195 L 375 282 L 125 282 Z M 370 210 L 460 210 L 460 250 L 370 250 Z",
+    outlinePath:
+      "M 148 210 C 150 200, 160 198, 175 200 C 190 202, 210 210, 220 218 C 225 222, 228 228, 225 234 C 220 248, 192 264, 172 268 C 155 270, 142 260, 140 248 C 138 236, 142 222, 148 210 Z M 372 210 C 370 200, 360 198, 345 200 C 330 202, 310 210, 300 218 C 295 222, 292 228, 295 234 C 300 248, 328 264, 348 268 C 365 270, 378 260, 380 248 C 382 236, 378 222, 372 210 Z",
+    annotLine: { x1: 380, y1: 235, x2: 440, y2: 230 },
+    hitPath: "M 130 195 L 230 195 L 230 275 L 130 275 Z M 290 195 L 390 195 L 390 275 L 290 275 Z M 380 220 L 460 220 L 460 250 L 380 250 Z",
   },
   {
     zone: "cheeks",
-    dots: [{ x: 160, y: 318 }, { x: 352, y: 318 }],
-    connectors: [],
-    annotLine: { x1: 148, y1: 318, x2: 82, y2: 318 },
-    hitPath: "M 100 278 L 215 278 L 218 378 L 102 375 Z M 285 278 L 400 278 L 398 375 L 282 378 Z",
+    outlinePath:
+      "M 140 252 C 132 270, 110 300, 108 330 C 106 355, 112 375, 128 388 C 145 400, 178 395, 200 380 C 215 370, 222 355, 218 340 C 212 310, 185 285, 162 265 C 152 258, 144 254, 140 252 Z M 380 252 C 388 270, 410 300, 412 330 C 414 355, 408 375, 392 388 C 375 400, 342 395, 320 380 C 305 370, 298 355, 302 340 C 308 310, 335 285, 358 265 C 368 258, 376 254, 380 252 Z",
+    annotLine: { x1: 108, y1: 330, x2: 50, y2: 330 },
+    hitPath: "M 95 245 L 225 245 L 225 405 L 95 405 Z M 295 245 L 425 245 L 425 405 L 295 405 Z M 40 315 L 110 315 L 110 350 L 40 350 Z",
   },
   {
     zone: "mouth",
-    dots: [{ x: 200, y: 350 }, { x: 320, y: 350 }, { x: 260, y: 418 }],
-    connectors: [
-      { x1: 200, y1: 350, x2: 320, y2: 350 },
-      { x1: 260, y1: 350, x2: 260, y2: 418 },
-    ],
-    annotLine: { x1: 320, y1: 350, x2: 430, y2: 370 },
-    hitPath: "M 152 358 L 348 358 L 342 452 L 158 452 Z M 330 350 L 450 350 L 450 390 L 330 390 Z",
+    outlinePath:
+      "M 200 362 C 210 356, 230 350, 260 350 C 290 350, 310 356, 320 362 C 330 368, 335 378, 330 390 C 325 402, 312 418, 300 425 C 285 432, 268 435, 260 435 C 252 435, 235 432, 220 425 C 208 418, 195 402, 190 390 C 185 378, 190 368, 200 362 Z",
+    annotLine: { x1: 330, y1: 390, x2: 430, y2: 395 },
+    hitPath: "M 180 345 L 340 345 L 340 440 L 180 440 Z M 330 380 L 450 380 L 450 410 L 330 410 Z",
   },
   {
     zone: "jawline",
-    dots: [{ x: 175, y: 402 }, { x: 220, y: 435 }, { x: 345, y: 402 }, { x: 318, y: 435 }],
-    connectors: [
-      { x1: 175, y1: 402, x2: 220, y2: 435 },
-      { x1: 345, y1: 402, x2: 318, y2: 435 },
-    ],
-    annotLine: { x1: 175, y1: 402, x2: 92, y2: 442 },
-    hitPath: "M 130 435 L 200 500 L 170 515 L 105 450 Z M 370 435 L 300 500 L 330 515 L 395 450 Z",
+    outlinePath:
+      "M 108 388 C 105 410, 110 435, 125 455 C 140 475, 165 492, 195 502 C 220 510, 242 512, 260 512 C 278 512, 300 510, 325 502 C 355 492, 380 475, 395 455 C 410 435, 415 410, 412 388 C 400 395, 375 400, 350 395 C 330 390, 315 378, 310 370 C 305 365, 302 360, 300 358 C 290 352, 270 350, 260 350 C 250 350, 230 352, 220 358 C 218 360, 215 365, 210 370 C 205 378, 190 390, 170 395 C 145 400, 120 395, 108 388 Z",
+    annotLine: { x1: 130, y1: 460, x2: 55, y2: 470 },
+    hitPath: "M 95 380 L 425 380 L 425 520 L 95 520 Z M 40 455 L 130 455 L 130 485 L 40 485 Z",
   },
   {
     zone: "neck",
-    dots: [{ x: 205, y: 470 }, { x: 320, y: 470 }],
-    connectors: [{ x1: 205, y1: 470, x2: 320, y2: 470 }],
-    annotLine: { x1: 320, y1: 470, x2: 420, y2: 500 },
-    hitPath: "M 168 470 L 332 470 L 345 580 L 155 580 Z M 320 460 L 440 460 L 440 520 L 320 520 Z",
+    outlinePath:
+      "M 195 505 C 182 515, 172 535, 168 555 C 165 575, 168 595, 175 610 C 185 612, 220 615, 260 615 C 300 615, 335 612, 345 610 C 352 595, 355 575, 352 555 C 348 535, 338 515, 325 505 C 310 510, 285 512, 260 512 C 235 512, 210 510, 195 505 Z",
+    annotLine: { x1: 345, y1: 560, x2: 430, y2: 565 },
+    hitPath: "M 155 500 L 365 500 L 365 620 L 155 620 Z M 345 550 L 450 550 L 450 580 L 345 580 Z",
   },
 ];
 
 // ─── SVG animation CSS ────────────────────────────────────────────────────────
 const SVG_CSS = `
-  @keyframes fms-dot-idle {
+  @keyframes fms-outline-idle {
+    0%, 100% { opacity: 0.30; }
+    50%      { opacity: 0.55; }
+  }
+  @keyframes fms-outline-hover {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.80; }
+  }
+  @keyframes fms-outline-active {
+    0%, 100% { opacity: 0.80; }
+    50%      { opacity: 1.00; }
+  }
+  @keyframes fms-outline-selected {
+    0%, 100% { opacity: 0.75; }
+    50%      { opacity: 1.00; }
+  }
+  @keyframes fms-glow-pulse {
+    0%, 100% { opacity: 0.15; }
+    50%      { opacity: 0.45; }
+  }
+  @keyframes fms-label-idle {
     0%, 100% { opacity: 0.40; }
-    50%       { opacity: 0.80; }
-  }
-  @keyframes fms-line-idle {
-    0%, 100% { opacity: 0.40; }
-    50%       { opacity: 0.80; }
-  }
-  @keyframes fms-dot-hover {
-    0%, 100% { opacity: 0.78; }
-    50%       { opacity: 0.90; }
-  }
-  @keyframes fms-halo-hover {
-    0%, 100% { opacity: 0.10; }
-    50%       { opacity: 0.24; }
-  }
-  @keyframes fms-dot-active {
-    0%, 100% { opacity: 0.90; }
-    50%       { opacity: 1.00; }
-  }
-  @keyframes fms-halo-active {
-    0%, 100% { opacity: 0.16; }
-    50%       { opacity: 0.36; }
-  }
-  @keyframes fms-dot-selected {
-    0%, 100% { opacity: 0.85; transform: scale(1.0); }
-    50%       { opacity: 1.00; transform: scale(1.15); }
-  }
-  @keyframes fms-halo-selected {
-    0%, 100% { opacity: 0.20; transform: scale(1.0); }
-    50%       { opacity: 0.50; transform: scale(1.35); }
-  }
-  @keyframes fms-severity-pulse {
-    0%, 100% { opacity: 0.25; transform: scale(1.0); }
-    50%       { opacity: 0.55; transform: scale(1.5); }
+    50%      { opacity: 0.70; }
   }
 `;
 
@@ -290,12 +313,12 @@ function annotLabelProps(ln: { x1: number; y1: number; x2: number; y2: number })
   const dy = ln.y2 - ln.y1;
   if (Math.abs(dx) >= Math.abs(dy)) {
     return dx > 0
-      ? { x: ln.x2 + 7,  y: ln.y2 + 4, anchor: "start"  as const }
-      : { x: ln.x2 - 7,  y: ln.y2 + 4, anchor: "end"    as const };
+      ? { x: ln.x2 + 7, y: ln.y2 + 4, anchor: "start" as const }
+      : { x: ln.x2 - 7, y: ln.y2 + 4, anchor: "end" as const };
   }
   return dy > 0
-    ? { x: ln.x2,      y: ln.y2 + 13, anchor: "middle" as const }
-    : { x: ln.x2,      y: ln.y2 - 6,  anchor: "middle" as const };
+    ? { x: ln.x2, y: ln.y2 + 13, anchor: "middle" as const }
+    : { x: ln.x2, y: ln.y2 - 6, anchor: "middle" as const };
 }
 
 // ─── Localized text helper ────────────────────────────────────────────────────
@@ -303,7 +326,7 @@ const gt = (t: LocalizedText, lang: Lang): string =>
   (t as unknown as Record<string, string>)[lang] ?? (t as unknown as Record<string, string>).en;
 
 // ─── FaceSVG ──────────────────────────────────────────────────────────────────
-// Step 8: dots scale by zone max severity
+// Zone outline paths with gold stroke and glow effects
 function FaceSVG({
   activeZone, selectedZones, onZoneClick, lang, concernSeverity,
 }: {
@@ -329,37 +352,34 @@ function FaceSVG({
     >
       <style>{SVG_CSS}</style>
       <defs>
-        <filter id="fms-glow-warm" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b" />
-          <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-        </filter>
-        <filter id="fms-glow-sev" x="-100%" y="-100%" width="300%" height="300%">
+        <filter id="fms-glow-outline" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="b" />
           <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
+        <filter id="fms-glow-strong" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="b" />
+          <feMerge><feMergeNode in="b" /><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
       </defs>
 
-      {ZONES_DEF.map(({ zone, dots, connectors, annotLine, hitPath }, zoneIdx) => {
+      {ZONES_DEF.map(({ zone, outlinePath, annotLine, hitPath }, zoneIdx) => {
         const isSelected = selectedZones.has(zone);
-        const isActive   = activeZone === zone;
-        const isHovered  = hoveredZone === zone;
+        const isActive = activeZone === zone;
+        const isHovered = hoveredZone === zone;
 
-        const lit    = isActive || isSelected;
+        const lit = isActive || isSelected;
         const dimmed = activeZone !== null && !lit;
 
-        const statusColor = (isSelected || isActive)
-          ? (isDark ? COLOR_PALETTE.dark_selected : COLOR_PALETTE.light_selected)
-          : (isDark ? COLOR_PALETTE.dark_idle : COLOR_PALETTE.light_idle);
+        const accentColor = isDark ? "#c9a96e" : "#f5d657ff";
+        const idleColor = isDark ? "rgba(201,169,110,0.7)" : "rgba(144, 56, 29, 0.7)";
+        const strokeColor = lit ? accentColor : idleColor;
 
-        const finalOpacity = isSelected ? 1 : (isActive ? 0.9 : 0.6);
-        const finalStrokeWidth = (isSelected || isActive) ? 1.2 : 0.8;
+        const d0 = zoneIdx * 0.5;
 
-        const d0 = zoneIdx * 0.38;
-
-        const lp    = annotLine ? annotLabelProps(annotLine) : null;
+        const lp = annotLine ? annotLabelProps(annotLine) : null;
         const label = ZONE_LABELS[zone][lang];
 
-        // ── Step 8: Zone max severity for visual scaling ──────────────────────
+        // Zone max severity
         const zoneMaxSeverity = Math.max(
           0,
           ...Object.entries(concernSeverity)
@@ -367,26 +387,36 @@ function FaceSVG({
             .map(([, sev]) => sev as number)
         );
 
-        // Dot radius scales: 3.5 → 4.5 → 5.5 → 7
-        const dotR = zoneMaxSeverity === 0 ? 3.5
-          : zoneMaxSeverity === 1 ? 4.5
-          : zoneMaxSeverity === 2 ? 5.5
-          : 7;
+        // Stroke width scales with severity
+        const strokeW = isSelected
+          ? (zoneMaxSeverity >= 2 ? 2.5 : 2.0)
+          : (isActive ? 1.8 : (isHovered && !dimmed ? 1.5 : 1.0));
 
-        // Dot opacity scales: 0.4 → 0.6 → 0.8 → 1.0
-        const dotBaseOp = zoneMaxSeverity === 0 ? 0.4
-          : zoneMaxSeverity === 1 ? 0.6
-          : zoneMaxSeverity === 2 ? 0.8
-          : 1.0;
-        const dotOp = isSelected ? Math.max(dotBaseOp, finalOpacity) : finalOpacity;
+        // Fill opacity for completed zones
+        const fillOp = isSelected
+          ? (zoneMaxSeverity >= 2 ? 0.10 : 0.06)
+          : (isActive ? 0.04 : 0);
 
-        // Glow radius for severity indicator
-        const glowR = zoneMaxSeverity * 4;
-
-        // Severity dots on annotation label: "Forehead ●●○"
+        // Severity dots on annotation label
         const sevDots = zoneMaxSeverity > 0
           ? " " + "●".repeat(zoneMaxSeverity) + "○".repeat(3 - zoneMaxSeverity)
           : "";
+
+        // Choose animation
+        const outlineAnim = isSelected
+          ? `fms-outline-selected 2.5s ease-in-out ${d0}s infinite`
+          : isActive
+            ? `fms-outline-active 2s ease-in-out infinite`
+            : (isHovered && !dimmed)
+              ? `fms-outline-hover 1.2s ease-in-out infinite`
+              : `fms-outline-idle 3.5s ease-in-out ${d0}s infinite`;
+
+        // Choose glow filter
+        const glowFilter = isSelected
+          ? "url(#fms-glow-strong)"
+          : (isActive || (isHovered && !dimmed))
+            ? "url(#fms-glow-outline)"
+            : undefined;
 
         return (
           <g key={zone}
@@ -394,42 +424,73 @@ function FaceSVG({
             onMouseEnter={() => setHoveredZone(zone)}
             onMouseLeave={() => setHoveredZone(null)}
             style={{
-              opacity: dimmed && !isSelected ? 0.8 : 1,
-              transition: "all 0.4s",
+              opacity: dimmed && !isSelected ? 0.35 : 1,
+              transition: "opacity 0.4s ease",
               cursor: "pointer",
             }}>
 
+            {/* Invisible hit area */}
             <path d={hitPath} fill="transparent" />
 
-            {/* Connector lines */}
-            {connectors?.map((ln, i) => (
-              <line
-                key={i}
-                x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
-                stroke={statusColor}
-                strokeWidth={finalStrokeWidth}
+            {/* Glow layer (behind the outline) */}
+            {(isSelected || isActive || (isHovered && !dimmed)) && (
+              <path
+                d={outlinePath}
+                fill="none"
+                stroke={accentColor}
+                strokeWidth={strokeW + 3}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                filter={glowFilter}
                 style={{
-                  animation: (isSelected || isActive)
-                    ? "none"
-                    : `fms-line-idle 3s ease-in-out ${d0 + i * 0.25}s infinite`,
-                  opacity: finalOpacity,
+                  animation: isSelected
+                    ? `fms-glow-pulse 2.5s ease-in-out ${d0}s infinite`
+                    : "none",
+                  opacity: isSelected ? 0.4 : 0.25,
                   transition: "all 0.4s ease",
                 }}
               />
-            ))}
+            )}
+
+            {/* Fill layer for selected zones */}
+            {fillOp > 0 && (
+              <path
+                d={outlinePath}
+                fill={accentColor}
+                stroke="none"
+                style={{
+                  opacity: fillOp,
+                  transition: "opacity 0.4s ease",
+                }}
+              />
+            )}
+
+            {/* Main outline path */}
+            <path
+              d={outlinePath}
+              fill="none"
+              stroke={strokeColor}
+              strokeWidth={strokeW}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              filter={glowFilter}
+              style={{
+                animation: outlineAnim,
+                transition: "stroke-width 0.3s ease, stroke 0.3s ease",
+              }}
+            />
 
             {/* Annotation callout line */}
             {annotLine && (
               <line
                 x1={annotLine.x1} y1={annotLine.y1}
                 x2={annotLine.x2} y2={annotLine.y2}
-                stroke={statusColor}
-                strokeWidth={finalStrokeWidth}
+                stroke={strokeColor}
+                strokeWidth={lit ? 1.0 : 0.6}
                 style={{
-                  animation: (isSelected || isActive)
+                  animation: lit
                     ? "none"
-                    : `fms-line-idle 3s ease-in-out ${d0 + 0.15}s infinite`,
-                  opacity: finalOpacity,
+                    : `fms-label-idle 3.5s ease-in-out ${d0 + 0.15}s infinite`,
                   transition: "all 0.4s ease",
                 }}
               />
@@ -440,16 +501,15 @@ function FaceSVG({
               <text
                 x={lp.x} y={lp.y}
                 textAnchor={lp.anchor}
-                fill={statusColor}
+                fill={strokeColor}
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "16px",
-                  fontWeight: (isSelected || isActive) ? 600 : 400,
-                  opacity: dotOp,
+                  fontSize: "14px",
+                  fontWeight: lit ? 600 : 400,
                   letterSpacing: "0.02em",
-                  animation: (isSelected || isActive)
+                  animation: lit
                     ? "none"
-                    : `fms-dot-idle 3s ease-in-out ${d0 + 0.2}s infinite`,
+                    : `fms-label-idle 3.5s ease-in-out ${d0 + 0.2}s infinite`,
                   transition: "all 0.4s ease",
                   userSelect: "none",
                 }}
@@ -457,72 +517,6 @@ function FaceSVG({
                 {label}{sevDots}
               </text>
             )}
-
-            {/* Dots */}
-            {dots.map((d, i) => {
-              const dotAnim = isSelected
-                ? `fms-dot-selected 2s ease-in-out ${i * 0.3}s infinite`
-                : lit
-                  ? "fms-dot-active 2.4s ease-in-out infinite"
-                  : (isHovered && !dimmed)
-                    ? `fms-dot-hover 0.8s ease-in-out infinite`
-                    : `fms-dot-idle 3s ease-in-out ${d0 + i * 0.45}s infinite`;
-
-              return (
-                <g key={i}>
-                  {/* Hover halo */}
-                  {isHovered && !dimmed && !isSelected && (
-                    <circle
-                      cx={d.x} cy={d.y} r={7}
-                      fill={statusColor}
-                      filter="url(#fms-glow-warm)"
-                      style={{ animation: "fms-halo-hover 1.2s ease-in-out infinite", opacity: 0.5 }}
-                    />
-                  )}
-
-                  {/* Selected halo */}
-                  {isSelected && (
-                    <circle
-                      cx={d.x} cy={d.y} r={7}
-                      fill={isDark ? COLOR_PALETTE.dark_selected : COLOR_PALETTE.light_selected}
-                      filter="url(#fms-glow-warm)"
-                      style={{
-                        animation: `fms-halo-selected 2s ease-in-out ${i * 0.3}s infinite`,
-                        transformOrigin: `${d.x}px ${d.y}px`,
-                      }}
-                    />
-                  )}
-
-                  {/* Step 8: Severity glow ring */}
-                  {zoneMaxSeverity > 0 && glowR > 0 && (
-                    <circle
-                      cx={d.x} cy={d.y} r={glowR}
-                      fill={statusColor}
-                      filter="url(#fms-glow-sev)"
-                      style={{
-                        animation: `fms-severity-pulse 2.4s ease-in-out ${i * 0.3}s infinite`,
-                        transformOrigin: `${d.x}px ${d.y}px`,
-                        opacity: 0,
-                      }}
-                    />
-                  )}
-
-                  {/* Main dot — scaled by severity */}
-                  <circle
-                    cx={d.x} cy={d.y}
-                    r={dotR}
-                    fill={statusColor}
-                    filter={(isSelected || (isHovered && !dimmed)) ? "url(#fms-glow-warm)" : undefined}
-                    style={{
-                      transformOrigin: `${d.x}px ${d.y}px`,
-                      animation: dotAnim,
-                      opacity: dotOp,
-                      transition: "r 0.4s ease, opacity 0.3s ease",
-                    }}
-                  />
-                </g>
-              );
-            })}
           </g>
         );
       })}
@@ -680,7 +674,7 @@ function GlossaryBadge({
   const [pos, setPos] = useState<{ left: number; top: number } | null>(null);
 
   const TOOLTIP_W = 240;
-  const PADDING   = 12;
+  const PADDING = 12;
 
   const handleOpen = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -783,9 +777,9 @@ function GlossaryBadge({
 
 // ─── Step 2: ConcernItem — 3-level severity ───────────────────────────────────
 const SEVERITY_LABELS: Record<1 | 2 | 3, Record<Lang, string>> = {
-  1: { en: "Mild",     de: "Leicht", ko: "약간" },
+  1: { en: "Mild", de: "Leicht", ko: "약간" },
   2: { en: "Moderate", de: "Mittel", ko: "보통" },
-  3: { en: "Severe",   de: "Stark",  ko: "심각" },
+  3: { en: "Severe", de: "Stark", ko: "심각" },
 };
 
 function ConcernItem({
@@ -805,8 +799,8 @@ function ConcernItem({
 
   const bgOpacity = severity === 3 ? 0.18
     : severity === 2 ? 0.10
-    : severity === 1 ? 0.05
-    : 0;
+      : severity === 1 ? 0.05
+        : 0;
 
   return (
     <motion.button
@@ -889,7 +883,7 @@ function ConcernAndQuestionPanel({
             <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "var(--font-sans)", fontWeight: 600 }}>
               {lang === "ko" ? "피부 고민 선택"
                 : lang === "de" ? "Beschwerden auswählen"
-                : "Select Your Concerns"}
+                  : "Select Your Concerns"}
             </p>
             <h3 style={{ fontSize: 22, fontWeight: 400, color: isDark ? "#fff" : "#111", fontFamily: "var(--font-sans)", margin: 0, lineHeight: 1.2 }}>
               {ZONE_LABELS[zone][lang]}
@@ -924,8 +918,8 @@ function ConcernAndQuestionPanel({
               💡 {lang === "ko"
                 ? "탭할 때마다 심각도가 올라가요"
                 : lang === "de"
-                ? "Jedes Tippen erhöht den Schweregrad"
-                : "Each tap increases severity"}
+                  ? "Jedes Tippen erhöht den Schweregrad"
+                  : "Each tap increases severity"}
             </div>
             <div style={{ marginTop: 6, fontSize: 12, letterSpacing: "1px", opacity: 0.7 }}>
               <span>●○○ {lang === "ko" ? "약간" : lang === "de" ? "Leicht" : "Mild"}</span>
@@ -969,7 +963,7 @@ function ConcernAndQuestionPanel({
       >
         {lang === "ko" ? "이 부위는 괜찮아요 — 건너뛰기"
           : lang === "de" ? "Hier keine Probleme — überspringen"
-          : "No concerns here — skip"}
+            : "No concerns here — skip"}
       </motion.button>
 
       {/* Confirm Selection button */}
@@ -1029,7 +1023,7 @@ function TailQuestionSection({
       }}>
         {lang === "ko" ? "마지막 몇 가지만 확인할게요"
           : lang === "de" ? "Nur noch ein paar kurze Fragen"
-          : "Just a few quick follow-ups"}
+            : "Just a few quick follow-ups"}
       </h3>
       <p style={{
         fontSize: 13,
@@ -1039,7 +1033,7 @@ function TailQuestionSection({
       }}>
         {lang === "ko" ? "피부 지도에서 알 수 없는 것만 여쭤볼게요"
           : lang === "de" ? "Wir fragen nur, was die Gesichtskarte nicht zeigen kann"
-          : "We only ask what the face map can't tell us"}
+            : "We only ask what the face map can't tell us"}
       </p>
 
       {tailQuestions.map((q, i) => (
@@ -1088,8 +1082,8 @@ function TailQuestionSection({
         {lang === "ko"
           ? `${tailQuestions.length}개 질문`
           : lang === "de"
-          ? `${tailQuestions.length} Fragen`
-          : `${tailQuestions.length} question${tailQuestions.length !== 1 ? "s" : ""}`}
+            ? `${tailQuestions.length} Fragen`
+            : `${tailQuestions.length} question${tailQuestions.length !== 1 ? "s" : ""}`}
         {" · "}
         {lang === "ko" ? "약 1분" : lang === "de" ? "ca. 1 Minute" : "~1 minute"}
       </div>
@@ -1108,13 +1102,13 @@ export function getAxisLabel(axis: string, lang: Lang, gender: number): string {
 
 // ─── Main export ───────────────────────────────────────────────────────────────
 export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => void; isAnalyzing?: boolean }) {
-  const { language }      = useI18nStore();
-  const lang              = language as Lang;
-  const store             = useDiagnosisStore();
-  const copy              = COPY[lang];
+  const { language } = useI18nStore();
+  const lang = language as Lang;
+  const store = useDiagnosisStore();
+  const copy = COPY[lang];
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
-  const GOLD   = isDark ? "#c9a96e" : "#7A9E82";
+  const GOLD = isDark ? "#c9a96e" : "#7A9E82";
 
   // ── Step 2: severity map ──────────────────────────────────────────────────
   // Initialise from the Zustand store so selections survive back/forward navigation.
@@ -1143,13 +1137,13 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
     }
     setAllZones(zoneMap);
   }, [concernSeverity, setAllZones]);
-  const [activeZone, setActiveZone]           = useState<ZoneId | null>(null);
-  const [isMobile, setIsMobile]               = useState(false);
+  const [activeZone, setActiveZone] = useState<ZoneId | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [severityHintShown, setSeverityHintShown] = useState(false);
 
   // ── Step 7: 3-phase state machine ────────────────────────────────────────
-  const [fmPhase, setFmPhase]         = useState<FaceMapPhase>("mapping");
-  const [inference, setInference]     = useState<FaceMapInference | null>(null);
+  const [fmPhase, setFmPhase] = useState<FaceMapPhase>("mapping");
+  const [inference, setInference] = useState<FaceMapInference | null>(null);
   const [tailQuestions, setTailQuestions] = useState<QuestionDef[]>([]);
 
   // ── Real-time pattern detection (Part C Step 2) ───────────────────────────
@@ -1214,7 +1208,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
     setInference(inf);
 
     const ageBracket = (store.axisAnswers["EXP_AGE"] as number | undefined) ?? 2;
-    const gender     = (store.axisAnswers["EXP_GENDER"] as number | undefined) ?? 2;
+    const gender = (store.axisAnswers["EXP_GENDER"] as number | undefined) ?? 2;
     const tqs = computeTailQuestions(inf, ageBracket, gender);
     setTailQuestions(tqs);
 
@@ -1254,7 +1248,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
   }, [concernSeverity, inference, store, onNext]);
 
   const totalSelected = Object.keys(concernSeverity).length;
-  const allZonesDone  = selectedZones.size === ZONES_DEF.length;
+  const allZonesDone = selectedZones.size === ZONES_DEF.length;
 
   return (
     <div style={{ width: "100%" }}>
@@ -1293,7 +1287,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
               aspectRatio: "600/700",
               flexShrink: 0,
               borderRadius: 28,
-              background: isDark ? "#484f4ba5" : "#becad3bf",
+              background: isDark ? "#d4bc77c2" : "#d5874bff",
               boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
               border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
               margin: isMobile ? "0 auto" : "0",
@@ -1305,7 +1299,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                   width: "100%", height: "100%",
                   objectFit: "cover",
                   borderRadius: 28,
-                  filter: isDark ? "brightness(0.8) contrast(1.2) multiply" : "mix-blend-mode: multiply",
+                  filter: isDark ? "brightness(0.85) contrast(1.1)" : "none",
                   transition: "filter 0.3s ease"
                 }}
               />
@@ -1364,12 +1358,12 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                         <div style={{ fontSize: 15, color: GOLD, fontFamily: "var(--font-sans)", fontWeight: 500 }}>
                           {lang === "ko" ? "피부 분석 준비 완료!"
                             : lang === "de" ? "Hautanalyse bereit!"
-                            : "Skin Analysis Ready!"}
+                              : "Skin Analysis Ready!"}
                         </div>
                         <div style={{ fontSize: 13, marginTop: 6, fontFamily: "var(--font-sans)", color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>
                           {lang === "ko" ? "결과를 확인하세요"
                             : lang === "de" ? "Ergebnisse ansehen"
-                            : "Check your results"}
+                              : "Check your results"}
                         </div>
                       </motion.div>
                     ) : (
@@ -1381,8 +1375,8 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                           {lang === "ko"
                             ? `완료 ${selectedZones.size} / 전체 ${ZONES_DEF.length} 구역`
                             : lang === "de"
-                            ? `${selectedZones.size} von ${ZONES_DEF.length} Zonen abgeschlossen`
-                            : `${selectedZones.size} of ${ZONES_DEF.length} zones completed`}
+                              ? `${selectedZones.size} von ${ZONES_DEF.length} Zonen abgeschlossen`
+                              : `${selectedZones.size} of ${ZONES_DEF.length} zones completed`}
                         </div>
                       </>
                     )}

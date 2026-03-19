@@ -15,16 +15,18 @@ import { useNavStore } from "@/store/navStore";
 // ── Logo ──────────────────────────────────────────────────────────────────────
 function Logo() {
   return (
-    <Link to="/" className="flex flex-col items-start leading-none group" aria-label="Skin Strategy Lab">
+    <Link to="/" className="flex flex-col items-center md:items-start group" aria-label="Skin Strategy Lab">
+      {/* 폰트 고유의 상하 여백을 무시하고 정렬하기 위해 leading-none 추가 */}
       <span
-        className="font-display text-[1.05rem] md:text-[1.3rem] font-light tracking-[0.12em] text-gray-900 dark:text-white transition-colors group-hover:text-[#947E5C] dark:group-hover:text-[#D4AF37]"
-        style={{ fontFamily: "var(--font-display)", letterSpacing: "0.14em" }}
+        className="font-display text-[1.05rem] md:text-[1.3rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[#947E5C] dark:group-hover:text-[#D4AF37] leading-none"
+        style={{ fontFamily: "var(--font-display)", letterSpacing: "0.06em" }}
       >
         SKIN STRATEGY
       </span>
+      {/* 억지로 위로 끌어올리던 음수 마진(mt-[-2px])을 없애고 자연스러운 여백(mt-[4px]) 부여 */}
       <span
-        className="font-body text-[0.48rem] md:text-[0.58rem] font-medium uppercase tracking-[0.35em] text-[#947E5C] dark:text-[#D4AF37] mt-[-2px]"
-        style={{ letterSpacing: "0.4em" }}
+        className="font-body text-[0.48rem] md:text-[0.58rem] font-medium uppercase text-[#947E5C] dark:text-[#D4AF37] mt-[5px] leading-none"
+        style={{ letterSpacing: "0.22em" }}
       >
         — LAB —
       </span>
@@ -48,7 +50,6 @@ function AvatarCircle({
   );
 }
 
-
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -70,6 +71,7 @@ const Navbar = () => {
   const kMaskRef    = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const langRef     = useRef<HTMLDivElement>(null);
+
   // Close dropdowns on outside click
   useEffect(() => {
     const onOutside = (e: MouseEvent) => {
@@ -96,20 +98,23 @@ const Navbar = () => {
   ];
   const langLabel = LANG_OPTIONS.find((l) => l.code === language)?.label ?? "DE";
 
-  // Shared link style
+  // Shared link style - 데스크탑 텍스트 메뉴들도 완벽한 수직 정렬이 되도록 flex items-center 추가
   const navLink =
-    "px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap";
+    "flex items-center px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors whitespace-nowrap";
   const navFont = { fontFamily: "var(--font-sans)" };
-
 
   return (
     <>
       {/* ── Main bar ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-stone-200/70 dark:border-white/[0.06] bg-white/85 dark:bg-black/85 backdrop-blur-xl pt-[env(safe-area-inset-top)]">
-        <div className="flex w-full items-center h-16 px-4 md:px-8 lg:px-12">
+        {/* 안정감을 위해 기존 h-12에서 h-14로 높이를 살짝 키웠습니다 (선택사항, 필요시 12로 원복) */}
+        <div className="flex w-full items-center justify-between h-14 px-4 md:px-8 lg:px-10">
 
-          {/* Logo — centered on mobile, left on desktop */}
-          <div className="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0 md:mr-8">
+          {/* 왼쪽 Spacer: 우측 아이콘 영역(w-9 + w-9 + gap-1 = 76px)과 똑같이 폭을 주어 모바일 완벽 중앙 정렬 */}
+          <div className="w-[76px] shrink-0 md:hidden" />
+
+          {/* Logo — 강제 translate 이동 제거하고 items-center로 자연스러운 수직 중앙 정렬 */}
+          <div className="flex-1 flex justify-center items-center md:justify-start md:flex-none md:mr-8">
             <Logo />
           </div>
 
@@ -118,10 +123,10 @@ const Navbar = () => {
             <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.hautAnalyse}</Link>
 
             {/* K-Mask Lab dropdown */}
-            <div className="relative" ref={kMaskRef}>
+            <div className="relative flex items-center h-full" ref={kMaskRef}>
               <button
                 onClick={() => setKMaskOpen(!kMaskOpen)}
-                className={`${navLink} flex items-center gap-1`}
+                className={`${navLink} gap-1`}
                 style={navFont}
               >
                 {p1.nav.kMaskLab}
@@ -166,18 +171,18 @@ const Navbar = () => {
             <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.science}</Link>
           </div>
 
-
           {/* ── Right icon cluster ── */}
-          <div className="ml-auto flex items-center gap-1">
+          {/* 모바일에서는 정확히 76px 너비를 차지하여 좌측 스페이서와 완벽한 대칭을 이룸 */}
+          <div className="w-[76px] md:w-auto ml-auto flex items-center justify-end gap-1">
             {/* Search (all screens) */}
-            <button className="flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" aria-label="Search">
+            <button className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" aria-label="Search">
               <Search className="h-[1.1rem] w-[1.1rem]" />
             </button>
 
             {/* Theme toggle (desktop only) */}
             <motion.button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hidden md:flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              className="hidden md:flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
               whileTap={{ scale: 0.9 }}
               aria-label="Toggle theme"
             >
@@ -290,7 +295,7 @@ const Navbar = () => {
             )}
 
             {/* Cart (all screens) */}
-            <Link to="/cart" className="relative flex h-9 w-9 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+            <Link to="/cart" className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4AF37] text-[0.6rem] font-bold text-[#0a0a0a]">

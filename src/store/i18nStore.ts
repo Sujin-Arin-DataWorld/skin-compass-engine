@@ -101,7 +101,7 @@ export const translations = {
             kitSub: "5 formulas perfectly curated to shift your exact clinical vector toward harmony. Delivered monthly.",
             exploreKit: "Explore Kit",
             initializing: "Initializing...",
-            scanningSebum: "Scanning Sebum...",
+            scanningSebum: "Scanning Skin Oil...",
             checkingHydration: "Checking Hydration...",
             analyzingTexture: "Analyzing Texture...",
             evaluatingBarrier: "Evaluating Barrier...",
@@ -191,7 +191,7 @@ export const translations = {
             confirmEmailBack: "Back to Sign In",
         },
         markers: {
-            sebum: "Sebum",
+            sebum: "Skin Oil",
             aging: "Aging",
             pores: "Pores",
             barrier: "Barrier",
@@ -201,7 +201,7 @@ export const translations = {
             sensitivity: "Sensitivity"
         },
         axes: {
-            seb: "Sebum",
+            seb: "Skin Oil",
             hyd: "Hydration",
             bar: "Barrier",
             sen: "Sensitivity",
@@ -455,7 +455,7 @@ export const translations = {
             kitSub: "5 Formeln, perfekt kuratiert, um Ihren exakten klinischen Vektor in Richtung Harmonie zu verschieben. Monatlich geliefert.",
             exploreKit: "Kit entdecken",
             initializing: "Initialisieren...",
-            scanningSebum: "Scanne Talg...",
+            scanningSebum: "Scanne Hautöl...",
             checkingHydration: "Prüfe Feuchtigkeit...",
             analyzingTexture: "Analysiere Textur...",
             evaluatingBarrier: "Bewerte Hautbarriere...",
@@ -545,7 +545,7 @@ export const translations = {
             confirmEmailBack: "Zurück zur Anmeldung",
         },
         markers: {
-            sebum: "Talg",
+            sebum: "Hautöl",
             aging: "Alterung",
             pores: "Poren",
             barrier: "Hautbarriere",
@@ -555,7 +555,7 @@ export const translations = {
             sensitivity: "Empfindlichkeit"
         },
         axes: {
-            seb: "Talg",
+            seb: "Hautöl",
             hyd: "Feuchtigkeit",
             bar: "Hautbarriere",
             sen: "Empfindlichkeit",
@@ -751,7 +751,7 @@ export const phase1T = {
             signIn:           "Anmelden",
         },
         concerns: {
-            sebum: "Sebum", sensitivity: "Sensitivität", hydration: "Hydration",
+            sebum: "Hautöl", sensitivity: "Sensitivität", hydration: "Hydration",
             aging: "Anti-Aging", pigment: "Pigment", texture: "Textur",
             barrier: "Barriere", pores: "Poren", neuro: "Neurodermitis",
         },
@@ -799,7 +799,7 @@ export const phase1T = {
             signIn:           "Sign In",
         },
         concerns: {
-            sebum: "Sebum", sensitivity: "Sensitivity", hydration: "Hydration",
+            sebum: "Skin Oil", sensitivity: "Sensitivity", hydration: "Hydration",
             aging: "Anti-Aging", pigment: "Pigment", texture: "Texture",
             barrier: "Barrier", pores: "Pores", neuro: "Neurodermatitis",
         },

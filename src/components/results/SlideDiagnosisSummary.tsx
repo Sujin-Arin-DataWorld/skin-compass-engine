@@ -66,8 +66,8 @@ const OBSERVATION_TEMPLATES: Partial<Record<AxisKey, {
     ko: (s) => `트러블 활동 ${s > 60 ? "집중적이고 주기적" : "중간 빈도로 나타남"}`,
   },
   seb: {
-    en: (s) => `Sebum overproduction${s > 60 ? " returning within 2–4h of cleansing" : " in the T-zone"}`,
-    de: (s) => `Talgüberproduktion${s > 60 ? ", die 2–4h nach der Reinigung zurückkehrt" : " primär in der T-Zone"}`,
+    en: (s) => `Oil overproduction${s > 60 ? " returning within 2–4h of cleansing" : " in the T-zone"}`,
+    de: (s) => `Übermäßige Ölproduktion${s > 60 ? ", die 2–4h nach der Reinigung zurückkehrt" : " primär in der T-Zone"}`,
     ko: (s) => `피지 과다 분비${s > 60 ? " — 세안 후 2–4시간 내 재발생" : " — T존 중심"}`,
   },
   hyd: {

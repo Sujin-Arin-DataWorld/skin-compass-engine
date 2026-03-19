@@ -74,15 +74,15 @@ export function generateAxisExplanation(input: ExplainInput): AxisExplanation {
     outcomeKo = "펩타이드 또는 레티노이드를 꾸준히 사용하면 6-12주 내에 탄력이 눈에 띄게 개선될 수 있어요.";
 
   } else if (axis === "seb" && score >= 40) {
-    const maleCtxEn = isMale ? " Male skin produces significantly more sebum due to higher androgen levels." : "";
-    const maleCtxDe = isMale ? " Männliche Haut produziert aufgrund höherer Androgenspiegel deutlich mehr Talg." : "";
+    const maleCtxEn = isMale ? " Male skin produces significantly more skin oil due to higher androgen levels." : "";
+    const maleCtxDe = isMale ? " Männliche Haut produziert aufgrund höherer Androgenspiegel deutlich mehr Hautöl." : "";
     const maleCtxKo = isMale ? " 남성 피부는 안드로겐 수치가 높아 피지 분비가 더 활발해요." : "";
-    const summerCtxEn = isSummer ? " Heat and humidity in summer amplify sebum output." : "";
-    const summerCtxDe = isSummer ? " Hitze und Feuchtigkeit im Sommer verstärken die Talgproduktion." : "";
+    const summerCtxEn = isSummer ? " Heat and humidity in summer amplify skin oil output." : "";
+    const summerCtxDe = isSummer ? " Hitze und Feuchtigkeit im Sommer verstärken die Hautöl-Produktion." : "";
     const summerCtxKo = isSummer ? " 여름철 열기와 습도가 피지 분비를 더욱 촉진해요." : "";
 
-    explanationEn = `Your oil glands are actively producing excess sebum.${maleCtxEn}${summerCtxEn} This contributes to shine, enlarged pores, and potential breakouts.`;
-    explanationDe = `Ihre Talgdrüsen produzieren übermäßig Talg.${maleCtxDe}${summerCtxDe} Das trägt zu Glanz, vergrößerten Poren und möglichen Unreinheiten bei.`;
+    explanationEn = `Your oil glands are actively producing excess skin oil.${maleCtxEn}${summerCtxEn} This contributes to shine, enlarged pores, and potential breakouts.`;
+    explanationDe = `Ihre Öl-Drüsen produzieren übermäßig Hautöl.${maleCtxDe}${summerCtxDe} Das trägt zu Glanz, vergrößerten Poren und möglichen Unreinheiten bei.`;
     explanationKo = `피지선이 과도하게 피지를 분비하고 있어요.${maleCtxKo}${summerCtxKo} 번들거림, 넓은 모공, 트러블의 원인이 될 수 있어요.`;
     outcomeEn = "With the right oil-control routine, shine should reduce noticeably within 2–3 weeks.";
     outcomeDe = "Mit der richtigen ölkontrollierenden Routine sollte der Glanz innerhalb von 2–3 Wochen merklich abnehmen.";
@@ -109,8 +109,8 @@ export function generateAxisExplanation(input: ExplainInput): AxisExplanation {
     outcomeKo = "루틴을 단순화하고 장벽 케어에 집중하면 보통 3-4주 내에 민감도가 감소해요.";
 
   } else if (axis === "acne" && score >= 40) {
-    explanationEn = "Active breakouts indicate ongoing inflammation, often driven by excess sebum, bacteria, or hormonal fluctuations.";
-    explanationDe = "Aktive Unreinheiten weisen auf anhaltende Entzündungen hin, oft durch übermäßigen Talg, Bakterien oder hormonelle Schwankungen.";
+    explanationEn = "Active breakouts indicate ongoing inflammation, often driven by excess skin oil, bacteria, or hormonal fluctuations.";
+    explanationDe = "Aktive Unreinheiten weisen auf anhaltende Entzündungen hin, oft durch übermäßiges Hautöl, Bakterien oder hormonelle Schwankungen.";
     explanationKo = "활성 트러블은 지속적인 염증 상태를 나타내며, 과도한 피지·세균·호르몬 변화가 주요 원인이에요.";
     outcomeEn = "Consistent use of targeted actives can noticeably reduce breakout frequency within 4–6 weeks.";
     outcomeDe = "Der konsistente Einsatz gezielter Wirkstoffe kann die Häufigkeit von Unreinheiten in 4–6 Wochen merklich reduzieren.";

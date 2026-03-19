@@ -44,11 +44,11 @@ const L = {
 
   // Q3 — Stress
   q3:    { en: "How would you rate your current stress level?", de: "Wie würden Sie Ihr aktuelles Stressniveau einschätzen?", ko: "현재 스트레스 수준은 어떤가요?" } as LT,
-  q3why: { en: "Cortisol, your stress hormone, directly increases sebum and triggers inflammatory cascades that worsen breakouts and accelerate aging.", de: "Cortisol erhöht die Talgproduktion direkt und löst Entzündungskaskaden aus, die Unreinheiten verschlechtern.", ko: "스트레스 호르몬 코르티솔은 피지 분비를 증가시키고 염증 반응을 유발해 트러블과 노화를 악화시킵니다." } as LT,
+  q3why: { en: "Cortisol, your stress hormone, directly increases skin oil and triggers inflammatory cascades that worsen breakouts and accelerate aging.", de: "Cortisol erhöht die Hautöl-Produktion direkt und löst Entzündungskaskaden aus, die Unreinheiten verschlechtern.", ko: "스트레스 호르몬 코르티솔은 피지 분비를 증가시키고 염증 반응을 유발해 트러블과 노화를 악화시킵니다." } as LT,
 
   // Q4 — Climate
   q4:    { en: "What is the climate where you live?", de: "Welches Klima herrscht dort, wo Sie leben?", ko: "사시는 지역의 기후는 어떤가요?" } as LT,
-  q4why: { en: "Your climate determines your skin's daily challenges — cold strips the barrier, humidity promotes oil, UV-intense climates accelerate pigmentation.", de: "Kälte schadet der Hautbarriere, Feuchtigkeit begünstigt Talg, UV beschleunigt Pigmentierung.", ko: "기후는 피부의 일상적 과제를 결정합니다. 추위는 장벽을, 습도는 피지를, UV는 색소침착을 유발합니다." } as LT,
+  q4why: { en: "Your climate determines your skin's daily challenges — cold strips the barrier, humidity promotes oil, UV-intense climates accelerate pigmentation.", de: "Kälte schadet der Hautbarriere, Feuchtigkeit begünstigt Hautöl, UV beschleunigt Pigmentierung.", ko: "기후는 피부의 일상적 과제를 결정합니다. 추위는 장벽을, 습도는 피지를, UV는 색소침착을 유발합니다." } as LT,
 
   // Q5 — Exercise
   q5:    { en: "How often do you exercise outdoors?", de: "Wie oft bewegen Sie sich im Freien?", ko: "야외에서 얼마나 자주 운동하시나요?" } as LT,

@@ -3,7 +3,7 @@ import { DiagnosisResult, AXIS_LABELS, AxisKey } from "@/engine/types";
 
 const SKIN_PATTERNS: Record<string, { name: string; tagline: string; icon: string }> = {
   acne:              { name: "The Reactive Combatant",   tagline: "Your skin fights back — and needs a peace treaty",          icon: "🔴" },
-  seb:               { name: "The Overproducer",         tagline: "Excess sebum masking an underlying imbalance",              icon: "✨" },
+  seb:               { name: "The Overproducer",         tagline: "Excess oil masking an underlying imbalance",              icon: "✨" },
   hyd:               { name: "The Thirsty Skin",         tagline: "Depleted reservoirs beneath the surface",                   icon: "💧" },
   bar:               { name: "The Compromised Shield",   tagline: "Your barrier needs rebuilding from the inside out",         icon: "🛡" },
   sen:               { name: "The Hyper-Aware",          tagline: "Finely tuned — but easily overwhelmed",                    icon: "⚡" },

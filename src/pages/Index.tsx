@@ -68,7 +68,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
   }, [emblaApi]);
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: "min(100svh, 720px)" }}>
+    <section className="relative w-full overflow-hidden" style={{ height: "min(75svh, 720px)" }}>
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
           {HERO_IMAGES.map((img, i) => (
@@ -106,7 +106,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                   zIndex: 3,
                 }}
               />
-              <div className="absolute inset-0 flex flex-col justify-end pb-16 px-8 md:px-20 lg:px-28" style={{ zIndex: 4 }}>
+              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-16 px-8 md:px-20 lg:px-28" style={{ zIndex: 4 }}>
                 <motion.p
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
@@ -197,7 +197,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
         {HERO_IMAGES.map((_, i) => (
           <button
             key={i}
@@ -205,7 +205,10 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
             aria-label={`Slide ${i + 1}`}
             className="rounded-full transition-all duration-300"
             style={{
-              width: current === i ? "1.75rem" : "0.375rem",
+              minWidth: 0,
+              minHeight: 0,
+              padding: 0,
+              width: current === i ? "1.25rem" : "0.375rem",
               height: "0.375rem",
               background: current === i ? accent : "rgba(255,255,255,0.45)",
             }}

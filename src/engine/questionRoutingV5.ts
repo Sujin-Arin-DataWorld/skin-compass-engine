@@ -167,7 +167,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   // ── Axis 1: Sebum ─────────────────────────────────────────────────────────
   {
     id: 1,
-    name: t("Sebum & Oiliness", "Talg & Glanz", "피지 & 유분"),
+    name: t("Oiliness", "Hautöl & Glanz", "피지 & 유분"),
     eyebrow: t("Oiliness Check", "Fettigkeit-Check", "유분 체크"),
     triggerConcerns: ["oily_tzone", "oily_nose", "blackheads_forehead", "blackheads_nose", "whiteheads_forehead", "forehead_breakouts"],
     questions: [
@@ -176,8 +176,8 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         type: "single",
         text: t("After washing your face in the morning, when does the shine appear?", "Wann beginnt Ihre Haut nach der morgendlichen Reinigung zu glänzen?", "아침 세안 후 얼마나 지나면 얼굴이 번들거리나요?"),
         hint: t(
-          "This estimates your sebum production rate — the faster the shine, the more active your oil glands.",
-          "Das schätzt Ihre Talgproduktionsrate ein — je schneller der Glanz, desto aktiver Ihre Talgdrüsen.",
+          "This estimates your skin oil production rate — the faster the shine, the more active your oil glands.",
+          "Das schätzt Ihre Hautöl-Produktionsrate ein — je schneller der Glanz, desto aktiver Ihre Öl-Drüsen.",
           "피지 분비 속도를 추정하는 질문이에요 — 번들거림이 빨리 올수록 피지선이 활발해요."
         ),
         required: true,
@@ -226,8 +226,8 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         hideIfGender: [1],  // male users don't typically wear base makeup
         text: t("By 2 PM, what does your base makeup look like?", "Wie sieht Ihr Foundation-Make-up gegen 14 Uhr aus?", "오후 2시경, 베이스 메이크업 상태는 어떤가요?"),
         hint: t(
-          "Makeup breakdown speed is a validated proxy for sebum output in clinical dermatology.",
-          "Die Geschwindigkeit des Make-up-Abbaus ist ein klinisch validierter Indikator für die Talgproduktion.",
+          "Makeup breakdown speed is a validated proxy for skin oil output in clinical dermatology.",
+          "Die Geschwindigkeit des Make-up-Abbaus ist ein klinisch validierter Indikator für die Hautöl-Produktion.",
           "화장 무너짐 속도는 피부과 임상에서 검증된 피지량 추정 지표예요."
         ),
         required: false,
@@ -249,8 +249,8 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           "면도 후 정오 무렵 피부 상태는 어떤가요?"
         ),
         hint: t(
-          "Post-shave oiliness or tightness reveals your skin's sebum behavior and barrier response after mechanical stress.",
-          "Öl oder Spannung nach dem Rasieren zeigt das Talg- und Barriereverhalten Ihrer Haut nach mechanischem Stress.",
+          "Post-shave oiliness or tightness reveals your skin's oil behavior and barrier response after mechanical stress.",
+          "Öl oder Spannung nach dem Rasieren zeigt das Hautöl- und Barriereverhalten Ihrer Haut nach mechanischem Stress.",
           "면도 후 유분감이나 당김은 기계적 자극 후 피지 분비와 장벽 반응을 파악하는 데 도움이 돼요."
         ),
         required: false,

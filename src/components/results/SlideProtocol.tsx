@@ -86,7 +86,7 @@ const BASE_TYPE_LABEL: Record<BaseType, Record<string, string>> = {
 const TARGET_LABEL: Record<TargetTrouble, Record<string, string>> = {
   "barrier-repair":        { en: "Barrier Repair & Soothing",    de: "Barriere-Reparatur & Beruhigung", ko: "배리어 회복 & 진정"  },
   "intense-hydration":     { en: "Intense Hydration",            de: "Intensive Feuchtigkeit",          ko: "집중 수분 공급"      },
-  "blemish-sebum-control": { en: "Blemish & Sebum Control",      de: "Unreinheiten & Talg-Kontrolle",   ko: "트러블 & 피지 관리"  },
+  "blemish-sebum-control": { en: "Blemish & Oil Control",      de: "Unreinheiten & Öl-Kontrolle",   ko: "트러블 & 피지 관리"  },
   "brightening":           { en: "Brightening & Tone Correction", de: "Aufhellung & Ton-Korrektur",     ko: "브라이트닝 & 톤 보정" },
   "well-aging":            { en: "Well-Aging & Firming",          de: "Well-Aging & Straffung",          ko: "안티에이징 & 탄력"   },
 };

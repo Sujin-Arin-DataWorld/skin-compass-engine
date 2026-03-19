@@ -8,6 +8,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useI18nStore } from "@/store/i18nStore";
 import { useDiagnosis } from "@/hooks/useDiagnosis";
@@ -16,6 +17,7 @@ import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
 import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
 import { savePendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
+import RetestReminderModal from "@/components/RetestReminderModal";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const GOLD_DARK = "#c9a96e";
@@ -427,6 +429,12 @@ const DiagnosisPage: React.FC = () => {
   // Auth guard — temporarily disabled for local dev
   // if (!isLoggedIn) return <Navigate to="/login?redirect=/diagnosis" replace />;
 
+  // ── Task 1: Reset diagnosis state on mount to clear leftover zone data ──────
+  useEffect(() => {
+    store.reset();
+    setFounds({});
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Mobile detection
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -555,6 +563,11 @@ const DiagnosisPage: React.FC = () => {
         clearPendingDiagnosis();
       } catch (saveErr) {
         console.warn("[handleCompleteAnalysis] saveDiagnosis failed (non-fatal):", saveErr);
+        toast.error(
+          lang === "ko" ? "결과 저장에 실패했습니다. 다시 시도해주세요."
+          : lang === "de" ? "Ergebnisse konnten nicht gespeichert werden. Bitte versuchen Sie es erneut."
+          : "Failed to save results. Please try again."
+        );
       }
 
       navigate("/results");
@@ -582,108 +595,14 @@ const DiagnosisPage: React.FC = () => {
       <Navbar />
 
       {/* ── Retest intercept modal ─────────────────────────────────────────── */}
-      <AnimatePresence>
-        {showRetestModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center px-4"
-            style={{ background: "rgba(13,13,18,0.75)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={(e) => { if (e.target === e.currentTarget) setShowRetestModal(false); }}>
-            <motion.div
-              style={{
-                position: "relative", width: "100%", maxWidth: 380, borderRadius: 24, overflow: "hidden",
-                border: `1px solid ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.2)"}`,
-
-                background: isDark ? "rgba(20,20,32,0.97)" : "rgba(255,255,255,0.97)",
-                backdropFilter: "blur(32px)", WebkitBackdropFilter: "blur(32px)"
-              }}
-              initial={{ scale: 0.88, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.92, opacity: 0, y: 8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 28 }}>
-              <div style={{ height: 2, background: `linear-gradient(to right, transparent, ${GOLD}, transparent)` }} />
-              <button onClick={() => setShowRetestModal(false)}
-                style={{
-                  position: "absolute", top: 14, right: 14, background: "none", border: "none",
-                  cursor: "pointer", color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.35)", padding: 6, borderRadius: "50%"
-                }}>
-                <X size={16} />
-              </button>
-              <div style={{ padding: "20px 24px 24px" }}>
-                <p style={{
-                  fontSize: "0.6rem", letterSpacing: "0.22em", textTransform: "uppercase",
-                  fontFamily: "var(--font-sans)", color: GOLD, marginBottom: 10
-                }}>
-                  {lang === "ko" ? "피부 분석 기록" : lang === "de" ? "Hautanalyse-Verlauf" : "Skin Analysis History"}
-                </p>
-                <h3 style={{ fontSize: "1.45rem", fontWeight: 300, lineHeight: 1.35, marginBottom: 4 }}>
-                  {lang === "ko" ? "당신의 피부는 어떻게 달라졌을까요?"
-                    : lang === "de" ? "Bereit zu sehen, wie sich Ihre Haut verändert hat?"
-                      : "Ready to see how your skin has changed?"}
-                </h3>
-                {lastDiagnosedAt && (
-                  <p style={{
-                    fontSize: 12, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)", marginBottom: 16,
-                    fontFamily: "var(--font-sans)", fontWeight: 300
-                  }}>
-                    {lang === "de" ? `Letzte Analyse: ${formatDiagnosisDate(lastDiagnosedAt, "de")}`
-                      : lang === "ko" ? `마지막 분석: ${formatDiagnosisDate(lastDiagnosedAt, "ko")}`
-                        : `Last analyzed: ${formatDiagnosisDate(lastDiagnosedAt, "en")}`}
-                  </p>
-                )}
-                {radarScores && (
-                  <div style={{
-                    display: "flex", alignItems: "center", gap: 16, borderRadius: 16,
-                    padding: 16, background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                    border: "1px solid rgba(201,169,110,0.15)", marginBottom: 20
-                  }}>
-                    <MiniRadarChart scores={radarScores} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{
-                        fontSize: "0.6rem", letterSpacing: "0.16em", textTransform: "uppercase",
-                        color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "var(--font-sans)", marginBottom: 4
-                      }}>
-                        {lang === "ko" ? "피부 프로필" : lang === "de" ? "Hautprofil" : "Skin Profile"}
-                      </p>
-                      {lastTier && <p style={{ fontSize: 14, fontFamily: "var(--font-sans)", color: isDark ? "#e8e4df" : "#1a1a1a", marginBottom: 6 }}>{lastTier}</p>}
-                      <p style={{
-                        fontSize: 11, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)", fontFamily: "var(--font-sans)",
-                        lineHeight: 1.5, fontWeight: 300
-                      }}>
-                        {lang === "ko" ? "변화를 추적하면 더 정밀한 맞춤 프로토콜이 가능합니다."
-                          : lang === "de" ? "Verfolgen Sie Veränderungen für ein präziseres Protokoll."
-                            : "Track changes to refine your personalised protocol."}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <motion.button whileTap={{ scale: 0.97 }}
-                    onClick={() => { store.reset(); setShowRetestModal(false); }}
-                    style={{
-                      width: "100%", padding: "14px 24px", borderRadius: 14, border: "none",
-                      background: `linear-gradient(135deg, ${GOLD}, ${GOLD_DEEP})`,
-                      color: "#0d0d12", fontSize: 13, fontFamily: "var(--font-sans)",
-                      letterSpacing: "0.1em", fontWeight: 600, cursor: "pointer",
-                      boxShadow: `0 6px 24px ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.25)"}`
-                    }}>
-                    {lang === "ko" ? "새 분석 시작" : lang === "de" ? "Neue Analyse starten" : "Start New Analysis"}
-                  </motion.button>
-                  <motion.button whileTap={{ scale: 0.97 }}
-                    onClick={() => navigate("/profile")}
-                    style={{
-                      width: "100%", padding: "12px 24px", borderRadius: 14,
-                      border: `1px solid ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.2)"}`, background: "transparent",
-                      color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)", fontSize: 13, fontFamily: "var(--font-sans)",
-                      letterSpacing: "0.06em", cursor: "pointer"
-                    }}>
-                    {lang === "ko" ? "내 피부 여정 보기" : lang === "de" ? "Meine Hautreise ansehen" : "View My Skin Journey"}
-                  </motion.button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <RetestReminderModal
+        isOpen={showRetestModal}
+        onConfirm={() => { store.reset(); setFounds({}); setShowRetestModal(false); }}
+        onDismiss={() => setShowRetestModal(false)}
+        lastDiagnosedAt={lastDiagnosedAt}
+        radarScores={radarScores}
+        skinTier={lastTier}
+      />
 
       {/* ── Page content ────────────────────────────────────────────────────── */}
       <div style={{

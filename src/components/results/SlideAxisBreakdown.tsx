@@ -22,8 +22,8 @@ const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, {
     ko: (s) => s >= 75 ? "주기적, 호르몬성 가능성 높음" : s >= 50 ? "중간 수준의 염증 패턴" : "간헐적, 표면성",
   },
   seb: {
-    en: (s) => s >= 75 ? "Rapid sebum return, T-zone dominant" : s >= 50 ? "Balanced but reactive to humidity" : "Controlled",
-    de: (s) => s >= 75 ? "Schnelle Talgproduktion, T-Zonen-dominant" : s >= 50 ? "Ausgeglichen, reagiert auf Feuchtigkeit" : "Kontrolliert",
+    en: (s) => s >= 75 ? "Rapid oil return, T-zone dominant" : s >= 50 ? "Balanced but reactive to humidity" : "Controlled",
+    de: (s) => s >= 75 ? "Schnelle Hautöl-Produktion, T-Zonen-dominant" : s >= 50 ? "Ausgeglichen, reagiert auf Feuchtigkeit" : "Kontrolliert",
     ko: (s) => s >= 75 ? "빠른 피지 재분비, T존 집중" : s >= 50 ? "균형적이나 습도에 반응" : "조절됨",
   },
   hyd: {
@@ -64,15 +64,15 @@ const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, {
 };
 
 const CRITICAL_MESSAGES: Partial<Record<AxisKey, { en: string; de: string; ko: string }>> = {
-  acne:    { en: "Inflammation control must come before any actives.",                  de: "Entzündungskontrolle muss vor anderen Wirkstoffen kommen.",            ko: "모든 활성 성분 전에 염증 관리가 선행되어야 합니다." },
-  seb:     { en: "Sebum regulation is the gateway to texture and pore improvement.",    de: "Talgregulierung ist das Tor zur Verbesserung von Textur und Poren.",    ko: "피지 조절이 피부결과 모공 개선의 시작점입니다." },
-  hyd:     { en: "Barrier hydration is Phase 1 before any targeted treatment.",         de: "Barriere-Hydratation ist Phase 1 vor jeder gezielten Behandlung.",      ko: "장벽 수분 공급이 모든 집중 케어 전 1단계입니다." },
-  sen:     { en: "Barrier calming must precede all active ingredients.",                de: "Barriere-Beruhigung muss vor der starken Wirkstofftherapie stehen.",    ko: "모든 활성 성분 전에 장벽 진정이 선행되어야 합니다." },
-  pigment: { en: "SPF protocol activation is the highest leverage action.",             de: "Aktivierung des SPF-Protokolls ist die wirkungsvollste Maßnahme.",      ko: "SPF 프로토콜 실천이 가장 효과적인 조치입니다." },
-  texture: { en: "Gentle exfoliation cadence is the critical variable.",                de: "Regelmäßiges, schonendes Peeling ist die entscheidende Variable.",       ko: "부드러운 각질 제거 주기가 핵심 변수입니다." },
-  aging:   { en: "Collagen-supporting actives unlock in Phase 4.",                      de: "Kollagenunterstützende Wirkstoffe entfalten Phase 4.",                  ko: "콜라겐 지지 활성 성분은 4단계에서 효과가 나타납니다." },
-  bar:     { en: "Barrier repair must be established before adding any new actives.",   de: "Die Barrierereparatur muss aufgebaut sein, bevor neue Wirkstoffe hinzugefügt werden.", ko: "새로운 활성 성분 추가 전 장벽 회복이 선행되어야 합니다." },
-  ox:      { en: "Antioxidant integration is the first line of defence.",               de: "Antioxidantien-Integration ist die erste Verteidigungslinie.",          ko: "항산화제 적용이 첫 번째 방어선입니다." },
+  acne: { en: "Inflammation control must come before any actives.", de: "Entzündungskontrolle muss vor anderen Wirkstoffen kommen.", ko: "모든 활성 성분 전에 염증 관리가 선행되어야 합니다." },
+  seb: { en: "Oil regulation is the gateway to texture and pore improvement.", de: "Hautöl-Regulierung ist das Tor zur Verbesserung von Textur und Poren.", ko: "피지 조절이 피부결과 모공 개선의 시작점입니다." },
+  hyd: { en: "Barrier hydration is Phase 1 before any targeted treatment.", de: "Barriere-Hydratation ist Phase 1 vor jeder gezielten Behandlung.", ko: "장벽 수분 공급이 모든 집중 케어 전 1단계입니다." },
+  sen: { en: "Barrier calming must precede all active ingredients.", de: "Barriere-Beruhigung muss vor der starken Wirkstofftherapie stehen.", ko: "모든 활성 성분 전에 장벽 진정이 선행되어야 합니다." },
+  pigment: { en: "SPF protocol activation is the highest leverage action.", de: "Aktivierung des SPF-Protokolls ist die wirkungsvollste Maßnahme.", ko: "SPF 프로토콜 실천이 가장 효과적인 조치입니다." },
+  texture: { en: "Gentle exfoliation cadence is the critical variable.", de: "Regelmäßiges, schonendes Peeling ist die entscheidende Variable.", ko: "부드러운 각질 제거 주기가 핵심 변수입니다." },
+  aging: { en: "Collagen-supporting actives unlock in Phase 4.", de: "Kollagenunterstützende Wirkstoffe entfalten Phase 4.", ko: "콜라겐 지지 활성 성분은 4단계에서 효과가 나타납니다." },
+  bar: { en: "Barrier repair must be established before adding any new actives.", de: "Die Barrierereparatur muss aufgebaut sein, bevor neue Wirkstoffe hinzugefügt werden.", ko: "새로운 활성 성분 추가 전 장벽 회복이 선행되어야 합니다." },
+  ox: { en: "Antioxidant integration is the first line of defence.", de: "Antioxidantien-Integration ist die erste Verteidigungslinie.", ko: "항산화제 적용이 첫 번째 방어선입니다." },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -82,17 +82,17 @@ const CRITICAL_MESSAGES: Partial<Record<AxisKey, { en: string; de: string; ko: s
 type Grade = "stable" | "watch" | "active" | "critical";
 
 const GRADE_COLORS: Record<Grade, { text: string; bg: string }> = {
-  stable:   { text: "hsl(142, 65%, 32%)", bg: "hsla(142, 65%, 32%, 0.12)" },
-  watch:    { text: "hsl(45,  88%, 38%)", bg: "hsla(45,  88%, 38%, 0.13)" },
-  active:   { text: "hsl(25,  90%, 46%)", bg: "hsla(25,  90%, 46%, 0.13)" },
+  stable: { text: "hsl(142, 65%, 32%)", bg: "hsla(142, 65%, 32%, 0.12)" },
+  watch: { text: "hsl(45,  88%, 38%)", bg: "hsla(45,  88%, 38%, 0.13)" },
+  active: { text: "hsl(25,  90%, 46%)", bg: "hsla(25,  90%, 46%, 0.13)" },
   critical: { text: "hsl(0,   78%, 52%)", bg: "hsla(0,   78%, 52%, 0.13)" },
 };
 
 const GRADE_LABELS: Record<Grade, { en: string; de: string; ko: string }> = {
-  stable:   { en: "Stable",   de: "Stabil",      ko: "안정" },
-  watch:    { en: "Watch",    de: "Beobachten",  ko: "주의" },
-  active:   { en: "Active",   de: "Aktiv",       ko: "관리 필요" },
-  critical: { en: "Critical", de: "Kritisch",    ko: "긴급" },
+  stable: { en: "Stable", de: "Stabil", ko: "안정" },
+  watch: { en: "Watch", de: "Beobachten", ko: "주의" },
+  active: { en: "Active", de: "Aktiv", ko: "관리 필요" },
+  critical: { en: "Critical", de: "Kritisch", ko: "긴급" },
 };
 
 function ClinicalBadge({ grade, lang }: { grade: Grade; lang: string }) {
@@ -124,25 +124,25 @@ function ClinicalBadge({ grade, lang }: { grade: Grade; lang: string }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ZONE_LABELS: Record<ZoneId, { en: string; de: string; ko: string }> = {
-  forehead: { en: "Forehead", de: "Stirn",   ko: "이마" },
-  eyes:     { en: "Eyes",     de: "Augen",   ko: "눈 주변" },
-  nose:     { en: "Nose",     de: "Nase",    ko: "코" },
-  cheeks:   { en: "Cheeks",   de: "Wangen",  ko: "볼" },
-  mouth:    { en: "Mouth",    de: "Mund",    ko: "입 주변" },
-  jawline:  { en: "Jawline",  de: "Kiefer",  ko: "턱선" },
-  neck:     { en: "Neck",     de: "Hals",    ko: "목" },
+  forehead: { en: "Forehead", de: "Stirn", ko: "이마" },
+  eyes: { en: "Eyes", de: "Augen", ko: "눈 주변" },
+  nose: { en: "Nose", de: "Nase", ko: "코" },
+  cheeks: { en: "Cheeks", de: "Wangen", ko: "볼" },
+  mouth: { en: "Mouth", de: "Mund", ko: "입 주변" },
+  jawline: { en: "Jawline", de: "Kiefer", ko: "턱선" },
+  neck: { en: "Neck", de: "Hals", ko: "목" },
 };
 
 const FACTOR_LABELS: Record<string, { en: string; de: string; ko: string }> = {
-  stress_high:      { en: "High stress",         de: "Hoher Stress",           ko: "높은 스트레스" },
-  stress_moderate:  { en: "Moderate stress",      de: "Mäßiger Stress",         ko: "중간 스트레스" },
-  sleep_poor:       { en: "Poor sleep (<5h)",     de: "Schlechter Schlaf (<5h)", ko: "수면 부족 (<5h)" },
-  sleep_low:        { en: "Low sleep (5–6h)",     de: "Wenig Schlaf (5–6h)",    ko: "부족한 수면 (5–6h)" },
-  water_low:        { en: "Low water intake",     de: "Wenig Wasser",           ko: "수분 섭취 부족" },
-  climate_humid:    { en: "Humid climate",        de: "Feuchtes Klima",         ko: "습한 기후" },
-  climate_dry:      { en: "Dry climate",          de: "Trockenes Klima",        ko: "건조한 기후" },
-  climate_polluted: { en: "Polluted air",         de: "Verschmutzte Luft",      ko: "오염된 공기" },
-  climate_tropical: { en: "Tropical climate",     de: "Tropisches Klima",       ko: "열대성 기후" },
+  stress_high: { en: "High stress", de: "Hoher Stress", ko: "높은 스트레스" },
+  stress_moderate: { en: "Moderate stress", de: "Mäßiger Stress", ko: "중간 스트레스" },
+  sleep_poor: { en: "Poor sleep (<5h)", de: "Schlechter Schlaf (<5h)", ko: "수면 부족 (<5h)" },
+  sleep_low: { en: "Low sleep (5–6h)", de: "Wenig Schlaf (5–6h)", ko: "부족한 수면 (5–6h)" },
+  water_low: { en: "Low water intake", de: "Wenig Wasser", ko: "수분 섭취 부족" },
+  climate_humid: { en: "Humid climate", de: "Feuchtes Klima", ko: "습한 기후" },
+  climate_dry: { en: "Dry climate", de: "Trockenes Klima", ko: "건조한 기후" },
+  climate_polluted: { en: "Polluted air", de: "Verschmutzte Luft", ko: "오염된 공기" },
+  climate_tropical: { en: "Tropical climate", de: "Tropisches Klima", ko: "열대성 기후" },
 };
 
 const CONCERN_READABLE: Record<string, string> = {
@@ -162,8 +162,8 @@ function readableConcern(id: string): string {
 }
 
 interface ProvenanceDrawerProps {
-  prov:     ScoreProvenance;
-  lang:     string;
+  prov: ScoreProvenance;
+  lang: string;
 }
 
 function ProvenanceDrawer({ prov, lang }: ProvenanceDrawerProps) {
@@ -209,8 +209,8 @@ function ProvenanceDrawer({ prov, lang }: ProvenanceDrawerProps) {
           <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
             {zoneConcerns.map((z, i) => {
               const zoneName = ZONE_LABELS[z.zone as ZoneId]?.[lang as "en" | "de" | "ko"] ?? z.zone;
-              const concern  = readableConcern(z.concernId);
-              const pts      = Math.round(z.contribution);
+              const concern = readableConcern(z.concernId);
+              const pts = Math.round(z.contribution);
               return (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
                   <span style={{ fontSize: "0.7rem", color: "hsl(var(--foreground))" }}>
@@ -309,9 +309,9 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
 
   // V5 lookup helpers — graceful when fields are absent
   const clinicalGrade = result.axis_clinical_grade;
-  const provenance    = result.score_provenance;
+  const provenance = result.score_provenance;
   const getGrade = (axis: AxisKey) => clinicalGrade?.[axis]?.grade as Grade | undefined;
-  const getProv  = (axis: AxisKey) => provenance?.find(p => p.axis === axis) ?? null;
+  const getProv = (axis: AxisKey) => provenance?.find(p => p.axis === axis) ?? null;
 
   const hasV5 = Boolean(clinicalGrade || provenance);
 
@@ -346,8 +346,8 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
           {language === "de"
             ? "Keine zwei Hautbilder sind gleich — das ist Ihre persönliche Hautanalyse."
             : language === "ko"
-            ? "세상에 같은 피부는 없습니다 — 이것이 바로 당신만의 피부 분석 결과입니다."
-            : "No two skin profiles are the same — this is your personal skin analysis."}
+              ? "세상에 같은 피부는 없습니다 — 이것이 바로 당신만의 피부 분석 결과입니다."
+              : "No two skin profiles are the same — this is your personal skin analysis."}
         </motion.p>
 
         {/* Radar + axis bars */}
@@ -356,14 +356,14 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {sorted.map((axis, i) => {
-              const score          = Math.round(result.axis_scores[axis]);
-              const isTop          = i === 0;
+              const score = Math.round(result.axis_scores[axis]);
+              const isTop = i === 0;
               const interpretation = AXIS_INTERPRETATIONS[axis]?.[language as "en" | "de" | "ko"]?.(score)
                 ?? AXIS_INTERPRETATIONS[axis]?.en?.(score) ?? "";
-              const grade          = getGrade(axis);
-              const prov           = getProv(axis);
-              const isExpanded     = expandedAxis === axis;
-              const canExpand      = hasV5 && prov != null;
+              const grade = getGrade(axis);
+              const prov = getProv(axis);
+              const isExpanded = expandedAxis === axis;
+              const canExpand = hasV5 && prov != null;
 
               return (
                 <motion.div
@@ -504,8 +504,8 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
             {language === "de"
               ? "Tippen Sie auf eine Achse für die Bewertungsaufschlüsselung"
               : language === "ko"
-              ? "축을 탭하면 점수 분석을 볼 수 있습니다"
-              : "Tap any axis to see the score breakdown"}
+                ? "축을 탭하면 점수 분석을 볼 수 있습니다"
+                : "Tap any axis to see the score breakdown"}
           </motion.p>
         )}
 
@@ -528,8 +528,8 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
               language === "de"
                 ? "Ihr Protokoll ist nach klinischer Priorität geordnet, beginnend mit Ihrer am höchsten bewerteten Achse."
                 : language === "ko"
-                ? "프로토콜은 임상적 우선순위에 따라 정렬되며, 가장 높은 점수의 축부터 시작합니다."
-                : "Your protocol is ordered by clinical priority, starting with your highest-scoring axis."
+                  ? "프로토콜은 임상적 우선순위에 따라 정렬되며, 가장 높은 점수의 축부터 시작합니다."
+                  : "Your protocol is ordered by clinical priority, starting with your highest-scoring axis."
             )}
           </p>
 
@@ -549,55 +549,55 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
             </button>
           )}
 
-        {/* ── "Why this recommendation" explanations (Phase 3.5D) ── */}
-        {result.axis_explanations && result.axis_explanations.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65 }}
-            className="mt-5"
-          >
-            <p className="slide-eyebrow mb-3" style={{ letterSpacing: "0.12em" }}>
-              {language === "de"
-                ? "Warum diese Empfehlung?"
-                : language === "ko"
-                ? "이 추천의 이유"
-                : "Why this recommendation?"}
-            </p>
-            <div className="space-y-3">
-              {(result.axis_explanations as AxisExplanation[]).slice(0, 3).map((exp) => {
-                const axLabel = language === "de"
-                  ? AXIS_LABELS_DE[exp.axis]
+          {/* ── "Why this recommendation" explanations (Phase 3.5D) ── */}
+          {result.axis_explanations && result.axis_explanations.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.65 }}
+              className="mt-5"
+            >
+              <p className="slide-eyebrow mb-3" style={{ letterSpacing: "0.12em" }}>
+                {language === "de"
+                  ? "Warum diese Empfehlung?"
                   : language === "ko"
-                  ? AXIS_LABELS_KO[exp.axis]
-                  : AXIS_LABELS[exp.axis];
-                const explanation = exp.explanation[language as "en" | "de" | "ko"] ?? exp.explanation.en;
-                const outcome = exp.expectedOutcome[language as "en" | "de" | "ko"] ?? exp.expectedOutcome.en;
-                return (
-                  <div
-                    key={exp.axis}
-                    className="rounded-xl border p-3"
-                    style={{
-                      borderColor: "hsl(var(--border) / 0.6)",
-                      background: "hsl(var(--card) / 0.6)",
-                    }}
-                  >
-                    <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "hsl(var(--primary))", marginBottom: 4 }}>
-                      {axLabel}
-                    </p>
-                    <p className="slide-body" style={{ fontSize: "0.8rem", lineHeight: 1.5, marginBottom: 4 }}>
-                      {explanation}
-                    </p>
-                    <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.4, fontStyle: "italic" }}>
-                      {language === "de" ? "In 4 Wochen: " : language === "ko" ? "4주 후: " : "In 4 weeks: "}
-                      {outcome}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
+                    ? "이 추천의 이유"
+                    : "Why this recommendation?"}
+              </p>
+              <div className="space-y-3">
+                {(result.axis_explanations as AxisExplanation[]).slice(0, 3).map((exp) => {
+                  const axLabel = language === "de"
+                    ? AXIS_LABELS_DE[exp.axis]
+                    : language === "ko"
+                      ? AXIS_LABELS_KO[exp.axis]
+                      : AXIS_LABELS[exp.axis];
+                  const explanation = exp.explanation[language as "en" | "de" | "ko"] ?? exp.explanation.en;
+                  const outcome = exp.expectedOutcome[language as "en" | "de" | "ko"] ?? exp.expectedOutcome.en;
+                  return (
+                    <div
+                      key={exp.axis}
+                      className="rounded-xl border p-3"
+                      style={{
+                        borderColor: "hsl(var(--border) / 0.6)",
+                        background: "hsl(var(--card) / 0.6)",
+                      }}
+                    >
+                      <p style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "hsl(var(--primary))", marginBottom: 4 }}>
+                        {axLabel}
+                      </p>
+                      <p className="slide-body" style={{ fontSize: "0.8rem", lineHeight: 1.5, marginBottom: 4 }}>
+                        {explanation}
+                      </p>
+                      <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.4, fontStyle: "italic" }}>
+                        {language === "de" ? "In 4 Wochen: " : language === "ko" ? "4주 후: " : "In 4 weeks: "}
+                        {outcome}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </div>

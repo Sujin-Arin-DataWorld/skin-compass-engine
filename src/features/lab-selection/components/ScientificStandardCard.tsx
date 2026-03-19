@@ -31,7 +31,7 @@ const ZONE_META: Record<string, { ko: string; en: string; de: string; icon: stri
 };
 
 const AXIS_META: Record<string, { ko: string; en: string; de: string; color: string }> = {
-  sebum: { ko: '피지', en: 'Sebum', de: 'Talg', color: '#F59E0B' },
+  sebum: { ko: '피지', en: 'Skin Oil', de: 'Hautöl', color: '#F59E0B' },
   hydration: { ko: '수분', en: 'Hydration', de: 'Feuchtigkeit', color: '#60A5FA' },
   pores: { ko: '모공', en: 'Pores', de: 'Poren', color: '#A78BFA' },
   texture: { ko: '피부결', en: 'Texture', de: 'Textur', color: '#34D399' },
@@ -52,7 +52,7 @@ const SEVERITY_META: Record<string, { ko: string; en: string; de: string; color:
 // Translate ingredient role strings (from product_db / axisIngredientMap)
 const ROLE_META: Record<string, { ko: string; en: string; de: string }> = {
   exfoliant: { ko: '각질 제거', en: 'Exfoliant', de: 'Exfoliant' },
-  sebum_control: { ko: '피지 조절', en: 'Sebum Control', de: 'Talgkontrolle' },
+  sebum_control: { ko: '피지 조절', en: 'Oil Control', de: 'Öl-Kontrolle' },
   hydration: { ko: '보습', en: 'Hydration', de: 'Feuchtigkeit' },
   soothing: { ko: '진정', en: 'Soothing', de: 'Beruhigung' },
   brightening: { ko: '미백', en: 'Brightening', de: 'Aufhellung' },
@@ -60,7 +60,7 @@ const ROLE_META: Record<string, { ko: string; en: string; de: string }> = {
   anti_aging: { ko: '노화 방지', en: 'Anti-Aging', de: 'Anti-Aging' },
   pore_minimizing: { ko: '모공 관리', en: 'Pore Minimizing', de: 'Porenminimierung' },
   antioxidant: { ko: '항산화', en: 'Antioxidant', de: 'Antioxidans' },
-  'sebum control': { ko: '피지 조절', en: 'Sebum Control', de: 'Talgkontrolle' },
+  'sebum control': { ko: '피지 조절', en: 'Oil Control', de: 'Öl-Kontrolle' },
 };
 
 const UI = {

@@ -30,7 +30,7 @@ const ZONE_LABEL: Record<string, { ko: string; en: string; de: string }> = {
 };
 
 const AXIS_LABEL: Record<string, { ko: string; en: string; de: string }> = {
-  sebum: { ko: '피지', en: 'Sebum', de: 'Talg' },
+  sebum: { ko: '피지', en: 'Skin Oil', de: 'Hautöl' },
   hydration: { ko: '수분', en: 'Hydration', de: 'Feuchtigkeit' },
   pores: { ko: '모공', en: 'Pores', de: 'Poren' },
   texture: { ko: '피부결', en: 'Texture', de: 'Textur' },

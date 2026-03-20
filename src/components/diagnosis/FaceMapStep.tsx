@@ -8,6 +8,7 @@ import type { QuestionDef, LocalizedText, QuestionAnswer } from "@/engine/questi
 import { MALE_ADJUSTMENTS } from "@/engine/tailQuestionRouter";
 import { useTheme } from "next-themes";
 import facemapImg from "@/assets/facemap_final.png";
+import { faceMap } from "@/lib/designTokens";
 import { inferFromFaceMap } from "@/engine/faceMapInference";
 import type { FaceMapInference } from "@/engine/faceMapInference";
 import { computeTailQuestions } from "@/engine/tailQuestionRouter";
@@ -242,10 +243,10 @@ const ZONES_DEF: ZoneDef[] = [
       "C 397 174, 377 160, 328 160 C 299 160, 279 179, 260 179 " +
       // 중앙에서 왼쪽 끝점(99)으로 이어지는 선 (제어점 비율 유지하여 완벽한 대칭 형성)
       "C 241 179, 221 160, 192 160 C 143 160, 123 174, 99 179 Z",
-    
+
     // 이마 양끝이 넓어졌으므로, 지시선이 라인에 겹치지 않도록 조금 더 왼쪽 바깥으로 뺌
     annotLine: { x1: 150, y1: 100, x2: 20, y2: 90 },
-    
+
     // 클릭 영역 박스도 넓어진 양옆을 충분히 커버하도록 x좌표 여백 확보
     hitPath: "M 20 0 L 500 0 L 500 200 L 20 200 Z",
   },
@@ -265,7 +266,7 @@ const ZONES_DEF: ZoneDef[] = [
       // --- 오른쪽 눈 (Right Eye) ---
       // 아래로 이동(+10) + 오른쪽 끝선 연장(+30)
       "M 402 220 C 400 210, 375 208, 345 210 C 330 212, 310 220, 300 228 C 295 232, 292 238, 295 244 C 300 258, 328 274, 358 278 C 390 280, 408 270, 410 258 C 412 246, 408 232, 402 220 Z",
-    
+
     // 오른쪽 눈이 우측으로 늘어났으므로 지시선 시작점도 우측으로 밀고 아래로 내림
     annotLine: { x1: 390, y1: 210, x2: 460, y2: 280 },
 
@@ -431,8 +432,9 @@ function FaceSVG({
         const lit = isActive || isSelected;
         const dimmed = activeZone !== null && !lit;
 
-        const accentColor = isDark ? "#e59d17ff" : "#2f1b0b4c";  /*글씨색*/
-        const idleColor = isDark ? "rgba(243, 227, 55, 0.77)" : "rgba(124, 53, 17, 0.95)";
+        const fm = isDark ? faceMap.dark : faceMap.light;
+        const accentColor = fm.labelActiveColor;
+        const idleColor = isDark ? "rgba(245, 235, 215, 0.85)" : fm.labelColor;
         const strokeColor = lit ? accentColor : idleColor;
 
         const d0 = zoneIdx * 0.5;
@@ -472,12 +474,14 @@ function FaceSVG({
               ? `fms-outline-hover 1.2s ease-in-out infinite`
               : `fms-outline-idle 3.5s ease-in-out ${d0}s infinite`;
 
-        // Choose glow filter
-        const glowFilter = isSelected
-          ? "url(#fms-glow-strong)"
-          : (isActive || (isHovered && !dimmed))
-            ? "url(#fms-glow-outline)"
-            : undefined;
+        // Choose glow filter (disabled on mobile for GPU performance)
+        const glowFilter = isMobile ? undefined : (
+          isSelected
+            ? "url(#fms-glow-strong)"
+            : (isActive || (isHovered && !dimmed))
+              ? "url(#fms-glow-outline)"
+              : undefined
+        );
 
         return (
           <g key={zone}
@@ -499,7 +503,7 @@ function FaceSVG({
                 d={outlinePath}
                 fill="none"
                 stroke={accentColor}
-                strokeWidth={strokeW + 3}
+                strokeWidth={strokeW + 2}
                 strokeLinejoin="round"
                 strokeLinecap="round"
                 filter={glowFilter}
@@ -565,9 +569,13 @@ function FaceSVG({
                 fill={strokeColor}
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: isMobile ? "18px" : "14px",
+                  fontSize: isMobile ? "24px" : "14px",
                   fontWeight: lit ? 600 : 400,
                   letterSpacing: "0.02em",
+                  paintOrder: "stroke",
+                  stroke: isDark ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)",
+                  strokeWidth: isMobile ? "3px" : "0",
+                  strokeLinejoin: "round",
                   animation: lit
                     ? "none"
                     : `fms-label-idle 3.5s ease-in-out ${d0 + 0.2}s infinite`,
@@ -630,7 +638,7 @@ function InlineQuestionRenderer({
     borderRadius: 24, fontSize: 13, fontFamily: "var(--font-sans)",
     cursor: "pointer", minHeight: 44, lineHeight: "1.2",
     border: sel ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
-    background: sel ? (isDark ? "rgba(201,169,110,0.15)" : "rgba(122,162,115,0.15)") : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
+    background: sel ? (isDark ? "rgba(45,107,74,0.15)" : "rgba(122,162,115,0.15)") : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
     color: sel ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",
     transition: "all 0.3s ease",
   });
@@ -767,10 +775,10 @@ function GlossaryBadge({
             ? (isDark ? "#c9a96e" : "#7A9E82")
             : (isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)"),
           border: `1px solid ${isOpen
-            ? (isDark ? "rgba(201,169,110,0.5)" : "rgba(122,162,115,0.5)")
+            ? (isDark ? "rgba(45,107,74,0.5)" : "rgba(122,162,115,0.5)")
             : (isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)")}`,
           background: isOpen
-            ? (isDark ? "rgba(201,169,110,0.1)" : "rgba(122,162,115,0.08)")
+            ? (isDark ? "rgba(45,107,74,0.1)" : "rgba(122,162,115,0.08)")
             : "transparent",
           cursor: "pointer", marginLeft: 5, transition: "all 0.15s ease",
         }}
@@ -873,7 +881,7 @@ function ConcernItem({
         padding: "13px 16px", borderRadius: 14,
         textAlign: "left", cursor: "pointer", transition: "all 0.2s ease",
         background: severity > 0
-          ? (isDark ? `rgba(201,169,110,${bgOpacity})` : `rgba(122,162,115,${bgOpacity})`)
+          ? (isDark ? `rgba(45,107,74,${bgOpacity})` : `rgba(122,162,115,${bgOpacity})`)
           : (isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.03)"),
         border: `1px solid ${severity > 0
           ? GOLD
@@ -897,7 +905,7 @@ function ConcernItem({
             {label[lang]}
           </span>
         )}
-        <span style={{ fontSize: 10, letterSpacing: "2px", color: severity > 0 ? GOLD : (isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)") }}>
+        <span style={{ fontSize: 12, letterSpacing: "3px", padding: "4px 0", color: severity > 0 ? GOLD : (isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)") }}>
           {dots}
         </span>
       </span>
@@ -908,6 +916,7 @@ function ConcernItem({
 // ─── Step 3: ConcernAndQuestionPanel — chips only, no deep-dive ───────────────
 function ConcernAndQuestionPanel({
   zone, concernSeverity, onToggle, onClose, lang, isDark, severityHintShown, onHintShown,
+  renderActions = true,
 }: {
   zone: ZoneId;
   concernSeverity: Record<string, 1 | 2 | 3>;
@@ -917,6 +926,7 @@ function ConcernAndQuestionPanel({
   isDark: boolean;
   severityHintShown: boolean;
   onHintShown: () => void;
+  renderActions?: boolean;
 }) {
   const GOLD = isDark ? "#c9a96e" : "#7A9E82";
   const store = useDiagnosisStore();
@@ -941,7 +951,7 @@ function ConcernAndQuestionPanel({
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
           <div>
             {/* Step 3: "Select Your Concerns" instead of "Clinical Area" */}
-            <p style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "var(--font-sans)", fontWeight: 600 }}>
+            <p style={{ fontSize: 12, letterSpacing: "0.2em", textTransform: "uppercase", color: GOLD, marginBottom: 6, fontFamily: "var(--font-sans)", fontWeight: 600 }}>
               {lang === "ko" ? "피부 고민 선택"
                 : lang === "de" ? "Beschwerden auswählen"
                   : "Select Your Concerns"}
@@ -967,8 +977,8 @@ function ConcernAndQuestionPanel({
             onAnimationComplete={() => setTimeout(onHintShown, 4000)}
             style={{
               padding: "12px 16px", borderRadius: 12, marginBottom: 14,
-              background: isDark ? "rgba(201,169,110,0.08)" : "rgba(122,162,115,0.08)",
-              border: `1px solid ${isDark ? "rgba(201,169,110,0.2)" : "rgba(122,162,115,0.2)"}`,
+              background: isDark ? "rgba(45,107,74,0.08)" : "rgba(122,162,115,0.08)",
+              border: `1px solid ${isDark ? "rgba(45,107,74,0.2)" : "rgba(122,162,115,0.2)"}`,
               fontSize: 13,
               color: isDark ? "rgba(255,255,255,0.65)" : "rgba(0,0,0,0.55)",
               fontFamily: "var(--font-sans)",
@@ -994,7 +1004,7 @@ function ConcernAndQuestionPanel({
       </AnimatePresence>
 
       {/* Concern list */}
-      <h4 style={{ fontSize: 13, textTransform: "uppercase", letterSpacing: "0.1em", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", marginBottom: 12, fontFamily: "var(--font-sans)" }}>
+      <h4 style={{ fontSize: 14, textTransform: "uppercase", letterSpacing: "0.1em", color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)", marginBottom: 12, fontFamily: "var(--font-sans)" }}>
         {lang === "ko" ? "피부 고민 선택" : lang === "de" ? "Beschwerden auswählen" : "Select Concerns"}
       </h4>
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
@@ -1010,40 +1020,45 @@ function ConcernAndQuestionPanel({
         ))}
       </div>
 
-      {/* Step 2-H: "No concerns here — skip" button */}
-      <motion.button
-        onClick={onClose}
-        style={{
-          width: "100%", padding: "11px 16px", borderRadius: 14,
-          border: `1px dashed ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
-          background: "transparent", cursor: "pointer",
-          color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
-          fontSize: 13, fontFamily: "var(--font-sans)",
-          marginBottom: 8, transition: "all 0.2s ease",
-        }}
-      >
-        {lang === "ko" ? "이 부위는 괜찮아요 — 건너뛰기"
-          : lang === "de" ? "Hier keine Probleme — überspringen"
-            : "No concerns here — skip"}
-      </motion.button>
+      {/* Action buttons — skip + confirm (only when renderActions is true, i.e. desktop panel) */}
+      {renderActions && (
+        <>
+          {/* Step 2-H: "No concerns here — skip" button */}
+          <motion.button
+            onClick={onClose}
+            style={{
+              width: "100%", padding: "11px 16px", borderRadius: 14,
+              border: `1px dashed ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
+              background: "transparent", cursor: "pointer",
+              color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
+              fontSize: 13, fontFamily: "var(--font-sans)",
+              marginBottom: 8, transition: "all 0.2s ease",
+            }}
+          >
+            {lang === "ko" ? "이 부위는 괜찮아요 — 건너뛰기"
+              : lang === "de" ? "Hier keine Probleme — überspringen"
+                : "No concerns here — skip"}
+          </motion.button>
 
-      {/* Confirm Selection button */}
-      <motion.button
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        onClick={onClose}
-        style={{
-          width: "100%", padding: "14px 0",
-          borderRadius: 24, fontSize: 14, fontWeight: 600,
-          fontFamily: "var(--font-sans)", border: "none",
-          background: isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)",
-          color: isDark ? "#0d0d12" : "#fff", cursor: "pointer",
-          boxShadow: isDark ? "0 6px 20px rgba(201,169,110,0.3)" : "0 6px 20px rgba(45,79,57,0.25)",
-        }}
-      >
-        {lang === "ko" ? "선택 완료" : lang === "de" ? "Auswahl bestätigen" : "Confirm Selection"}
-      </motion.button>
+          {/* Confirm Selection button */}
+          <motion.button
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            onClick={onClose}
+            style={{
+              width: "100%", padding: "14px 0",
+              borderRadius: 24, fontSize: 14, fontWeight: 600,
+              fontFamily: "var(--font-sans)", border: "none",
+              background: isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)",
+              color: isDark ? "#0d0d12" : "#fff", cursor: "pointer",
+              boxShadow: isDark ? "0 6px 20px rgba(45,107,74,0.3)" : "0 6px 20px rgba(45,79,57,0.25)",
+            }}
+          >
+            {lang === "ko" ? "선택 완료" : lang === "de" ? "Auswahl bestätigen" : "Confirm Selection"}
+          </motion.button>
+        </>
+      )}
     </div>
   );
 }
@@ -1319,15 +1334,15 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
         <>
           {/* Header */}
           <h2 style={{
-            fontSize: isMobile ? 30 : 30, fontWeight: 300,
+            fontSize: isMobile ? 26 : 30, fontWeight: 300,
             fontFamily: "var(--font-display)",
             color: isDark ? "#fff" : "#111", marginBottom: isMobile ? 4 : 8,
           }}>
             {copy.title}
           </h2>
           <p style={{
-            fontSize: isMobile ? 16 : 14, marginBottom: isMobile ? 16 : 32,
-            color: isDark ? "rgba(185, 182, 141, 0.76)" : "rgba(0,0,0,0.6)",
+            fontSize: isMobile ? 16 : 14, marginBottom: isMobile ? 8 : 32,
+            color: isDark ? "rgba(212, 200, 160, 0.85)" : "rgba(0,0,0,0.6)",
             fontFamily: "var(--font-sans)",
           }}>
             {copy.subtitle}
@@ -1339,17 +1354,17 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
             flexDirection: isMobile ? "column" : "row",
             alignItems: isMobile ? "center" : "flex-start",
             gap: 28,
-            padding: "0 20px",
+            padding: isMobile ? "0 8px" : "0 20px",
           }}>
             {/* Face image card */}
             <div style={{
               position: "relative",
               width: "100%",
-              maxWidth: isMobile ? "490px" : "520px",
+              maxWidth: isMobile ? "420px" : "520px",
               aspectRatio: "600/700",
               flexShrink: 0,
               borderRadius: 28,
-              background: isDark ? "#d4bc77" : "#ed8748", /*사진배경색깔*/
+              background: isDark ? faceMap.dark.imageBg : faceMap.light.imageBg, /*사진배경색깔*/
               boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
               border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
               margin: isMobile ? "0 auto" : "0",
@@ -1364,6 +1379,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                     : "linear-gradient(110deg, #f0ebe4 30%, #faf5ee 50%, #f0ebe4 70%)",
                   backgroundSize: "200% 100%",
                   animation: "fms-skeleton-shimmer 1.5s ease-in-out infinite",
+                  willChange: "transform",
                 }} />
               )}
               {/* Composite: image + vignette + SVG — fades in together */}
@@ -1375,6 +1391,8 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                 <img
                   src={facemapImg}
                   alt="Clinical face map"
+                  // @ts-expect-error fetchpriority not yet in React types
+                  fetchpriority="high"
                   onLoad={() => setImageLoaded(true)}
                   style={{
                     width: "100%", height: "100%",
@@ -1487,22 +1505,75 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                     position: "relative",
                     background: isDark ? "#14141a" : "#ffffff",
                     borderRadius: "28px 28px 0 0",
-                    padding: "12px 20px calc(40px + env(safe-area-inset-bottom, 34px))",
-                    maxHeight: "85vh", overflowY: "auto",
-                    WebkitOverflowScrolling: "touch",
+                    maxHeight: "85vh",
+                    display: "flex",
+                    flexDirection: "column",
                     boxShadow: "0 -20px 60px rgba(0,0,0,0.3)",
                   }}>
-                  <div style={{ width: 44, height: 4, borderRadius: 2, background: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)", margin: "0 auto 16px" }} />
-                  <ConcernAndQuestionPanel
-                    zone={activeZone}
-                    concernSeverity={concernSeverity}
-                    onToggle={toggleConcern}
-                    onClose={() => setActiveZone(null)}
-                    lang={lang}
-                    isDark={isDark}
-                    severityHintShown={severityHintShown}
-                    onHintShown={() => setSeverityHintShown(true)}
-                  />
+                  {/* Drag handle */}
+                  <div style={{ padding: "12px 20px 0", flexShrink: 0 }}>
+                    <div style={{ width: 44, height: 4, borderRadius: 2, background: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)", margin: "0 auto 12px" }} />
+                  </div>
+                  {/* Scrollable concern list */}
+                  <div style={{
+                    flex: 1,
+                    overflowY: "auto",
+                    WebkitOverflowScrolling: "touch",
+                    padding: "0 20px",
+                  }}>
+                    <ConcernAndQuestionPanel
+                      zone={activeZone}
+                      concernSeverity={concernSeverity}
+                      onToggle={toggleConcern}
+                      onClose={() => setActiveZone(null)}
+                      lang={lang}
+                      isDark={isDark}
+                      severityHintShown={severityHintShown}
+                      onHintShown={() => setSeverityHintShown(true)}
+                      renderActions={false}
+                    />
+                  </div>
+                  {/* Sticky action buttons — always visible at bottom */}
+                  <div style={{
+                    padding: "12px 20px calc(12px + env(safe-area-inset-bottom, 34px))",
+                    borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
+                    background: isDark ? "#14141a" : "#ffffff",
+                    flexShrink: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 8,
+                  }}>
+                    <motion.button
+                      onClick={() => setActiveZone(null)}
+                      style={{
+                        width: "100%", padding: "11px 16px", borderRadius: 14,
+                        border: `1px dashed ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)"}`,
+                        background: "transparent", cursor: "pointer",
+                        color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
+                        fontSize: 13, fontFamily: "var(--font-sans)",
+                      }}
+                    >
+                      {lang === "ko" ? "이 부위는 괜찮아요 — 건너뛰기"
+                        : lang === "de" ? "Hier keine Probleme — überspringen"
+                          : "No concerns here — skip"}
+                    </motion.button>
+                    <motion.button
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}
+                      onClick={() => setActiveZone(null)}
+                      style={{
+                        width: "100%", padding: "14px 0",
+                        borderRadius: 24, fontSize: 14, fontWeight: 600,
+                        fontFamily: "var(--font-sans)", border: "none",
+                        background: isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)",
+                        color: isDark ? "#0d0d12" : "#fff", cursor: "pointer",
+                        boxShadow: isDark ? "0 6px 20px rgba(45,107,74,0.3)" : "0 6px 20px rgba(45,79,57,0.25)",
+                      }}
+                    >
+                      {lang === "ko" ? "선택 완료" : lang === "de" ? "Auswahl bestätigen" : "Confirm Selection"}
+                    </motion.button>
+                  </div>
                 </motion.div>
               </div>
             )}
@@ -1522,8 +1593,8 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                     animate={{ opacity: 1, y: 0 }}
                     style={{
                       padding: "14px 18px", borderRadius: 14,
-                      background: isDark ? "rgba(201,169,110,0.06)" : "rgba(122,162,115,0.06)",
-                      border: `1px solid ${isDark ? "rgba(201,169,110,0.15)" : "rgba(122,162,115,0.15)"}`,
+                      background: isDark ? "rgba(45,107,74,0.06)" : "rgba(122,162,115,0.06)",
+                      border: `1px solid ${isDark ? "rgba(45,107,74,0.15)" : "rgba(122,162,115,0.15)"}`,
                     }}
                   >
                     <div style={{
@@ -1559,15 +1630,15 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                 disabled={!totalSelected || isAnalyzing}
                 animate={allZonesDone && !isAnalyzing ? {
                   boxShadow: isDark ? [
-                    "0 8px 24px rgba(201,169,110,0.4)",
-                    "0 8px 40px rgba(201,169,110,0.85)",
-                    "0 8px 24px rgba(201,169,110,0.4)",
+                    "0 8px 24px rgba(45,107,74,0.4)",
+                    "0 8px 40px rgba(45,107,74,0.85)",
+                    "0 8px 24px rgba(45,107,74,0.4)",
                   ] : [
                     "0 8px 24px rgba(45,79,57,0.35)",
                     "0 8px 40px rgba(45,79,57,0.7)",
                     "0 8px 24px rgba(45,79,57,0.35)",
                   ],
-                } : { boxShadow: totalSelected > 0 ? (isDark ? "0 4px 16px rgba(201,169,110,0.15)" : "0 4px 16px rgba(45,79,57,0.15)") : "none" }}
+                } : { boxShadow: totalSelected > 0 ? (isDark ? "0 4px 16px rgba(45,107,74,0.15)" : "0 4px 16px rgba(45,79,57,0.15)") : "none" }}
                 transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
                 style={{
                   display: "flex", alignItems: "center", gap: 10,
@@ -1577,7 +1648,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                   background: allZonesDone
                     ? (isDark ? "linear-gradient(135deg, #c9a96e, #a38555)" : "linear-gradient(135deg, #8EA273, #2D4F39)")
                     : totalSelected > 0
-                      ? (isDark ? "linear-gradient(135deg, rgba(201,169,110,0.45), rgba(163,133,85,0.45))" : "linear-gradient(135deg, rgba(142,162,115,0.55), rgba(45,79,57,0.55))")
+                      ? (isDark ? "linear-gradient(135deg, rgba(45,107,74,0.45), rgba(45,107,74,0.45))" : "linear-gradient(135deg, rgba(142,162,115,0.55), rgba(45,79,57,0.55))")
                       : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)",
                   color: totalSelected > 0 ? "#fff" : isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
                   cursor: (totalSelected > 0 && !isAnalyzing) ? "pointer" : "not-allowed",
@@ -1622,9 +1693,9 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
               whileTap={{ scale: isAnalyzing ? 1 : 0.97 }}
               animate={!isAnalyzing ? {
                 boxShadow: isDark ? [
-                  "0 8px 24px rgba(201,169,110,0.4)",
-                  "0 8px 40px rgba(201,169,110,0.85)",
-                  "0 8px 24px rgba(201,169,110,0.4)",
+                  "0 8px 24px rgba(45,107,74,0.4)",
+                  "0 8px 40px rgba(45,107,74,0.85)",
+                  "0 8px 24px rgba(45,107,74,0.4)",
                 ] : [
                   "0 8px 24px rgba(45,79,57,0.35)",
                   "0 8px 40px rgba(45,79,57,0.7)",

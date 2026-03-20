@@ -7,15 +7,15 @@ import { useI18nStore } from "@/store/i18nStore";
 
 export type TabId = "profile" | "history" | "orders" | "wishlist" | "address";
 
-const GOLD = "#D4AF37";
-const BRONZE = "#947E5C";
+const GOLD = "var(--ssl-accent)";
+const BRONZE = "var(--ssl-accent-deep)";
 
 const TABS = [
-    { id: "profile"  as TabId, Icon: User,     en: "My Profile",   de: "Mein Profil"  },
-    { id: "history"  as TabId, Icon: Activity, en: "Skin Analysis", de: "Hautanalyse"  },
-    { id: "orders"   as TabId, Icon: Package,  en: "Orders",        de: "Bestellungen" },
-    { id: "wishlist" as TabId, Icon: Heart,    en: "Wishlist",      de: "Wunschliste"  },
-    { id: "address"  as TabId, Icon: MapPin,   en: "Addresses",     de: "Adressen"     },
+    { id: "profile" as TabId, Icon: User, en: "My Profile", de: "Mein Profil" },
+    { id: "history" as TabId, Icon: Activity, en: "Skin Analysis", de: "Hautanalyse" },
+    { id: "orders" as TabId, Icon: Package, en: "Orders", de: "Bestellungen" },
+    { id: "wishlist" as TabId, Icon: Heart, en: "Wishlist", de: "Wunschliste" },
+    { id: "address" as TabId, Icon: MapPin, en: "Addresses", de: "Adressen" },
 ];
 
 interface Props {
@@ -41,15 +41,15 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
     };
 
     return (
-        <div className="min-h-screen" style={{ background: "#0a0a0a", color: "#e8e8e8" }}>
+        <div className="min-h-screen" style={{ background: "#F5F5F7", color: "#e8e8e8" }}>
 
             {/* ── Desktop sidebar ─────────────────────────────────── */}
             <aside
                 className="hidden md:flex fixed inset-y-0 left-0 w-56 flex-col z-40 select-none"
-                style={{ background: "#0d0d0d", borderRight: "1px solid rgba(212,175,55,0.1)" }}
+                style={{ background: "#0d0d0d", borderRight: "1px solid rgba(45,107,74,0.1)" }}
             >
                 {/* Brand */}
-                <div className="px-6 pt-8 pb-5" style={{ borderBottom: "1px solid rgba(212,175,55,0.08)" }}>
+                <div className="px-6 pt-8 pb-5" style={{ borderBottom: "1px solid rgba(45,107,74,0.08)" }}>
                     <p style={{ fontSize: "0.55rem", letterSpacing: "0.3em", color: BRONZE, textTransform: "uppercase" }}>
                         Skin Strategy Lab
                     </p>
@@ -59,7 +59,7 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
                 </div>
 
                 {/* User info */}
-                <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(212,175,55,0.08)" }}>
+                <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(45,107,74,0.08)" }}>
                     {userProfile?.avatar ? (
                         <img
                             src={userProfile.avatar}
@@ -71,8 +71,8 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
                         <div
                             className="w-9 h-9 rounded-full flex items-center justify-center mb-3 text-xs font-bold"
                             style={{
-                                background: "rgba(212,175,55,0.1)",
-                                border: "1.5px solid rgba(212,175,55,0.4)",
+                                background: "rgba(45,107,74,0.1)",
+                                border: "1.5px solid rgba(45,107,74,0.4)",
                                 color: GOLD,
                             }}
                         >
@@ -104,7 +104,7 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
                                         layoutId="sidebar-active-pill"
                                         className="absolute inset-0 rounded-lg"
                                         style={{
-                                            background: "rgba(212,175,55,0.09)",
+                                            background: "rgba(45,107,74,0.09)",
                                             borderLeft: `2px solid ${GOLD}`,
                                         }}
                                         transition={{ type: "spring", stiffness: 420, damping: 36 }}
@@ -125,7 +125,7 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
                 {/* Sign out */}
                 <div
                     className="px-3 pb-6"
-                    style={{ borderTop: "1px solid rgba(212,175,55,0.08)", paddingTop: "1rem" }}
+                    style={{ borderTop: "1px solid rgba(45,107,74,0.08)", paddingTop: "1rem" }}
                 >
                     <button
                         onClick={handleLogout}
@@ -181,7 +181,7 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
                     background: "rgba(10,10,10,0.82)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
-                    borderTop: "1px solid rgba(212,175,55,0.12)",
+                    borderTop: "1px solid rgba(45,107,74,0.12)",
                     height: "60px",
                     paddingBottom: "env(safe-area-inset-bottom)",
                 }}

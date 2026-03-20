@@ -11,12 +11,12 @@ import { useAuthStore } from "@/store/authStore";
 import { useProfile } from "@/hooks/useProfile";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD = "#D4AF37";
-const BRONZE = "#947E5C";
+const GOLD = "var(--ssl-accent)";
+const BRONZE = "var(--ssl-accent-deep)";
 
 const CARD: React.CSSProperties = {
     background: "rgba(255,255,255,0.025)",
-    border: "1px solid rgba(212,175,55,0.12)",
+    border: "1px solid rgba(45,107,74,0.12)",
     borderRadius: "16px",
     padding: "1.5rem",
 };
@@ -24,23 +24,23 @@ const CARD: React.CSSProperties = {
 // ── Zod schemas ───────────────────────────────────────────────────────────────
 const profileSchema = z.object({
     firstName: z.string().min(1, "Vorname ist erforderlich"),
-    lastName:  z.string().min(1, "Nachname ist erforderlich"),
-    phone:     z.string().optional(),
+    lastName: z.string().min(1, "Nachname ist erforderlich"),
+    phone: z.string().optional(),
     birthDate: z.string().optional(),
-    skinType:  z.string().optional(),
+    skinType: z.string().optional(),
 });
 
 const passwordSchema = z
     .object({
         password: z.string().min(8, "Mindestens 8 Zeichen"),
-        confirm:  z.string(),
+        confirm: z.string(),
     })
     .refine((d) => d.password === d.confirm, {
         message: "Passwörter stimmen nicht überein",
         path: ["confirm"],
     });
 
-type ProfileFormValues  = z.infer<typeof profileSchema>;
+type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 type SaveState = "idle" | "saving" | "success";
 
@@ -80,7 +80,7 @@ function FloatingField({
                         ? "1.2rem 2.75rem 0.4rem 0.875rem"
                         : "1.2rem 0.875rem 0.4rem",
                     background: "rgba(255,255,255,0.04)",
-                    border: `1px solid ${focused ? GOLD : error ? "#EF4444" : "rgba(212,175,55,0.18)"}`,
+                    border: `1px solid ${focused ? GOLD : error ? "#EF4444" : "rgba(45,107,74,0.18)"}`,
                     borderRadius: "10px",
                     fontSize: "0.875rem",
                     color: "#e8e8e8",
@@ -123,11 +123,11 @@ function FloatingField({
 
 // ── Skin type pills ───────────────────────────────────────────────────────────
 const SKIN_TYPES = [
-    { id: "normal",      en: "Normal",      de: "Normal"      },
-    { id: "oily",        en: "Oily",        de: "Fettig"      },
-    { id: "dry",         en: "Dry",         de: "Trocken"     },
-    { id: "combination", en: "Combination", de: "Mischhaut"   },
-    { id: "sensitive",   en: "Sensitive",   de: "Empfindlich" },
+    { id: "normal", en: "Normal", de: "Normal" },
+    { id: "oily", en: "Oily", de: "Fettig" },
+    { id: "dry", en: "Dry", de: "Trocken" },
+    { id: "combination", en: "Combination", de: "Mischhaut" },
+    { id: "sensitive", en: "Sensitive", de: "Empfindlich" },
 ];
 
 function SkinTypePills({
@@ -149,7 +149,7 @@ function SkinTypePills({
                             borderRadius: "999px",
                             fontSize: "0.75rem",
                             border: `1px solid ${active ? GOLD : "rgba(148,126,92,0.3)"}`,
-                            background: active ? "rgba(212,175,55,0.12)" : "transparent",
+                            background: active ? "rgba(45,107,74,0.12)" : "transparent",
                             color: active ? GOLD : BRONZE,
                             cursor: "pointer",
                             transition: "all 0.15s",
@@ -171,15 +171,15 @@ function SaveButton({ state, de }: { state: SaveState; de: boolean }) {
             type="submit"
             disabled={state === "saving"}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-60 transition-colors duration-300"
-            style={{ color: "#0a0a0a", background: bg }}
+            style={{ color: "#F5F5F7", background: bg }}
         >
             {state === "saving" && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
             {state === "success" && <Check className="w-3.5 h-3.5" />}
             {state === "saving"
-                ? (de ? "Speichere…"        : "Saving…")
+                ? (de ? "Speichere…" : "Saving…")
                 : state === "success"
-                ? (de ? "Gespeichert!"      : "Saved!")
-                : (de ? "Änderungen speichern" : "Save Changes")}
+                    ? (de ? "Gespeichert!" : "Saved!")
+                    : (de ? "Änderungen speichern" : "Save Changes")}
         </button>
     );
 }
@@ -188,10 +188,10 @@ function SaveButton({ state, de }: { state: SaveState; de: boolean }) {
 function GoogleLogo({ size = 18 }: { size?: number }) {
     return (
         <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-            <path d="M23.745 12.27c0-.79-.07-1.54-.19-2.27h-11.3v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" fill="#4285F4"/>
-            <path d="M12.255 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.515 21.3 7.615 24 12.255 24z" fill="#34A853"/>
-            <path d="M5.525 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62h-3.98a11.86 11.86 0 000 10.76l3.98-3.09z" fill="#FBBC05"/>
-            <path d="M12.255 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C18.205 1.19 15.495 0 12.255 0c-4.64 0-8.74 2.7-10.71 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z" fill="#EA4335"/>
+            <path d="M23.745 12.27c0-.79-.07-1.54-.19-2.27h-11.3v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z" fill="#4285F4" />
+            <path d="M12.255 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96h-3.98v3.09C3.515 21.3 7.615 24 12.255 24z" fill="#34A853" />
+            <path d="M5.525 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62h-3.98a11.86 11.86 0 000 10.76l3.98-3.09z" fill="#FBBC05" />
+            <path d="M12.255 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C18.205 1.19 15.495 0 12.255 0c-4.64 0-8.74 2.7-10.71 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z" fill="#EA4335" />
         </svg>
     );
 }
@@ -203,7 +203,7 @@ function DeleteModal({
     de: boolean; onClose: () => void; onConfirm: () => Promise<void>;
 }) {
     const [confirmText, setConfirmText] = useState("");
-    const [deleting, setDeleting]       = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const matches = confirmText === "DELETE";
 
     const handleConfirm = async () => {
@@ -301,10 +301,10 @@ export default function ProfilePage({ de }: { de: boolean }) {
     const { profile, loading, updateProfile, updatePassword } = useProfile();
 
     const [profileSave, setProfileSave] = useState<SaveState>("idle");
-    const [pwdSave,     setPwdSave]     = useState<SaveState>("idle");
-    const [showPwd,     setShowPwd]     = useState(false);
+    const [pwdSave, setPwdSave] = useState<SaveState>("idle");
+    const [showPwd, setShowPwd] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
-    const [deleteOpen,  setDeleteOpen]  = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
 
     // ── Profile form ─────────────────────────────────────────────────────────
     const profileForm = useForm<ProfileFormValues>({
@@ -316,23 +316,23 @@ export default function ProfilePage({ de }: { de: boolean }) {
         if (loading) return;
         profileForm.reset({
             firstName: userProfile?.firstName ?? "",
-            lastName:  userProfile?.lastName  ?? "",
-            phone:     profile?.phone         ?? "",
-            birthDate: profile?.birth_date    ?? "",
-            skinType:  profile?.skin_type     ?? "",
+            lastName: userProfile?.lastName ?? "",
+            phone: profile?.phone ?? "",
+            birthDate: profile?.birth_date ?? "",
+            skinType: profile?.skin_type ?? "",
         });
-    // Reset once when profile data arrives
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // Reset once when profile data arrives
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loading, profile?.id]);
 
     const onProfileSubmit = async (values: ProfileFormValues) => {
         setProfileSave("saving");
         const { error } = await updateProfile({
             firstName: values.firstName,
-            lastName:  values.lastName,
-            phone:     values.phone     || undefined,
+            lastName: values.lastName,
+            phone: values.phone || undefined,
             birthDate: values.birthDate || undefined,
-            skinType:  values.skinType  || undefined,
+            skinType: values.skinType || undefined,
         });
         if (error) {
             toast.error(error);
@@ -400,14 +400,14 @@ export default function ProfilePage({ de }: { de: boolean }) {
                                 src={userProfile.avatar}
                                 alt={initials}
                                 className="w-14 h-14 rounded-full object-cover flex-shrink-0"
-                                style={{ border: `2px solid rgba(212,175,55,0.5)` }}
+                                style={{ border: `2px solid rgba(45,107,74,0.5)` }}
                             />
                         ) : (
                             <div
                                 className="w-14 h-14 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0"
                                 style={{
-                                    background: "rgba(212,175,55,0.1)",
-                                    border: `2px solid rgba(212,175,55,0.3)`,
+                                    background: "rgba(45,107,74,0.1)",
+                                    border: `2px solid rgba(45,107,74,0.3)`,
                                     color: GOLD,
                                 }}
                             >
@@ -570,7 +570,7 @@ export default function ProfilePage({ de }: { de: boolean }) {
                                         >
                                             {showPwd
                                                 ? <EyeOff className="w-4 h-4" strokeWidth={1.5} />
-                                                : <Eye    className="w-4 h-4" strokeWidth={1.5} />}
+                                                : <Eye className="w-4 h-4" strokeWidth={1.5} />}
                                         </button>
                                     }
                                 />
@@ -597,7 +597,7 @@ export default function ProfilePage({ de }: { de: boolean }) {
                                         >
                                             {showConfirm
                                                 ? <EyeOff className="w-4 h-4" strokeWidth={1.5} />
-                                                : <Eye    className="w-4 h-4" strokeWidth={1.5} />}
+                                                : <Eye className="w-4 h-4" strokeWidth={1.5} />}
                                         </button>
                                     }
                                 />

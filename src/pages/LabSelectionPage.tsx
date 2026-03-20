@@ -119,19 +119,19 @@ function computeZoneAxisScores(
  */
 function computeRequiredIngredients(zoneAxisScores: AxisScore[]): RequiredIngredient[] {
   const ingredientsMap = new Map<string, RequiredIngredient>();
-  
+
   for (const { axis, score, severity } of zoneAxisScores) {
     if (score <= 0) continue;
-    
+
     const axisIngredients = AXIS_INGREDIENT_MAP[axis]?.[severity] ?? [];
-    
+
     for (const ing of axisIngredients) {
       if (!ingredientsMap.has(ing.name_en)) {
         ingredientsMap.set(ing.name_en, ing);
       }
     }
   }
-  
+
   return Array.from(ingredientsMap.values());
 }
 
@@ -163,8 +163,8 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult, selectedZones: Select
       if (zoneData && zoneData.concerns.length > 0) {
         const computed = computeZoneAxisScores(zoneData.concerns, zoneData.severity ?? {});
         scaledScores = scaledScores.map(a => {
-           const found = computed.find(c => c.axis === a.axis);
-           return found ? found : a;
+          const found = computed.find(c => c.axis === a.axis);
+          return found ? found : a;
         });
       } else {
         scaledScores = globalAxisScores.map((a) => ({ ...a }));
@@ -357,7 +357,7 @@ export default function LabSelectionPage() {
                         width: 32,
                         height: 1,
                         background: done
-                          ? 'rgba(201,169,110,0.6)'
+                          ? 'rgba(45,107,74,0.6)'
                           : isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)',
                       }}
                     />
@@ -376,12 +376,12 @@ export default function LabSelectionPage() {
                       padding: '5px 12px',
                       borderRadius: 20,
                       border: active
-                        ? '1.5px solid rgba(201,169,110,0.6)'
+                        ? '1.5px solid rgba(45,107,74,0.6)'
                         : done
                           ? '1px solid rgba(93,202,165,0.4)'
                           : `1px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.1)'}`,
                       background: active
-                        ? 'rgba(201,169,110,0.1)'
+                        ? 'rgba(45,107,74,0.1)'
                         : 'transparent',
                       cursor: 'pointer',
                       fontSize: 12,
@@ -399,7 +399,7 @@ export default function LabSelectionPage() {
                         height: 18,
                         borderRadius: '50%',
                         background: active
-                          ? 'rgba(201,169,110,0.2)'
+                          ? 'rgba(45,107,74,0.2)'
                           : done
                             ? 'rgba(93,202,165,0.2)'
                             : isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.07)',

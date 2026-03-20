@@ -78,26 +78,26 @@ export default function GdprConsentModal({ onAccept, onDecline, loading = false 
                 className="w-full max-w-md rounded-2xl overflow-hidden"
                 style={{
                     background: "#0d0d0d",
-                    border: "1px solid rgba(212,175,55,0.2)",
-                    boxShadow: "0 0 60px rgba(212,175,55,0.08)",
+                    border: "1px solid rgba(45,107,74,0.2)",
+                    boxShadow: "0 0 60px rgba(45,107,74,0.08)",
                 }}
             >
                 {/* Header */}
                 <div
                     className="flex items-center gap-3 px-6 py-5"
-                    style={{ borderBottom: "1px solid rgba(212,175,55,0.1)" }}
+                    style={{ borderBottom: "1px solid rgba(45,107,74,0.1)" }}
                 >
                     <div
                         className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ background: "rgba(212,175,55,0.1)" }}
+                        style={{ background: "rgba(45,107,74,0.1)" }}
                     >
-                        <ShieldCheck className="w-4 h-4" style={{ color: "#D4AF37" }} />
+                        <ShieldCheck className="w-4 h-4" style={{ color: "var(--ssl-accent)" }} />
                     </div>
                     <div>
-                        <p style={{ fontSize: "0.55rem", letterSpacing: "0.28em", color: "#947E5C", textTransform: "uppercase" }}>
+                        <p style={{ fontSize: "0.55rem", letterSpacing: "0.28em", color: "var(--ssl-accent-deep)", textTransform: "uppercase" }}>
                             {t.badge}
                         </p>
-                        <p style={{ fontFamily: "'Georgia', serif", fontSize: "1.05rem", color: "#D4AF37", lineHeight: 1.2 }}>
+                        <p style={{ fontFamily: "'Georgia', serif", fontSize: "1.05rem", color: "var(--ssl-accent)", lineHeight: 1.2 }}>
                             {t.title}
                         </p>
                     </div>
@@ -114,21 +114,21 @@ export default function GdprConsentModal({ onAccept, onDecline, loading = false 
                             <li key={item} className="flex items-start gap-2.5">
                                 <span
                                     className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0"
-                                    style={{ background: "#D4AF37" }}
+                                    style={{ background: "var(--ssl-accent)" }}
                                 />
                                 <span style={{ fontSize: "0.8125rem", color: "#e8e8e8", lineHeight: 1.5 }}>{item}</span>
                             </li>
                         ))}
                     </ul>
 
-                    <p style={{ fontSize: "0.75rem", color: "#947E5C", lineHeight: 1.6 }}>
+                    <p style={{ fontSize: "0.75rem", color: "var(--ssl-accent-deep)", lineHeight: 1.6 }}>
                         {t.purpose}
                     </p>
 
                     <Link
                         to="/datenschutz"
                         className="inline-flex items-center gap-1 text-xs underline underline-offset-2 transition-opacity hover:opacity-70"
-                        style={{ color: "#D4AF37" }}
+                        style={{ color: "var(--ssl-accent)" }}
                     >
                         {t.policy} →
                     </Link>
@@ -137,13 +137,13 @@ export default function GdprConsentModal({ onAccept, onDecline, loading = false 
                 {/* Actions */}
                 <div
                     className="px-6 pb-6 pt-4 space-y-3"
-                    style={{ borderTop: "1px solid rgba(212,175,55,0.08)" }}
+                    style={{ borderTop: "1px solid rgba(45,107,74,0.08)" }}
                 >
                     <button
                         onClick={onAccept}
                         disabled={loading}
                         className="w-full py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
-                        style={{ background: "#D4AF37", color: "#0a0a0a" }}
+                        style={{ background: "var(--ssl-accent)", color: "#F5F5F7" }}
                     >
                         {loading
                             ? <><Loader2 className="w-4 h-4 animate-spin" /><span>Saving…</span></>
@@ -155,7 +155,7 @@ export default function GdprConsentModal({ onAccept, onDecline, loading = false 
                         onClick={onDecline}
                         disabled={loading}
                         className="w-full py-2.5 rounded-xl text-sm transition-opacity hover:opacity-70 disabled:opacity-50"
-                        style={{ color: "#947E5C", border: "1px solid rgba(148,126,92,0.25)" }}
+                        style={{ color: "var(--ssl-accent-deep)", border: "1px solid rgba(148,126,92,0.25)" }}
                     >
                         <X className="w-3 h-3 inline mr-1.5 mb-0.5" />
                         {t.decline}

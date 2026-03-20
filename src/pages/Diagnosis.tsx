@@ -21,9 +21,9 @@ import RetestReminderModal from "@/components/RetestReminderModal";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const GOLD_DARK = "#c9a96e";
-const ROSE      = "#b76e79";
-const SAGE      = "#7A9E82";   // light-mode primary accent
-const FOREST    = "#2D4F39";   // light-mode deep accent
+const ROSE = "#b76e79";
+const SAGE = "#7A9E82";   // light-mode primary accent
+const FOREST = "#2D4F39";   // light-mode deep accent
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase = "foundation" | "scanning" | "facemap";
@@ -51,7 +51,7 @@ function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
     borderRadius: 24, fontSize: 14, fontFamily: "var(--font-sans)",
     cursor: "pointer", minHeight: 44, lineHeight: "1",
     border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-    background: selected ? "rgba(201,169,110,0.15)" : "transparent",
+    background: selected ? "rgba(45,107,74,0.15)" : "transparent",
     color: selected ? GOLD : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)",
     transition: "all 0.3s ease",
   };
@@ -69,12 +69,12 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Die Bedürfnisse Ihrer Haut verändern sich mit dem Alter — so können wir die richtige Pflege empfehlen",
     hintKO: "나이에 따라 피부가 필요로 하는 관리가 달라져요 — 맞춤 추천을 위해 확인합니다",
     options: [
-      { label: { en: "Under 20",  de: "Unter 20",  ko: "20세 미만" }, value: 0 },
-      { label: { en: "20–29",     de: "20–29",     ko: "20–29세"  }, value: 1 },
-      { label: { en: "30–39",     de: "30–39",     ko: "30–39세"  }, value: 2 },
-      { label: { en: "40–49",     de: "40–49",     ko: "40–49세"  }, value: 3 },
-      { label: { en: "50–59",     de: "50–59",     ko: "50–59세"  }, value: 4 },
-      { label: { en: "60+",       de: "60+",       ko: "60세 이상" }, value: 5 },
+      { label: { en: "Under 20", de: "Unter 20", ko: "20세 미만" }, value: 0 },
+      { label: { en: "20–29", de: "20–29", ko: "20–29세" }, value: 1 },
+      { label: { en: "30–39", de: "30–39", ko: "30–39세" }, value: 2 },
+      { label: { en: "40–49", de: "40–49", ko: "40–49세" }, value: 3 },
+      { label: { en: "50–59", de: "50–59", ko: "50–59세" }, value: 4 },
+      { label: { en: "60+", de: "60+", ko: "60세 이상" }, value: 5 },
     ],
   },
   {
@@ -86,8 +86,8 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Hormone beeinflussen Ihre Haut erheblich — dies hilft bei hormonellen und Produktempfehlungen",
     hintKO: "호르몬이 피부에 큰 영향을 미쳐요 — 호르몬 관련 추천에 활용됩니다",
     options: [
-      { label: { en: "Female",                       de: "Weiblich",              ko: "여성"              }, value: 0 },
-      { label: { en: "Male",                          de: "Männlich",              ko: "남성"              }, value: 1 },
+      { label: { en: "Female", de: "Weiblich", ko: "여성" }, value: 0 },
+      { label: { en: "Male", de: "Männlich", ko: "남성" }, value: 1 },
       { label: { en: "Non-binary / Prefer not to say", de: "Nicht-binär / Keine Angabe", ko: "논바이너리 / 답하고 싶지 않음" }, value: 2 },
     ],
   },
@@ -97,10 +97,10 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     textDE: "Stunden erholsamen Schlafs",
     textKO: "평균 수면 시간",
     options: [
-      { label: { en: "< 5h",  de: "< 5 Std.",  ko: "5시간 미만"  }, value: 1 },
-      { label: { en: "5–6h",  de: "5–6 Std.",  ko: "5-6시간"    }, value: 2 },
-      { label: { en: "7h",    de: "7 Std.",    ko: "7시간"      }, value: 3 },
-      { label: { en: "8h+",   de: "8+ Std.",   ko: "8시간 이상"  }, value: 4 },
+      { label: { en: "< 5h", de: "< 5 Std.", ko: "5시간 미만" }, value: 1 },
+      { label: { en: "5–6h", de: "5–6 Std.", ko: "5-6시간" }, value: 2 },
+      { label: { en: "7h", de: "7 Std.", ko: "7시간" }, value: 3 },
+      { label: { en: "8h+", de: "8+ Std.", ko: "8시간 이상" }, value: 4 },
     ],
   },
   {
@@ -109,9 +109,9 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     textDE: "Tägliche Wasseraufnahme",
     textKO: "일일 수분 섭취량",
     options: [
-      { label: { en: "1–2 glasses", de: "1–2 Gläser", ko: "1-2잔"    }, value: 1 },
-      { label: { en: "3–5 glasses", de: "3–5 Gläser", ko: "3-5잔"    }, value: 2 },
-      { label: { en: "6+ glasses",  de: "6+ Gläser",  ko: "6잔 이상" }, value: 3 },
+      { label: { en: "1–2 glasses", de: "1–2 Gläser", ko: "1-2잔" }, value: 1 },
+      { label: { en: "3–5 glasses", de: "3–5 Gläser", ko: "3-5잔" }, value: 2 },
+      { label: { en: "6+ glasses", de: "6+ Gläser", ko: "6잔 이상" }, value: 3 },
     ],
   },
   {
@@ -120,9 +120,9 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     textDE: "Aktuelles Stresslevel",
     textKO: "현재 스트레스 수준",
     options: [
-      { label: { en: "Low",      de: "Niedrig", ko: "낮음" }, value: 1 },
-      { label: { en: "Moderate", de: "Mittel",  ko: "보통" }, value: 2 },
-      { label: { en: "High",     de: "Hoch",    ko: "높음" }, value: 3 },
+      { label: { en: "Low", de: "Niedrig", ko: "낮음" }, value: 1 },
+      { label: { en: "Moderate", de: "Mittel", ko: "보통" }, value: 2 },
+      { label: { en: "High", de: "Hoch", ko: "높음" }, value: 3 },
     ],
   },
   {
@@ -134,10 +134,10 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Viele Europäer haben im Sommer fettigere und im Winter trockenere Haut — Ihre Routine sollte sich anpassen",
     hintKO: "유럽에서는 여름에 더 유분지고 겨울에 더 건조해지는 분들이 많아요 — 루틴도 따라 바뀌어야 합니다",
     options: [
-      { label: { en: "Yes — oilier in summer, drier in winter",   de: "Ja — im Sommer fettiger, im Winter trockener",   ko: "네 — 여름엔 유분, 겨울엔 건조"    }, value: 1 },
-      { label: { en: "Yes — dry year-round, worse in winter",     de: "Ja — ganzjährig trocken, im Winter schlimmer",   ko: "네 — 연중 건조, 겨울에 더 심함"   }, value: 2 },
-      { label: { en: "Yes — oily year-round, worse in summer",    de: "Ja — ganzjährig fettig, im Sommer schlimmer",    ko: "네 — 연중 유분, 여름에 더 심함"   }, value: 3 },
-      { label: { en: "No significant change",                     de: "Keine wesentliche Veränderung",                  ko: "큰 변화 없음"                    }, value: 0 },
+      { label: { en: "Yes — oilier in summer, drier in winter", de: "Ja — im Sommer fettiger, im Winter trockener", ko: "네 — 여름엔 유분, 겨울엔 건조" }, value: 1 },
+      { label: { en: "Yes — dry year-round, worse in winter", de: "Ja — ganzjährig trocken, im Winter schlimmer", ko: "네 — 연중 건조, 겨울에 더 심함" }, value: 2 },
+      { label: { en: "Yes — oily year-round, worse in summer", de: "Ja — ganzjährig fettig, im Sommer schlimmer", ko: "네 — 연중 유분, 여름에 더 심함" }, value: 3 },
+      { label: { en: "No significant change", de: "Keine wesentliche Veränderung", ko: "큰 변화 없음" }, value: 0 },
     ],
   },
   {
@@ -149,10 +149,10 @@ const FOUNDATION_QUESTIONS: FoundationQuestion[] = [
     hintDE: "Wir empfehlen Produkte, die sich für SIE gut anfühlen — eine schwere Creme nützt nichts, wenn Sie das Gefühl nicht mögen",
     hintKO: "피부에 맞으면서 발림감도 좋아야 꾸준히 쓸 수 있어요 — 선호도를 반영합니다",
     options: [
-      { label: { en: "Light gel or water-based", de: "Leichtes Gel oder wasserbasiert",    ko: "가벼운 젤 또는 수분 베이스" }, value: 0 },
-      { label: { en: "Medium lotion",            de: "Mittlere Lotion",                     ko: "보통 로션"               }, value: 1 },
-      { label: { en: "Rich cream",               de: "Reichhaltige Creme",                  ko: "리치 크림"               }, value: 2 },
-      { label: { en: "Depends on season",        de: "Kommt auf die Jahreszeit an",         ko: "계절에 따라 다름"         }, value: 3 },
+      { label: { en: "Light gel or water-based", de: "Leichtes Gel oder wasserbasiert", ko: "가벼운 젤 또는 수분 베이스" }, value: 0 },
+      { label: { en: "Medium lotion", de: "Mittlere Lotion", ko: "보통 로션" }, value: 1 },
+      { label: { en: "Rich cream", de: "Reichhaltige Creme", ko: "리치 크림" }, value: 2 },
+      { label: { en: "Depends on season", de: "Kommt auf die Jahreszeit an", ko: "계절에 따라 다름" }, value: 3 },
     ],
   },
 ];
@@ -258,7 +258,7 @@ function MobileFoundationStepper({
         /* Climate step */
         <div style={{
           background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-          border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
+          border: `1px solid ${isDark ? "rgba(45,107,74,0.12)" : "rgba(45,107,74,0.18)"}`,
           borderRadius: 16, padding: "20px 16px",
           backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
         }}>
@@ -309,7 +309,7 @@ function MobileFoundationStepper({
                     borderWidth: 1, borderStyle: "solid",
                     borderColor: isSelected ? GOLD : (isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"),
                     background: isSelected
-                      ? (isDark ? "rgba(201,169,110,0.1)" : "rgba(122,162,115,0.08)")
+                      ? (isDark ? "rgba(45,107,74,0.1)" : "rgba(122,162,115,0.08)")
                       : "transparent",
                     color: isSelected ? GOLD : (isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)"),
                     fontWeight: isSelected ? 500 : 400,
@@ -348,9 +348,9 @@ const DiagnosisPage: React.FC = () => {
   const { language } = useI18nStore();
   const lang = language as Lang;
   const { resolvedTheme } = useTheme();
-  const isDark      = resolvedTheme === "dark";
-  const GOLD        = isDark ? GOLD_DARK : SAGE;
-  const GOLD_DEEP   = isDark ? "#947E5C" : FOREST;
+  const isDark = resolvedTheme === "dark";
+  const GOLD = isDark ? GOLD_DARK : SAGE;
+  const GOLD_DEEP = isDark ? "var(--ssl-accent-deep)" : FOREST;
   const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
 
   // ── URL-synced navigation state ──────────────────────────────────────────────
@@ -367,8 +367,8 @@ const DiagnosisPage: React.FC = () => {
   const phase: Phase = isScanning
     ? "scanning"
     : urlPhase === "facemap"
-    ? "facemap"
-    : "foundation";
+      ? "facemap"
+      : "foundation";
 
   // Mobile question index from URL (0-based)
   const mobileQ = Math.max(
@@ -473,7 +473,7 @@ const DiagnosisPage: React.FC = () => {
     if (!foundationComplete) return;
     store.setAxisAnswer("EXP_SLEEP", (foundationAnswers.sleep ?? 1) - 1);
     // water/stress must be stored as string keys that buildFoundation's WATER_MAP / STRESS_MAP expect
-    store.setAxisAnswer("EXP_WATER",  (["water_low", "water_mid", "water_high"] as const)[(foundationAnswers.water ?? 1) - 1] ?? "water_mid");
+    store.setAxisAnswer("EXP_WATER", (["water_low", "water_mid", "water_high"] as const)[(foundationAnswers.water ?? 1) - 1] ?? "water_mid");
     store.setAxisAnswer("EXP_STRESS", (["stress_low", "stress_mod", "stress_high"] as const)[(foundationAnswers.stress ?? 1) - 1] ?? "stress_low");
     if (foundationAnswers.age_bracket !== undefined)
       store.setAxisAnswer("EXP_AGE", foundationAnswers.age_bracket);
@@ -510,11 +510,11 @@ const DiagnosisPage: React.FC = () => {
       // not the potentially-stale React hook snapshot captured in this closure.
       const freshState = useDiagnosisStore.getState();
       const result = runDiagnosisV5({
-        axisAnswers:   freshState.axisAnswers,
+        axisAnswers: freshState.axisAnswers,
         selectedZones: freshState.selectedZones ?? {},
         implicitFlags: freshState.implicitFlags,
-        lifestyle:     freshState.lifestyle,
-        products:      [],
+        lifestyle: freshState.lifestyle,
+        products: [],
       });
 
       if (!result) {
@@ -565,8 +565,8 @@ const DiagnosisPage: React.FC = () => {
         console.warn("[handleCompleteAnalysis] saveDiagnosis failed (non-fatal):", saveErr);
         toast.error(
           lang === "ko" ? "결과 저장에 실패했습니다. 다시 시도해주세요."
-          : lang === "de" ? "Ergebnisse konnten nicht gespeichert werden. Bitte versuchen Sie es erneut."
-          : "Failed to save results. Please try again."
+            : lang === "de" ? "Ergebnisse konnten nicht gespeichert werden. Bitte versuchen Sie es erneut."
+              : "Failed to save results. Please try again."
         );
       }
 
@@ -588,7 +588,7 @@ const DiagnosisPage: React.FC = () => {
       <style>{`
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:4px}
-        ::-webkit-scrollbar-thumb{background:${isDark ? 'rgba(201,169,110,0.2)' : 'rgba(45,79,57,0.15)'};border-radius:4px}
+        ::-webkit-scrollbar-thumb{background:${isDark ? 'rgba(45,107,74,0.2)' : 'rgba(45,79,57,0.15)'};border-radius:4px}
         input[type="range"]{accent-color:${isDark ? '#c9a96e' : '#7A9E82'}}
       `}</style>
 
@@ -629,7 +629,7 @@ const DiagnosisPage: React.FC = () => {
           })}
         </div>
         <p style={{
-          fontSize: 12, letterSpacing: "0.22em", color: isDark ? "rgba(201,169,110,0.6)" : "rgba(45,79,57,0.65)",
+          fontSize: 12, letterSpacing: "0.22em", color: isDark ? "rgba(45,107,74,0.6)" : "rgba(45,79,57,0.65)",
           textTransform: "uppercase", fontFamily: "var(--font-sans)", marginBottom: isMobile ? 14 : 36
         }}>
           {phase === "foundation" && (lang === "de" ? "Phase 01 · Basis-Scan" : lang === "ko" ? "Phase 01 · 기초 스캔" : "Phase 01 · Foundation Scan")}
@@ -685,7 +685,7 @@ const DiagnosisPage: React.FC = () => {
                       transition={{ delay: i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                       style={{
                         background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                        border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
+                        border: `1px solid ${isDark ? "rgba(45,107,74,0.12)" : "rgba(45,107,74,0.18)"}`,
                         borderRadius: 16, padding: "20px 16px",
                         backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
                       }}>
@@ -718,7 +718,7 @@ const DiagnosisPage: React.FC = () => {
                     transition={{ delay: FOUNDATION_QUESTIONS.length * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                     style={{
                       background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                      border: `1px solid ${isDark ? "rgba(201,169,110,0.12)" : "rgba(201,169,110,0.18)"}`,
+                      border: `1px solid ${isDark ? "rgba(45,107,74,0.12)" : "rgba(45,107,74,0.18)"}`,
                       borderRadius: 16, padding: "20px 16px",
                       backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
                     }}>
@@ -746,7 +746,7 @@ const DiagnosisPage: React.FC = () => {
                     fontSize: 15, fontFamily: "var(--font-sans)",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: foundationComplete ? "pointer" : "default",
-                    boxShadow: foundationComplete ? `0 8px 32px ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.25)"}` : "none",
+                    boxShadow: foundationComplete ? `0 8px 32px ${isDark ? "rgba(45,107,74,0.3)" : "rgba(45,79,57,0.25)"}` : "none",
                     transition: "all 0.4s ease",
                   }}>
                   {lang === "de" ? "Gesichts-Mapping beginnen →" : lang === "ko" ? "얼굴 매핑 시작 →" : "Begin Face Mapping →"}
@@ -775,7 +775,7 @@ const DiagnosisPage: React.FC = () => {
               <div style={{ position: "relative", width: 80, height: 80 }}>
                 <motion.div style={{
                   position: "absolute", inset: -16, borderRadius: "50%",
-                  background: `radial-gradient(circle, ${isDark ? 'rgba(201,169,110,0.15)' : 'rgba(45,79,57,0.12)'} 0%, transparent 70%)`
+                  background: `radial-gradient(circle, ${isDark ? 'rgba(45,107,74,0.15)' : 'rgba(45,79,57,0.12)'} 0%, transparent 70%)`
                 }}
                   animate={{ scale: [1, 1.4, 1], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }} />
@@ -799,7 +799,7 @@ const DiagnosisPage: React.FC = () => {
                 }} />
                 <motion.div style={{
                   position: "absolute", inset: 26, borderRadius: "50%",
-                  background: `radial-gradient(circle, ${GOLD}, ${isDark ? 'rgba(201,169,110,0.4)' : 'rgba(45,79,57,0.35)'})`
+                  background: `radial-gradient(circle, ${GOLD}, ${isDark ? 'rgba(45,107,74,0.4)' : 'rgba(45,79,57,0.35)'})`
                 }}
                   animate={{ scale: [0.6, 1.15, 0.6], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />

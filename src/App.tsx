@@ -5,10 +5,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
+import { brand } from "@/lib/designTokens";
 import GdprConsentModal from "./components/GdprConsentModal";
 import Index from "./pages/Index";
 import Diagnosis from "./pages/Diagnosis";
@@ -40,11 +41,37 @@ function AppInner() {
   const { logout } = useAuthStore();
   const location = useLocation();
   const { language } = useI18nStore();
+  const { resolvedTheme } = useTheme();
 
   // Sync HTML lang attribute for i18n CSS rules ([lang="ko"], etc.)
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  // ── Sync design-token CSS custom properties onto :root ───────────────────
+  useEffect(() => {
+    const isDark = resolvedTheme === "dark";
+    const t = isDark ? brand.dark : brand.light;
+    const root = document.documentElement.style;
+
+    root.setProperty("--ssl-bg",             t.bg);
+    root.setProperty("--ssl-bg-card",        t.bgCard);
+    root.setProperty("--ssl-bg-surface",     t.bgSurface);
+    root.setProperty("--ssl-bg-elevated",    t.bgElevated);
+    root.setProperty("--ssl-accent",         t.accent);
+    root.setProperty("--ssl-accent-deep",    t.accentDeep);
+    root.setProperty("--ssl-accent-muted",   t.accentMuted);
+    root.setProperty("--ssl-accent-bg",      t.accentBg);
+    root.setProperty("--ssl-accent-border",  t.accentBorder);
+    root.setProperty("--ssl-secondary",      t.secondary);
+    root.setProperty("--ssl-secondary-muted",t.secondaryMuted);
+    root.setProperty("--ssl-secondary-bg",   t.secondaryBg);
+    root.setProperty("--ssl-text",           t.text);
+    root.setProperty("--ssl-text-secondary", t.textSecondary);
+    root.setProperty("--ssl-text-tertiary",  t.textTertiary);
+    root.setProperty("--ssl-border",         t.border);
+    root.setProperty("--ssl-border-hover",   t.borderHover);
+  }, [resolvedTheme]);
 
   // ── GDPR gate state ──────────────────────────────────────────────────────
   const [showGdpr, setShowGdpr] = useState(false);

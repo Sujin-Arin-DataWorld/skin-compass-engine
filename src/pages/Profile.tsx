@@ -24,7 +24,7 @@ export function GlobalSettings() {
         <div className="flex gap-4 justify-center mt-6">
             <button
                 onClick={toggleLanguage}
-                className="flex h-10 items-center justify-center gap-2 rounded-full border border-border px-4 text-[#947E5C] dark:text-[#D4AF37] transition-colors hover:border-primary/40 bg-card/50 shadow-sm"
+                className="flex h-10 items-center justify-center gap-2 rounded-full border border-border px-4 text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] transition-colors hover:border-primary/40 bg-card/50 shadow-sm"
             >
                 <Globe className="h-4 w-4" />
                 <span className="text-xs font-bold uppercase tracking-widest">{language}</span>
@@ -155,9 +155,9 @@ function SkinProgressTab() {
                             {userProfile.savedResults.slice(0, 5).map((saved, idx) => {
                                 const date = saved.engineVersion
                                     ? new Date().toLocaleDateString(
-                                          language === "ko" ? "ko-KR" : language === "de" ? "de-DE" : "en-GB",
-                                          { day: "numeric", month: "short", year: "numeric" }
-                                      )
+                                        language === "ko" ? "ko-KR" : language === "de" ? "de-DE" : "en-GB",
+                                        { day: "numeric", month: "short", year: "numeric" }
+                                    )
                                     : "—";
 
                                 const topAxis = saved.primary_concerns?.[0] ?? "sen";
@@ -188,7 +188,7 @@ function SkinProgressTab() {
                                             {/* Date + Primary Axis */}
                                             <div className="flex items-center justify-between mb-2">
                                                 <p className="text-[0.65rem] font-bold tracking-widest uppercase"
-                                                   style={{ color: idx === 0 ? "hsl(var(--primary))" : "hsl(var(--foreground-hint))" }}
+                                                    style={{ color: idx === 0 ? "hsl(var(--primary))" : "hsl(var(--foreground-hint))" }}
                                                 >
                                                     {date}
                                                 </p>
@@ -206,7 +206,7 @@ function SkinProgressTab() {
                                             {routineProducts.length > 0 && (
                                                 <div className="mb-2">
                                                     <p className="text-[0.55rem] font-bold tracking-[0.12em] uppercase mb-1"
-                                                       style={{ color: "hsl(var(--foreground-hint))" }}
+                                                        style={{ color: "hsl(var(--foreground-hint))" }}
                                                     >
                                                         {language === "ko" ? "시스템 기본 루틴" : language === "de" ? "System-Basisroutine" : "System Base Routine"}
                                                     </p>
@@ -231,7 +231,7 @@ function SkinProgressTab() {
                                             {specialCarePicks.length > 0 && (
                                                 <div>
                                                     <p className="text-[0.55rem] font-bold tracking-[0.12em] uppercase mb-1"
-                                                       style={{ color: "hsl(var(--primary))" }}
+                                                        style={{ color: "hsl(var(--primary))" }}
                                                     >
                                                         {language === "ko" ? "맞춤 특수 케어" : language === "de" ? "Spezial-Pflege Add-ons" : "My Special Care Add-ons"}
                                                     </p>

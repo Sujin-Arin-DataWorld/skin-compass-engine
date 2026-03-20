@@ -235,8 +235,8 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
                 style={{
                   fontSize: "clamp(0.6rem, 1.5vw, 0.65rem)",
                   background: added || inCart ? "transparent" : "hsl(var(--primary))",
-                  color: added || inCart ? "#D4AF37" : "hsl(var(--primary-foreground))",
-                  border: added || inCart ? "1px solid #D4AF37" : "1px solid transparent",
+                  color: added || inCart ? "var(--ssl-accent)" : "hsl(var(--primary-foreground))",
+                  border: added || inCart ? "1px solid var(--ssl-accent)" : "1px solid transparent",
                 }}
               >
                 {added || inCart

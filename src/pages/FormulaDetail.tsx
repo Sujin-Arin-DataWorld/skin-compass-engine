@@ -132,8 +132,8 @@ export default function FormulaDetail() {
                             style={{
                                 fontSize: "clamp(0.8rem, 2.5vw, 0.875rem)",
                                 background: added || inCart ? "transparent" : "hsl(var(--primary))",
-                                color: added || inCart ? "#D4AF37" : "hsl(var(--primary-foreground))",
-                                border: added || inCart ? "2px solid #D4AF37" : "2px solid transparent",
+                                color: added || inCart ? "var(--ssl-accent)" : "hsl(var(--primary-foreground))",
+                                border: added || inCart ? "2px solid var(--ssl-accent)" : "2px solid transparent",
                                 boxShadow: added || inCart ? "none" : undefined,
                             }}
                         >
@@ -147,40 +147,40 @@ export default function FormulaDetail() {
 
                 {/* The Strategy Section */}
                 {lowestTarget && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="rounded-3xl border border-primary/20 bg-primary/[0.03] p-6 md:p-8 mb-8"
-                >
-                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">The Strategy</p>
-                    <h2 className="font-display text-xl md:text-2xl font-light text-foreground leading-snug mb-4">
-                        Targeting your <span className="text-primary font-medium">{AXIS_LABELS[lowestTarget]}</span> with personalized precision.
-                    </h2>
-                    <div className="flex items-center gap-4 bg-card rounded-2xl p-4 border border-border/50 mb-4">
-                        <div className="flex-1">
-                            <p className="text-xs text-foreground/50 mb-1">Current {AXIS_LABELS[lowestTarget]} Score</p>
-                            <div className="w-full h-2 bg-border/50 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-primary rounded-full"
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${lowestScore}%` }}
-                                    transition={{ duration: 1, delay: 0.5 }}
-                                />
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.15 }}
+                        className="rounded-3xl border border-primary/20 bg-primary/[0.03] p-6 md:p-8 mb-8"
+                    >
+                        <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">The Strategy</p>
+                        <h2 className="font-display text-xl md:text-2xl font-light text-foreground leading-snug mb-4">
+                            Targeting your <span className="text-primary font-medium">{AXIS_LABELS[lowestTarget]}</span> with personalized precision.
+                        </h2>
+                        <div className="flex items-center gap-4 bg-card rounded-2xl p-4 border border-border/50 mb-4">
+                            <div className="flex-1">
+                                <p className="text-xs text-foreground/50 mb-1">Current {AXIS_LABELS[lowestTarget]} Score</p>
+                                <div className="w-full h-2 bg-border/50 rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full bg-primary rounded-full"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${lowestScore}%` }}
+                                        transition={{ duration: 1, delay: 0.5 }}
+                                    />
+                                </div>
                             </div>
+                            <span className="font-display text-2xl font-bold text-foreground">{lowestScore}</span>
                         </div>
-                        <span className="font-display text-2xl font-bold text-foreground">{lowestScore}</span>
-                    </div>
-                    {product.vectorImpact && Object.keys(product.vectorImpact).length > 0 ? (
-                        <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">
-                            Based on your {lowestScore} {AXIS_LABELS[lowestTarget]} score, this product is mapped to shift this vector by <strong className="text-primary">{(product.vectorImpact[lowestTarget] ?? 0) > 0 ? '+' : ''}{product.vectorImpact[lowestTarget] ?? 0} points</strong>. The key ingredients precisely trigger the mechanisms required for this clinical improvement.
-                        </p>
-                    ) : (
-                        <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">
-                            This formula is projected to improve your {AXIS_LABELS[lowestTarget]} score by approximately <strong className="text-foreground">+{improvement} points</strong> within 30 days of consistent use. The key ingredients specifically target the mechanisms driving this vector.
-                        </p>
-                    )}
-                </motion.div>
+                        {product.vectorImpact && Object.keys(product.vectorImpact).length > 0 ? (
+                            <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">
+                                Based on your {lowestScore} {AXIS_LABELS[lowestTarget]} score, this product is mapped to shift this vector by <strong className="text-primary">{(product.vectorImpact[lowestTarget] ?? 0) > 0 ? '+' : ''}{product.vectorImpact[lowestTarget] ?? 0} points</strong>. The key ingredients precisely trigger the mechanisms required for this clinical improvement.
+                            </p>
+                        ) : (
+                            <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">
+                                This formula is projected to improve your {AXIS_LABELS[lowestTarget]} score by approximately <strong className="text-foreground">+{improvement} points</strong> within 30 days of consistent use. The key ingredients specifically target the mechanisms driving this vector.
+                            </p>
+                        )}
+                    </motion.div>
                 )}
 
                 {/* Usage Instructions */}
@@ -220,21 +220,21 @@ export default function FormulaDetail() {
 
                 {/* Targeted Axes */}
                 {product.target_axes.length > 0 && (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
-                    className="rounded-3xl border border-border bg-card p-6 md:p-8 mb-12"
-                >
-                    <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4">Targeting Vectors</p>
-                    <div className="flex flex-wrap gap-2">
-                        {product.target_axes.map((axis) => (
-                            <span key={axis} className="rounded-full px-4 py-1.5 text-sm font-medium bg-primary/10 text-primary border border-primary/20">
-                                {AXIS_LABELS[axis]} · {Math.round(result?.axis_scores?.[axis] ?? 50)}
-                            </span>
-                        ))}
-                    </div>
-                </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.35 }}
+                        className="rounded-3xl border border-border bg-card p-6 md:p-8 mb-12"
+                    >
+                        <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4">Targeting Vectors</p>
+                        <div className="flex flex-wrap gap-2">
+                            {product.target_axes.map((axis) => (
+                                <span key={axis} className="rounded-full px-4 py-1.5 text-sm font-medium bg-primary/10 text-primary border border-primary/20">
+                                    {AXIS_LABELS[axis]} · {Math.round(result?.axis_scores?.[axis] ?? 50)}
+                                </span>
+                            ))}
+                        </div>
+                    </motion.div>
                 )}
             </main>
 

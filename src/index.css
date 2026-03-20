@@ -11,6 +11,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Fraunces';
   src: url('./assets/fonts/Fraunces/Fraunces-Italic-VariableFont_SOFT,WONK,opsz,wght.woff2') format('woff2-variations');
@@ -27,6 +28,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Plus Jakarta Sans';
   src: url('./assets/fonts/Plus_Jakarta_Sans/PlusJakartaSans-Italic-VariableFont_wght.woff2') format('woff2-variations');
@@ -60,8 +62,10 @@
     /* ===== WHITE MODE: Clean Clinical Lab ===== */
 
     /* Base */
-    --background: 210 33% 98%;        /* #F8FAFC - Ice Pearl */
-    --foreground: 160 14% 12%;        /* #1C2421 - Charcoal Green */
+    --background: 210 33% 98%;
+    /* #F8FAFC - Ice Pearl */
+    --foreground: 160 14% 12%;
+    /* #1C2421 - Charcoal Green */
     --background-2: 210 8% 91%;
 
     /* Cards & Popovers */
@@ -71,19 +75,24 @@
     --popover-foreground: 160 14% 12%;
 
     /* Extended foreground variants (used by existing components) */
-    --foreground-body: 210 30% 24%;   /* #2C3E50 — body text */
-    --foreground-hint: 210 20% 35%;   /* muted labels/hints */
+    --foreground-body: 210 30% 24%;
+    /* #2C3E50 — body text */
+    --foreground-hint: 210 20% 35%;
+    /* muted labels/hints */
 
     /* Tier 1: Sage Green (Clinical Trust) */
-    --primary: 100 22% 48%;           /* #769362 */
+    --primary: 100 22% 48%;
+    /* #769362 */
     --primary-foreground: 0 0% 100%;
 
     /* Tier 2: Dusty Aqua (Science & Data) */
-    --secondary: 187 26% 63%;         /* #87B6BC */
+    --secondary: 187 26% 63%;
+    /* #87B6BC */
     --secondary-foreground: 160 14% 12%;
 
     /* Tier 3: Gold Accent */
-    --accent-gold: 43 58% 55%;        /* #D2AC47 */
+    --accent-gold: 43 58% 55%;
+    /* #D2AC47 */
     --accent-gold-foreground: 160 14% 12%;
 
     /* Semantic: Muted */
@@ -137,15 +146,16 @@
     --glow-champagne: 0 0 20px hsla(100, 22%, 48%, 0.1);
 
     /* ── Typography system (EN/DE defaults) ── */
-    --font-display:  'Fraunces', serif;
-    --font-sans:     'Plus Jakarta Sans', sans-serif;
-    --font-numeric:  'Plus Jakarta Sans', sans-serif; /* NEVER override — always PJS */
+    --font-display: 'Fraunces', serif;
+    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-numeric: 'Plus Jakarta Sans', sans-serif;
+    /* NEVER override — always PJS */
 
     /* Hero Title */
-    --fs-hero:    clamp(2rem, 5vw, 3.5rem);
-    --fw-hero:    600;
-    --lh-hero:    1.3;
-    --ls-hero:    -0.03em;
+    --fs-hero: clamp(2rem, 5vw, 3.5rem);
+    --fw-hero: 600;
+    --lh-hero: 1.3;
+    --ls-hero: -0.03em;
 
     /* Section Header */
     --fs-section: clamp(1.375rem, 3vw, 2rem);
@@ -154,34 +164,34 @@
     --ls-section: -0.02em;
 
     /* Sub Header */
-    --fs-sub:     clamp(1.0625rem, 2vw, 1.375rem);
-    --fw-sub:     700;
-    --lh-sub:     1.5;
-    --ls-sub:     -0.02em;
+    --fs-sub: clamp(1.0625rem, 2vw, 1.375rem);
+    --fw-sub: 700;
+    --lh-sub: 1.5;
+    --ls-sub: -0.02em;
 
     /* Body Text */
-    --fs-body:    1rem;
-    --fw-body:    400;
-    --lh-body:    1.7;
-    --ls-body:    -0.02em;
+    --fs-body: 1rem;
+    --fw-body: 400;
+    --lh-body: 1.7;
+    --ls-body: -0.02em;
 
     /* UI Elements (buttons, nav, labels) */
-    --fs-ui:      0.875rem;
-    --fw-ui:      500;
-    --lh-ui:      1;
-    --ls-ui:      -0.04em;
+    --fs-ui: 0.875rem;
+    --fw-ui: 500;
+    --lh-ui: 1;
+    --ls-ui: -0.04em;
 
     /* Analysis Data (score values — always Plus Jakarta Sans) */
-    --fs-data:    clamp(1.375rem, 3vw, 2rem);
-    --fw-data:    600;
-    --lh-data:    1.4;
-    --ls-data:    -0.03em;
+    --fs-data: clamp(1.375rem, 3vw, 2rem);
+    --fw-data: 600;
+    --lh-data: 1.4;
+    --ls-data: -0.03em;
 
     /* Technical Label */
-    --fs-label:   0.6875rem;
-    --fw-label:   500;
-    --lh-label:   1.2;
-    --ls-label:   0.05em;
+    --fs-label: 0.6875rem;
+    --fw-label: 500;
+    --lh-label: 1.2;
+    --ls-label: 0.05em;
 
     --sidebar-background: 210 8% 93%;
     --sidebar-foreground: 210 30% 24%;
@@ -237,45 +247,70 @@
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --tracking-normal: 0em;
     --spacing: 0.25rem;
+
+    /* ── SSL Design Tokens (static fallback — synced by App.tsx) ── */
+    --ssl-bg: #FAFAF8;
+    --ssl-bg-card: rgba(255, 255, 255, 0.72);
+    --ssl-bg-surface: #F3F3EF;
+    --ssl-bg-elevated: #FFFFFF;
+    --ssl-accent: #5E8B68;
+    --ssl-accent-deep: #3D6B4A;
+    --ssl-accent-muted: #7A9E82;
+    --ssl-accent-bg: rgba(94, 139, 104, 0.06);
+    --ssl-accent-border: rgba(94, 139, 104, 0.15);
+    --ssl-secondary: #5A8A8D;
+    --ssl-secondary-muted: #7AADAF;
+    --ssl-secondary-bg: rgba(122, 173, 175, 0.08);
+    --ssl-text: #1B2838;
+    --ssl-text-secondary: #6B7280;
+    --ssl-text-tertiary: #9CA3AF;
+    --ssl-border: rgba(0, 0, 0, 0.08);
+    --ssl-border-hover: rgba(94, 139, 104, 0.25);
   }
 
   .dark {
     /* ===== DARK MODE: Deep Hydration & Premium Aesthetic ===== */
 
     /* Base */
-    --background: 222 33% 11%;        /* #111827 - Deep Navy Slate */
-    --foreground: 220 13% 91%;        /* #E5E7EB - Soft Off-White */
-    --background-2: 220 20% 14%;
+    --background: 0 0% 4%;
+    /* #0A0A0A - Pure Apple Black */
+    --foreground: 0 0% 96%;
+    /* #F5F5F7 - Soft White */
+    --background-2: 0 0% 8%;
 
-    /* Cards & Popovers (Dark Elevation: bg < card < popover) */
-    --card: 222 27% 17%;              /* #1F2636 */
-    --card-foreground: 220 13% 91%;
-    --popover: 222 23% 21%;           /* #2A3142 */
-    --popover-foreground: 220 13% 91%;
+    /* Cards & Popovers */
+    --card: 0 0% 10%;
+    /* #1A1A1A - Elevated Surface */
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 12%;
+    /* #1E1E1E - Popover Surface */
+    --popover-foreground: 0 0% 96%;
 
     /* Extended foreground variants */
     --foreground-body: 210 8% 72%;
     --foreground-hint: 210 8% 50%;
 
     /* Tier 1: Luminating Sage */
-    --primary: 104 24% 61%;           /* #98B486 */
-    --primary-foreground: 222 33% 11%;
+    --primary: 145 30% 60%;
+    /* Forest/Sage variant */
+    --primary-foreground: 0 0% 4%;
 
     /* Tier 2: Glowing Aqua */
-    --secondary: 189 36% 73%;         /* #A5D0D6 */
-    --secondary-foreground: 222 33% 11%;
+    --secondary: 189 36% 73%;
+    /* Keep aqua for science feel */
+    --secondary-foreground: 0 0% 4%;
 
     /* Tier 3: Gold */
-    --accent-gold: 43 58% 55%;        /* #D2AC47 */
-    --accent-gold-foreground: 222 33% 11%;
+    --accent-gold: 43 58% 55%;
+    --accent-gold-foreground: 0 0% 4%;
 
     /* Semantic: Muted */
-    --muted: 222 27% 17%;
-    --muted-foreground: 215 14% 65%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
 
     /* Semantic: Accent */
-    --accent: 222 27% 20%;
-    --accent-foreground: 220 13% 91%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 96%;
 
     /* Clinical Safety (muted for dark) */
     --destructive: 0 62% 50%;
@@ -339,6 +374,26 @@
 
     --sidebar: 0 0% 14%;
     --radius: 0.75rem;
+
+    /* ── SSL Design Tokens (dark — static fallback) ── */
+    --ssl-bg: #0A0A0A;
+    --ssl-bg-card: rgba(28, 28, 30, 0.65);
+    --ssl-bg-surface: #1C1C1E;
+    --ssl-bg-elevated: #2C2C2E;
+    --ssl-accent: #4A9E68;
+    --ssl-accent-deep: #2D6B4A;
+    --ssl-accent-muted: #3D8B5A;
+    --ssl-accent-bg: rgba(45, 107, 74, 0.08);
+    --ssl-accent-border: rgba(45, 107, 74, 0.20);
+    --ssl-secondary: #87B6BC;
+    --ssl-secondary-muted: #6A9DA3;
+    --ssl-secondary-bg: rgba(135, 182, 188, 0.06);
+    --ssl-text: #F5F5F7;
+    --ssl-text-secondary: #86868B;
+    --ssl-text-tertiary: #48484A;
+    --ssl-border: rgba(255, 255, 255, 0.06);
+    --ssl-border-hover: rgba(255, 255, 255, 0.12);
+
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
@@ -368,22 +423,30 @@
   }
 
   .dark body {
-    background-image:
-      radial-gradient(ellipse 80% 60% at 10% 0%, hsl(222 30% 18% / 0.65) 0%, transparent 55%),
-      radial-gradient(ellipse 60% 50% at 90% 100%, hsl(222 25% 14% / 0.55) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, hsl(222 20% 12% / 0.3) 0%, transparent 65%);
+    background-image: none;
+    background-color: var(--ssl-bg);
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
   }
 
-  button, a, [role="button"] {
+  button,
+  a,
+  [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
 
-  p, li, td, th {
+  p,
+  li,
+  td,
+  th {
     font-size: max(var(--fs-body), 0.875rem);
   }
 }
@@ -467,31 +530,40 @@
 /* ── Korean font override ── */
 :root[lang="ko"] {
   --font-display: 'Hahmlet', serif;
-  --font-sans:    'SUIT', sans-serif;
+  --font-sans: 'SUIT', sans-serif;
   /* --font-numeric is NEVER overridden — always Plus Jakarta Sans */
 
-  --lh-hero:    1.3;  --ls-hero:    -0.03em;
-  --lh-section: 1.4;  --ls-section: -0.02em;  --fw-section: 600;
-  --lh-sub:     1.5;  --ls-sub:     -0.02em;
-  --lh-body:    1.7;  --ls-body:    -0.02em;
-  --lh-ui:      1;    --ls-ui:      -0.04em;
-  --lh-data:    1.4;  --ls-data:    -0.03em;
-  --lh-label:   1.2;  --ls-label:   0.05em;
+  --lh-hero: 1.3;
+  --ls-hero: -0.03em;
+  --lh-section: 1.4;
+  --ls-section: -0.02em;
+  --fw-section: 600;
+  --lh-sub: 1.5;
+  --ls-sub: -0.02em;
+  --lh-body: 1.7;
+  --ls-body: -0.02em;
+  --lh-ui: 1;
+  --ls-ui: -0.04em;
+  --lh-data: 1.4;
+  --ls-data: -0.03em;
+  --lh-label: 1.2;
+  --ls-label: 0.05em;
 }
 
 /* ── Mobile (max-width: 639px) ── */
 @media (max-width: 639px) {
   :root {
-    --fs-hero:    clamp(1.625rem, 8vw, 2.25rem);
-    --fs-section: clamp(1.25rem,  6vw, 1.5rem);
-    --fs-sub:     1.0625rem;
-    --fs-body:    0.9375rem;
-    --fs-ui:      0.875rem;
-    --fs-data:    clamp(1.25rem,  7vw, 1.75rem);
-    --fs-label:   0.625rem;
-    --lh-body:    1.75;
-    --lh-ui:      1.2;
+    --fs-hero: clamp(1.625rem, 8vw, 2.25rem);
+    --fs-section: clamp(1.25rem, 6vw, 1.5rem);
+    --fs-sub: 1.0625rem;
+    --fs-body: 0.9375rem;
+    --fs-ui: 0.875rem;
+    --fs-data: clamp(1.25rem, 7vw, 1.75rem);
+    --fs-label: 0.625rem;
+    --lh-body: 1.75;
+    --lh-ui: 1.2;
   }
+
   :root[lang="ko"] {
     --lh-body: 1.85;
     --lh-hero: 1.4;
@@ -501,9 +573,9 @@
 /* ── Tablet (640px – 1023px) ── */
 @media (min-width: 640px) and (max-width: 1023px) {
   :root {
-    --fs-hero:    clamp(2rem, 4.5vw, 2.75rem);
+    --fs-hero: clamp(2rem, 4.5vw, 2.75rem);
     --fs-section: clamp(1.375rem, 3.5vw, 1.75rem);
-    --fs-data:    clamp(1.375rem, 3.5vw, 1.75rem);
+    --fs-data: clamp(1.375rem, 3.5vw, 1.75rem);
   }
 }
 
@@ -526,11 +598,19 @@ html {
   overflow-wrap: break-word;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   text-wrap: balance;
 }
 
-p, li, dd, figcaption {
+p,
+li,
+dd,
+figcaption {
   text-wrap: pretty;
 }
 
@@ -645,7 +725,7 @@ p, li, dd, figcaption {
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #947E5C;
+  color: var(--ssl-accent-deep);
   text-shadow: 0 1px 6px rgba(148, 126, 92, 0.2);
 }
 
@@ -654,7 +734,7 @@ p, li, dd, figcaption {
   font-variant-numeric: tabular-nums;
   font-size: 0.65rem;
   font-weight: 600;
-  color: #947E5C;
+  color: var(--ssl-accent-deep);
   text-shadow: 0 1px 6px rgba(148, 126, 92, 0.2);
 }
 
@@ -959,34 +1039,95 @@ p, li, dd, figcaption {
   text-align: center;
   line-height: 1.15;
 }
+
 /* ── Part C: Design System — Touch Targets & Spacing ───────────────────── */
-.concern-chip  { min-height: 48px; padding: 13px 16px; border-radius: 14px; }
-.pill-option   { min-height: 44px; padding: 10px 18px; border-radius: 24px; }
-.cta-button    { min-height: 48px; padding: 14px 32px; border-radius: 32px; }
-.zone-panel    { padding: 20px 24px; border-radius: 24px; }
-.question-card { margin-bottom: 28px; padding: 16px 20px; border-radius: 16px; }
+.concern-chip {
+  min-height: 48px;
+  padding: 13px 16px;
+  border-radius: 14px;
+}
+
+.pill-option {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 24px;
+}
+
+.cta-button {
+  min-height: 48px;
+  padding: 14px 32px;
+  border-radius: 32px;
+}
+
+.zone-panel {
+  padding: 20px 24px;
+  border-radius: 24px;
+}
+
+.question-card {
+  margin-bottom: 28px;
+  padding: 16px 20px;
+  border-radius: 16px;
+}
 
 @media (max-width: 768px) {
-  .concern-chip { min-height: 52px; font-size: 15px; }
-  .pill-option  { min-height: 48px; }
+  .concern-chip {
+    min-height: 52px;
+    font-size: 15px;
+  }
+
+  .pill-option {
+    min-height: 48px;
+  }
 }
 
 /* ── Part C: Responsive Layout ─────────────────────────────────────────── */
-.diagnosis-layout { display: flex; gap: 32px; max-width: 1200px; margin: 0 auto; }
-.face-map-area    { flex: 1; min-width: 280px; max-width: 420px; }
-.panel-area       { width: min(400px, 40vw); }
+.diagnosis-layout {
+  display: flex;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.face-map-area {
+  flex: 1;
+  min-width: 280px;
+  max-width: 420px;
+}
+
+.panel-area {
+  width: min(400px, 40vw);
+}
 
 @media (max-width: 1023px) {
-  .diagnosis-layout { flex-direction: column; align-items: center; }
-  .face-map-area    { max-width: 380px; }
-  .panel-area       { width: 100%; max-width: 480px; }
+  .diagnosis-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .face-map-area {
+    max-width: 380px;
+  }
+
+  .panel-area {
+    width: 100%;
+    max-width: 480px;
+  }
 }
 
 @media (max-width: 767px) {
-  .face-map-area { max-width: 360px; width: 100%; margin: 0 auto; }
+  .face-map-area {
+    max-width: 360px;
+    width: 100%;
+    margin: 0 auto;
+  }
 }
 
-.tail-section { max-width: 520px; margin: 0 auto; padding: 0 16px; }
+.tail-section {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
 
 /* ── Part C: Age-adaptive text scale (50+ users) ───────────────────────── */
 .age-50-plus {

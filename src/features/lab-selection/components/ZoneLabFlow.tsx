@@ -133,12 +133,12 @@ function ZonePanel({
   const zoneLabel = getZoneLabel(zone, language);
 
   const headerBg = isDark
-    ? isActive ? 'rgba(201,169,110,0.08)' : 'rgba(255,255,255,0.03)'
-    : isActive ? 'rgba(201,169,110,0.06)' : 'rgba(0,0,0,0.02)';
+    ? isActive ? 'rgba(45,107,74,0.08)' : 'rgba(255,255,255,0.03)'
+    : isActive ? 'rgba(45,107,74,0.06)' : 'rgba(0,0,0,0.02)';
 
   const headerBorder = isDark
-    ? isActive ? 'rgba(201,169,110,0.35)' : 'rgba(255,255,255,0.08)'
-    : isActive ? 'rgba(201,169,110,0.4)' : 'rgba(0,0,0,0.08)';
+    ? isActive ? 'rgba(45,107,74,0.35)' : 'rgba(255,255,255,0.08)'
+    : isActive ? 'rgba(45,107,74,0.4)' : 'rgba(0,0,0,0.08)';
 
   return (
     <div
@@ -172,7 +172,7 @@ function ZonePanel({
             width: 32,
             height: 32,
             borderRadius: 8,
-            background: isDark ? 'rgba(201,169,110,0.12)' : 'rgba(201,169,110,0.1)',
+            background: isDark ? 'rgba(45,107,74,0.12)' : 'rgba(45,107,74,0.1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -461,8 +461,8 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
                   width: '100%',
                   padding: '16px 24px',
                   borderRadius: 14,
-                  border: '1.5px solid rgba(201,169,110,0.55)',
-                  background: 'linear-gradient(135deg, rgba(201,169,110,0.14), rgba(201,169,110,0.06))',
+                  border: '1.5px solid rgba(45,107,74,0.55)',
+                  background: 'linear-gradient(135deg, rgba(45,107,74,0.14), rgba(45,107,74,0.06))',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -476,11 +476,11 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.background =
-                    'linear-gradient(135deg, rgba(201,169,110,0.22), rgba(201,169,110,0.12))';
+                    'linear-gradient(135deg, rgba(45,107,74,0.22), rgba(45,107,74,0.12))';
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLButtonElement).style.background =
-                    'linear-gradient(135deg, rgba(201,169,110,0.14), rgba(201,169,110,0.06))';
+                    'linear-gradient(135deg, rgba(45,107,74,0.14), rgba(45,107,74,0.06))';
                 }}
               >
                 {language === 'ko'

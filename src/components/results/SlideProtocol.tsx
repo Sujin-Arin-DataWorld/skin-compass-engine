@@ -8,15 +8,15 @@ import type { RoutineOutput, RoutineStep, StepRole, BaseType, TargetTrouble } fr
 // ─── Axis label maps ───────────────────────────────────────────────────────────
 
 const AXIS_LABELS_KO: Record<AxisKey, string> = {
-  seb:              "피지",
-  hyd:              "수분",
-  bar:              "피부 장벽",
-  sen:              "민감성",
-  ox:               "산화 스트레스",
-  acne:             "여드름",
-  pigment:          "색소침착",
-  texture:          "피부결",
-  aging:            "노화",
+  seb: "피지",
+  hyd: "수분",
+  bar: "피부 장벽",
+  sen: "민감성",
+  ox: "산화 스트레스",
+  acne: "여드름",
+  pigment: "색소침착",
+  texture: "피부결",
+  aging: "노화",
   makeup_stability: "메이크업 지속",
 };
 
@@ -57,46 +57,46 @@ const FLAG_MESSAGES: Record<string, {
 // ─── Display maps ─────────────────────────────────────────────────────────────
 
 const ROLE_ICON: Record<StepRole, string> = {
-  cleanser:     "🫧",
-  toner:        "💧",
-  serum:        "🔬",
-  treatment:    "👁",
-  moisturizer:  "🛡",
-  spf:          "☀️",
-  device:       "✨",
+  cleanser: "🫧",
+  toner: "💧",
+  serum: "🔬",
+  treatment: "👁",
+  moisturizer: "🛡",
+  spf: "☀️",
+  device: "✨",
 };
 
 const ROLE_LABEL: Record<StepRole, Record<string, string>> = {
-  cleanser:    { en: "Cleanser",    de: "Reiniger",      ko: "클렌저"    },
-  toner:       { en: "Toner",       de: "Toner",         ko: "토너"      },
-  serum:       { en: "Serum",       de: "Serum",         ko: "세럼"      },
-  treatment:   { en: "Treatment",   de: "Treatment",     ko: "트리트먼트" },
+  cleanser: { en: "Cleanser", de: "Reiniger", ko: "클렌저" },
+  toner: { en: "Toner", de: "Toner", ko: "토너" },
+  serum: { en: "Serum", de: "Serum", ko: "세럼" },
+  treatment: { en: "Treatment", de: "Treatment", ko: "트리트먼트" },
   moisturizer: { en: "Moisturiser", de: "Feuchtigkeits-\ncreme", ko: "보습제" },
-  spf:         { en: "SPF",         de: "Sonnenschutz",  ko: "선크림"    },
-  device:      { en: "Device",      de: "Gerät",         ko: "기기"      },
+  spf: { en: "SPF", de: "Sonnenschutz", ko: "선크림" },
+  device: { en: "Device", de: "Gerät", ko: "기기" },
 };
 
 const BASE_TYPE_LABEL: Record<BaseType, Record<string, string>> = {
-  "oily":                        { en: "Oily",                      de: "Ölig",                     ko: "지성"         },
-  "combination-dehydrated-oily": { en: "Combination-Dehydrated",    de: "Mischhaut-Dehydriert",      ko: "복합성-수분부족" },
-  "dry":                         { en: "Dry",                       de: "Trocken",                   ko: "건성"         },
-  "normal":                      { en: "Normal / Balanced",         de: "Normal / Ausgeglichen",     ko: "중성 / 균형"   },
+  "oily": { en: "Oily", de: "Ölig", ko: "지성" },
+  "combination-dehydrated-oily": { en: "Combination-Dehydrated", de: "Mischhaut-Dehydriert", ko: "복합성-수분부족" },
+  "dry": { en: "Dry", de: "Trocken", ko: "건성" },
+  "normal": { en: "Normal / Balanced", de: "Normal / Ausgeglichen", ko: "중성 / 균형" },
 };
 
 const TARGET_LABEL: Record<TargetTrouble, Record<string, string>> = {
-  "barrier-repair":        { en: "Barrier Repair & Soothing",    de: "Barriere-Reparatur & Beruhigung", ko: "배리어 회복 & 진정"  },
-  "intense-hydration":     { en: "Intense Hydration",            de: "Intensive Feuchtigkeit",          ko: "집중 수분 공급"      },
-  "blemish-sebum-control": { en: "Blemish & Oil Control",      de: "Unreinheiten & Öl-Kontrolle",   ko: "트러블 & 피지 관리"  },
-  "brightening":           { en: "Brightening & Tone Correction", de: "Aufhellung & Ton-Korrektur",     ko: "브라이트닝 & 톤 보정" },
-  "well-aging":            { en: "Well-Aging & Firming",          de: "Well-Aging & Straffung",          ko: "안티에이징 & 탄력"   },
+  "barrier-repair": { en: "Barrier Repair & Soothing", de: "Barriere-Reparatur & Beruhigung", ko: "배리어 회복 & 진정" },
+  "intense-hydration": { en: "Intense Hydration", de: "Intensive Feuchtigkeit", ko: "집중 수분 공급" },
+  "blemish-sebum-control": { en: "Blemish & Oil Control", de: "Unreinheiten & Öl-Kontrolle", ko: "트러블 & 피지 관리" },
+  "brightening": { en: "Brightening & Tone Correction", de: "Aufhellung & Ton-Korrektur", ko: "브라이트닝 & 톤 보정" },
+  "well-aging": { en: "Well-Aging & Firming", de: "Well-Aging & Straffung", ko: "안티에이징 & 탄력" },
 };
 
 const TARGET_COLOR: Record<TargetTrouble, string> = {
-  "barrier-repair":        "#B76E79",
-  "intense-hydration":     "#6EA8C9",
+  "barrier-repair": "#B76E79",
+  "intense-hydration": "#6EA8C9",
   "blemish-sebum-control": "#7EC96E",
-  "brightening":           "#C9A96E",
-  "well-aging":            "#9E6EC9",
+  "brightening": "#C9A96E",
+  "well-aging": "#9E6EC9",
 };
 
 // ─── Projected Improvement section ────────────────────────────────────────────
@@ -116,8 +116,8 @@ function ProjectedImprovementSection({
 }: ImproveSectionProps) {
   const axisLabel = (key: AxisKey) =>
     lang === "ko" ? AXIS_LABELS_KO[key]
-    : lang === "de" ? AXIS_LABELS_DE[key]
-    : AXIS_LABELS[key];
+      : lang === "de" ? AXIS_LABELS_DE[key]
+        : AXIS_LABELS[key];
 
   // Canonical axis order, only axes with currentScore ≥ 25
   const activeAxes = AXIS_KEYS.filter(
@@ -130,7 +130,7 @@ function ProjectedImprovementSection({
   const { currentScore: cur, targetScore4w: t4w } = improvement[summaryAxis];
   const improvePct = cur > 0 ? Math.round(((cur - t4w) / cur) * 100) : 0;
 
-  const GOLD      = "#c9a96e";
+  const GOLD = "#c9a96e";
   const GOLD_FAINT = "#c9a96e44";
 
   const title: Record<string, string> = {
@@ -138,9 +138,9 @@ function ProjectedImprovementSection({
     de: "Projizierter Fortschritt",
     ko: "예상 개선 효과",
   };
-  const legendNow: Record<string, string>  = { en: "Current",        de: "Aktuell",          ko: "현재"   };
-  const legend4w:  Record<string, string>  = { en: "4-Week Target",  de: "4-Wochen-Ziel",    ko: "4주 목표" };
-  const legend12w: Record<string, string>  = { en: "12-Week Target", de: "12-Wochen-Ziel",   ko: "12주 목표" };
+  const legendNow: Record<string, string> = { en: "Current", de: "Aktuell", ko: "현재" };
+  const legend4w: Record<string, string> = { en: "4-Week Target", de: "4-Wochen-Ziel", ko: "4주 목표" };
+  const legend12w: Record<string, string> = { en: "12-Week Target", de: "12-Wochen-Ziel", ko: "12주 목표" };
 
   const summaryText: Record<string, string> = {
     en: `Following this protocol, your ${AXIS_LABELS[summaryAxis]} severity is projected to reduce by ${improvePct}% in 4 weeks.`,
@@ -271,45 +271,47 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
   const isSosActive = skinRescue !== null;
 
   const routine =
-    level === "3-step"   ? routines.minimalist :
-    level === "5-step"   ? routines.committed  :
-    routines.advanced ?? routines.committed; // fallback if safety gate active
+    level === "3-step" ? routines.minimalist :
+      level === "5-step" ? routines.committed :
+        routines.advanced ?? routines.committed; // fallback if safety gate active
 
   type FilteredStep = RoutineStep & { product: NonNullable<RoutineStep["product"]> };
   const filterSteps = (arr: RoutineStep[]): FilteredStep[] =>
     arr.filter((s): s is FilteredStep => s.product !== null);
 
-  const steps       = filterSteps(timing === "am" ? routine.am               : routine.pm);
-  const sosSteps    = isSosActive
+  const steps = filterSteps(timing === "am" ? routine.am : routine.pm);
+  const sosSteps = isSosActive
     ? filterSteps(timing === "am" ? skinRescue!.routine.am : skinRescue!.routine.pm)
     : ([] as FilteredStep[]);
   const displaySteps = isSosActive ? sosSteps : steps;
 
   const signalCount = result.radar_chart_data.filter((d) => d.score > 0).length;
-  const confidence  = Math.min(95, 65 + signalCount * 3);
+  const confidence = Math.min(95, 65 + signalCount * 3);
 
   const SOS_CORAL = "#C8645A";
   const SOS_AMBER = "#D4935A";
   const accentColor = isSosActive ? SOS_CORAL : TARGET_COLOR[targetTrouble];
 
   const copy = {
-    eyebrow:        { en: "Your Personalised Protocol",    de: "Ihr Persönliches Protokoll",    ko: "맞춤 루틴"            },
-    sub:            { en: "Personalised sequence based on your skin profile", de: "Personalisierte Sequenz basierend auf Ihrem Hautprofil", ko: "피부 프로필 기반 맞춤 시퀀스" },
-    match:          { en: "protocol match",                de: "Protokoll-Übereinstimmung",     ko: "프로토콜 일치율"       },
-    signals:        { en: "signals",                       de: "Signale",                       ko: "신호"                },
-    baseLabel:      { en: "Skin Type",                     de: "Hauttyp",                       ko: "피부 타입"            },
-    targetLabel:    { en: "Priority Target",               de: "Haupt-Ziel",                    ko: "우선 케어"            },
-    noSteps:        { en: "No steps for this timing.",     de: "Keine Schritte für diesen Zeitpunkt.", ko: "해당 타이밍에 단계가 없습니다." },
-    step:           { en: "Step",                          de: "Schritt",                       ko: "단계"                },
-    advancedLabel:  { en: "Advanced ✦",                    de: "Advanced ✦",                    ko: "어드밴스드 ✦"         },
-    cautionTitle:   { en: "Device therapy paused",         de: "Gerätetherapie pausiert",       ko: "기기 테라피 일시 중단"  },
-    upgradeAdvanced:{ en: "→ Unlock Advanced: 5-step + Medicube Booster Pro Device",
-                      de: "→ Advanced freischalten: 5-Schritt + Medicube Booster Pro",
-                      ko: "→ 어드밴스드 해제: 5단계 + 메디큐브 부스터 프로 기기" },
+    eyebrow: { en: "Your Personalised Protocol", de: "Ihr Persönliches Protokoll", ko: "맞춤 루틴" },
+    sub: { en: "Personalised sequence based on your skin profile", de: "Personalisierte Sequenz basierend auf Ihrem Hautprofil", ko: "피부 프로필 기반 맞춤 시퀀스" },
+    match: { en: "protocol match", de: "Protokoll-Übereinstimmung", ko: "프로토콜 일치율" },
+    signals: { en: "signals", de: "Signale", ko: "신호" },
+    baseLabel: { en: "Skin Type", de: "Hauttyp", ko: "피부 타입" },
+    targetLabel: { en: "Priority Target", de: "Haupt-Ziel", ko: "우선 케어" },
+    noSteps: { en: "No steps for this timing.", de: "Keine Schritte für diesen Zeitpunkt.", ko: "해당 타이밍에 단계가 없습니다." },
+    step: { en: "Step", de: "Schritt", ko: "단계" },
+    advancedLabel: { en: "Advanced ✦", de: "Advanced ✦", ko: "어드밴스드 ✦" },
+    cautionTitle: { en: "Device therapy paused", de: "Gerätetherapie pausiert", ko: "기기 테라피 일시 중단" },
+    upgradeAdvanced: {
+      en: "→ Unlock Advanced: 5-step + Medicube Booster Pro Device",
+      de: "→ Advanced freischalten: 5-Schritt + Medicube Booster Pro",
+      ko: "→ 어드밴스드 해제: 5단계 + 메디큐브 부스터 프로 기기"
+    },
     // ── B-3 SOS copy ────────────────────────────────────────────────────────
-    sosEyebrow:   { en: "🚨 SOS Rescue Protocol",        de: "🚨 SOS Rettungsprotokoll",        ko: "🚨 SOS 레스큐 프로토콜" },
-    sosSub:       { en: "K-Derma Clinic Exclusive",      de: "K-Derma Klinik Exklusiv",         ko: "피부과 전문 추천"       },
-    sosBadge:     { en: "Minimalist 3-Step Protocol",    de: "Minimalprotokoll — 3 Schritte",   ko: "미니멀 3단계 프로토콜"  },
+    sosEyebrow: { en: "🚨 SOS Rescue Protocol", de: "🚨 SOS Rettungsprotokoll", ko: "🚨 SOS 레스큐 프로토콜" },
+    sosSub: { en: "K-Derma Clinic Exclusive", de: "K-Derma Klinik Exklusiv", ko: "피부과 전문 추천" },
+    sosBadge: { en: "Minimalist 3-Step Protocol", de: "Minimalprotokoll — 3 Schritte", ko: "미니멀 3단계 프로토콜" },
     sosBrandNote: { en: "Clinical dermatology brands only", de: "Nur klinische Dermatologie-Marken", ko: "임상 피부과 브랜드 전용" },
   };
   const t = (k: keyof typeof copy) => copy[k][lang] ?? copy[k]["en"];
@@ -432,7 +434,7 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
               {(["3-step", "5-step", "advanced"] as const).map((lv) => {
                 const isAdv = lv === "advanced";
                 const isActive = level === lv;
-                const GOLD = "#D4AF37";
+                const GOLD = "var(--ssl-accent)";
                 return (
                   <button
                     key={lv}
@@ -486,12 +488,12 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
             transition={{ delay: 0.2 }}
             style={{
               background: "linear-gradient(135deg, #1a140022 0%, #2e220033 100%)",
-              border: "1px solid #D4AF3755",
+              border: "1px solid var(--ssl-accent)55",
             }}
           >
             <span style={{ fontSize: "1.1rem", flexShrink: 0 }}>⚠️</span>
             <div>
-              <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "#D4AF37", marginBottom: "2px" }}>
+              <p style={{ fontSize: "0.875rem", fontWeight: 700, color: "var(--ssl-accent)", marginBottom: "2px" }}>
                 {t("cautionTitle")}
               </p>
               <p style={{ fontSize: "0.8rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.5 }}>
@@ -550,77 +552,78 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
             ) : (
               displaySteps.map((step, idx) => {
                 const isDevice = step.role === "device";
-                const GOLD = "#D4AF37";
+                const GOLD = "var(--ssl-accent)";
                 return (
-                <motion.div
-                  key={`${step.role}-${idx}`}
-                  layoutId={`product-${step.product.id}`}
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.06, type: "spring", stiffness: 280, damping: 26 }}
-                  className="relative flex items-center gap-4 rounded-2xl overflow-hidden"
-                  style={{
-                    background: isDevice
-                      ? "linear-gradient(135deg, #1a140055 0%, #2e220066 100%)"
-                      : "hsl(var(--card) / 0.7)",
-                    border: isDevice
-                      ? `1px solid ${GOLD}66`
-                      : "1px solid hsl(var(--border) / 0.5)",
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    padding: "14px 16px",
-                    boxShadow: isDevice ? `0 0 24px ${GOLD}33` : undefined,
-                  }}
-                >
-                  {/* Gold left accent strip */}
-                  <div
-                    className="absolute left-0 top-4 bottom-4 w-[2px] rounded-full"
-                    style={{ background: `linear-gradient(to bottom, ${accentColor}, transparent)` }}
-                  />
-
-                  {/* Step number + icon */}
-                  <div
-                    className="flex-shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl"
-                    style={{ background: `${accentColor}14` }}
-                  >
-                    <span style={{ fontSize: "1.1rem" }}>{ROLE_ICON[step.role]}</span>
-                    <span style={{ fontSize: "0.6rem", fontWeight: 700, color: accentColor, marginTop: "1px" }}>
-                      {step.order}
-                    </span>
-                  </div>
-
-                  {/* Product info */}
-                  <div className="flex-1 min-w-0 pl-1">
-                    <p style={{
-                      fontSize: "0.65rem", fontWeight: 700, color: accentColor,
-                      textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1px",
-                    }}>
-                      {ROLE_LABEL[step.role][lang] ?? ROLE_LABEL[step.role].en}
-                    </p>
-                    <p style={{ fontSize: "0.9375rem", fontWeight: 600, color: "hsl(var(--foreground))", lineHeight: 1.3 }}>
-                      {step.product.name[lang as "en" | "de" | "ko"] ?? step.product.name.en}
-                    </p>
-                    <p className="slide-body truncate mt-0.5" style={{ fontSize: "0.8rem" }}>
-                      {step.product.keyIngredients.slice(0, 3).join(" · ")}
-                    </p>
-                  </div>
-
-                  {/* Formulation badge */}
-                  <div
-                    className="flex-shrink-0 rounded-full px-2 py-0.5"
+                  <motion.div
+                    key={`${step.role}-${idx}`}
+                    layoutId={`product-${step.product.id}`}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.06, type: "spring", stiffness: 280, damping: 26 }}
+                    className="relative flex items-center gap-4 rounded-2xl overflow-hidden"
                     style={{
-                      background: isDevice ? `${GOLD}22` : `${accentColor}18`,
-                      border: `1px solid ${isDevice ? GOLD : accentColor}33`,
+                      background: isDevice
+                        ? "linear-gradient(135deg, #1a140055 0%, #2e220066 100%)"
+                        : "hsl(var(--card) / 0.7)",
+                      border: isDevice
+                        ? `1px solid ${GOLD}66`
+                        : "1px solid hsl(var(--border) / 0.5)",
+                      backdropFilter: "blur(12px)",
+                      WebkitBackdropFilter: "blur(12px)",
+                      padding: "14px 16px",
+                      boxShadow: isDevice ? `0 0 24px ${GOLD}33` : undefined,
                     }}
                   >
-                    <span style={{ fontSize: "0.7rem", fontWeight: 600, color: isDevice ? GOLD : accentColor, whiteSpace: "nowrap" }}>
-                      {isDevice
-                        ? (lang === "de" ? "6-in-1 Gerät" : lang === "ko" ? "6-in-1 기기" : "6-in-1 Device")
-                        : step.product.formulation}
-                    </span>
-                  </div>
-                </motion.div>
-              ); })
+                    {/* Gold left accent strip */}
+                    <div
+                      className="absolute left-0 top-4 bottom-4 w-[2px] rounded-full"
+                      style={{ background: `linear-gradient(to bottom, ${accentColor}, transparent)` }}
+                    />
+
+                    {/* Step number + icon */}
+                    <div
+                      className="flex-shrink-0 flex flex-col items-center justify-center w-12 h-12 rounded-xl"
+                      style={{ background: `${accentColor}14` }}
+                    >
+                      <span style={{ fontSize: "1.1rem" }}>{ROLE_ICON[step.role]}</span>
+                      <span style={{ fontSize: "0.6rem", fontWeight: 700, color: accentColor, marginTop: "1px" }}>
+                        {step.order}
+                      </span>
+                    </div>
+
+                    {/* Product info */}
+                    <div className="flex-1 min-w-0 pl-1">
+                      <p style={{
+                        fontSize: "0.65rem", fontWeight: 700, color: accentColor,
+                        textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "1px",
+                      }}>
+                        {ROLE_LABEL[step.role][lang] ?? ROLE_LABEL[step.role].en}
+                      </p>
+                      <p style={{ fontSize: "0.9375rem", fontWeight: 600, color: "hsl(var(--foreground))", lineHeight: 1.3 }}>
+                        {step.product.name[lang as "en" | "de" | "ko"] ?? step.product.name.en}
+                      </p>
+                      <p className="slide-body truncate mt-0.5" style={{ fontSize: "0.8rem" }}>
+                        {step.product.keyIngredients.slice(0, 3).join(" · ")}
+                      </p>
+                    </div>
+
+                    {/* Formulation badge */}
+                    <div
+                      className="flex-shrink-0 rounded-full px-2 py-0.5"
+                      style={{
+                        background: isDevice ? `${GOLD}22` : `${accentColor}18`,
+                        border: `1px solid ${isDevice ? GOLD : accentColor}33`,
+                      }}
+                    >
+                      <span style={{ fontSize: "0.7rem", fontWeight: 600, color: isDevice ? GOLD : accentColor, whiteSpace: "nowrap" }}>
+                        {isDevice
+                          ? (lang === "de" ? "6-in-1 Gerät" : lang === "ko" ? "6-in-1 기기" : "6-in-1 Device")
+                          : step.product.formulation}
+                      </span>
+                    </div>
+                  </motion.div>
+                );
+              })
             )}
           </motion.div>
         </AnimatePresence>
@@ -703,8 +706,8 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
             {lang === "de"
               ? "→ Auf 5-Schritt-Protokoll upgraden für Toner + Augenpflege"
               : lang === "ko"
-              ? "→ 5단계 루틴으로 업그레이드 (토너 + 트리트먼트 포함)"
-              : "→ Upgrade to 5-step for Toner + Eye Treatment"}
+                ? "→ 5단계 루틴으로 업그레이드 (토너 + 트리트먼트 포함)"
+                : "→ Upgrade to 5-step for Toner + Eye Treatment"}
           </motion.button>
         )}
 
@@ -714,8 +717,8 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
             className="w-full mt-5 rounded-2xl py-3 text-sm font-semibold transition-all duration-200"
             style={{
               background: "linear-gradient(135deg, #1a140018 0%, #2e220022 100%)",
-              border: "1px dashed #D4AF3766",
-              color: "#D4AF37",
+              border: "1px dashed var(--ssl-accent)66",
+              color: "var(--ssl-accent)",
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

@@ -9,15 +9,15 @@ import { useProductStore } from "@/store/productStore";
 import type { Product } from "@/engine/types";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD   = "#D4AF37";
-const BRONZE = "#947E5C";
+const GOLD = "var(--ssl-accent)";
+const BRONZE = "var(--ssl-accent-deep)";
 
 // ── Status stepper configuration ──────────────────────────────────────────────
 const STEPS = [
-    { key: "pending",   en: "Placed",    de: "Bestellt"   },
-    { key: "paid",      en: "Confirmed", de: "Bestätigt"  },
-    { key: "shipped",   en: "Shipped",   de: "Versandt"   },
-    { key: "delivered", en: "Delivered", de: "Geliefert"  },
+    { key: "pending", en: "Placed", de: "Bestellt" },
+    { key: "paid", en: "Confirmed", de: "Bestätigt" },
+    { key: "shipped", en: "Shipped", de: "Versandt" },
+    { key: "delivered", en: "Delivered", de: "Geliefert" },
 ] as const;
 
 const STATUS_INDEX: Record<string, number> = {
@@ -25,28 +25,28 @@ const STATUS_INDEX: Record<string, number> = {
 };
 
 const STATUS_BADGE: Record<string, { bg: string; color: string; en: string; de: string }> = {
-    pending:   { bg: "rgba(148,126,92,0.12)",  color: BRONZE,    en: "Pending",   de: "Ausstehend" },
-    paid:      { bg: "rgba(59,130,246,0.12)",  color: "#60A5FA", en: "Confirmed", de: "Bezahlt"    },
-    shipped:   { bg: "rgba(245,158,11,0.12)",  color: "#F59E0B", en: "Shipped",   de: "Versandt"   },
-    delivered: { bg: "rgba(34,197,94,0.12)",   color: "#22C55E", en: "Delivered", de: "Geliefert"  },
-    cancelled: { bg: "rgba(239,68,68,0.12)",   color: "#EF4444", en: "Cancelled", de: "Storniert"  },
+    pending: { bg: "rgba(148,126,92,0.12)", color: BRONZE, en: "Pending", de: "Ausstehend" },
+    paid: { bg: "rgba(59,130,246,0.12)", color: "#60A5FA", en: "Confirmed", de: "Bezahlt" },
+    shipped: { bg: "rgba(245,158,11,0.12)", color: "#F59E0B", en: "Shipped", de: "Versandt" },
+    delivered: { bg: "rgba(34,197,94,0.12)", color: "#22C55E", en: "Delivered", de: "Geliefert" },
+    cancelled: { bg: "rgba(239,68,68,0.12)", color: "#EF4444", en: "Cancelled", de: "Storniert" },
 };
 
 // ── Build a minimal Product from an OrderItem for "Buy Again" ─────────────────
 function minimalProduct(item: OrderItem): Product {
     return {
-        id:             item.product_id,
-        name:           { en: item.product_name, de: item.product_name },
-        brand:          "",
-        phase:          "",
-        type:           "",
-        price_eur:      item.unit_price,
-        price:          item.unit_price,
-        tier:           [],
+        id: item.product_id,
+        name: { en: item.product_name, de: item.product_name },
+        brand: "",
+        phase: "",
+        type: "",
+        price_eur: item.unit_price,
+        price: item.unit_price,
+        tier: [],
         shopify_handle: item.product_id,
         key_ingredients: [],
-        target_axes:    [],
-        for_skin:       [],
+        target_axes: [],
+        for_skin: [],
     };
 }
 
@@ -70,7 +70,7 @@ function StatusStepper({ status, de }: { status: string; de: boolean }) {
     return (
         <div className="flex items-start w-full">
             {STEPS.map((step, i) => {
-                const done   = i < activeIdx;
+                const done = i < activeIdx;
                 const active = i === activeIdx;
 
                 return (
@@ -80,20 +80,20 @@ function StatusStepper({ status, de }: { status: string; de: boolean }) {
                             <div
                                 className="relative flex items-center justify-center rounded-full transition-all duration-300"
                                 style={{
-                                    width:  active ? "20px" : "16px",
+                                    width: active ? "20px" : "16px",
                                     height: active ? "20px" : "16px",
                                     background: done || active
                                         ? GOLD
                                         : "transparent",
                                     border: `2px solid ${done || active ? GOLD : "rgba(148,126,92,0.25)"}`,
                                     boxShadow: active
-                                        ? `0 0 0 4px rgba(212,175,55,0.15)`
+                                        ? `0 0 0 4px rgba(45,107,74,0.15)`
                                         : "none",
                                 }}
                             >
                                 {done && (
                                     <Check
-                                        className="text-[#0a0a0a]"
+                                        className="text-[#F5F5F7]"
                                         style={{ width: "9px", height: "9px" }}
                                         strokeWidth={3}
                                     />
@@ -101,7 +101,7 @@ function StatusStepper({ status, de }: { status: string; de: boolean }) {
                                 {active && (
                                     <div
                                         className="rounded-full"
-                                        style={{ width: "6px", height: "6px", background: "#0a0a0a" }}
+                                        style={{ width: "6px", height: "6px", background: "#F5F5F7" }}
                                     />
                                 )}
                             </div>
@@ -143,7 +143,7 @@ function StatusStepper({ status, de }: { status: string; de: boolean }) {
 // ── Order card (accordion) ────────────────────────────────────────────────────
 function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
     const [expanded, setExpanded] = useState(false);
-    const [buying,   setBuying]   = useState(false);
+    const [buying, setBuying] = useState(false);
 
     const { addItem } = useCartStore();
     const { products } = useProductStore();
@@ -202,7 +202,7 @@ function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
                             {de ? badge.de : badge.en}
                         </span>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-[#947E5C]">
+                    <p className="text-xs text-gray-500 dark:text-[var(--ssl-accent-deep)]">
                         {new Date(order.created_at).toLocaleDateString(
                             de ? "de-DE" : "en-GB",
                             { day: "2-digit", month: "short", year: "numeric" }
@@ -220,7 +220,7 @@ function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
                         transition={{ duration: 0.2, ease: "easeInOut" }}
                     >
                         <ChevronDown
-                            className="w-4 h-4 text-gray-400 dark:text-[#947E5C]"
+                            className="w-4 h-4 text-gray-400 dark:text-[var(--ssl-accent-deep)]"
                             strokeWidth={1.5}
                         />
                     </motion.div>
@@ -256,7 +256,7 @@ function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
                                             <p className="text-sm font-medium truncate text-gray-800 dark:text-[#e8e8e8]">
                                                 {item.product_name}
                                             </p>
-                                            <p className="text-xs mt-0.5 text-gray-500 dark:text-[#947E5C]">
+                                            <p className="text-xs mt-0.5 text-gray-500 dark:text-[var(--ssl-accent-deep)]">
                                                 {de ? "Menge" : "Qty"}: {item.quantity}
                                                 {" · "}
                                                 €{item.unit_price.toFixed(2)}
@@ -280,7 +280,7 @@ function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
                             >
                                 <span
                                     className="text-xs uppercase tracking-widest font-semibold
-                                        text-gray-500 dark:text-[#947E5C]"
+                                        text-gray-500 dark:text-[var(--ssl-accent-deep)]"
                                 >
                                     {de ? "Gesamt" : "Total"}
                                 </span>
@@ -297,7 +297,7 @@ function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
                             >
                                 <span
                                     className="text-[0.65rem] uppercase tracking-widest
-                                        text-gray-500 dark:text-[#947E5C]"
+                                        text-gray-500 dark:text-[var(--ssl-accent-deep)]"
                                 >
                                     {de ? "Sendungsnummer" : "Tracking No."}
                                 </span>
@@ -312,8 +312,8 @@ function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
                                 disabled={buying}
                                 className="w-full min-h-[44px] flex items-center justify-center gap-2
                                     rounded-xl text-sm font-semibold
-                                    border border-[rgba(212,175,55,0.3)]
-                                    hover:bg-[rgba(212,175,55,0.06)] dark:hover:bg-[rgba(212,175,55,0.08)]
+                                    border border-[rgba(45,107,74,0.3)]
+                                    hover:bg-[rgba(45,107,74,0.06)] dark:hover:bg-[rgba(45,107,74,0.08)]
                                     transition-colors disabled:opacity-60"
                                 style={{ color: GOLD }}
                             >
@@ -337,20 +337,20 @@ function EmptyOrders({ de }: { de: boolean }) {
         <div
             className="flex flex-col items-center justify-center py-20 rounded-2xl
                 bg-white/50 dark:bg-white/[0.02]
-                border border-gray-200 dark:border-[rgba(212,175,55,0.08)]"
+                border border-gray-200 dark:border-[rgba(45,107,74,0.08)]"
             style={{ backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}
         >
             <div
                 className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
-                style={{ background: "rgba(212,175,55,0.07)" }}
+                style={{ background: "rgba(45,107,74,0.07)" }}
             >
-                <ShoppingBag className="w-7 h-7" strokeWidth={1.5} style={{ color: "rgba(212,175,55,0.4)" }} />
+                <ShoppingBag className="w-7 h-7" strokeWidth={1.5} style={{ color: "rgba(45,107,74,0.4)" }} />
             </div>
 
             <p className="text-base font-medium text-gray-800 dark:text-[#e8e8e8] mb-1.5">
                 {de ? "Noch keine Bestellungen" : "No orders yet"}
             </p>
-            <p className="text-sm text-center max-w-xs mb-6 text-gray-500 dark:text-[#947E5C]">
+            <p className="text-sm text-center max-w-xs mb-6 text-gray-500 dark:text-[var(--ssl-accent-deep)]">
                 {de
                     ? "Ihre Bestellungen werden hier angezeigt, sobald Sie etwas kaufen."
                     : "Your orders will appear here once you make a purchase."}
@@ -359,7 +359,7 @@ function EmptyOrders({ de }: { de: boolean }) {
             <Link
                 to="/results"
                 className="px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-80"
-                style={{ background: GOLD, color: "#0a0a0a" }}
+                style={{ background: GOLD, color: "#F5F5F7" }}
             >
                 {de ? "Empfehlungen ansehen" : "View Recommendations"}
             </Link>

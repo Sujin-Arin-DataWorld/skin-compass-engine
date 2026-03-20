@@ -21,34 +21,34 @@ import { useDiagnosis, type DiagnosisRecord } from "@/hooks/useDiagnosis";
 import { RADAR_AXES, AXIS_LABELS, AXIS_LABELS_DE, type AxisKey } from "@/engine/types";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD = "#D4AF37";
-const BRONZE = "#947E5C";
+const GOLD = "var(--ssl-accent)";
+const BRONZE = "var(--ssl-accent-deep)";
 
 /** 10 perceptually distinct colours for the 10 axes — readable on dark BG */
 const AXIS_COLORS: Record<string, string> = {
-    seb:              "#D4AF37",
-    hyd:              "#60A5FA",
-    bar:              "#4ADE80",
-    sen:              "#F472B6",
-    ox:               "#FB923C",
-    acne:             "#EF4444",
-    pigment:          "#C084FC",
-    texture:          "#38BDF8",
-    aging:            "#A78BFA",
+    seb: "var(--ssl-accent)",
+    hyd: "#60A5FA",
+    bar: "#4ADE80",
+    sen: "#F472B6",
+    ox: "#FB923C",
+    acne: "#EF4444",
+    pigment: "#C084FC",
+    texture: "#38BDF8",
+    aging: "#A78BFA",
     makeup_stability: "#34D399",
 };
 
 const TIER_BADGE: Record<string, { bg: string; color: string }> = {
-    Entry:    { bg: "rgba(148,126,92,0.15)",  color: BRONZE },
-    Advanced: { bg: "rgba(212,175,55,0.12)",  color: GOLD   },
-    Full:     { bg: "rgba(212,175,55,0.12)",  color: GOLD   },
+    Entry: { bg: "rgba(148,126,92,0.15)", color: BRONZE },
+    Advanced: { bg: "rgba(45,107,74,0.12)", color: GOLD },
+    Full: { bg: "rgba(45,107,74,0.12)", color: GOLD },
     Clinical: { bg: "rgba(255,255,255,0.07)", color: "#e8e8e8" },
-    Premium:  { bg: "rgba(255,255,255,0.07)", color: "#e8e8e8" },
+    Premium: { bg: "rgba(255,255,255,0.07)", color: "#e8e8e8" },
 };
 
 const CARD: React.CSSProperties = {
     background: "rgba(255,255,255,0.025)",
-    border: "1px solid rgba(212,175,55,0.12)",
+    border: "1px solid rgba(45,107,74,0.12)",
     borderRadius: "14px",
 };
 
@@ -72,7 +72,7 @@ function LineTooltip({ active, payload, label }: any) {
     return (
         <div style={{
             background: "#111",
-            border: "1px solid rgba(212,175,55,0.2)",
+            border: "1px solid rgba(45,107,74,0.2)",
             borderRadius: "8px",
             padding: "0.5rem 0.75rem",
             fontSize: "0.7rem",
@@ -190,14 +190,14 @@ function EmptyState({ de }: { de: boolean }) {
                 background: "rgba(10,10,10,0.8)",
                 backdropFilter: "blur(20px)",
                 WebkitBackdropFilter: "blur(20px)",
-                border: "1px solid rgba(212,175,55,0.12)",
+                border: "1px solid rgba(45,107,74,0.12)",
             }}
         >
             <div
                 className="mx-auto mb-6 w-16 h-16 rounded-full flex items-center justify-center"
                 style={{
-                    background: "rgba(212,175,55,0.07)",
-                    border: "1px solid rgba(212,175,55,0.15)",
+                    background: "rgba(45,107,74,0.07)",
+                    border: "1px solid rgba(45,107,74,0.15)",
                 }}
             >
                 <FlaskConical className="w-7 h-7" style={{ color: GOLD }} strokeWidth={1} />
@@ -225,7 +225,7 @@ function EmptyState({ de }: { de: boolean }) {
             <Link
                 to="/diagnosis"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-80"
-                style={{ background: GOLD, color: "#0a0a0a" }}
+                style={{ background: GOLD, color: "#F5F5F7" }}
             >
                 <FlaskConical className="w-4 h-4" strokeWidth={1.5} />
                 {de ? "Diagnose starten" : "Start Diagnosis"}
@@ -310,7 +310,7 @@ function DiagnosisCard({
                             className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all duration-200"
                             style={{
                                 border: `1.5px solid ${isSelected ? GOLD : "rgba(148,126,92,0.35)"}`,
-                                background: isSelected ? "rgba(212,175,55,0.12)" : "transparent",
+                                background: isSelected ? "rgba(45,107,74,0.12)" : "transparent",
                                 opacity: compareDisabled && !isSelected ? 0.3 : 1,
                             }}
                         >
@@ -353,7 +353,7 @@ function DiagnosisCard({
                     >
                         <div
                             className="px-5 pb-5 pt-3 space-y-5"
-                            style={{ borderTop: "1px solid rgba(212,175,55,0.08)" }}
+                            style={{ borderTop: "1px solid rgba(45,107,74,0.08)" }}
                         >
                             {/* Full radar chart */}
                             <FullRadar data={radarData} />
@@ -409,8 +409,8 @@ function DiagnosisCard({
                                                 key={p.id}
                                                 className="flex items-center justify-between rounded-xl px-3.5 py-2.5"
                                                 style={{
-                                                    background: "rgba(212,175,55,0.04)",
-                                                    border: "1px solid rgba(212,175,55,0.09)",
+                                                    background: "rgba(45,107,74,0.04)",
+                                                    border: "1px solid rgba(45,107,74,0.09)",
                                                 }}
                                             >
                                                 <Link
@@ -424,7 +424,7 @@ function DiagnosisCard({
                                                 <span
                                                     className="rounded px-2 py-0.5 text-[0.55rem] font-semibold ml-3 flex-shrink-0"
                                                     style={{
-                                                        background: "rgba(212,175,55,0.09)",
+                                                        background: "rgba(45,107,74,0.09)",
                                                         color: GOLD,
                                                         letterSpacing: "0.1em",
                                                         textTransform: "uppercase",
@@ -521,13 +521,13 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
             <div className="space-y-3">
                 <div
                     className="h-[220px] rounded-2xl animate-pulse"
-                    style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(212,175,55,0.07)" }}
+                    style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(45,107,74,0.07)" }}
                 />
                 {[1, 2].map((i) => (
                     <div
                         key={i}
                         className="h-24 rounded-2xl animate-pulse"
-                        style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(212,175,55,0.07)" }}
+                        style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(45,107,74,0.07)" }}
                     />
                 ))}
             </div>
@@ -550,7 +550,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-opacity hover:opacity-80 flex-shrink-0"
                             style={{
                                 background: GOLD,
-                                color: "#0a0a0a",
+                                color: "#F5F5F7",
                                 fontSize: "0.6rem",
                                 fontWeight: 700,
                                 letterSpacing: "0.1em",
@@ -565,7 +565,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
 
                 <div
                     className="rounded-2xl p-4 pb-3"
-                    style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(212,175,55,0.1)" }}
+                    style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(45,107,74,0.1)" }}
                 >
                     {history.length < 2 ? (
                         <div className="py-10 text-center">
@@ -664,8 +664,8 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
                                 background: "rgba(8,8,8,0.9)",
                                 backdropFilter: "blur(24px)",
                                 WebkitBackdropFilter: "blur(24px)",
-                                border: `1px solid rgba(212,175,55,0.22)`,
-                                boxShadow: `0 0 48px rgba(212,175,55,0.06)`,
+                                border: `1px solid rgba(45,107,74,0.22)`,
+                                boxShadow: `0 0 48px rgba(45,107,74,0.06)`,
                             }}
                         >
                             {/* Header */}

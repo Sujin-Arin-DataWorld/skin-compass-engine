@@ -18,14 +18,14 @@ function Logo() {
     <Link to="/" className="flex flex-col items-center md:items-start group" aria-label="Skin Strategy Lab">
       {/* 폰트 고유의 상하 여백을 무시하고 정렬하기 위해 leading-none 추가 */}
       <span
-        className="font-display text-[1.05rem] md:text-[1.3rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[#947E5C] dark:group-hover:text-[#D4AF37] leading-none"
+        className="font-display text-[1.05rem] md:text-[1.3rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[var(--ssl-accent-deep)] dark:group-hover:text-[var(--ssl-accent)] leading-none"
         style={{ fontFamily: "var(--font-display)", letterSpacing: "0.06em" }}
       >
         SKIN STRATEGY
       </span>
       {/* 억지로 위로 끌어올리던 음수 마진(mt-[-2px])을 없애고 자연스러운 여백(mt-[4px]) 부여 */}
       <span
-        className="font-body text-[0.48rem] md:text-[0.58rem] font-medium uppercase text-[#947E5C] dark:text-[#D4AF37] mt-[5px] leading-none"
+        className="font-body text-[0.48rem] md:text-[0.58rem] font-medium uppercase text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] mt-[3px] md:mt-[5px] leading-none"
         style={{ letterSpacing: "0.22em" }}
       >
         — LAB —
@@ -41,10 +41,10 @@ function AvatarCircle({
   const initials = `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase() || "?";
   const dim = size === "sm" ? "h-8 w-8 text-xs" : "h-9 w-9 text-xs";
   if (avatar) {
-    return <img src={avatar} alt={initials} className={`${dim} rounded-full object-cover border border-[#947E5C] dark:border-[#D4AF37]`} />;
+    return <img src={avatar} alt={initials} className={`${dim} rounded-full object-cover border border-[var(--ssl-accent-deep)] dark:border-[var(--ssl-accent)]`} />;
   }
   return (
-    <span className={`${dim} rounded-full flex items-center justify-center font-bold border border-[#947E5C] dark:border-[#D4AF37] text-[#947E5C] dark:text-[#D4AF37] bg-white dark:bg-[#111]`}>
+    <span className={`${dim} rounded-full flex items-center justify-center font-bold border border-[var(--ssl-accent-deep)] dark:border-[var(--ssl-accent)] text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] bg-white dark:bg-[#111]`}>
       {initials}
     </span>
   );
@@ -53,31 +53,31 @@ function AvatarCircle({
 // ── Navbar ────────────────────────────────────────────────────────────────────
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
-  const [kMaskOpen,    setKMaskOpen]    = useState(false);
+  const [kMaskOpen, setKMaskOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [langOpen,     setLangOpen]     = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const { mobileMenuOpen, closeMobileMenu } = useNavStore();
 
   const { isLoggedIn, userProfile, logout } = useAuthStore();
   const { language, setLanguage } = useI18nStore();
-  const t  = translations[language as "en" | "de"] ?? translations.en;
+  const t = translations[language as "en" | "de"] ?? translations.en;
   const p1 = phase1T[language] ?? phase1T.de;
   const cartCount = useCartStore((s) => s.totalItems());
-  const location  = useLocation();
+  const location = useLocation();
 
   const redirectParam = encodeURIComponent(location.pathname);
-  const loginUrl  = `/login?redirect=${redirectParam}`;
+  const loginUrl = `/login?redirect=${redirectParam}`;
 
-  const kMaskRef    = useRef<HTMLDivElement>(null);
+  const kMaskRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const langRef     = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns on outside click
   useEffect(() => {
     const onOutside = (e: MouseEvent) => {
-      if (kMaskRef.current    && !kMaskRef.current.contains(e.target as Node))    setKMaskOpen(false);
+      if (kMaskRef.current && !kMaskRef.current.contains(e.target as Node)) setKMaskOpen(false);
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) setUserMenuOpen(false);
-      if (langRef.current     && !langRef.current.contains(e.target as Node))     setLangOpen(false);
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
     };
     document.addEventListener("mousedown", onOutside);
     return () => document.removeEventListener("mousedown", onOutside);
@@ -92,9 +92,9 @@ const Navbar = () => {
   };
 
   const LANG_OPTIONS: { code: Language; label: string; native: string }[] = [
-    { code: "de", label: "DE", native: "Deutsch"  },
-    { code: "en", label: "EN", native: "English"  },
-    { code: "ko", label: "KO", native: "한국어"    },
+    { code: "de", label: "DE", native: "Deutsch" },
+    { code: "en", label: "EN", native: "English" },
+    { code: "ko", label: "KO", native: "한국어" },
   ];
   const langLabel = LANG_OPTIONS.find((l) => l.code === language)?.label ?? "DE";
 
@@ -106,15 +106,12 @@ const Navbar = () => {
   return (
     <>
       {/* ── Main bar ── */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-stone-200/70 dark:border-white/[0.06] bg-white/85 dark:bg-black/85 backdrop-blur-xl pt-[env(safe-area-inset-top)]">
-        {/* 안정감을 위해 기존 h-12에서 h-14로 높이를 살짝 키웠습니다 (선택사항, 필요시 12로 원복) */}
-        <div className="flex w-full items-center justify-between h-14 px-4 md:px-8 lg:px-10">
-
-          {/* 왼쪽 Spacer: 우측 아이콘 영역(w-9 + w-9 + gap-1 = 76px)과 똑같이 폭을 주어 모바일 완벽 중앙 정렬 */}
-          <div className="w-[76px] shrink-0 md:hidden" />
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b pt-[env(safe-area-inset-top)]" style={{ background: 'var(--ssl-bg)', borderColor: 'var(--ssl-border)', backdropFilter: 'blur(24px) saturate(1.4)', WebkitBackdropFilter: 'blur(24px) saturate(1.4)' }}>
+        {/* Mobile: CSS Grid for perfect centering; Desktop: flex */}
+        <div className="grid grid-cols-[76px_1fr_76px] md:flex w-full items-center h-14 px-4 md:px-8 lg:px-10">
 
           {/* Logo — 강제 translate 이동 제거하고 items-center로 자연스러운 수직 중앙 정렬 */}
-          <div className="flex-1 flex justify-center items-center md:justify-start md:flex-none md:mr-8">
+          <div className="flex justify-center items-center md:justify-start md:flex-none md:mr-8">
             <Logo />
           </div>
 
@@ -148,8 +145,8 @@ const Navbar = () => {
                     className="absolute top-full left-0 mt-1 w-44 rounded-2xl border border-stone-200 dark:border-white/10 bg-white dark:bg-[#111] shadow-2xl overflow-hidden z-50"
                   >
                     {([
-                      ["augen",   p1.nav.kMask.augen],
-                      ["vLinie",  p1.nav.kMask.vLinie],
+                      ["augen", p1.nav.kMask.augen],
+                      ["vLinie", p1.nav.kMask.vLinie],
                       ["gesicht", p1.nav.kMask.gesicht],
                     ] as [string, string][]).map(([key, label]) => (
                       <button
@@ -173,7 +170,7 @@ const Navbar = () => {
 
           {/* ── Right icon cluster ── */}
           {/* 모바일에서는 정확히 76px 너비를 차지하여 좌측 스페이서와 완벽한 대칭을 이룸 */}
-          <div className="w-[76px] md:w-auto ml-auto flex items-center justify-end gap-1">
+          <div className="flex items-center justify-end gap-1">
             {/* Search (all screens) */}
             <button className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" aria-label="Search">
               <Search className="h-[1.1rem] w-[1.1rem]" />
@@ -193,7 +190,7 @@ const Navbar = () => {
             <div className="hidden md:block relative" ref={langRef}>
               <motion.button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex h-9 items-center gap-1 px-2.5 rounded-full border border-stone-200 dark:border-white/15 text-[#947E5C] dark:text-[#D4AF37] hover:border-[#D4AF37]/50 transition-colors text-[0.68rem] font-medium tracking-wide"
+                className="flex h-9 items-center gap-1 px-2.5 rounded-full border border-stone-200 dark:border-white/15 text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] hover:border-[var(--ssl-accent)]/50 transition-colors text-[0.68rem] font-medium tracking-wide"
                 whileTap={{ scale: 0.95 }}
                 aria-label="Change language"
                 style={navFont}
@@ -221,17 +218,16 @@ const Navbar = () => {
                       <button
                         key={code}
                         onClick={() => { setLanguage(code); setLangOpen(false); }}
-                        className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors ${
-                          language === code
-                            ? "bg-stone-50 dark:bg-white/5 font-medium"
-                            : "hover:bg-stone-50 dark:hover:bg-white/5"
-                        }`}
+                        className={`flex w-full items-center justify-between px-4 py-2.5 text-sm transition-colors ${language === code
+                          ? "bg-stone-50 dark:bg-white/5 font-medium"
+                          : "hover:bg-stone-50 dark:hover:bg-white/5"
+                          }`}
                         style={navFont}
                       >
                         <span className="text-gray-800 dark:text-gray-200">{native}</span>
                         <span
                           className="text-[0.65rem] font-medium"
-                          style={{ color: language === code ? "#D4AF37" : "#9a9a9a" }}
+                          style={{ color: language === code ? "var(--ssl-accent)" : "#9a9a9a" }}
                         >
                           {label}
                         </span>
@@ -288,7 +284,7 @@ const Navbar = () => {
             ) : (
               <Link
                 to={loginUrl}
-                className="hidden md:flex items-center rounded-full border border-stone-200 dark:border-white/15 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:border-[#D4AF37]/50 hover:text-gray-900 dark:hover:text-white transition-colors ml-1"
+                className="hidden md:flex items-center rounded-full border border-stone-200 dark:border-white/15 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:border-[var(--ssl-accent)]/50 hover:text-gray-900 dark:hover:text-white transition-colors ml-1"
               >
                 {p1.nav.signIn}
               </Link>
@@ -298,7 +294,7 @@ const Navbar = () => {
             <Link to="/cart" className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4AF37] text-[0.6rem] font-bold text-[#0a0a0a]">
+                <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--ssl-accent)] text-[0.6rem] font-bold text-[#F5F5F7]">
                   {cartCount > 9 ? "9+" : cartCount}
                 </span>
               )}
@@ -345,18 +341,18 @@ const Navbar = () => {
               <nav className="flex-1 overflow-y-auto pt-7 pb-7">
 
                 {/* ── SKIN LAB ── */}
-                <p className="px-6 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
-                  Skin Lab
+                <p className="px-6 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--ssl-accent)' }}>
+                  {language === "ko" ? "스킨 랩" : language === "de" ? "Skin Lab" : "Skin Lab"}
                 </p>
                 {([
-                  { Icon: Microscope, label: p1.nav.hautAnalyse,  href: "/diagnosis" },
-                  { Icon: Layers,     label: p1.nav.routinenSets, href: "/diagnosis" },
+                  { Icon: Microscope, label: p1.nav.hautAnalyse, href: "/diagnosis" },
+                  { Icon: Layers, label: p1.nav.routinenSets, href: "/diagnosis" },
                 ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
                   <Link key={label} to={href}
                     className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
                     style={navFont}
                   >
-                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
+                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 transition-colors" style={{ color: 'var(--ssl-accent-muted)' }} strokeWidth={1.5} />
                     <span className="text-sm font-medium tracking-wide">{label}</span>
                   </Link>
                 ))}
@@ -364,19 +360,19 @@ const Navbar = () => {
                 <div className="mx-6 my-2 border-t border-stone-100 dark:border-white/[0.06]" />
 
                 {/* ── SHOP ── */}
-                <p className="px-6 mt-3 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
-                  Shop
+                <p className="px-6 mt-3 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--ssl-accent)' }}>
+                  {language === "ko" ? "쇼핑" : language === "de" ? "Shop" : "Shop"}
                 </p>
                 {([
-                  { Icon: Trophy,   label: p1.nav.bestseller,       href: "/diagnosis" },
-                  { Icon: Target,   label: p1.nav.hautbeduerfnisse, href: "/diagnosis" },
-                  { Icon: Sparkles, label: p1.nav.kMaskLab,         href: "/diagnosis" },
+                  { Icon: Trophy, label: p1.nav.bestseller, href: "/diagnosis" },
+                  { Icon: Target, label: p1.nav.hautbeduerfnisse, href: "/diagnosis" },
+                  { Icon: Sparkles, label: p1.nav.kMaskLab, href: "/diagnosis" },
                 ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
                   <Link key={label} to={href}
                     className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
                     style={navFont}
                   >
-                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
+                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 transition-colors" style={{ color: 'var(--ssl-accent-muted)' }} strokeWidth={1.5} />
                     <span className="text-sm font-medium tracking-wide">{label}</span>
                   </Link>
                 ))}
@@ -384,39 +380,39 @@ const Navbar = () => {
                 <div className="mx-6 my-2 border-t border-stone-100 dark:border-white/[0.06]" />
 
                 {/* ── KNOWLEDGE ── */}
-                <p className="px-6 mt-3 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
-                  Knowledge
+                <p className="px-6 mt-3 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--ssl-accent)' }}>
+                  {language === "ko" ? "지식" : language === "de" ? "Wissen" : "Knowledge"}
                 </p>
                 <Link to="/diagnosis"
                   className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
                   style={navFont}
                 >
-                  <Atom className="h-[1.05rem] w-[1.05rem] shrink-0 text-[#947E5C] dark:text-[#D4AF37] group-hover:text-[#D4AF37] transition-colors" strokeWidth={1.5} />
+                  <Atom className="h-[1.05rem] w-[1.05rem] shrink-0 transition-colors" style={{ color: 'var(--ssl-accent-muted)' }} strokeWidth={1.5} />
                   <span className="text-sm font-medium tracking-wide">{p1.nav.science}</span>
                 </Link>
               </nav>
 
               {/* ── Settings ── */}
               <div className="border-t border-stone-100 dark:border-white/[0.07] flex-shrink-0">
-                <p className="px-6 pt-5 pb-3 text-[0.58rem] font-semibold uppercase tracking-[0.22em] text-[#D4AF37]">
-                  Settings
+                <p className="px-6 pt-5 pb-3 text-[0.58rem] font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--ssl-accent)' }}>
+                  {language === "ko" ? "설정" : language === "de" ? "Einstellungen" : "Settings"}
                 </p>
 
                 {/* Language */}
                 <div className="px-6 pb-3 flex items-center justify-between" style={navFont}>
                   <span className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    <Globe className="h-3.5 w-3.5" /> Language
+                    <Globe className="h-3.5 w-3.5" /> {language === "ko" ? "언어" : language === "de" ? "Sprache" : "Language"}
                   </span>
                   <div className="flex gap-1.5">
                     {(["de", "en", "ko"] as Language[]).map((lang) => (
                       <button
                         key={lang}
                         onClick={() => setLanguage(lang)}
-                        className={`w-9 py-1 rounded-full text-[0.65rem] font-semibold border transition-all ${
-                          language === lang
-                            ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#947E5C] dark:text-[#D4AF37]"
-                            : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-[#D4AF37]/40"
-                        }`}
+                        className={`w-9 py-1 rounded-full text-[0.65rem] font-semibold border transition-all ${language === lang
+                          ? ""
+                          : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500"
+                          }`}
+                        style={language === lang ? { borderColor: 'var(--ssl-accent)', background: 'var(--ssl-accent-bg)', color: 'var(--ssl-accent)' } : undefined}
                       >
                         {lang.toUpperCase()}
                       </button>
@@ -431,17 +427,17 @@ const Navbar = () => {
                   </span>
                   <div className="flex gap-1.5">
                     {([
-                      { val: "light", label: "White", Icon: Sun },
-                      { val: "dark",  label: "Dark",  Icon: Moon },
+                      { val: "light", label: language === "ko" ? "라이트" : language === "de" ? "Hell" : "Light", Icon: Sun },
+                      { val: "dark", label: language === "ko" ? "다크" : language === "de" ? "Dunkel" : "Dark", Icon: Moon },
                     ] as { val: string; label: string; Icon: React.ElementType }[]).map(({ val, label, Icon }) => (
                       <button
                         key={val}
                         onClick={() => setTheme(val)}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border transition-all ${
-                          (val === "dark" ? theme === "dark" : theme !== "dark")
-                            ? "border-[#D4AF37] bg-[#D4AF37]/10 text-[#947E5C] dark:text-[#D4AF37]"
-                            : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500 hover:border-[#D4AF37]/40"
-                        }`}
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border transition-all ${(val === "dark" ? theme === "dark" : theme !== "dark")
+                          ? ""
+                          : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500"
+                          }`}
+                        style={(val === "dark" ? theme === "dark" : theme !== "dark") ? { borderColor: 'var(--ssl-accent)', background: 'var(--ssl-accent-bg)', color: 'var(--ssl-accent)' } : undefined}
                       >
                         <Icon className="h-3 w-3" strokeWidth={1.8} />
                         {label}
@@ -466,7 +462,11 @@ const Navbar = () => {
                   ) : (
                     <Link
                       to={loginUrl}
-                      className="flex w-full items-center justify-center rounded-full bg-[#D4AF37] px-5 py-3 text-sm font-semibold text-[#0a0a0a] hover:opacity-90 transition-opacity"
+                      className="flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-semibold hover:opacity-90 transition-opacity"
+                      style={{
+                        background: 'var(--ssl-accent-deep)',
+                        color: '#FFFFFF',
+                      }}
                     >
                       {p1.nav.signIn}
                     </Link>

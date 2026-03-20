@@ -75,8 +75,8 @@ function ProductBadge({ product, language }: { product: Product; language: strin
   return (
     <div
       style={{
-        background: 'rgba(201,169,110,0.18)',
-        border: '1px solid rgba(201,169,110,0.55)',
+        background: 'rgba(45,107,74,0.18)',
+        border: '1px solid rgba(45,107,74,0.55)',
         borderRadius: 6,
         padding: '2px 6px',
         fontSize: 9,

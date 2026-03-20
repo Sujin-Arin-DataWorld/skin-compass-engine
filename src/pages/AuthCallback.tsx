@@ -17,8 +17,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getPendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 
-const GOLD    = "#c9a96e";
-const ROSE    = "#b76e79";
+const GOLD = "#c9a96e";
+const ROSE = "#b76e79";
 const PAGE_BG = "linear-gradient(160deg, #0d0d12 0%, #141420 40%, #1a1528 100%)";
 
 export default function AuthCallback() {
@@ -132,7 +132,7 @@ export default function AuthCallback() {
       <div style={{ position: "relative", width: 64, height: 64 }}>
         <div style={{
           position: "absolute", inset: 0, borderRadius: "50%",
-          border: `1.5px solid rgba(201,169,110,0.12)`,
+          border: `1.5px solid rgba(45,107,74,0.12)`,
         }} />
         <motion.div
           style={{

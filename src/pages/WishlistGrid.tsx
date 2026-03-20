@@ -8,8 +8,8 @@ import { useCartStore } from "@/store/cartStore";
 import { useProductStore } from "@/store/productStore";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD   = "#D4AF37";
-const BRONZE = "#947E5C";
+const GOLD = "var(--ssl-accent)";
+const BRONZE = "var(--ssl-accent-deep)";
 
 type CartBtnState = "idle" | "adding" | "added";
 
@@ -19,20 +19,20 @@ function EmptyWishlist({ de }: { de: boolean }) {
         <div
             className="flex flex-col items-center justify-center py-20 rounded-2xl
                 bg-white/50 dark:bg-white/[0.02]
-                border border-gray-200 dark:border-[rgba(212,175,55,0.08)]"
+                border border-gray-200 dark:border-[rgba(45,107,74,0.08)]"
             style={{ backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}
         >
             <div
                 className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
-                style={{ background: "rgba(212,175,55,0.07)" }}
+                style={{ background: "rgba(45,107,74,0.07)" }}
             >
-                <Heart className="w-7 h-7" strokeWidth={1.5} style={{ color: "rgba(212,175,55,0.4)" }} />
+                <Heart className="w-7 h-7" strokeWidth={1.5} style={{ color: "rgba(45,107,74,0.4)" }} />
             </div>
 
             <p className="text-base font-medium text-gray-800 dark:text-[#e8e8e8] mb-1.5">
                 {de ? "Ihre Wunschliste ist leer" : "Your wishlist is empty"}
             </p>
-            <p className="text-sm text-center max-w-xs mb-6 text-gray-500 dark:text-[#947E5C]">
+            <p className="text-sm text-center max-w-xs mb-6 text-gray-500 dark:text-[var(--ssl-accent-deep)]">
                 {de
                     ? "Führen Sie eine Diagnose durch, um personalisierte Produktempfehlungen zu erhalten."
                     : "Complete a diagnosis to receive personalized product recommendations."}
@@ -41,7 +41,7 @@ function EmptyWishlist({ de }: { de: boolean }) {
             <Link
                 to="/diagnosis"
                 className="px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-80"
-                style={{ background: GOLD, color: "#0a0a0a" }}
+                style={{ background: GOLD, color: "#F5F5F7" }}
             >
                 {de ? "Diagnose starten" : "Start Diagnosis"}
             </Link>
@@ -69,7 +69,7 @@ function WishlistCard({
             className="relative group flex flex-col rounded-2xl overflow-hidden
                 bg-white dark:bg-[#111]
                 border border-gray-200 dark:border-[#1e1e1e]
-                hover:border-[rgba(212,175,55,0.4)] dark:hover:border-[rgba(212,175,55,0.3)]
+                hover:border-[rgba(45,107,74,0.4)] dark:hover:border-[rgba(45,107,74,0.3)]
                 transition-all duration-300"
         >
             {/* Heart toggle — top right, spring physics pop */}
@@ -109,7 +109,7 @@ function WishlistCard({
                     ) : (
                         <div
                             className="w-16 h-16 rounded-full"
-                            style={{ background: "rgba(212,175,55,0.08)" }}
+                            style={{ background: "rgba(45,107,74,0.08)" }}
                         />
                     )}
                 </div>
@@ -142,31 +142,31 @@ function WishlistCard({
                         disabled:opacity-50 disabled:cursor-not-allowed
                         ${cartState === "added"
                             ? "border border-green-500/40 bg-green-50 dark:bg-green-500/10"
-                            : "border border-gray-200 dark:border-[#2a2a2a] hover:border-[rgba(212,175,55,0.5)] dark:hover:border-[rgba(212,175,55,0.4)]"
+                            : "border border-gray-200 dark:border-[#2a2a2a] hover:border-[rgba(45,107,74,0.5)] dark:hover:border-[rgba(45,107,74,0.4)]"
                         }`}
                 >
                     {cartState === "adding" && (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-[#947E5C]" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-400 dark:text-[var(--ssl-accent-deep)]" />
                     )}
                     {cartState === "added" && (
                         <Check className="w-3.5 h-3.5" style={{ color: "#4ADE80" }} strokeWidth={2} />
                     )}
                     {cartState === "idle" && (
                         <ShoppingBag
-                            className="w-3.5 h-3.5 text-gray-500 dark:text-[#947E5C]"
+                            className="w-3.5 h-3.5 text-gray-500 dark:text-[var(--ssl-accent-deep)]"
                             strokeWidth={1.5}
                         />
                     )}
                     <span
                         className={cartState === "added"
                             ? "text-green-600 dark:text-green-400"
-                            : "text-gray-600 dark:text-[#947E5C]"}
+                            : "text-gray-600 dark:text-[var(--ssl-accent-deep)]"}
                     >
                         {cartState === "adding"
-                            ? (de ? "Füge hinzu…"     : "Adding…")
+                            ? (de ? "Füge hinzu…" : "Adding…")
                             : cartState === "added"
-                            ? (de ? "Hinzugefügt!"    : "Added!")
-                            : (de ? "In den Warenkorb" : "Add to Cart")}
+                                ? (de ? "Hinzugefügt!" : "Added!")
+                                : (de ? "In den Warenkorb" : "Add to Cart")}
                     </span>
                 </button>
             </div>
@@ -247,10 +247,10 @@ export default function WishlistGrid({ de }: { de: boolean }) {
                                 cartState={cartStates[item.product_id] ?? "idle"}
                                 onToggle={() =>
                                     toggle({
-                                        product_id:    item.product_id,
-                                        product_name:  item.product_name,
+                                        product_id: item.product_id,
+                                        product_name: item.product_name,
                                         product_image: item.product_image,
-                                        price:         item.price,
+                                        price: item.price,
                                     })
                                 }
                                 onAddToCart={() => handleAddToCart(item.product_id)}

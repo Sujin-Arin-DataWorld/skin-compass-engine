@@ -146,12 +146,12 @@ export default function RecheckBanner() {
     return COPY[bannerState][lang];
   };
 
-  const isUrgent    = bannerState === "overdue";
+  const isUrgent = bannerState === "overdue";
   const borderColor = isUrgent ? "hsl(var(--warning))" : "hsl(var(--accent-gold))";
-  const textColor   = isUrgent ? "hsl(var(--warning))" : "hsl(var(--accent-gold))";
-  const bgColor     = isDark
-    ? (isUrgent ? "rgba(245,158,11,0.07)" : "rgba(201,169,110,0.07)")
-    : (isUrgent ? "rgba(245,158,11,0.05)" : "rgba(201,169,110,0.06)");
+  const textColor = isUrgent ? "hsl(var(--warning))" : "hsl(var(--accent-gold))";
+  const bgColor = isDark
+    ? (isUrgent ? "rgba(245,158,11,0.07)" : "rgba(45,107,74,0.07)")
+    : (isUrgent ? "rgba(245,158,11,0.05)" : "rgba(45,107,74,0.06)");
 
   return (
     <AnimatePresence>

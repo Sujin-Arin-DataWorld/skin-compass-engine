@@ -173,11 +173,10 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
         <button
             type="button"
             onClick={onClick}
-            className={`flex-1 py-2.5 text-sm font-bold tracking-wide rounded-xl transition-all ${
-                active
-                    ? "bg-card border border-[#947E5C] dark:border-[#D4AF37] text-[#947E5C] dark:text-[#D4AF37]"
-                    : "text-foreground/40 hover:text-foreground/70"
-            }`}
+            className={`flex-1 py-2.5 text-sm font-bold tracking-wide rounded-xl transition-all ${active
+                ? "bg-card border border-[var(--ssl-accent-deep)] dark:border-[var(--ssl-accent)] text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)]"
+                : "text-foreground/40 hover:text-foreground/70"
+                }`}
         >
             {children}
         </button>

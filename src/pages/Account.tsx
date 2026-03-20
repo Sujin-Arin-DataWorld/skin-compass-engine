@@ -15,21 +15,21 @@ import RecheckBanner from "@/features/results/components/RecheckBanner";
 // ── Skeleton loader ───────────────────────────────────────────────────────
 // Mirrors AccountLayout's structure so there's zero layout shift on load.
 function AccountSkeleton() {
-    const shimmer: React.CSSProperties     = { background: "rgba(255,255,255,0.04)" };
-    const goldShimmer: React.CSSProperties = { background: "rgba(212,175,55,0.08)" };
+    const shimmer: React.CSSProperties = { background: "rgba(255,255,255,0.04)" };
+    const goldShimmer: React.CSSProperties = { background: "rgba(45,107,74,0.08)" };
 
     return (
-        <div className="min-h-screen flex" style={{ background: "#0a0a0a" }}>
+        <div className="min-h-screen flex" style={{ background: "#F5F5F7" }}>
             {/* Sidebar */}
             <aside
                 className="hidden md:flex w-56 flex-col flex-shrink-0"
-                style={{ background: "#0d0d0d", borderRight: "1px solid rgba(212,175,55,0.1)" }}
+                style={{ background: "#0d0d0d", borderRight: "1px solid rgba(45,107,74,0.1)" }}
             >
-                <div className="px-6 pt-8 pb-5 space-y-2" style={{ borderBottom: "1px solid rgba(212,175,55,0.08)" }}>
+                <div className="px-6 pt-8 pb-5 space-y-2" style={{ borderBottom: "1px solid rgba(45,107,74,0.08)" }}>
                     <div className="h-1.5 w-20 rounded animate-pulse" style={goldShimmer} />
                     <div className="h-3.5 w-28 rounded animate-pulse" style={goldShimmer} />
                 </div>
-                <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(212,175,55,0.08)" }}>
+                <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(45,107,74,0.08)" }}>
                     <div className="w-9 h-9 rounded-full animate-pulse mb-3" style={goldShimmer} />
                     <div className="h-2.5 w-28 rounded animate-pulse mb-1.5" style={shimmer} />
                     <div className="h-2 w-36 rounded animate-pulse" style={shimmer} />
@@ -50,9 +50,9 @@ function AccountSkeleton() {
                         <div className="h-6 w-40 rounded animate-pulse" style={shimmer} />
                     </div>
                     <div className="h-2 w-24 rounded animate-pulse" style={goldShimmer} />
-                    <div className="h-36 rounded-2xl animate-pulse" style={{ ...shimmer, border: "1px solid rgba(212,175,55,0.07)" }} />
-                    <div className="h-28 rounded-2xl animate-pulse" style={{ ...shimmer, border: "1px solid rgba(212,175,55,0.07)" }} />
-                    <div className="h-20 rounded-2xl animate-pulse" style={{ ...shimmer, border: "1px solid rgba(212,175,55,0.07)" }} />
+                    <div className="h-36 rounded-2xl animate-pulse" style={{ ...shimmer, border: "1px solid rgba(45,107,74,0.07)" }} />
+                    <div className="h-28 rounded-2xl animate-pulse" style={{ ...shimmer, border: "1px solid rgba(45,107,74,0.07)" }} />
+                    <div className="h-20 rounded-2xl animate-pulse" style={{ ...shimmer, border: "1px solid rgba(45,107,74,0.07)" }} />
                 </div>
             </main>
 
@@ -63,7 +63,7 @@ function AccountSkeleton() {
                     background: "rgba(10,10,10,0.82)",
                     backdropFilter: "blur(20px)",
                     WebkitBackdropFilter: "blur(20px)",
-                    borderTop: "1px solid rgba(212,175,55,0.1)",
+                    borderTop: "1px solid rgba(45,107,74,0.1)",
                 }}
             />
         </div>
@@ -82,7 +82,7 @@ export default function Account() {
     const de = language === "de";
 
     // Derive active tab from ?tab= URL param — supports deep-linking
-    const tabParam  = searchParams.get("tab") as TabId | null;
+    const tabParam = searchParams.get("tab") as TabId | null;
     const activeTab: TabId = VALID_TABS.includes(tabParam as TabId) ? (tabParam as TabId) : "profile";
 
     const setActiveTab = (tab: TabId) => {
@@ -103,11 +103,11 @@ export default function Account() {
     if (sessionLoading) return <AccountSkeleton />;
 
     const CONTENT: Record<TabId, ReactNode> = {
-        profile:  <ProfilePage de={de} />,
-        history:  <DiagnosisHistoryPage de={de} />,
-        orders:   <OrdersPage de={de} />,
+        profile: <ProfilePage de={de} />,
+        history: <DiagnosisHistoryPage de={de} />,
+        orders: <OrdersPage de={de} />,
         wishlist: <WishlistGrid de={de} />,
-        address:  <AddressManager de={de} />,
+        address: <AddressManager de={de} />,
     };
 
     return (

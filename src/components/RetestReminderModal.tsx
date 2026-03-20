@@ -131,7 +131,7 @@ export default function RetestReminderModal({
 
   // ── Accent colors (match existing design tokens) ────────────────────────
   const GOLD = isDark ? "#c9a96e" : "#7A9E82";
-  const GOLD_DEEP = isDark ? "#947E5C" : "#2D4F39";
+  const GOLD_DEEP = isDark ? "var(--ssl-accent-deep)" : "#2D4F39";
 
   // ── Escape key dismiss ──────────────────────────────────────────────────
   useEffect(() => {
@@ -203,12 +203,12 @@ export default function RetestReminderModal({
               maxWidth: 420,
               borderRadius: 24,
               overflow: "hidden",
-              border: `1px solid ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.2)"}`,
+              border: `1px solid ${isDark ? "rgba(45,107,74,0.3)" : "rgba(45,79,57,0.2)"}`,
               background: isDark ? "rgba(20,20,32,0.97)" : "rgba(255,255,255,0.97)",
               backdropFilter: "blur(32px)",
               WebkitBackdropFilter: "blur(32px)",
               boxShadow: isDark
-                ? "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,169,110,0.1)"
+                ? "0 24px 64px rgba(0,0,0,0.5), 0 0 0 1px rgba(45,107,74,0.1)"
                 : "0 24px 64px rgba(0,0,0,0.12), 0 0 0 1px rgba(45,79,57,0.08)",
             }}
             initial={{ scale: 0.88, opacity: 0, y: 20 }}
@@ -293,7 +293,7 @@ export default function RetestReminderModal({
                   display: "flex", alignItems: "center", gap: 16, borderRadius: 16,
                   padding: 16,
                   background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                  border: "1px solid rgba(201,169,110,0.15)", marginBottom: 20,
+                  border: "1px solid rgba(45,107,74,0.15)", marginBottom: 20,
                 }}>
                   <MiniRadar scores={radarScores} />
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -319,7 +319,7 @@ export default function RetestReminderModal({
                     }}>
                       {lang === "ko" ? "변화를 추적하면 더 정밀한 맞춤 프로토콜이 가능합니다."
                         : lang === "de" ? "Verfolgen Sie Veränderungen für ein präziseres Protokoll."
-                        : "Track changes to refine your personalised protocol."}
+                          : "Track changes to refine your personalised protocol."}
                     </p>
                   </div>
                 </div>
@@ -337,7 +337,7 @@ export default function RetestReminderModal({
                     color: isDark ? "#0d0d12" : "#fff",
                     fontSize: 13, fontFamily: "var(--font-sans)",
                     letterSpacing: "0.1em", fontWeight: 600, cursor: "pointer",
-                    boxShadow: `0 6px 24px ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.25)"}`,
+                    boxShadow: `0 6px 24px ${isDark ? "rgba(45,107,74,0.3)" : "rgba(45,79,57,0.25)"}`,
                   }}
                 >
                   {COPY.confirm[lang]}
@@ -349,7 +349,7 @@ export default function RetestReminderModal({
                   onClick={onDismiss}
                   style={{
                     width: "100%", padding: "12px 24px", borderRadius: 14,
-                    border: `1px solid ${isDark ? "rgba(201,169,110,0.3)" : "rgba(45,79,57,0.2)"}`,
+                    border: `1px solid ${isDark ? "rgba(45,107,74,0.3)" : "rgba(45,79,57,0.2)"}`,
                     background: "transparent",
                     color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.55)",
                     fontSize: 13, fontFamily: "var(--font-sans)",

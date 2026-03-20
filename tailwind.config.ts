@@ -161,8 +161,8 @@ export default {
   			xl: 'var(--shadow-xl)',
   			'2xl': 'var(--shadow-2xl)',
   			'inner-highlight': 'inset 0 1px 1px rgba(255,255,255,0.4)',
-  			'gold-glow': '0 0 20px rgba(210,172,71,0.15)',
-  			'gold-glow-dark': '0 0 20px rgba(254,189,17,0.25)'
+  			'accent-glow': '0 0 20px rgba(94,139,104,0.15)',
+  			'accent-glow-dark': '0 0 20px rgba(45,107,74,0.25)'
   		}
   	}
   },

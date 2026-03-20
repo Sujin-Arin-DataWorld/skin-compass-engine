@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { useAddresses, type ShippingAddress, type AddressInput } from "@/hooks/useAddresses";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD   = "#D4AF37";
-const BRONZE = "#947E5C";
+const GOLD = "var(--ssl-accent)";
+const BRONZE = "var(--ssl-accent-deep)";
 
 const EMPTY_FORM: AddressInput = {
     label: "", name: "", street: "", city: "", zip: "", country: "DE", phone: "",
@@ -53,7 +53,7 @@ function FloatingField({
                     width: "100%",
                     padding: "1.2rem 0.875rem 0.4rem",
                     background: "rgba(255,255,255,0.04)",
-                    border: `1px solid ${focused ? GOLD : error ? "#EF4444" : "rgba(212,175,55,0.18)"}`,
+                    border: `1px solid ${focused ? GOLD : error ? "#EF4444" : "rgba(45,107,74,0.18)"}`,
                     borderRadius: "10px",
                     fontSize: "0.875rem",
                     color: "#e8e8e8",
@@ -145,10 +145,10 @@ function AddressDrawer({
     const errors: Partial<Record<keyof AddressInput, string>> = {};
     if (submitted) {
         const req = de ? "Erforderlich" : "Required";
-        if (!form.name)   errors.name   = req;
+        if (!form.name) errors.name = req;
         if (!form.street) errors.street = req;
-        if (!form.city)   errors.city   = req;
-        if (!form.zip)    errors.zip    = req;
+        if (!form.city) errors.city = req;
+        if (!form.zip) errors.zip = req;
     }
 
     const handleSave = () => {
@@ -160,7 +160,7 @@ function AddressDrawer({
 
     const title = editTarget
         ? (de ? "Adresse bearbeiten" : "Edit Address")
-        : (de ? "Neue Adresse"       : "New Address");
+        : (de ? "Neue Adresse" : "New Address");
 
     const content = (
         <div className="flex flex-col h-full">
@@ -183,14 +183,14 @@ function AddressDrawer({
                 onClick={handleSave}
                 disabled={saving}
                 className="mt-6 w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-opacity"
-                style={{ background: GOLD, color: "#0a0a0a", opacity: saving ? 0.7 : 1 }}
+                style={{ background: GOLD, color: "#F5F5F7", opacity: saving ? 0.7 : 1 }}
             >
                 {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 {saving
                     ? (de ? "Speichere…" : "Saving…")
                     : editTarget
-                    ? (de ? "Aktualisieren" : "Update")
-                    : (de ? "Adresse speichern" : "Save Address")}
+                        ? (de ? "Aktualisieren" : "Update")
+                        : (de ? "Adresse speichern" : "Save Address")}
             </button>
         </div>
     );
@@ -214,7 +214,7 @@ function AddressDrawer({
                     style={{
                         background: "#111",
                         borderRadius: "20px 20px 0 0",
-                        border: "1px solid rgba(212,175,55,0.12)",
+                        border: "1px solid rgba(45,107,74,0.12)",
                         borderBottom: "none",
                         maxHeight: "92vh",
                     }}
@@ -244,7 +244,7 @@ function AddressDrawer({
                 className="w-full max-w-[420px] p-7 overflow-y-auto"
                 style={{
                     background: "#111",
-                    borderLeft: "1px solid rgba(212,175,55,0.12)",
+                    borderLeft: "1px solid rgba(45,107,74,0.12)",
                 }}
             >
                 {content}
@@ -269,9 +269,9 @@ function AddressCard({
         <div
             style={{
                 background: address.is_default
-                    ? "rgba(212,175,55,0.06)"
+                    ? "rgba(45,107,74,0.06)"
                     : "rgba(255,255,255,0.025)",
-                border: `1px solid ${address.is_default ? "rgba(212,175,55,0.28)" : "rgba(212,175,55,0.1)"}`,
+                border: `1px solid ${address.is_default ? "rgba(45,107,74,0.28)" : "rgba(45,107,74,0.1)"}`,
                 borderRadius: "14px",
                 padding: "1.25rem",
             }}
@@ -292,7 +292,7 @@ function AddressCard({
                             <span
                                 className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full"
                                 style={{
-                                    background: "rgba(212,175,55,0.15)",
+                                    background: "rgba(45,107,74,0.15)",
                                     fontSize: "0.6rem", color: GOLD,
                                     letterSpacing: "0.1em", textTransform: "uppercase",
                                 }}
@@ -326,11 +326,11 @@ function AddressCard({
                             disabled={settingDefault}
                             title={de ? "Als Standard setzen" : "Set as default"}
                             className="w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-yellow-500/10"
-                            style={{ border: "1px solid rgba(212,175,55,0.2)" }}
+                            style={{ border: "1px solid rgba(45,107,74,0.2)" }}
                         >
                             {settingDefault
                                 ? <Loader2 className="w-3 h-3 animate-spin" style={{ color: GOLD }} />
-                                : <Star    className="w-3 h-3" style={{ color: BRONZE }} strokeWidth={1.5} />
+                                : <Star className="w-3 h-3" style={{ color: BRONZE }} strokeWidth={1.5} />
                             }
                         </button>
                     )}
@@ -338,7 +338,7 @@ function AddressCard({
                         onClick={onEdit}
                         title={de ? "Bearbeiten" : "Edit"}
                         className="w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-yellow-500/10"
-                        style={{ border: "1px solid rgba(212,175,55,0.2)" }}
+                        style={{ border: "1px solid rgba(45,107,74,0.2)" }}
                     >
                         <Pencil className="w-3 h-3" style={{ color: BRONZE }} strokeWidth={1.5} />
                     </button>
@@ -351,7 +351,7 @@ function AddressCard({
                     >
                         {deleting
                             ? <Loader2 className="w-3 h-3 animate-spin" style={{ color: BRONZE }} />
-                            : <Trash2  className="w-3 h-3" style={{ color: BRONZE }} strokeWidth={1.5} />
+                            : <Trash2 className="w-3 h-3" style={{ color: BRONZE }} strokeWidth={1.5} />
                         }
                     </button>
                 </div>
@@ -365,11 +365,11 @@ export default function AddressManager({ de }: { de: boolean }) {
     const { addresses, loading, addAddress, updateAddress, deleteAddress, setDefault } = useAddresses();
     const isMobile = useIsMobile();
 
-    const [drawerOpen,   setDrawerOpen]   = useState(false);
-    const [editTarget,   setEditTarget]   = useState<ShippingAddress | null>(null);
-    const [form,         setForm]         = useState<AddressInput>(EMPTY_FORM);
-    const [saving,       setSaving]       = useState(false);
-    const [deletingId,   setDeletingId]   = useState<string | null>(null);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [editTarget, setEditTarget] = useState<ShippingAddress | null>(null);
+    const [form, setForm] = useState<AddressInput>(EMPTY_FORM);
+    const [saving, setSaving] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [defaultingId, setDefaultingId] = useState<string | null>(null);
 
     const openAdd = () => {
@@ -381,13 +381,13 @@ export default function AddressManager({ de }: { de: boolean }) {
     const openEdit = (addr: ShippingAddress) => {
         setEditTarget(addr);
         setForm({
-            label:   addr.label,
-            name:    addr.name,
-            street:  addr.street,
-            city:    addr.city,
-            zip:     addr.zip,
+            label: addr.label,
+            name: addr.name,
+            street: addr.street,
+            city: addr.city,
+            zip: addr.zip,
             country: addr.country,
-            phone:   addr.phone ?? "",
+            phone: addr.phone ?? "",
         });
         setDrawerOpen(true);
     };
@@ -404,7 +404,7 @@ export default function AddressManager({ de }: { de: boolean }) {
             toast.success(
                 editTarget
                     ? (de ? "Adresse aktualisiert" : "Address updated")
-                    : (de ? "Adresse hinzugefügt"  : "Address added")
+                    : (de ? "Adresse hinzugefügt" : "Address added")
             );
             setDrawerOpen(false);
         }
@@ -443,7 +443,7 @@ export default function AddressManager({ de }: { de: boolean }) {
                 <button
                     onClick={openAdd}
                     className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold"
-                    style={{ background: GOLD, color: "#0a0a0a" }}
+                    style={{ background: GOLD, color: "#F5F5F7" }}
                 >
                     <Plus className="w-3.5 h-3.5" strokeWidth={2} />
                     {de ? "Hinzufügen" : "Add New"}
@@ -468,13 +468,13 @@ export default function AddressManager({ de }: { de: boolean }) {
                     className="text-center py-14 rounded-2xl"
                     style={{
                         background: "rgba(255,255,255,0.02)",
-                        border: "1px solid rgba(212,175,55,0.08)",
+                        border: "1px solid rgba(45,107,74,0.08)",
                         backdropFilter: "blur(10px)",
                     }}
                 >
                     <MapPin
                         className="w-10 h-10 mx-auto mb-3"
-                        style={{ color: "rgba(212,175,55,0.25)" }}
+                        style={{ color: "rgba(45,107,74,0.25)" }}
                         strokeWidth={1.5}
                     />
                     <p style={{ fontSize: "0.875rem", color: BRONZE }}>
@@ -483,7 +483,7 @@ export default function AddressManager({ de }: { de: boolean }) {
                     <button
                         onClick={openAdd}
                         className="mt-4 px-5 py-2 rounded-full text-sm font-semibold"
-                        style={{ background: GOLD, color: "#0a0a0a" }}
+                        style={{ background: GOLD, color: "#F5F5F7" }}
                     >
                         {de ? "Erste Adresse hinzufügen" : "Add First Address"}
                     </button>

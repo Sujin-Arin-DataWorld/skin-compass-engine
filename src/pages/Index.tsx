@@ -19,12 +19,10 @@ import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
 import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
+import { tokens } from "@/lib/designTokens";
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
-const GOLD_DARK = "#D4AF37";
-const BRONZE    = "#947E5C";
-const SAGE      = "#7A9E82";   // light-mode accent
-const FOREST    = "#2D4F39";   // light-mode deep
+// ── Design tokens (consumed from designTokens.ts via tokens() helper) ─────────
+const BRONZE = "var(--ssl-accent-deep)";  // kept for non-active icon fallback
 
 // ── Concern map ───────────────────────────────────────────────────────────────
 const CONCERN_KEYS = ["sebum", "sensitivity", "hydration", "aging", "pigment", "texture", "barrier", "pores", "neuro"] as const;
@@ -90,7 +88,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                 className="absolute inset-0 pointer-events-none"
                 style={{
                   background: isDark
-                    ? "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(201,169,110,0.32) 0%, rgba(160,130,80,0.14) 55%, transparent 100%)"
+                    ? "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(45,107,74,0.32) 0%, rgba(160,130,80,0.14) 55%, transparent 100%)"
                     : "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(122,158,130,0.50) 0%, rgba(45,79,57,0.22) 55%, transparent 100%)",
                   zIndex: 2,
                   mixBlendMode: isDark ? "screen" : "multiply",
@@ -101,7 +99,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                 className="absolute inset-0 pointer-events-none"
                 style={{
                   boxShadow: isDark
-                    ? "inset 0 0 140px rgba(201,169,110,0.22), inset 0 -60px 80px rgba(160,130,80,0.10)"
+                    ? "inset 0 0 140px rgba(45,107,74,0.22), inset 0 -60px 80px rgba(160,130,80,0.10)"
                     : "inset 0 0 140px rgba(122,158,130,0.28), inset 0 -60px 80px rgba(45,79,57,0.12)",
                   zIndex: 3,
                 }}
@@ -162,11 +160,12 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                   <motion.div whileTap={{ scale: 0.97 }}>
                     <Link
                       to="/diagnosis"
-                      className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide transition-opacity hover:opacity-90"
+                      className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97] active:shadow-[0_2px_12px_rgba(45,79,57,0.2)] dark:active:shadow-[0_2px_12px_rgba(45,107,74,0.15)]"
                       style={{
                         background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
-                        color: isDark ? "#0a0a0a" : "#fff",
-                        boxShadow: isDark ? "0 6px 24px rgba(212,175,55,0.35)" : "0 6px 24px rgba(45,79,57,0.3)",
+                        color: isDark ? "#F5F5F7" : "#fff",
+                        boxShadow: isDark ? "0 6px 24px rgba(45,107,74,0.35)" : "0 6px 24px rgba(45,79,57,0.3)",
+                        transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
                         fontFamily: "var(--font-sans)",
                       }}
                     >
@@ -220,7 +219,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
 }
 
 // ── USP Strip ─────────────────────────────────────────────────────────────────
-function UspStrip({ items }: { items: { label: string }[] }) {
+function UspStrip({ items, accent, isDark }: { items: { label: string }[]; accent: string; isDark: boolean }) {
   const icons = [FlaskConical, ShieldCheck, Package, Sparkles];
   return (
     <section className="border-b border-stone-100 dark:border-white/[0.06] bg-white dark:bg-transparent">
@@ -229,8 +228,8 @@ function UspStrip({ items }: { items: { label: string }[] }) {
           const Icon = icons[i] ?? Sparkles;
           return (
             <div key={i} className="flex flex-col items-center text-center gap-3">
-              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(220,160,160,0.12)" }}>
-                <Icon className="w-5 h-5" style={{ color: "#c07a7a" }} strokeWidth={1.5} />
+              <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'var(--ssl-accent-bg)' }}>
+                <Icon className="w-5 h-5" style={{ color: 'var(--ssl-accent)' }} strokeWidth={1.5} />
               </div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300 tracking-wide">{item.label}</p>
             </div>
@@ -243,7 +242,7 @@ function UspStrip({ items }: { items: { label: string }[] }) {
 
 // ── 9 Skin Concerns ───────────────────────────────────────────────────────────
 function ConcernSection({
-  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart, accent,
+  title, sub, concernLabels, noProducts, products, cartStates, onAddToCart, accent, isDark, addLabel,
 }: {
   title: string; sub: string;
   concernLabels: Record<ConcernKey, string>;
@@ -252,6 +251,8 @@ function ConcernSection({
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
   accent: string;
+  isDark: boolean;
+  addLabel: string;
 }) {
   const [active, setActive] = useState<ConcernKey | null>(null);
 
@@ -287,12 +288,17 @@ function ConcernSection({
                 className="flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200"
                 style={{
                   borderColor: isActive ? accent : "transparent",
-                  background: isActive ? "rgba(212,175,55,0.07)" : "transparent",
+                  background: isActive ? 'var(--ssl-accent-bg)' : 'transparent',
+                  backdropFilter: isActive ? "blur(8px)" : "none",
+                  WebkitBackdropFilter: isActive ? "blur(8px)" : "none",
+                  boxShadow: isActive
+                    ? (isDark ? "0 2px 12px rgba(45,107,74,0.08)" : "0 2px 12px rgba(94,139,104,0.08)")
+                    : "none",
                 }}
               >
                 <div
                   className="w-11 h-11 rounded-full flex items-center justify-center"
-                  style={{ background: isActive ? "rgba(212,175,55,0.12)" : "rgba(148,126,92,0.07)" }}
+                  style={{ background: isActive ? (isDark ? "rgba(45,107,74,0.12)" : "rgba(94,139,104,0.12)") : "rgba(148,126,92,0.07)" }}
                 >
                   <Icon className="w-5 h-5" style={{ color: isActive ? accent : BRONZE }} strokeWidth={1.5} />
                 </div>
@@ -328,7 +334,7 @@ function ConcernSection({
                       return (
                         <div
                           key={product.id}
-                          className="flex-shrink-0 w-44 md:w-52 rounded-2xl border border-stone-200 dark:border-white/10 bg-white dark:bg-white/[0.05] dark:backdrop-blur-sm overflow-hidden"
+                          className="flex-shrink-0 w-44 md:w-52 rounded-2xl overflow-hidden border border-stone-200/60 dark:border-white/10 bg-white/80 dark:bg-white/[0.04] backdrop-blur-md transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg hover:shadow-[rgba(94,139,104,0.1)] dark:hover:shadow-black/30 dark:hover:border-[var(--ssl-accent)]/25 active:scale-[0.98]"
                           style={{ scrollSnapAlign: "start" }}
                         >
                           <Link to={`/formula/${product.id}`}>
@@ -336,7 +342,7 @@ function ConcernSection({
                               {product.image ? (
                                 <img src={product.image} alt={name} className="w-full h-full object-contain" loading="lazy" />
                               ) : (
-                                <div className="w-12 h-12 rounded-full" style={{ background: "rgba(212,175,55,0.08)" }} />
+                                <div className="w-12 h-12 rounded-full" style={{ background: "rgba(45,107,74,0.08)" }} />
                               )}
                             </div>
                           </Link>
@@ -352,16 +358,24 @@ function ConcernSection({
                             <button
                               onClick={() => onAddToCart(product)}
                               disabled={state === "adding"}
-                              className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50 ${state === "added"
-                                  ? "border border-green-400/50 bg-green-50 dark:bg-green-500/10"
-                                  : "border border-stone-200 dark:border-white/10 hover:border-[#D4AF37]/50"
-                                }`}
+                              className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50"
+                              style={{
+                                background: state === "added"
+                                  ? "rgba(74,222,128,0.08)"
+                                  : isDark ? "rgba(45,107,74,0.04)" : "rgba(94,139,104,0.04)",
+                                backdropFilter: "blur(12px)",
+                                WebkitBackdropFilter: "blur(12px)",
+                                border: state === "added"
+                                  ? "1px solid rgba(74,222,128,0.3)"
+                                  : isDark ? "1px solid rgba(45,107,74,0.12)" : "1px solid rgba(94,139,104,0.15)",
+                                boxShadow: isDark ? "0 1px 8px rgba(45,107,74,0.05)" : "0 1px 8px rgba(94,139,104,0.06)",
+                              }}
                             >
                               {state === "adding" && <Loader2 className="w-3 h-3 animate-spin text-gray-400" />}
                               {state === "added" && <Check className="w-3 h-3 text-green-500" strokeWidth={2} />}
                               {state === "idle" && <ShoppingBag className="w-3 h-3 text-gray-400" strokeWidth={1.5} />}
                               <span className={state === "added" ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}>
-                                {state === "adding" ? "…" : state === "added" ? "✓" : "Add"}
+                                {state === "adding" ? "…" : state === "added" ? "✓" : addLabel}
                               </span>
                             </button>
                           </div>
@@ -386,14 +400,17 @@ const ROUTINE_MOOD_IMAGES = [
   "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&w=800&q=80",
 ];
 
-function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, accent }: {
+function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, accent, isDark, addLabel }: {
   title: string; sub: string;
   cards: { badge: string; title: string; desc: string; cta: string }[];
   products: Product[];
   cartStates: Record<string, CartBtnState>;
   onAddToCart: (product: Product) => void;
   accent: string;
+  isDark: boolean;
+  addLabel: string;
 }) {
+  const { language } = useI18nStore();
   const routineSlices = [
     products.slice(0, Math.min(products.length, 6)),
     products.slice(0, Math.min(products.length, 8)),
@@ -471,7 +488,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                 <div className="md:col-span-7 flex items-center">
                   {rowProducts.length === 0 ? (
                     <div className="flex items-center justify-center w-full h-48 rounded-2xl border border-dashed border-stone-200 dark:border-white/10">
-                      <p className="text-sm text-gray-400">Products coming soon</p>
+                      <p className="text-sm text-gray-400">{language === "ko" ? "제품 준비 중" : language === "de" ? "Produkte kommen bald" : "Products coming soon"}</p>
                     </div>
                   ) : (
                     <div
@@ -484,7 +501,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                         return (
                           <div
                             key={product.id}
-                            className="flex-shrink-0 w-44 md:w-52 rounded-2xl border border-stone-200 dark:border-white/10 bg-white dark:bg-white/[0.05] dark:backdrop-blur-sm overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-xl dark:hover:shadow-black/40 hover:border-[#D4AF37]/30"
+                            className="flex-shrink-0 w-44 md:w-52 rounded-2xl overflow-hidden border border-stone-200/60 dark:border-white/10 bg-white/80 dark:bg-white/[0.04] backdrop-blur-md transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg hover:shadow-[rgba(94,139,104,0.1)] dark:hover:shadow-black/30 dark:hover:border-[var(--ssl-accent)]/25 active:scale-[0.98]"
                             style={{ scrollSnapAlign: "start" }}
                           >
                             <Link to={`/formula/${product.id}`}>
@@ -492,7 +509,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                                 {product.image ? (
                                   <img src={product.image} alt={name} className="w-full h-full object-contain" loading="lazy" />
                                 ) : (
-                                  <div className="w-12 h-12 rounded-full" style={{ background: "rgba(212,175,55,0.08)" }} />
+                                  <div className="w-12 h-12 rounded-full" style={{ background: "rgba(45,107,74,0.08)" }} />
                                 )}
                               </div>
                             </Link>
@@ -508,16 +525,24 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                               <button
                                 onClick={() => onAddToCart(product)}
                                 disabled={state === "adding"}
-                                className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50 ${state === "added"
-                                    ? "border border-green-400/50 bg-green-50 dark:bg-green-500/10"
-                                    : "border border-stone-200 dark:border-white/10 hover:border-[#D4AF37]/50"
-                                  }`}
+                                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-300 disabled:opacity-50"
+                                style={{
+                                  background: state === "added"
+                                    ? "rgba(74,222,128,0.08)"
+                                    : isDark ? "rgba(45,107,74,0.04)" : "rgba(94,139,104,0.04)",
+                                  backdropFilter: "blur(12px)",
+                                  WebkitBackdropFilter: "blur(12px)",
+                                  border: state === "added"
+                                    ? "1px solid rgba(74,222,128,0.3)"
+                                    : isDark ? "1px solid rgba(45,107,74,0.12)" : "1px solid rgba(94,139,104,0.15)",
+                                  boxShadow: isDark ? "0 1px 8px rgba(45,107,74,0.05)" : "0 1px 8px rgba(94,139,104,0.06)",
+                                }}
                               >
                                 {state === "adding" && <Loader2 className="w-3 h-3 animate-spin text-gray-400" />}
                                 {state === "added" && <Check className="w-3 h-3 text-green-500" strokeWidth={2} />}
                                 {state === "idle" && <ShoppingBag className="w-3 h-3 text-gray-400" strokeWidth={1.5} />}
                                 <span className={state === "added" ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}>
-                                  {state === "adding" ? "…" : state === "added" ? "✓" : "Add"}
+                                  {state === "adding" ? "…" : state === "added" ? "✓" : addLabel}
                                 </span>
                               </button>
                             </div>
@@ -595,11 +620,12 @@ function DiagnosisBanner({ headline, sub, cta, accent, accentDeep, isDark }: { h
           >
             <Link
               to="/diagnosis"
-              className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide"
+              className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97]"
               style={{
                 background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
-                color: isDark ? "#0a0a0a" : "#fff",
-                boxShadow: isDark ? "0 8px 32px rgba(212,175,55,0.45)" : "0 8px 32px rgba(45,79,57,0.35)",
+                color: isDark ? "#F5F5F7" : "#fff",
+                boxShadow: isDark ? "0 8px 32px rgba(45,107,74,0.45)" : "0 8px 32px rgba(45,79,57,0.35)",
+                transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
               }}
             >
               {cta}
@@ -620,12 +646,13 @@ function Newsletter({
   const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [done, setDone] = useState(false);
+  const { language } = useI18nStore();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !agreed) return;
     setDone(true);
-    toast.success("10% Rabatt-Code wird gesendet!");
+    toast.success(language === "ko" ? "10% 할인 코드가 발송됩니다!" : language === "de" ? "10% Rabatt-Code wird gesendet!" : "10% discount code will be sent!");
   };
 
   return (
@@ -661,17 +688,18 @@ function Newsletter({
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={placeholder}
                 required
-                className="flex-1 rounded-full border border-stone-200 dark:border-white/15 bg-white dark:bg-white/[0.05] dark:backdrop-blur-sm px-5 py-3 text-sm md:text-base text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:border-emerald-500/50 dark:focus:border-[#D4AF37]/50 transition-colors"
+                className="flex-1 rounded-full border border-stone-200 dark:border-white/15 bg-white dark:bg-white/[0.05] dark:backdrop-blur-sm px-5 py-3 text-sm md:text-base text-gray-800 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:border-emerald-500/50 dark:focus:border-[var(--ssl-accent)]/50 transition-colors"
               />
               <motion.button
                 type="submit"
                 whileTap={{ scale: 0.96 }}
-                className="shrink-0 rounded-full px-6 py-3 text-sm md:text-base font-semibold tracking-wide"
+                className="shrink-0 rounded-full px-6 py-3 text-sm md:text-base font-semibold tracking-wide hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97]"
                 style={{
                   background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
-                  color: isDark ? "#0a0a0a" : "#fff",
-                  boxShadow: isDark ? "0 6px 20px rgba(212,175,55,0.35)" : "0 6px 20px rgba(45,79,57,0.28)",
+                  color: isDark ? "#F5F5F7" : "#fff",
+                  boxShadow: isDark ? "0 6px 20px rgba(45,107,74,0.35)" : "0 6px 20px rgba(45,79,57,0.28)",
                   border: "none", cursor: "pointer",
+                  transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
                 }}
               >
                 {submit}
@@ -682,7 +710,7 @@ function Newsletter({
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded cursor-pointer accent-emerald-600 dark:accent-[#D4AF37]"
+                className="mt-0.5 h-4 w-4 rounded cursor-pointer accent-emerald-600 dark:accent-[var(--ssl-accent)]"
               />
               <span className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
                 {gdprText}{" "}
@@ -701,9 +729,10 @@ function Newsletter({
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Index() {
   const { resolvedTheme } = useTheme();
-  const isDark     = resolvedTheme === "dark";
-  const accent     = isDark ? GOLD_DARK : SAGE;
-  const accentDeep = isDark ? "#947E5C" : FOREST;
+  const isDark = resolvedTheme === "dark";
+  const t = tokens(isDark);
+  const accent = t.accent;
+  const accentDeep = t.accentDeep;
   const { language } = useI18nStore();
   const p1 = phase1T[language] ?? phase1T.de;
   const { products } = useProductStore();
@@ -716,7 +745,7 @@ export default function Index() {
     addItem(product);
     setTimeout(() => {
       setCartStates((prev) => ({ ...prev, [product.id]: "added" }));
-      toast.success(language === "de" ? "Zum Warenkorb hinzugefügt" : "Added to cart");
+      toast.success(language === "ko" ? "장바구니에 추가되었습니다" : language === "de" ? "Zum Warenkorb hinzugefügt" : "Added to cart");
       setTimeout(() => {
         setCartStates((prev) => ({ ...prev, [product.id]: "idle" }));
       }, 1500);
@@ -731,7 +760,7 @@ export default function Index() {
 
       <main>
         <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} accent={accent} accentDeep={accentDeep} isDark={isDark} />
-        <UspStrip items={p1.home.usp as unknown as { label: string }[]} />
+        <UspStrip items={p1.home.usp as unknown as { label: string }[]} accent={accent} isDark={isDark} />
         {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
         <ConcernSection
           title={p1.home.concernTitle}
@@ -742,6 +771,8 @@ export default function Index() {
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
           accent={accent}
+          isDark={isDark}
+          addLabel={language === "ko" ? "담기" : language === "de" ? "Hinzufügen" : "Add"}
         />
         {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
         <RoutineShowcase
@@ -752,6 +783,8 @@ export default function Index() {
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
           accent={accent}
+          isDark={isDark}
+          addLabel={language === "ko" ? "담기" : language === "de" ? "Hinzufügen" : "Add"}
         />
         <DiagnosisBanner
           headline={p1.home.bannerHeadline}

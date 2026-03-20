@@ -51,14 +51,14 @@ export default function RadarChart({ result, highlightAxis, comparisonScores }: 
     // Comparison polygon points (previous diagnosis — dashed gray layer)
     const comparisonPoly = comparisonScores
         ? RADAR_AXES.map((key, i) => {
-              const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-              const displayScore = invertForDisplay(Math.round(comparisonScores[key] ?? 0));
-              const r = scaleForRadar(displayScore) * RADIUS;
-              return `${CENTER + r * Math.cos(angle)},${CENTER + r * Math.sin(angle)}`;
-          }).join(" ")
+            const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+            const displayScore = invertForDisplay(Math.round(comparisonScores[key] ?? 0));
+            const r = scaleForRadar(displayScore) * RADIUS;
+            return `${CENTER + r * Math.cos(angle)},${CENTER + r * Math.sin(angle)}`;
+        }).join(" ")
         : null;
 
-    const POLYGON_FILL   = isDark ? "rgba(201,169,110,0.15)" : "rgba(122,162,115,0.15)";
+    const POLYGON_FILL = isDark ? "rgba(45,107,74,0.15)" : "rgba(122,162,115,0.15)";
     const POLYGON_STROKE = isDark ? "#c9a96e" : "#7A9E82";
 
     return (

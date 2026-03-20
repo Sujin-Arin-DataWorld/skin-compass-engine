@@ -107,13 +107,13 @@ const OBSERVATION_TEMPLATES: Partial<Record<AxisKey, {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ZONE_LABELS: Record<string, { en: string; de: string; ko: string }> = {
-  forehead: { en: "Forehead", de: "Stirn",   ko: "이마" },
-  eyes:     { en: "Eyes",     de: "Augen",   ko: "눈 주변" },
-  nose:     { en: "Nose",     de: "Nase",    ko: "코" },
-  cheeks:   { en: "Cheeks",   de: "Wangen",  ko: "볼" },
-  mouth:    { en: "Mouth",    de: "Mund",    ko: "입 주변" },
-  jawline:  { en: "Jawline",  de: "Kiefer",  ko: "턱선" },
-  neck:     { en: "Neck",     de: "Hals",    ko: "목" },
+  forehead: { en: "Forehead", de: "Stirn", ko: "이마" },
+  eyes: { en: "Eyes", de: "Augen", ko: "눈 주변" },
+  nose: { en: "Nose", de: "Nase", ko: "코" },
+  cheeks: { en: "Cheeks", de: "Wangen", ko: "볼" },
+  mouth: { en: "Mouth", de: "Mund", ko: "입 주변" },
+  jawline: { en: "Jawline", de: "Kiefer", ko: "턱선" },
+  neck: { en: "Neck", de: "Hals", ko: "목" },
 };
 
 interface ZoneShape {
@@ -122,13 +122,13 @@ interface ZoneShape {
 }
 
 const ZONE_SVG_CONFIG: Record<ZoneId, ZoneShape> = {
-  forehead: { shapes: [{ cx: 50, cy: 23, rx: 22, ry: 11 }],                                           badgePos: { x: 70, y: 14 } },
-  eyes:     { shapes: [{ cx: 33, cy: 44, rx: 9,  ry: 5  }, { cx: 67, cy: 44, rx: 9,  ry: 5  }],      badgePos: { x: 74, y: 38 } },
-  nose:     { shapes: [{ cx: 50, cy: 61, rx: 6,  ry: 8  }],                                           badgePos: { x: 57, y: 54 } },
-  cheeks:   { shapes: [{ cx: 24, cy: 66, rx: 11, ry: 9  }, { cx: 76, cy: 66, rx: 11, ry: 9  }],      badgePos: { x: 85, y: 58 } },
-  mouth:    { shapes: [{ cx: 50, cy: 81, rx: 12, ry: 6  }],                                           badgePos: { x: 60, y: 75 } },
-  jawline:  { shapes: [{ cx: 30, cy: 95, rx: 12, ry: 7  }, { cx: 70, cy: 95, rx: 12, ry: 7  }],      badgePos: { x: 80, y: 89 } },
-  neck:     { shapes: [{ cx: 50, cy: 116, rx: 9, ry: 6  }],                                           badgePos: { x: 59, y: 112 } },
+  forehead: { shapes: [{ cx: 50, cy: 23, rx: 22, ry: 11 }], badgePos: { x: 70, y: 14 } },
+  eyes: { shapes: [{ cx: 33, cy: 44, rx: 9, ry: 5 }, { cx: 67, cy: 44, rx: 9, ry: 5 }], badgePos: { x: 74, y: 38 } },
+  nose: { shapes: [{ cx: 50, cy: 61, rx: 6, ry: 8 }], badgePos: { x: 57, y: 54 } },
+  cheeks: { shapes: [{ cx: 24, cy: 66, rx: 11, ry: 9 }, { cx: 76, cy: 66, rx: 11, ry: 9 }], badgePos: { x: 85, y: 58 } },
+  mouth: { shapes: [{ cx: 50, cy: 81, rx: 12, ry: 6 }], badgePos: { x: 60, y: 75 } },
+  jawline: { shapes: [{ cx: 30, cy: 95, rx: 12, ry: 7 }, { cx: 70, cy: 95, rx: 12, ry: 7 }], badgePos: { x: 80, y: 89 } },
+  neck: { shapes: [{ cx: 50, cy: 116, rx: 9, ry: 6 }], badgePos: { x: 59, y: 112 } },
 };
 
 /** intensity 0–1 → hsla color string */
@@ -186,7 +186,7 @@ function FaceHeatmap({ heatmap }: FaceHeatmapProps) {
       <g clipPath="url(#face-heatmap-clip)">
         {ALL_ZONES.filter(z => z !== "neck").map((zoneId) => {
           const entry = heatmap[zoneId];
-          const cfg   = ZONE_SVG_CONFIG[zoneId];
+          const cfg = ZONE_SVG_CONFIG[zoneId];
           const color = entry ? zoneColor(entry.intensity) : "transparent";
           return cfg.shapes.map((s, i) => (
             <ellipse
@@ -201,7 +201,7 @@ function FaceHeatmap({ heatmap }: FaceHeatmapProps) {
       {/* Neck zone overlay — outside clip */}
       {(() => {
         const entry = heatmap["neck"];
-        const cfg   = ZONE_SVG_CONFIG["neck"];
+        const cfg = ZONE_SVG_CONFIG["neck"];
         const color = entry ? zoneColor(entry.intensity) : "transparent";
         return cfg.shapes.map((s, i) => (
           <ellipse
@@ -268,28 +268,28 @@ interface Props {
 const SlideDiagnosisSummary = ({ result }: Props) => {
   const { language } = useI18nStore();
   const store = useDiagnosisStore();
-  const ageBracket  = (store.axisAnswers["EXP_AGE"]    as number | undefined) ?? 2;
-  const menoStatus  = (store.axisAnswers["menopause_status"] as string | undefined) ?? null;
-  const realAge     = AGE_MIDPOINTS[ageBracket] ?? 35;
+  const ageBracket = (store.axisAnswers["EXP_AGE"] as number | undefined) ?? 2;
+  const menoStatus = (store.axisAnswers["menopause_status"] as string | undefined) ?? null;
+  const realAge = AGE_MIDPOINTS[ageBracket] ?? 35;
   const skinAgeData = computeSkinAge(realAge, result.axis_scores, menoStatus);
 
   const comparisonState = useDiagnosisComparison();
 
   const patternNameEN = result.detected_patterns[0]?.pattern.name_en ?? "Balanced Profile";
   const p = result.detected_patterns[0]?.pattern as unknown as Record<string, string> | undefined;
-  const patternName   = language === "de"
+  const patternName = language === "de"
     ? (p?.name_de ?? "Ausgeglichenes Profil")
     : language === "ko"
-    ? (p?.name_ko ?? patternNameEN)
-    : patternNameEN;
+      ? (p?.name_ko ?? patternNameEN)
+      : patternNameEN;
 
-  const empathyText  = (EMPATHY_MAP[patternNameEN] ?? EMPATHY_MAP.default)[language];
-  const signalCount  = result.radar_chart_data.reduce((sum, d) => sum + (d.score > 0 ? 1 : 0), 0);
-  const confidence   = Math.min(95, 65 + signalCount * 3);
+  const empathyText = (EMPATHY_MAP[patternNameEN] ?? EMPATHY_MAP.default)[language];
+  const signalCount = result.radar_chart_data.reduce((sum, d) => sum + (d.score > 0 ? 1 : 0), 0);
+  const confidence = Math.min(95, 65 + signalCount * 3);
   const activeCategories = result.primary_concerns.slice(0, 4);
 
   // V5 heatmap data — only show section when there is at least one zone entry
-  const heatmap  = result.zone_heatmap;
+  const heatmap = result.zone_heatmap;
   const hasHeatmap = heatmap && Object.keys(heatmap).length > 0;
   const activeZones = hasHeatmap
     ? (Object.keys(heatmap) as ZoneId[]).filter(z => heatmap[z] && heatmap[z]!.concernCount > 0)
@@ -346,8 +346,8 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
               {activeZones.length > 0 && (
                 <div className="flex flex-col gap-2 flex-1 pt-1">
                   {activeZones.map((zoneId) => {
-                    const entry   = heatmap![zoneId]!;
-                    const label   = ZONE_LABELS[zoneId]?.[language] ?? zoneId;
+                    const entry = heatmap![zoneId]!;
+                    const label = ZONE_LABELS[zoneId]?.[language] ?? zoneId;
                     const summary = entry.summary[language];
                     return (
                       <div
@@ -391,8 +391,8 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
               {language === "de"
                 ? "Diese Kombination von Zonen verrät uns ein spezifisches klinisches Muster:"
                 : language === "ko"
-                ? "이 존들의 조합이 특정 임상 패턴을 보여줍니다:"
-                : "This combination of zones tells us a specific clinical pattern:"}
+                  ? "이 존들의 조합이 특정 임상 패턴을 보여줍니다:"
+                  : "This combination of zones tells us a specific clinical pattern:"}
             </p>
           </motion.div>
         )}
@@ -453,8 +453,8 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           {language === "de"
             ? "Dieses Muster wurde aus der Überschneidung Ihrer am höchsten bewerteten Achsen identifiziert. Es beschreibt, wie Ihre Hautprobleme interagieren — nicht nur, was sie einzeln bedeuten."
             : language === "ko"
-            ? "이 패턴은 가장 높은 점수를 받은 축들의 교차점에서 확인되었습니다. 피부 문제들이 개별적으로 무엇을 의미하는지가 아닌, 어떻게 상호작용하는지를 설명합니다."
-            : "This pattern was identified from the intersection of your highest-scoring axes. It describes how your skin's concerns interact — not just what they are individually."}
+              ? "이 패턴은 가장 높은 점수를 받은 축들의 교차점에서 확인되었습니다. 피부 문제들이 개별적으로 무엇을 의미하는지가 아닌, 어떻게 상호작용하는지를 설명합니다."
+              : "This pattern was identified from the intersection of your highest-scoring axes. It describes how your skin's concerns interact — not just what they are individually."}
         </motion.p>
 
         {/* ── Section E: Observation bullets ── */}
@@ -468,7 +468,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
             {language === "de" ? "Was wir beobachtet haben" : language === "ko" ? "관찰된 내용" : "What we observed"}
           </p>
           {activeCategories.map((axis) => {
-            const score    = Math.round(result.axis_scores[axis]);
+            const score = Math.round(result.axis_scores[axis]);
             const template = OBSERVATION_TEMPLATES[axis];
             if (!template) return null;
             const text = template[language]?.(score) ?? template.en(score);
@@ -491,45 +491,45 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
         {/* ── Section E2: Dehydrated-Oily (수부지) special card ── */}
         {(result.active_flags.includes("Dehydrated-Oily") ||
           (result.axis_scores.seb >= 50 && result.axis_scores.hyd >= 50)) && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: hasHeatmap ? 0.55 : 0.48, duration: 0.4 }}
-            className="rounded-2xl border p-4 mb-5"
-            style={{
-              borderColor: "rgba(100,180,220,0.35)",
-              background: "linear-gradient(135deg, rgba(100,180,220,0.08) 0%, rgba(201,169,110,0.06) 100%)",
-            }}
-          >
-            <p className="slide-eyebrow mb-1" style={{ fontSize: "0.65rem", letterSpacing: "0.14em", color: "hsl(var(--primary))" }}>
-              {language === "de" ? "Besonderer Befund" : language === "ko" ? "특별 감지" : "Special Detection"}
-            </p>
-            <p
-              className="font-display mb-2"
-              style={{ fontSize: "1.05rem", fontWeight: 600, color: "hsl(var(--foreground))" }}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: hasHeatmap ? 0.55 : 0.48, duration: 0.4 }}
+              className="rounded-2xl border p-4 mb-5"
+              style={{
+                borderColor: "rgba(100,180,220,0.35)",
+                background: "linear-gradient(135deg, rgba(100,180,220,0.08) 0%, rgba(45,107,74,0.06) 100%)",
+              }}
             >
-              {language === "de"
-                ? "Fettig-dehydrierte Haut erkannt"
-                : language === "ko"
-                ? "수부지(속건조 지성) 피부 감지"
-                : "Dehydrated-Oily Skin Detected"}
-            </p>
-            <p className="slide-body mb-2.5" style={{ fontSize: "0.82rem", lineHeight: 1.55 }}>
-              {language === "de"
-                ? "Ihre Haut sieht oberflächlich ölig aus, ist aber darunter durstig nach Feuchtigkeit. Das ist in europäischen Sommern sehr häufig. Leichte Hydration, die schnell einzieht ohne zu fetten, ist der Schlüssel."
-                : language === "ko"
-                ? "피부 표면은 번들거리는데 속은 사실 수분이 부족한 상태예요. 유럽 여름에 매우 흔한 현상이에요. 가벼우면서 빠르게 흡수되는 수분 제품이 핵심입니다."
-                : "Your skin looks oily on the surface, but underneath it's actually thirsty for moisture. This is very common in European summers. You need lightweight hydration that absorbs fast without leaving grease."}
-            </p>
-            <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.5 }}>
-              {language === "de"
-                ? "✓ Empfohlen: Hyaluronsäure-Gel, wasserbasierte Seren, ölfreie Pflege · ✗ Vermeiden: schwere Cremes, aggressive Reiniger"
-                : language === "ko"
-                ? "✓ 추천: 히알루론산 젤, 수분 세럼, 오일프리 보습제 · ✗ 피해야 할 것: 무거운 크림, 세정력 강한 클렌저"
-                : "✓ Look for: Hyaluronic acid gel, water-based serums, oil-free moisturizers · ✗ Avoid: Heavy creams, stripping foam cleansers"}
-            </p>
-          </motion.div>
-        )}
+              <p className="slide-eyebrow mb-1" style={{ fontSize: "0.65rem", letterSpacing: "0.14em", color: "hsl(var(--primary))" }}>
+                {language === "de" ? "Besonderer Befund" : language === "ko" ? "특별 감지" : "Special Detection"}
+              </p>
+              <p
+                className="font-display mb-2"
+                style={{ fontSize: "1.05rem", fontWeight: 600, color: "hsl(var(--foreground))" }}
+              >
+                {language === "de"
+                  ? "Fettig-dehydrierte Haut erkannt"
+                  : language === "ko"
+                    ? "수부지(속건조 지성) 피부 감지"
+                    : "Dehydrated-Oily Skin Detected"}
+              </p>
+              <p className="slide-body mb-2.5" style={{ fontSize: "0.82rem", lineHeight: 1.55 }}>
+                {language === "de"
+                  ? "Ihre Haut sieht oberflächlich ölig aus, ist aber darunter durstig nach Feuchtigkeit. Das ist in europäischen Sommern sehr häufig. Leichte Hydration, die schnell einzieht ohne zu fetten, ist der Schlüssel."
+                  : language === "ko"
+                    ? "피부 표면은 번들거리는데 속은 사실 수분이 부족한 상태예요. 유럽 여름에 매우 흔한 현상이에요. 가벼우면서 빠르게 흡수되는 수분 제품이 핵심입니다."
+                    : "Your skin looks oily on the surface, but underneath it's actually thirsty for moisture. This is very common in European summers. You need lightweight hydration that absorbs fast without leaving grease."}
+              </p>
+              <p style={{ fontSize: "0.75rem", color: "hsl(var(--foreground-hint))", lineHeight: 1.5 }}>
+                {language === "de"
+                  ? "✓ Empfohlen: Hyaluronsäure-Gel, wasserbasierte Seren, ölfreie Pflege · ✗ Vermeiden: schwere Cremes, aggressive Reiniger"
+                  : language === "ko"
+                    ? "✓ 추천: 히알루론산 젤, 수분 세럼, 오일프리 보습제 · ✗ 피해야 할 것: 무거운 크림, 세정력 강한 클렌저"
+                    : "✓ Look for: Hyaluronic acid gel, water-based serums, oil-free moisturizers · ✗ Avoid: Heavy creams, stripping foam cleansers"}
+              </p>
+            </motion.div>
+          )}
 
         {/* ── Section E2b: Re-Diagnosis Comparison (Phase 6 Step 2) ── */}
         {comparisonState.hasPrevious && comparisonState.comparison && (
@@ -580,8 +580,8 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           {language === "ko"
             ? "진단은 전 세계 피부과 의사가 사용하는 임상 방법론을 기반으로 합니다 — SOS 피지 척도, TEWL 장벽 평가, APIA 프레임워크. 카메라 없이도 정확한 분석이 가능합니다."
             : language === "de"
-            ? "Ihre Diagnose basiert auf Methoden der klinischen Dermatologie weltweit — darunter die SOS-Skala, TEWL-Barrierebewertung und das APIA-Framework. Keine Kamera nötig."
-            : "Your diagnosis uses methods from clinical dermatology worldwide — including the SOS scale, TEWL barrier assessment, and the APIA framework. No camera needed."}
+              ? "Ihre Diagnose basiert auf Methoden der klinischen Dermatologie weltweit — darunter die SOS-Skala, TEWL-Barrierebewertung und das APIA-Framework. Keine Kamera nötig."
+              : "Your diagnosis uses methods from clinical dermatology worldwide — including the SOS scale, TEWL barrier assessment, and the APIA framework. No camera needed."}
         </motion.div>
 
         {/* ── Section F: Forward pull ── */}
@@ -598,8 +598,8 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           {language === "de"
             ? "Ihre vollständige klinische Karte ansehen →"
             : language === "ko"
-            ? "전체 임상 분석 보기 →"
-            : "See your full clinical map →"}
+              ? "전체 임상 분석 보기 →"
+              : "See your full clinical map →"}
         </motion.p>
       </div>
     </div>

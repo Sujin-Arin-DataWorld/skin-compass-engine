@@ -100,8 +100,8 @@ function RoutineStepRow({
           width: 24,
           height: 24,
           borderRadius: '50%',
-          background: 'rgba(201,169,110,0.15)',
-          border: '1px solid rgba(201,169,110,0.35)',
+          background: 'rgba(45,107,74,0.15)',
+          border: '1px solid rgba(45,107,74,0.35)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -523,9 +523,9 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
       <div
         style={{
           borderRadius: 14,
-          border: `1px solid ${isDark ? 'rgba(201,169,110,0.2)' : 'rgba(201,169,110,0.3)'}`,
+          border: `1px solid ${isDark ? 'rgba(45,107,74,0.2)' : 'rgba(45,107,74,0.3)'}`,
           padding: '16px 20px',
-          background: isDark ? 'rgba(201,169,110,0.04)' : 'rgba(201,169,110,0.03)',
+          background: isDark ? 'rgba(45,107,74,0.04)' : 'rgba(45,107,74,0.03)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -563,12 +563,12 @@ export default function RoutineBuilder({ onBack }: RoutineBuilderProps) {
             borderRadius: 12,
             border: isSaveBlocked
               ? `1.5px solid rgba(239,68,68,0.4)`
-              : `1.5px solid rgba(201,169,110,0.55)`,
+              : `1.5px solid rgba(45,107,74,0.55)`,
             background: isSaveBlocked
               ? 'rgba(239,68,68,0.08)'
               : saveState === 'saved'
                 ? 'rgba(93,202,165,0.14)'
-                : 'linear-gradient(135deg, rgba(201,169,110,0.18), rgba(201,169,110,0.08))',
+                : 'linear-gradient(135deg, rgba(45,107,74,0.18), rgba(45,107,74,0.08))',
             cursor: isSaveBlocked ? 'not-allowed' : 'pointer',
             fontSize: 13,
             fontWeight: 600,

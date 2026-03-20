@@ -361,6 +361,10 @@ const SVG_CSS = `
     0%, 100% { opacity: 0.60; }
     50%      { opacity: 0.80; }
   }
+  @keyframes fms-skeleton-shimmer {
+    0%   { background-position: 200% center; }
+    100% { background-position: -200% center; }
+  }
 `;
 
 // ─── Helper: text anchor from annotation line direction ───────────────────────
@@ -384,13 +388,14 @@ const gt = (t: LocalizedText, lang: Lang): string =>
 // ─── FaceSVG ──────────────────────────────────────────────────────────────────
 // Zone outline paths with gold stroke and glow effects
 function FaceSVG({
-  activeZone, selectedZones, onZoneClick, lang, concernSeverity,
+  activeZone, selectedZones, onZoneClick, lang, concernSeverity, isMobile = false,
 }: {
   activeZone: ZoneId | null;
   selectedZones: Set<ZoneId>;
   onZoneClick: (z: ZoneId) => void;
   lang: Lang;
   concernSeverity: Record<string, 1 | 2 | 3>;
+  isMobile?: boolean;
 }) {
   const [hoveredZone, setHoveredZone] = useState<ZoneId | null>(null);
   const { resolvedTheme } = useTheme();
@@ -560,7 +565,7 @@ function FaceSVG({
                 fill={strokeColor}
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: "14px",
+                  fontSize: isMobile ? "18px" : "14px",
                   fontWeight: lit ? 600 : 400,
                   letterSpacing: "0.02em",
                   animation: lit
@@ -1196,6 +1201,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
   const [activeZone, setActiveZone] = useState<ZoneId | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [severityHintShown, setSeverityHintShown] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   // ── Step 7: 3-phase state machine ────────────────────────────────────────
   const [fmPhase, setFmPhase] = useState<FaceMapPhase>("mapping");
@@ -1313,14 +1319,14 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
         <>
           {/* Header */}
           <h2 style={{
-            fontSize: isMobile ? 26 : 30, fontWeight: 300,
+            fontSize: isMobile ? 30 : 30, fontWeight: 300,
             fontFamily: "var(--font-display)",
-            color: isDark ? "#fff" : "#111", marginBottom: 8,
+            color: isDark ? "#fff" : "#111", marginBottom: isMobile ? 4 : 8,
           }}>
             {copy.title}
           </h2>
           <p style={{
-            fontSize: 14, marginBottom: 32,
+            fontSize: isMobile ? 16 : 14, marginBottom: isMobile ? 16 : 32,
             color: isDark ? "rgba(185, 182, 141, 0.76)" : "rgba(0,0,0,0.6)",
             fontFamily: "var(--font-sans)",
           }}>
@@ -1339,40 +1345,61 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
             <div style={{
               position: "relative",
               width: "100%",
-              maxWidth: isMobile ? "430px" : "520px",
+              maxWidth: isMobile ? "490px" : "520px",
               aspectRatio: "600/700",
               flexShrink: 0,
               borderRadius: 28,
-              background: isDark ? "#d4bc77c2" : "#dd7b3eff", /*사진배경색깔*/
+              background: isDark ? "#d4bc77" : "#ed8748", /*사진배경색깔*/
               boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
               border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
               margin: isMobile ? "0 auto" : "0",
+              overflow: "hidden",
             }}>
-              <img
-                src={facemapImg}
-                alt="Clinical face map"
-                style={{
-                  width: "100%", height: "100%",
-                  objectFit: "cover",
-                  borderRadius: 28,
-                  filter: isDark ? "brightness(0.85) contrast(1.1)" : "none",
-                  transition: "filter 0.3s ease"
-                }}
-              />
+              {/* Skeleton shimmer while image loads */}
+              {!imageLoaded && (
+                <div style={{
+                  position: "absolute", inset: 0, borderRadius: 28,
+                  background: isDark
+                    ? "linear-gradient(110deg, #1a1a22 30%, #25252f 50%, #1a1a22 70%)"
+                    : "linear-gradient(110deg, #f0ebe4 30%, #faf5ee 50%, #f0ebe4 70%)",
+                  backgroundSize: "200% 100%",
+                  animation: "fms-skeleton-shimmer 1.5s ease-in-out infinite",
+                }} />
+              )}
+              {/* Composite: image + vignette + SVG — fades in together */}
               <div style={{
-                position: "absolute", inset: 0, pointerEvents: "none",
-                borderRadius: 28,
-                background: isDark
-                  ? "radial-gradient(ellipse at 50% 45%, transparent 20%, rgba(18,18,20,0.6) 100%)"
-                  : "radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(242,240,237,0.4) 100%)",
-              }} />
-              <FaceSVG
-                activeZone={activeZone}
-                selectedZones={selectedZones}
-                onZoneClick={handleZoneClick}
-                lang={lang}
-                concernSeverity={concernSeverity}
-              />
+                opacity: imageLoaded ? 1 : 0,
+                transition: "opacity 0.5s ease",
+                width: "100%", height: "100%",
+              }}>
+                <img
+                  src={facemapImg}
+                  alt="Clinical face map"
+                  onLoad={() => setImageLoaded(true)}
+                  style={{
+                    width: "100%", height: "100%",
+                    objectFit: "cover",
+                    borderRadius: 28,
+                    filter: isDark ? "brightness(0.85) contrast(1.1)" : "none",
+                    transition: "filter 0.3s ease",
+                  }}
+                />
+                <div style={{
+                  position: "absolute", inset: 0, pointerEvents: "none",
+                  borderRadius: 28,
+                  background: isDark
+                    ? "radial-gradient(ellipse at 50% 45%, transparent 20%, rgba(18,18,20,0.6) 100%)"
+                    : "radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(242,240,237,0.4) 100%)",
+                }} />
+                <FaceSVG
+                  activeZone={activeZone}
+                  selectedZones={selectedZones}
+                  onZoneClick={handleZoneClick}
+                  lang={lang}
+                  concernSeverity={concernSeverity}
+                  isMobile={isMobile}
+                />
+              </div>
             </div>
 
             {/* Desktop concern panel */}
@@ -1460,8 +1487,9 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                     position: "relative",
                     background: isDark ? "#14141a" : "#ffffff",
                     borderRadius: "28px 28px 0 0",
-                    padding: "12px 20px 40px",
+                    padding: "12px 20px calc(40px + env(safe-area-inset-bottom, 34px))",
                     maxHeight: "85vh", overflowY: "auto",
+                    WebkitOverflowScrolling: "touch",
                     boxShadow: "0 -20px 60px rgba(0,0,0,0.3)",
                   }}>
                   <div style={{ width: 44, height: 4, borderRadius: 2, background: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)", margin: "0 auto 16px" }} />

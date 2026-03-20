@@ -607,7 +607,7 @@ const DiagnosisPage: React.FC = () => {
       {/* ── Page content ────────────────────────────────────────────────────── */}
       <div style={{
         maxWidth: 960, margin: "0 auto",
-        padding: isMobile ? "80px 20px 48px" : "88px 24px 64px"
+        padding: isMobile ? "60px 20px 120px" : "88px 24px 64px"
       }}>
 
         {/* Progress bar */}
@@ -630,7 +630,7 @@ const DiagnosisPage: React.FC = () => {
         </div>
         <p style={{
           fontSize: 12, letterSpacing: "0.22em", color: isDark ? "rgba(201,169,110,0.6)" : "rgba(45,79,57,0.65)",
-          textTransform: "uppercase", fontFamily: "var(--font-sans)", marginBottom: 36
+          textTransform: "uppercase", fontFamily: "var(--font-sans)", marginBottom: isMobile ? 14 : 36
         }}>
           {phase === "foundation" && (lang === "de" ? "Phase 01 · Basis-Scan" : lang === "ko" ? "Phase 01 · 기초 스캔" : "Phase 01 · Foundation Scan")}
           {phase === "scanning" && (lang === "de" ? "Scan wird initialisiert…" : lang === "ko" ? "스캔 초기화 중…" : "Initiating Skin Scan…")}

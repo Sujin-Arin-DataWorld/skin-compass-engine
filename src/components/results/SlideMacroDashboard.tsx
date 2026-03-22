@@ -144,12 +144,18 @@ type TierKey = '3-step' | '5-step' | 'advanced';
 type TabKey = 'routine' | 'insights';
 type FilteredStep = RoutineStep & { product: MockProduct };
 
-interface Props { result: DiagnosisResult; onGoToLab?: () => void; onTierChange?: (steps: FilteredStep[]) => void; }
+type CartItem = { id: string; price: number; role: string; emoji: string };
+interface Props {
+  result: DiagnosisResult;
+  onGoToLab?: () => void;
+  onTierChange?: (steps: FilteredStep[]) => void;
+  onAddToCart?: (item: CartItem) => void;
+}
 
 const DISCOUNT_PCT = 0.18;
 
 // ── Main Component ──────────────────────────────────────────────────────────
-export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }: Props) {
+export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, onAddToCart }: Props) {
   const { language } = useI18nStore();
   const lang = (language === 'de' || language === 'ko') ? language : 'en' as LangKey;
   const implicitFlags = useDiagnosisStore((s) => s.implicitFlags);
@@ -165,6 +171,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
   const [activeTab, setActiveTab] = useState<TabKey>('routine');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedAxis, setExpandedAxis] = useState<AxisKey | null>(null);
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
   const prefersReducedMotion = typeof window !== 'undefined'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
@@ -396,7 +403,10 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
                   lang={lang}
                   isDark={isDark}
                   tok={tok}
-                  onAddToCart={(productId) => { console.log('[BarrierRecovery] Add to cart:', productId); }}
+                  onAddToCart={onAddToCart ? (item) => {
+                    onAddToCart(item);
+                    setAddedIds((prev) => new Set([...prev, item.id]));
+                  } : undefined}
                 />
               ) : (
               <>
@@ -526,12 +536,34 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
                             </p>
                           )}
                         </div>
-                        {/* Price + chevron */}
-                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        {/* Price + add button + chevron */}
+                        <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                           {price > 0 && <div style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color: tok.text }}>€{price}</div>}
-                          <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                            <ChevronDown size={14} style={{ color: tok.textTertiary }} />
-                          </motion.div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            {onAddToCart && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const item = { id: step.product.id, price, role: step.role, emoji: ROLE_EMOJI[step.role] ?? '💊' };
+                                  onAddToCart(item);
+                                  setAddedIds((prev) => new Set([...prev, step.product.id]));
+                                }}
+                                style={{
+                                  padding: '3px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                                  fontSize: '0.75rem', fontWeight: 600,
+                                  background: addedIds.has(step.product.id) ? 'rgba(74,158,104,0.12)' : 'rgba(74,158,104,0.85)',
+                                  color: addedIds.has(step.product.id) ? '#4A9E68' : '#FFFFFF',
+                                  transition: 'all 0.2s ease',
+                                  minWidth: 40,
+                                }}
+                              >
+                                {addedIds.has(step.product.id) ? '✓' : (lang === 'ko' ? '추가' : lang === 'de' ? 'Add' : 'Add')}
+                              </button>
+                            )}
+                            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                              <ChevronDown size={14} style={{ color: tok.textTertiary }} />
+                            </motion.div>
+                          </div>
                         </div>
                       </button>
 

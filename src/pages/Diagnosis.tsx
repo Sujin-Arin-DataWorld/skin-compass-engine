@@ -18,12 +18,10 @@ import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
 import { savePendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
 import RetestReminderModal from "@/components/RetestReminderModal";
+import { tokens, cta as ctaTokenConfig } from "@/lib/designTokens";
 
-// ─── Design tokens ────────────────────────────────────────────────────────────
-const GOLD_DARK = "#c9a96e";
-const ROSE = "#b76e79";
-const SAGE = "#7A9E82";   // light-mode primary accent
-const FOREST = "#2D4F39";   // light-mode deep accent
+// ─── Legacy color aliases (derived from designTokens at render time) ──────────
+const ROSE = "#b76e79"; // gradient accent — kept for CTA gradient only
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase = "foundation" | "scanning" | "facemap";
@@ -44,15 +42,15 @@ function optLabel(opt: FoundationOption, lang: Lang): string {
 
 // Module-level pill style — used in Foundation, InlineQuestionRenderer, atopy banner
 function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
-  const GOLD = isDark ? GOLD_DARK : SAGE;
+  const tok = tokens(isDark);
   return {
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
     borderRadius: 24, fontSize: 14, fontFamily: "var(--font-sans)",
     cursor: "pointer", minHeight: 44, lineHeight: "1",
-    border: selected ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"}`,
-    background: selected ? "rgba(45,107,74,0.15)" : "transparent",
-    color: selected ? GOLD : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.45)",
+    border: selected ? `1px solid ${tok.accent}` : `1px solid ${tok.border}`,
+    background: selected ? tok.accentBg : "transparent",
+    color: selected ? tok.accent : tok.textSecondary,
     transition: "all 0.3s ease",
   };
 }
@@ -239,7 +237,7 @@ function MobileFoundationStepper({
             flex: 1, height: 3, borderRadius: 2,
             background: i <= currentIndex
               ? GOLD
-              : (isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"),
+              : (isDark ? tokens(isDark).border : tokens(isDark).border),
             transition: "background 0.3s ease",
           }} />
         ))}
@@ -248,7 +246,7 @@ function MobileFoundationStepper({
       {/* Counter */}
       <div style={{
         fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase",
-        color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+        color: tokens(isDark).textTertiary,
         fontFamily: "var(--font-sans)", marginBottom: 16,
       }}>
         {currentIndex + 1} / {TOTAL_MOBILE_STEPS}
@@ -257,14 +255,14 @@ function MobileFoundationStepper({
       {isClimateStep ? (
         /* Climate step */
         <div style={{
-          background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-          border: `1px solid ${isDark ? "rgba(45,107,74,0.12)" : "rgba(45,107,74,0.18)"}`,
+          background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+          border: `1px solid ${tokens(isDark).accentBorder}`,
           borderRadius: 16, padding: "20px 16px",
           backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
         }}>
           <div style={{ fontSize: 22, marginBottom: 8 }}>🌍</div>
           <div style={{
-            fontSize: 17, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)",
+            fontSize: 17, color: tokens(isDark).textSecondary,
             fontFamily: "var(--font-sans)", marginBottom: 16,
           }}>
             {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
@@ -280,14 +278,14 @@ function MobileFoundationStepper({
           <div style={{ fontSize: 26, marginBottom: 8 }}>{q.icon}</div>
           <h3 style={{
             fontSize: 18, fontWeight: 400, marginBottom: 6, lineHeight: 1.4,
-            color: isDark ? "#fff" : "#111", fontFamily: "var(--font-sans)",
+            color: isDark ? '#fff' : tokens(isDark).text, fontFamily: "var(--font-sans)",
           }}>
             {fqText(q, lang)}
           </h3>
           {fqHint(q, lang) && (
             <p style={{
               fontSize: 13, lineHeight: 1.5, marginBottom: 20,
-              color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)",
+              color: tokens(isDark).textTertiary,
               fontFamily: "var(--font-sans)", fontStyle: "italic",
             }}>
               {fqHint(q, lang)}
@@ -307,11 +305,11 @@ function MobileFoundationStepper({
                     fontSize: 15, fontFamily: "var(--font-sans)",
                     transition: "all 0.2s ease", border: "none",
                     borderWidth: 1, borderStyle: "solid",
-                    borderColor: isSelected ? GOLD : (isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"),
+                    borderColor: isSelected ? GOLD : tokens(isDark).border,
                     background: isSelected
-                      ? (isDark ? "rgba(45,107,74,0.1)" : "rgba(122,162,115,0.08)")
+                      ? tokens(isDark).accentBg
                       : "transparent",
-                    color: isSelected ? GOLD : (isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.8)"),
+                    color: isSelected ? GOLD : tokens(isDark).textSecondary,
                     fontWeight: isSelected ? 500 : 400,
                   }}
                 >
@@ -330,7 +328,7 @@ function MobileFoundationStepper({
           style={{
             marginTop: 20, padding: "8px 0", background: "transparent",
             border: "none", cursor: "pointer",
-            fontSize: 13, color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)",
+            fontSize: 13, color: tokens(isDark).textTertiary,
             fontFamily: "var(--font-sans)",
           }}
         >
@@ -349,8 +347,9 @@ const DiagnosisPage: React.FC = () => {
   const lang = language as Lang;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
-  const GOLD = isDark ? GOLD_DARK : SAGE;
-  const GOLD_DEEP = isDark ? "var(--ssl-accent-deep)" : FOREST;
+  const tok = tokens(isDark);
+  const GOLD = tok.accent;
+  const GOLD_DEEP = tok.accentDeep;
   const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
 
   // ── URL-synced navigation state ──────────────────────────────────────────────
@@ -581,15 +580,15 @@ const DiagnosisPage: React.FC = () => {
 
   return (
     <div style={{
-      minHeight: "100vh", color: isDark ? "#e8e4df" : "hsl(210,30%,24%)",
+      minHeight: "100vh", color: tok.text,
+      background: tok.bg,
       fontFamily: "var(--font-display)"
-    }}
-      className={isDark ? "" : "bg-background"}>
+    }}>
       <style>{`
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:4px}
-        ::-webkit-scrollbar-thumb{background:${isDark ? 'rgba(45,107,74,0.2)' : 'rgba(45,79,57,0.15)'};border-radius:4px}
-        input[type="range"]{accent-color:${isDark ? '#c9a96e' : '#7A9E82'}}
+        ::-webkit-scrollbar-thumb{background:${tok.accentBg};border-radius:4px}
+        input[type="range"]{accent-color:${tok.accent}}
       `}</style>
 
       <Navbar />
@@ -621,15 +620,15 @@ const DiagnosisPage: React.FC = () => {
             return (
               <div key={p} style={{
                 flex: 1, height: 3, borderRadius: 2,
-                background: isActive ? `linear-gradient(90deg, ${GOLD}, ${ROSE})`
-                  : isDone ? GOLD : isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
+                background: isActive ? `linear-gradient(90deg, ${tok.accent}, ${ROSE})`
+                  : isDone ? tok.accent : tok.border,
                 transition: "all 0.6s ease",
               }} />
             );
           })}
         </div>
         <p style={{
-          fontSize: 12, letterSpacing: "0.22em", color: isDark ? "rgba(45,107,74,0.6)" : "rgba(45,79,57,0.65)",
+          fontSize: 12, letterSpacing: "0.22em", color: tok.accentMuted,
           textTransform: "uppercase", fontFamily: "var(--font-sans)", marginBottom: isMobile ? 14 : 36
         }}>
           {phase === "foundation" && (lang === "de" ? "Phase 01 · Basis-Scan" : lang === "ko" ? "Phase 01 · 기초 스캔" : "Phase 01 · Foundation Scan")}
@@ -644,11 +643,11 @@ const DiagnosisPage: React.FC = () => {
             <motion.div key="foundation"
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}>
-              <h1 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 300, color: GOLD, marginBottom: 6 }}>
+              <h1 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 300, color: tok.accent, marginBottom: 6 }}>
                 {lang === "de" ? "Ihr Alltag & Ihre Haut" : lang === "ko" ? "일상 생활과 피부" : "Your Daily Life & Skin"}
               </h1>
               <p style={{
-                fontSize: 15, color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.45)", marginBottom: 36,
+                fontSize: 15, color: tok.textSecondary, marginBottom: 36,
                 fontFamily: "var(--font-sans)", maxWidth: 480, lineHeight: 1.6
               }}>
                 {lang === "de" ? "Wir beginnen mit Ihrem Lebensstil — dem Fundament, das Ihre Haut täglich prägt."
@@ -684,19 +683,19 @@ const DiagnosisPage: React.FC = () => {
                       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                       style={{
-                        background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                        border: `1px solid ${isDark ? "rgba(45,107,74,0.12)" : "rgba(45,107,74,0.18)"}`,
+                        background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                        border: `1px solid ${tok.accentBorder}`,
                         borderRadius: 16, padding: "20px 16px",
                         backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
                       }}>
                       <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
                       <div style={{
-                        fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 6,
+                        fontSize: 15, color: tok.textSecondary, marginBottom: 6,
                         fontFamily: "var(--font-sans)", lineHeight: 1.5
                       }}>{fqText(fq, lang)}</div>
                       {fqHint(fq, lang) && (
                         <div style={{
-                          fontSize: 11, color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)",
+                          fontSize: 11, color: tok.textTertiary,
                           fontFamily: "var(--font-sans)", lineHeight: 1.4, marginBottom: 10, fontStyle: "italic"
                         }}>{fqHint(fq, lang)}</div>
                       )}
@@ -717,14 +716,14 @@ const DiagnosisPage: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: FOUNDATION_QUESTIONS.length * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                     style={{
-                      background: isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
-                      border: `1px solid ${isDark ? "rgba(45,107,74,0.12)" : "rgba(45,107,74,0.18)"}`,
+                      background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                      border: `1px solid ${tok.accentBorder}`,
                       borderRadius: 16, padding: "20px 16px",
                       backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
                     }}>
                     <div style={{ fontSize: 24, marginBottom: 8 }}>🌍</div>
                     <div style={{
-                      fontSize: 15, color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.6)", marginBottom: 14,
+                      fontSize: 15, color: tok.textSecondary, marginBottom: 14,
                       fontFamily: "var(--font-sans)", lineHeight: 1.5
                     }}>
                       {lang === "de" ? "Ihr Klima" : lang === "ko" ? "거주 기후" : "Your climate"}
@@ -741,19 +740,19 @@ const DiagnosisPage: React.FC = () => {
                   whileTap={foundationComplete ? { scale: 0.97 } : {}}
                   style={{
                     display: "inline-block", padding: "16px 40px", borderRadius: 32, border: "none",
-                    background: foundationComplete ? `linear-gradient(135deg, ${GOLD}, ${ROSE})` : isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
-                    color: foundationComplete ? "#fafafdff" : isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)",
+                    background: foundationComplete ? `linear-gradient(135deg, ${tok.accent}, ${ROSE})` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'),
+                    color: foundationComplete ? '#FFFFFF' : tok.textTertiary,
                     fontSize: 15, fontFamily: "var(--font-sans)",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: foundationComplete ? "pointer" : "default",
-                    boxShadow: foundationComplete ? `0 8px 32px ${isDark ? "rgba(45,107,74,0.3)" : "rgba(45,79,57,0.25)"}` : "none",
+                    boxShadow: foundationComplete ? `0 8px 32px ${tok.accentBg}` : 'none',
                     transition: "all 0.4s ease",
                   }}>
                   {lang === "de" ? "Gesichts-Mapping beginnen →" : lang === "ko" ? "얼굴 매핑 시작 →" : "Begin Face Mapping →"}
                 </motion.button>
                 {!foundationComplete && (
                   <p style={{
-                    marginTop: 10, fontSize: 12, color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.3)",
+                    marginTop: 10, fontSize: 12, color: tok.textTertiary,
                     fontFamily: "var(--font-sans)"
                   }}>
                     {lang === "de" ? "Bitte alle 4 Fragen beantworten" : lang === "ko" ? "4개 질문을 모두 답해주세요" : "Answer all 4 questions to continue"}
@@ -805,14 +804,14 @@ const DiagnosisPage: React.FC = () => {
                   transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />
               </div>
               <motion.p style={{
-                fontSize: isMobile ? 20 : 26, fontWeight: 300, color: GOLD,
+                fontSize: isMobile ? 20 : 26, fontWeight: 300, color: tok.accent,
                 letterSpacing: "0.06em", textAlign: "center"
               }}
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
                 {lang === "de" ? "Haut-Scan wird initialisiert…" : lang === "ko" ? "피부 스캔 초기화 중…" : "Initiating Skin Scan…"}
               </motion.p>
-              <p style={{ fontSize: 12, color: isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.25)", fontFamily: "var(--font-sans)", letterSpacing: "0.12em" }}>
+              <p style={{ fontSize: 12, color: tok.textTertiary, fontFamily: "var(--font-sans)", letterSpacing: "0.12em" }}>
                 {lang === "de" ? "Biometrische Gesichtsanalyse wird vorbereitet" : lang === "ko" ? "생체 인식 얼굴 분석 준비 중" : "Preparing biometric facial analysis"}
               </p>
             </motion.div>

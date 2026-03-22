@@ -9,7 +9,7 @@
  * onError fallback → shows product.emoji
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { tokens } from '@/lib/designTokens';
 import { BARRIER_RECOVERY_PHASES } from './BarrierRecoveryProducts';
@@ -38,15 +38,23 @@ function t(key: keyof typeof COPY, lang: LangKey, vars?: Record<string, string |
   return s;
 }
 
+type CartItem = { id: string; price: number; role: string; emoji: string };
+
 interface BarrierRecoveryModeProps {
   lang:         LangKey;
   isDark:       boolean;
   tok:          ReturnType<typeof tokens>;
-  onAddToCart?: (productId: string) => void;
+  onAddToCart?: (item: CartItem) => void;
 }
 
 export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: BarrierRecoveryModeProps) {
   const [activePhase, setActivePhase] = useState<number>(0);
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+
+  const handleAdd = useCallback((product: { id: string; price: number; role: string; emoji: string }) => {
+    setAddedIds((prev) => new Set([...prev, product.id]));
+    onAddToCart?.({ id: product.id, price: product.price, role: product.role, emoji: product.emoji });
+  }, [onAddToCart]);
   const phase = BARRIER_RECOVERY_PHASES[activePhase];
 
   return (
@@ -245,14 +253,19 @@ export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: 
                   €{product.price}
                 </div>
                 <button
-                  onClick={() => onAddToCart?.(product.id)}
+                  onClick={() => handleAdd(product)}
                   style={{
                     padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                    fontSize: '0.8125rem', fontWeight: 600, color: '#FFFFFF',
-                    background: activePhase === 0 ? '#E24B4A' : activePhase === 1 ? '#378ADD' : '#4A9E68',
+                    fontSize: '0.8125rem', fontWeight: 600,
+                    color: addedIds.has(product.id) ? (activePhase === 0 ? '#E24B4A' : activePhase === 1 ? '#378ADD' : '#4A9E68') : '#FFFFFF',
+                    background: addedIds.has(product.id)
+                      ? (activePhase === 0 ? 'rgba(226,75,74,0.12)' : activePhase === 1 ? 'rgba(55,138,221,0.12)' : 'rgba(74,158,104,0.12)')
+                      : (activePhase === 0 ? '#E24B4A' : activePhase === 1 ? '#378ADD' : '#4A9E68'),
+                    transition: 'all 0.2s ease',
+                    minWidth: 44,
                   }}
                 >
-                  {t('add_btn', lang)}
+                  {addedIds.has(product.id) ? '✓' : t('add_btn', lang)}
                 </button>
               </div>
             </div>

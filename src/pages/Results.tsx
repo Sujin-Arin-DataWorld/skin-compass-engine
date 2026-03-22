@@ -5,8 +5,6 @@ import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
 import { getPendingDiagnosis } from "@/utils/diagnosisPersistence";
 import { useI18nStore } from "@/store/i18nStore";
-import { buildRoutineV5 } from "@/engine/routineEngineV5";
-import type { RoutineOutputV5 } from "@/engine/routineEngineV5";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 import SlideMacroDashboard from "@/components/results/SlideMacroDashboard";
@@ -14,7 +12,6 @@ import SlideFinalDashboard from "@/components/results/SlideFinalDashboard";
 import SlideNav from "@/components/results/SlideNav";
 import StickyCartBar from "@/components/results/StickyCartBar";
 import { AGE_CYCLE_MAP } from "@/components/results/sharedResultsData";
-import { BARRIER_RECOVERY_PHASES } from "@/components/results/BarrierRecoveryProducts";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { useProductStore } from "@/store/productStore";
 import type {
@@ -177,40 +174,20 @@ const ResultsPage = () => {
     if (pending?.fullResult) setResult(pending.fullResult);
   }, [storeResult, setResult]);
 
-  // Build personalised routine
-  const routineOutput = useMemo<RoutineOutputV5 | null>(() => {
-    if (!result) return null;
-    return buildRoutineV5(result, implicitFlags, "Full");
-  }, [result, implicitFlags]);
 
-  // Cart bar data: default to full routine, gets overridden by tier changes from SlideMacroDashboard
-  const [tierCartSteps, setTierCartSteps] = useState<any[] | null>(null);
+  // ── Cart state — starts empty; populated only by explicit "추가" clicks ────
+  const [cartItems, setCartItems] = useState<
+    Array<{ id: string; price: number; role: string; emoji: string }>
+  >([]);
 
-  const defaultCartSteps = useMemo(() => {
-    if (!routineOutput) return [];
-    const level = routineOutput.routines.committed;
-    const allSteps = [...level.am, ...level.pm];
-    const filtered = allSteps.filter((s): s is typeof s & { product: NonNullable<typeof s.product> } => s.product !== null);
-    const seen = new Set<string>();
-    return filtered.filter((s) => { if (seen.has(s.product.id)) return false; seen.add(s.product.id); return true; });
-  }, [routineOutput]);
-
-  // Use tier-specific steps when available, otherwise default
-  const cartSteps = tierCartSteps ?? defaultCartSteps;
-
-  const handleTierChange = useCallback((steps: any[]) => {
-    setTierCartSteps(steps);
-  }, []);
-
-  // Barrier emergency — flat product list for StickyCartBar pricing
-  const isBarrierEmergency = result?.active_flags?.includes('BARRIER_EMERGENCY') ?? false;
-  const barrierCartProducts = useMemo(() =>
-    isBarrierEmergency
-      ? BARRIER_RECOVERY_PHASES.flatMap((ph) =>
-          ph.products.map((p) => ({ id: p.id, price: p.price, role: p.role, emoji: p.emoji }))
-        )
-      : undefined,
-  [isBarrierEmergency]);
+  const addToCart = useCallback(
+    (item: { id: string; price: number; role: string; emoji: string }) => {
+      setCartItems((prev) =>
+        prev.some((c) => c.id === item.id) ? prev : [...prev, item]
+      );
+    },
+    []
+  );
 
   // Cycle days from EXP_AGE
   const axisAnswers = useDiagnosisStore((s) => s.axisAnswers);
@@ -294,7 +271,7 @@ const ResultsPage = () => {
   //
   const slides = [
     // Slide 0: Macro Dashboard
-    <SlideMacroDashboard key="slide-macro" result={result} onGoToLab={() => goTo(1)} onTierChange={handleTierChange} />,
+    <SlideMacroDashboard key="slide-macro" result={result} onGoToLab={() => goTo(1)} onAddToCart={addToCart} />,
 
     // Slide 1: Lab & Special Care (lazy)
     <Suspense
@@ -356,13 +333,13 @@ const ResultsPage = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Sticky cart bar — above SlideNav */}
-      {(isBarrierEmergency || cartSteps.length > 0) && (
+      {/* Sticky cart bar — shown only after user adds at least one product */}
+      {cartItems.length > 0 && (
         <StickyCartBar
-          steps={cartSteps}
+          steps={[]}
           cycleDays={cycleDays}
           slideNavHeight={0}
-          barrierProducts={barrierCartProducts}
+          barrierProducts={cartItems}
         />
       )}
 

@@ -16,11 +16,11 @@ import type { MockProduct, RoutineStep } from '@/engine/routineEngine';
 // ── i18n ──────────────────────────────────────────────────────────────────────
 
 const COPY = {
-  cart_protocol: { ko: '내 프로토콜', de: 'Mein Protokoll', en: 'My protocol' },
+  cart_protocol: { ko: '내 루틴', de: 'Meine Routine', en: 'My routine' },
   cart_products: { ko: '{N}개 제품', de: '{N} Produkte', en: '{N} products' },
   cart_daily_price: { ko: '하루 €{X}', de: '€{X} pro Tag', en: '€{X}/day' },
   cart_supply: { ko: '~{N}주분', de: '~{N} Wochen', en: '~{N} weeks' },
-  cart_cta: { ko: '내 프로토콜 시작 — 월 €{X}', de: 'Mein Protokoll starten — €{X}/Mo.', en: 'Get my protocol — €{X}/mo' },
+  cart_cta: { ko: '내 루틴 시작 — 월 €{X}', de: 'Meine Routine starten — €{X}/Mo.', en: 'Start my routine — €{X}/mo' },
   trust_dermatologist: { ko: '피부과 전문의 검증', de: 'Dermatologisch geprüft', en: 'Dermatologist reviewed' },
   trust_cancel: { ko: '언제든 해지 가능', de: 'Jederzeit kündbar', en: 'Cancel anytime' },
   trust_shipping: { ko: 'EU 3-5일 배송', de: 'EU 3-5 Werktage', en: 'EU 3-5 days' },
@@ -147,14 +147,17 @@ const StickyCartBar = memo(function StickyCartBar({
         {/* Row 2: Product thumbnail squares + daily price */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: 4 }}>
-            {steps.slice(0, 6).map((s) => (
-              <div key={s.product.id} style={{
+            {(isBarrierMode
+              ? barrierProducts!
+              : steps.map<BarrierProduct>((s) => ({ id: s.product.id, price: getProductPrice(s.product.id), role: s.role, emoji: ROLE_EMOJI[s.role] ?? '💊' }))
+            ).slice(0, 6).map((item) => (
+              <div key={item.id} style={{
                 width: 24, height: 24, borderRadius: 6,
-                background: categoryTint(s.role),
+                background: categoryTint(item.role),
                 position: 'relative', overflow: 'hidden', flexShrink: 0,
               }}>
-                <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>{ROLE_EMOJI[s.role] ?? '💊'}</span>
-                <img src={`/productsimage/${s.product.id}.jpeg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>{item.emoji}</span>
+                <img src={`/productsImage/${item.id}.jpg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               </div>
             ))}
           </div>

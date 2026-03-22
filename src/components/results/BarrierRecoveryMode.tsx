@@ -16,11 +16,7 @@ import { BARRIER_RECOVERY_PHASES } from './BarrierRecoveryProducts';
 
 type LangKey = 'ko' | 'en' | 'de';
 
-const TIMING_LABELS: Record<LangKey, [string, string, string]> = {
-  ko: ['지금 단계', '~4일 후',  '~1주 후'],
-  en: ['Current',  '~Day 4',   '~Week 1'],
-  de: ['Jetzt',    '~Tag 4',   '~Woche 1'],
-};
+
 
 const COPY = {
   banner_title:   { ko: '장벽 응급 상태 감지',                                en: 'Barrier Emergency Detected',                           de: 'Barriere-Notfall erkannt'                       },
@@ -97,7 +93,7 @@ export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: 
           const isComplete = idx < activePhase;
           const isActive   = idx === activePhase;
           return (
-            <div key={ph.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1, position: 'relative' }}>
+            <div key={ph.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative' }}>
               <button
                 onClick={() => setActivePhase(idx)}
                 style={{
@@ -112,12 +108,6 @@ export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: 
               >
                 {isComplete ? '✓' : idx + 1}
               </button>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: isActive ? ph.color : tok.textSecondary, textAlign: 'center' }}>
-                {ph.label[lang]}
-              </span>
-              <span style={{ fontSize: '0.5625rem', color: tok.textTertiary, textAlign: 'center' }}>
-                {TIMING_LABELS[lang][idx]}
-              </span>
             </div>
           );
         })}

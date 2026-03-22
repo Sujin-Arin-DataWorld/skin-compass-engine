@@ -18,10 +18,7 @@ import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
 import { savePendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
 import RetestReminderModal from "@/components/RetestReminderModal";
-import { tokens, cta as ctaTokenConfig } from "@/lib/designTokens";
-
-// ─── Legacy color aliases (derived from designTokens at render time) ──────────
-const ROSE = "#b76e79"; // gradient accent — kept for CTA gradient only
+import { tokens, ctaTokens, glassTokens, buttonTokens } from "@/lib/designTokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase = "foundation" | "scanning" | "facemap";
@@ -42,15 +39,16 @@ function optLabel(opt: FoundationOption, lang: Lang): string {
 
 // Module-level pill style — used in Foundation, InlineQuestionRenderer, atopy banner
 function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
+  const btnTok = buttonTokens(isDark);
   const tok = tokens(isDark);
   return {
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
     borderRadius: 24, fontSize: 14, fontFamily: "var(--font-sans)",
     cursor: "pointer", minHeight: 44, lineHeight: "1",
-    border: selected ? `1px solid ${tok.accent}` : `1px solid ${tok.border}`,
-    background: selected ? tok.accentBg : "transparent",
-    color: selected ? tok.accent : tok.textSecondary,
+    border: selected ? btnTok.accentGhost.border : btnTok.ghost.border,
+    background: selected ? btnTok.accentGhost.background : "transparent",
+    color: selected ? btnTok.accentGhost.color : tok.textSecondary,
     transition: "all 0.3s ease",
   };
 }
@@ -171,7 +169,8 @@ function formatDiagnosisDate(isoStr: string, lang: Lang): string {
 
 // ─── Mini Radar Chart ─────────────────────────────────────────────────────────
 const MINI_AXES = ["seb", "hyd", "bar", "sen", "acne", "pigment", "texture", "aging"] as const;
-function MiniRadarChart({ scores }: { scores: Record<string, number> }) {
+function MiniRadarChart({ scores, isDark }: { scores: Record<string, number>; isDark?: boolean }) {
+  const tok = tokens(isDark ?? false);
   const N = MINI_AXES.length;
   const cx = 54, cy = 54, r = 42;
   const angle = (i: number) => (2 * Math.PI * i) / N - Math.PI / 2;
@@ -185,18 +184,18 @@ function MiniRadarChart({ scores }: { scores: Record<string, number> }) {
       {[0.3, 0.6, 1.0].map((lvl, gi) => (
         <polygon key={gi}
           points={MINI_AXES.map((_, i) => { const a = angle(i); return `${cx + r * lvl * Math.cos(a)},${cy + r * lvl * Math.sin(a)}`; }).join(" ")}
-          fill="none" stroke="#C9A96E" strokeWidth="0.6" strokeOpacity="0.2" />
+          fill="none" stroke={tok.accent} strokeWidth="0.6" strokeOpacity="0.2" />
       ))}
       {MINI_AXES.map((_, i) => (
         <line key={i} x1={cx} y1={cy} x2={cx + r * Math.cos(angle(i))} y2={cy + r * Math.sin(angle(i))}
-          stroke="#C9A96E" strokeWidth="0.5" strokeOpacity="0.22" />
+          stroke={tok.accent} strokeWidth="0.5" strokeOpacity="0.22" />
       ))}
       <polygon points={pts.map(p => `${p.x},${p.y}`).join(" ")}
-        fill="#C9A96E" fillOpacity="0.14" stroke="#C9A96E" strokeWidth="1.5" strokeOpacity="0.8" />
+        fill={tok.accent} fillOpacity="0.14" stroke={tok.accent} strokeWidth="1.5" strokeOpacity="0.8" />
       {pts.map((p, i) => (scores[MINI_AXES[i]] ?? 0) > 55
-        ? <circle key={`rg-${i}`} cx={p.x} cy={p.y} r="3" fill="#B76E79" fillOpacity="0.55" />
+        ? <circle key={`rg-${i}`} cx={p.x} cy={p.y} r="3" fill={tok.accentDeep} fillOpacity="0.55" />
         : null)}
-      {pts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="2" fill="#C9A96E" fillOpacity="0.9" />)}
+      {pts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="2" fill={tok.accent} fillOpacity="0.9" />)}
     </svg>
   );
 }
@@ -205,7 +204,7 @@ function MiniRadarChart({ scores }: { scores: Record<string, number> }) {
 const TOTAL_MOBILE_STEPS = FOUNDATION_QUESTIONS.length + 1; // +1 for climate
 
 function MobileFoundationStepper({
-  currentIndex, selectedAnswers, onAnswer, onNext, onBack, lang, isDark, GOLD, onClimateChange,
+  currentIndex, selectedAnswers, onAnswer, onNext, onBack, lang, isDark, onClimateChange,
 }: {
   currentIndex: number;
   selectedAnswers: Record<string, number>;
@@ -214,7 +213,6 @@ function MobileFoundationStepper({
   onBack: () => void;
   lang: Lang;
   isDark: boolean;
-  GOLD: string;
   onClimateChange: (ct: string) => void;
 }) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -236,8 +234,8 @@ function MobileFoundationStepper({
           <div key={i} style={{
             flex: 1, height: 3, borderRadius: 2,
             background: i <= currentIndex
-              ? GOLD
-              : (isDark ? tokens(isDark).border : tokens(isDark).border),
+              ? tokens(isDark).accent
+              : tokens(isDark).border,
             transition: "background 0.3s ease",
           }} />
         ))}
@@ -255,10 +253,8 @@ function MobileFoundationStepper({
       {isClimateStep ? (
         /* Climate step */
         <div style={{
-          background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-          border: `1px solid ${tokens(isDark).accentBorder}`,
+          ...glassTokens(isDark).button,
           borderRadius: 16, padding: "20px 16px",
-          backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
         }}>
           <div style={{ fontSize: 22, marginBottom: 8 }}>🌍</div>
           <div style={{
@@ -278,7 +274,7 @@ function MobileFoundationStepper({
           <div style={{ fontSize: 26, marginBottom: 8 }}>{q.icon}</div>
           <h3 style={{
             fontSize: 18, fontWeight: 400, marginBottom: 6, lineHeight: 1.4,
-            color: isDark ? '#fff' : tokens(isDark).text, fontFamily: "var(--font-sans)",
+            color: tokens(isDark).text, fontFamily: "var(--font-sans)",
           }}>
             {fqText(q, lang)}
           </h3>
@@ -305,11 +301,11 @@ function MobileFoundationStepper({
                     fontSize: 15, fontFamily: "var(--font-sans)",
                     transition: "all 0.2s ease", border: "none",
                     borderWidth: 1, borderStyle: "solid",
-                    borderColor: isSelected ? GOLD : tokens(isDark).border,
+                    borderColor: isSelected ? tokens(isDark).accent : tokens(isDark).border,
                     background: isSelected
                       ? tokens(isDark).accentBg
                       : "transparent",
-                    color: isSelected ? GOLD : tokens(isDark).textSecondary,
+                    color: isSelected ? tokens(isDark).accent : tokens(isDark).textSecondary,
                     fontWeight: isSelected ? 500 : 400,
                   }}
                 >
@@ -348,8 +344,8 @@ const DiagnosisPage: React.FC = () => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
   const tok = tokens(isDark);
-  const GOLD = tok.accent;
-  const GOLD_DEEP = tok.accentDeep;
+  const ctaTok = ctaTokens(isDark);
+  const glassTok = glassTokens(isDark);
   const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
 
   // ── URL-synced navigation state ──────────────────────────────────────────────
@@ -620,7 +616,7 @@ const DiagnosisPage: React.FC = () => {
             return (
               <div key={p} style={{
                 flex: 1, height: 3, borderRadius: 2,
-                background: isActive ? `linear-gradient(90deg, ${tok.accent}, ${ROSE})`
+                background: isActive ? ctaTok.background
                   : isDone ? tok.accent : tok.border,
                 transition: "all 0.6s ease",
               }} />
@@ -669,7 +665,7 @@ const DiagnosisPage: React.FC = () => {
                         onAnswer={(id, val) => setFounds(p => ({ ...p, [id]: val }))}
                         onNext={() => setMobileQ(q => Math.min(q + 1, TOTAL_MOBILE_STEPS - 1))}
                         onBack={() => setMobileQ(q => Math.max(q - 1, 0))}
-                        lang={lang} isDark={isDark} GOLD={GOLD}
+                        lang={lang} isDark={isDark}
                         onClimateChange={(ct) => store.setAxisAnswer("EXP_CLIMATE", ct)}
                       />
                     </motion.div>
@@ -683,10 +679,8 @@ const DiagnosisPage: React.FC = () => {
                       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                       style={{
-                        background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-                        border: `1px solid ${tok.accentBorder}`,
+                        ...glassTok.button,
                         borderRadius: 16, padding: "20px 16px",
-                        backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
                       }}>
                       <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
                       <div style={{
@@ -716,10 +710,8 @@ const DiagnosisPage: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: FOUNDATION_QUESTIONS.length * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                     style={{
-                      background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-                      border: `1px solid ${tok.accentBorder}`,
+                      ...glassTok.button,
                       borderRadius: 16, padding: "20px 16px",
-                      backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)"
                     }}>
                     <div style={{ fontSize: 24, marginBottom: 8 }}>🌍</div>
                     <div style={{
@@ -737,16 +729,20 @@ const DiagnosisPage: React.FC = () => {
               )}
               <div style={{ textAlign: "center" }}>
                 <motion.button onClick={handleBeginFaceMapping}
-                  whileTap={foundationComplete ? { scale: 0.97 } : {}}
+                  whileHover={foundationComplete ? { y: -1, boxShadow: ctaTok.hoverBoxShadow } : {}}
+                  whileTap={foundationComplete ? { scale: 0.98, y: 0, boxShadow: ctaTok.activeBoxShadow } : {}}
                   style={{
-                    display: "inline-block", padding: "16px 40px", borderRadius: 32, border: "none",
-                    background: foundationComplete ? `linear-gradient(135deg, ${tok.accent}, ${ROSE})` : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)'),
-                    color: foundationComplete ? '#FFFFFF' : tok.textTertiary,
+                    display: "inline-block", padding: "16px 40px", borderRadius: 32,
+                    border: foundationComplete ? "none" : glassTok.button.border,
+                    background: foundationComplete ? ctaTok.background : glassTok.button.background,
+                    backdropFilter: foundationComplete ? "none" : glassTok.button.backdropFilter,
+                    WebkitBackdropFilter: foundationComplete ? "none" : glassTok.button.WebkitBackdropFilter,
+                    color: foundationComplete ? ctaTok.color : tok.textTertiary,
+                    boxShadow: foundationComplete ? ctaTok.boxShadow : "none",
                     fontSize: 15, fontFamily: "var(--font-sans)",
                     letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600,
                     cursor: foundationComplete ? "pointer" : "default",
-                    boxShadow: foundationComplete ? `0 8px 32px ${tok.accentBg}` : 'none',
-                    transition: "all 0.4s ease",
+                    transition: "all 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
                   }}>
                   {lang === "de" ? "Gesichts-Mapping beginnen →" : lang === "ko" ? "얼굴 매핑 시작 →" : "Begin Face Mapping →"}
                 </motion.button>
@@ -780,25 +776,25 @@ const DiagnosisPage: React.FC = () => {
                   transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }} />
                 <motion.div style={{
                   position: "absolute", inset: 4, borderRadius: "50%",
-                  background: `conic-gradient(from 0deg, transparent 0%, ${GOLD} 35%, transparent 70%)`
+                  background: `conic-gradient(from 0deg, transparent 0%, ${tok.accent} 35%, transparent 70%)`
                 }}
                   animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} />
                 <div style={{
                   position: "absolute", inset: 16, borderRadius: "50%",
-                  background: "linear-gradient(160deg, #0d0d12 0%, #141420 100%)"
+                  background: tok.bgSurface,
                 }} />
                 <motion.div style={{
                   position: "absolute", inset: 16, borderRadius: "50%",
-                  background: `conic-gradient(from 180deg, transparent 0%, ${ROSE} 20%, transparent 40%)`
+                  background: `conic-gradient(from 180deg, transparent 0%, ${tok.accentDeep} 20%, transparent 40%)`
                 }}
                   animate={{ rotate: -360 }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }} />
                 <div style={{
                   position: "absolute", inset: 26, borderRadius: "50%",
-                  background: "linear-gradient(160deg, #0d0d12 0%, #141420 100%)"
+                  background: tok.bgElevated,
                 }} />
                 <motion.div style={{
                   position: "absolute", inset: 26, borderRadius: "50%",
-                  background: `radial-gradient(circle, ${GOLD}, ${isDark ? 'rgba(45,107,74,0.4)' : 'rgba(45,79,57,0.35)'})`
+                  background: `radial-gradient(circle, ${tok.accent}, ${tok.accentBg})`
                 }}
                   animate={{ scale: [0.6, 1.15, 0.6], opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} />

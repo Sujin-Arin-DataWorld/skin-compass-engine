@@ -508,7 +508,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                           position: 'relative', overflow: 'hidden',
                         }}>
                           <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>{ROLE_EMOJI[step.role] ?? '💊'}</span>
-                          <img src={`/productsimage/${step.product.id}.jpeg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                          <img src={`/productsImage/${step.product.id}.jpg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                         </div>
                         {/* Product info */}
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -689,6 +689,112 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
             <motion.div key="insights" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.25 }}>
 
+              {isBarrierEmergency ? (
+                /* ── Barrier Emergency: Educational Bento Grid ── */
+                <div style={{ marginBottom: 'clamp(24px, 4vw, 32px)' }}>
+                  <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                    <span style={{
+                      display: 'inline-block', padding: '4px 12px', borderRadius: 99,
+                      background: 'rgba(226,75,74,0.1)', color: '#E24B4A',
+                      fontSize: 'clamp(0.6875rem, 1vw, 0.75rem)', fontWeight: 700,
+                      letterSpacing: '0.05em', marginBottom: 12,
+                    }}>
+                      🛡️ {lang === 'ko' ? '장벽 응급 복구 메커니즘' : lang === 'de' ? 'Barriere-Wiederherstellung' : 'Barrier Recovery Logic'}
+                    </span>
+                    <h3 style={{
+                      fontSize: 'clamp(1.125rem, 1.5vw, 1.375rem)', fontWeight: 600,
+                      color: tok.text, margin: '0 0 8px',
+                    }}>
+                      {lang === 'ko' ? '왜 3단계 복구 루틴인가요?' : lang === 'de' ? 'Warum das 3-Stufen-Protokoll?' : 'Why the 3-Step Recovery?'}
+                    </h3>
+                    <p style={{
+                      fontSize: 'clamp(0.8125rem, 1vw, 0.9375rem)', color: tok.textSecondary,
+                      margin: 0, wordBreak: 'keep-all', lineHeight: 1.5,
+                    }}>
+                      {lang === 'ko'
+                        ? '장벽이 무너진 상태에서는 평소의 스킨케어도 자극이 됩니다. 과학적인 "비우기-채우기-잠그기" 순서로 지질막을 먼저 재건해야 합니다.'
+                        : lang === 'de'
+                        ? 'Bei kompromittierter Hautbarriere wirkt normale Pflege wie ein Reizstoff. Bauen Sie die Lipidschicht in der richtigen Reihenfolge wieder auf.'
+                        : 'When the barrier is compromised, regular skincare becomes an irritant. Rebuild the lipid layer in the exact sequence.'}
+                    </p>
+                  </div>
+
+                  {/* Responsive Bento Grid: 1 col mobile → 3 cols desktop */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+                    {([
+                      {
+                        step: lang === 'ko' ? '1. 비우기 (Empty)' : lang === 'de' ? '1. Leeren (Empty)' : '1. Empty',
+                        icon: '🗑️', color: '#E24B4A', bg: 'rgba(226,75,74,0.06)',
+                        desc: lang === 'ko'
+                          ? '알칼리성 세안제와 활성 성분(레티놀/비타민C)은 지질을 씻어내고 미세 염증을 유발합니다. 즉시 중단하여 자극을 차단합니다.'
+                          : lang === 'de'
+                          ? 'Alkalische Reiniger und Wirkstoffe (Retinol/Vitamin C) waschen Lipide ab und verursachen Mikro-Entzündungen. Sofort stoppen.'
+                          : 'Alkaline cleansers and actives wash away lipids and cause micro-inflammation. Stopping them is the first step.',
+                      },
+                      {
+                        step: lang === 'ko' ? '2. 채우기 (Fill)' : lang === 'de' ? '2. Auffüllen (Fill)' : '2. Fill',
+                        icon: '💧', color: '#378ADD', bg: 'rgba(55,138,221,0.06)',
+                        desc: lang === 'ko'
+                          ? '지질이 빠져나가 메마르고 열이 나는 피부에 판테놀과 병풀을 투입하여 염증을 가라앉히고 수분 통로를 엽니다.'
+                          : lang === 'de'
+                          ? 'Panthenol und Centella in trockene, entzündete Haut einbringen, um die Entzündung zu mildern und Feuchtigkeitskanäle zu öffnen.'
+                          : 'Infuse Panthenol and Centella into dry, heated skin to soothe inflammation and open hydration channels.',
+                      },
+                      {
+                        step: lang === 'ko' ? '3. 잠그기 (Lock)' : lang === 'de' ? '3. Versiegeln (Lock)' : '3. Lock',
+                        icon: '🔒', color: '#4A9E68', bg: 'rgba(74,158,104,0.06)',
+                        desc: lang === 'ko'
+                          ? '세라마이드, 콜레스테롤로 구성된 보습제를 덮어 가짜 장벽을 만듭니다. 수분 증발을 차단해 스스로 회복할 시간을 줍니다.'
+                          : lang === 'de'
+                          ? 'Ceramid-reiche Feuchtigkeitspflege auftragen, um eine künstliche Lipidbarriere zu schaffen und Feuchtigkeitsverlust zu stoppen.'
+                          : 'Create an artificial lipid shield with ceramides to prevent moisture loss and secure time for self-recovery.',
+                      },
+                    ] as const).map((item, i) => (
+                      <motion.div key={i}
+                        initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        style={{
+                          padding: 24, borderRadius: 20,
+                          background: isDark ? 'rgba(255,255,255,0.02)' : tok.bgCard,
+                          border: `1px solid ${tok.border}`,
+                          position: 'relative', overflow: 'hidden',
+                          display: 'flex', flexDirection: 'column',
+                        }}
+                      >
+                        {/* Glassmorphic glow — clipped by overflow:hidden on parent */}
+                        <div style={{
+                          position: 'absolute', top: -30, right: -30,
+                          width: 100, height: 100,
+                          background: item.color, filter: 'blur(40px)',
+                          opacity: 0.15, borderRadius: '50%',
+                        }} />
+                        <div style={{
+                          width: 48, height: 48, borderRadius: 14,
+                          background: item.bg, color: item.color,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 24, marginBottom: 16, position: 'relative',
+                        }}>
+                          {item.icon}
+                        </div>
+                        <h4 style={{
+                          fontSize: '1rem', fontWeight: 600, color: item.color,
+                          margin: '0 0 8px', position: 'relative',
+                        }}>
+                          {item.step}
+                        </h4>
+                        <p style={{
+                          fontSize: '0.8125rem', color: tok.textSecondary, lineHeight: 1.6,
+                          margin: 0, wordBreak: 'keep-all', position: 'relative',
+                        }}>
+                          {item.desc}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* ── Normal Insights: Flag banners + 9-axis grid + Skin cycle ── */
+                <>
               {/* Flag banners */}
               {result.active_flags?.map((flag) => {
                 const msg = FLAG_MESSAGES[flag];
@@ -808,6 +914,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   color: tok.textSecondary, lineHeight: 1.6, textAlign: 'center', margin: 0,
                 }}>{tx('cycle_explanation', lang, { N: cycleDays })}</p>
               </div>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

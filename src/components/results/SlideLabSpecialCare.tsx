@@ -547,6 +547,85 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
   ];
 
   // ── Render ────────────────────────────────────────────────────────────────
+
+  // 🚨 Hard Lock State: barrier emergency hijacks the entire screen
+  if (isBarrierEmergency) {
+    return (
+      <div style={{
+        height: '100%', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        padding: '0 24px', paddingBottom: 100,
+      }}>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            maxWidth: 420, width: '100%', textAlign: 'center',
+            padding: 'clamp(32px, 5vw, 40px) 24px', borderRadius: 24,
+            background: isDark ? 'rgba(255,255,255,0.03)' : tok.bgCard,
+            border: `1px solid ${tok.border}`,
+            boxShadow: isDark ? 'none' : '0 8px 32px rgba(0,0,0,0.04)',
+            position: 'relative', overflow: 'hidden',
+          }}
+        >
+          {/* Glassmorphism red glow — clipped by overflow:hidden */}
+          <div style={{
+            position: 'absolute', top: -50, left: '50%', transform: 'translateX(-50%)',
+            width: 150, height: 150, background: '#E24B4A',
+            filter: 'blur(80px)', opacity: 0.15, borderRadius: '50%',
+          }} />
+
+          <div style={{
+            width: 80, height: 80, borderRadius: '50%', margin: '0 auto 24px',
+            background: 'rgba(226,75,74,0.08)', border: '1px solid rgba(226,75,74,0.15)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 36, boxShadow: '0 0 40px rgba(226,75,74,0.1)', position: 'relative',
+          }}>
+            🔒
+          </div>
+
+          <h2 style={{
+            fontSize: 'clamp(1.25rem, 2vw, 1.5rem)', fontWeight: 600, color: tok.text,
+            margin: '0 0 12px', wordBreak: 'keep-all', position: 'relative',
+          }}>
+            {lang === 'ko' ? '지금은 피부가 쉴 시간입니다'
+              : lang === 'de' ? 'Zonenpflege pausiert'
+              : 'Zone Care Paused'}
+          </h2>
+
+          <p style={{
+            color: tok.textSecondary, fontSize: '0.875rem', lineHeight: 1.6,
+            marginBottom: 32, wordBreak: 'keep-all', position: 'relative',
+          }}>
+            {lang === 'ko'
+              ? '장벽이 무너진 상태에서 부위별 액티브 성분(비타민C, AHA/BHA 등)을 추가하면 피부에 독이 되어 미세 염증을 악화시킬 수 있습니다. 2주 동안은 장벽 회복 루틴에만 온전히 집중해 주세요.'
+              : lang === 'de'
+              ? 'Aktive Inhaltsstoffe auf einzelne Zonen aufzutragen, wenn Ihre Hautbarriere beschädigt ist, kann zu starken Entzündungen führen. Konzentrieren Sie sich 2 Wochen lang ausschließlich auf das Barriere-Regenerationsprotokoll.'
+              : 'Applying active ingredients to specific zones when your barrier is broken can cause severe inflammation. Please focus entirely on the 2-week barrier recovery routine.'}
+          </p>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+            onClick={() => onGoToMacro?.()}
+            style={{
+              width: '100%', padding: '14px', borderRadius: 12,
+              border: 'none', cursor: 'pointer',
+              background: '#E24B4A', color: '#fff',
+              fontSize: '0.9375rem', fontWeight: 600,
+              boxShadow: '0 4px 14px rgba(226,75,74,0.25)',
+              position: 'relative',
+            }}
+          >
+            {lang === 'ko' ? '내 회복 루틴으로 돌아가기 →'
+              : lang === 'de' ? 'Zurück zum Wiederherstellungsprotokoll →'
+              : 'Return to Recovery Routine →'}
+          </motion.button>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       height: '100%', overflowY: 'auto', overflowX: 'hidden',
@@ -556,36 +635,6 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
         maxWidth: 900, margin: '0 auto',
         padding: 'clamp(16px, 3vw, 32px) clamp(16px, 4vw, 32px)',
       }}>
-
-        {/* ── BARRIER_EMERGENCY BANNER ────────────────────────────────────── */}
-        {isBarrierEmergency && (
-          <div style={{
-            padding: 'clamp(10px, 1.5vw, 14px)', borderRadius: 12, marginBottom: 'clamp(12px, 2vw, 16px)',
-            background: 'rgba(226,75,74,0.06)', border: '1px solid rgba(226,75,74,0.12)',
-            display: 'flex', gap: 8, alignItems: 'flex-start',
-          }}>
-            <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>🛡️</span>
-            <div>
-              <p style={{
-                fontSize: 'clamp(0.6875rem, 0.9vw, 0.8125rem)', color: '#E24B4A',
-                margin: '0 0 6px', lineHeight: 1.5, fontWeight: 500,
-                wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
-              }}>
-                {tx('barrier_emergency_warning', lang)}
-              </p>
-              <button
-                onClick={() => onGoToMacro?.()}
-                style={{
-                  fontSize: 'clamp(0.6875rem, 0.9vw, 0.8125rem)', fontWeight: 600,
-                  color: tok.accent, background: 'none', border: 'none', cursor: 'pointer',
-                  padding: 0, textDecoration: 'underline', textUnderlineOffset: 2,
-                }}
-              >
-                {tx('barrier_view_routine', lang)}
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* ── HEADER ──────────────────────────────────────────────────────── */}
         <motion.div

@@ -29,12 +29,174 @@ import {
   type BaseType,
   type TargetTrouble,
   type RoutineLevel,
+  type RoutineStep,
   type MockProduct,
   type RoutineOutput,
 } from "@/engine/routineEngine";
 import type { ImplicitFlags, AxisResponses } from "@/store/diagnosisStore";
 import type { AxisKey, DiagnosisResult, Product, Tier, SkinVector } from "@/engine/types";
 import { AXIS_KEYS } from "@/engine/types";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Barrier Recovery Mode — ingredient-safe product overrides
+//
+// When BARRIER_EMERGENCY is active, specific catalog products are replaced
+// with barrier-optimised alternatives that meet these rules:
+//   Cleanser   : No BHA / AHA / enzyme exfoliants. Low pH, gentle surfactants.
+//   Serum      : No retinol, Vitamin C, Niacinamide >5%, AHA, BHA, PHA.
+//                If unsafe → swap to Panthenol / Centella / Ceramide ampoule.
+//   Moisturizer: Must contain ≥1 of: Ceramide, Cholesterol, Fatty Acid.
+//                If absent → swap to triple-lipid recovery cream.
+//   SPF        : Mineral-only (Zinc Oxide / Titanium Dioxide).
+//                Chemical UV filters (Tinosorb, Oxybenzone, Octinoxate …) excluded.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Barrier-safe cleanser overrides (mirrored from SOS_CATALOG in routineEngine.ts)
+
+const BARRIER_CLEANSER_OILY: MockProduct = {
+  id: "madeca-cleanser",
+  name: {
+    en: "Madeca MD Calming Gel Cleanser",
+    de: "Madeca MD Beruhigendes Gel-Reinigungsmittel",
+    ko: "마데카MD 진정 젤 클렌저",
+  },
+  brand: "Dongkook Pharm",
+  role: "cleanser", targetTrouble: "barrier-repair",
+  baseTypes: ["oily", "combination-dehydrated-oily"],
+  formulation: "gel",
+  keyIngredients: ["Centella Asiatica 60%", "Madecassoside", "Panthenol 5%"],
+  phaseTiming: ["am", "pm"],
+};
+
+const BARRIER_CLEANSER_DRY: MockProduct = {
+  id: "aestura-cleanser",
+  name: {
+    en: "Atobarrier 365 Gentle Cream Cleanser",
+    de: "Atobarrier 365 Sanfter Creme-Reiniger",
+    ko: "에스트라 아토베리어 365 순한 크림 클렌저",
+  },
+  brand: "Aestura",
+  role: "cleanser", targetTrouble: "barrier-repair",
+  baseTypes: ["dry", "normal"],
+  formulation: "cream",
+  keyIngredients: ["Ceramide NP", "Betaine", "Allantoin"],
+  phaseTiming: ["am", "pm"],
+};
+
+// ── Barrier-safe serum placeholder (when catalog serum contains actives)
+
+const BARRIER_SERUM_PLACEHOLDER: MockProduct = {
+  id: "barrier-serum-recovery",
+  name: {
+    en: "Barrier Recovery Ampoule (Separate Selection)",
+    de: "Barriere-Regenerations-Ampulle (separate Auswahl)",
+    ko: "베리어 진정 앰플 (별도 선택)",
+  },
+  brand: "SkinStrategyLab",
+  role: "serum", targetTrouble: "barrier-repair",
+  baseTypes: [],
+  formulation: "lightweight-fluid",
+  keyIngredients: ["Panthenol", "Allantoin", "Centella Asiatica"],
+  phaseTiming: ["am", "pm"],
+};
+
+// ── Triple-lipid barrier moisturizer (when catalog pick lacks ceramide)
+
+const BARRIER_MOISTURIZER: MockProduct = {
+  id: "barrier-moist-recovery",
+  name: {
+    en: "Barrier Lock Ceramide Cream",
+    de: "Barriere-Schutz Ceramid-Creme",
+    ko: "배리어 락 세라마이드 크림",
+  },
+  brand: "SkinStrategyLab",
+  role: "moisturizer", targetTrouble: "barrier-repair",
+  baseTypes: [],
+  formulation: "cream",
+  keyIngredients: ["Ceramide Complex", "Cholesterol", "Linoleic Acid", "Panthenol"],
+  phaseTiming: ["am", "pm"],
+};
+
+// ── Mineral-only SPF override (when catalog SPF contains chemical UV filters)
+
+const BARRIER_SPF_MINERAL: MockProduct = {
+  id: "barrier-spf-mineral",
+  name: {
+    en: "Mineral Shield SPF 50+ (Zinc Oxide)",
+    de: "Mineral-Schutz LSF 50+ (Zinkoxid)",
+    ko: "미네랄 선스크린 SPF 50+ (산화아연)",
+  },
+  brand: "SkinStrategyLab",
+  role: "spf", targetTrouble: "universal",
+  baseTypes: [],
+  formulation: "lightweight-fluid",
+  keyIngredients: ["Zinc Oxide 20%", "Titanium Dioxide", "Ceramide NP"],
+  phaseTiming: ["am"],
+};
+
+// ── Per-step barrier safety gate
+
+function applyBarrierRecoveryToStep(
+  step: RoutineStep,
+  baseType: BaseType,
+): RoutineStep {
+  if (!step.product) return step;
+  const ing = step.product.keyIngredients;
+
+  switch (step.role) {
+    case "cleanser": {
+      const isUnsafe = ing.some((i) =>
+        /\bBHA\b|salicylic acid|AHA|glycolic acid|lactic acid|mandelic acid|enzyme|sulfate/i.test(i)
+      );
+      if (isUnsafe) {
+        const isOily = baseType === "oily" || baseType === "combination-dehydrated-oily";
+        return { ...step, product: isOily ? BARRIER_CLEANSER_OILY : BARRIER_CLEANSER_DRY };
+      }
+      return step;
+    }
+    case "serum": {
+      const isUnsafe = ing.some((i) =>
+        /retinol|retinal|tretinoin|ascorbic acid|vitamin c [0-9]|salicylic acid|glycolic|lactic|mandelic|niacinamide 10%/i.test(i)
+      );
+      if (isUnsafe) return { ...step, product: BARRIER_SERUM_PLACEHOLDER };
+      return step;
+    }
+    case "moisturizer": {
+      const hasBarrierLipid = ing.some((i) =>
+        /ceramide|cholesterol|linoleic|caprylic|capric|fatty acid/i.test(i)
+      );
+      if (!hasBarrierLipid) return { ...step, product: BARRIER_MOISTURIZER };
+      return step;
+    }
+    case "spf": {
+      const hasChemFilter = ing.some((i) =>
+        /tinosorb|oxybenzone|octinoxate|homosalate|ethylhexyl methoxycinnamate|butyl methoxydibenzoylmethane/i.test(i)
+      );
+      if (hasChemFilter) return { ...step, product: BARRIER_SPF_MINERAL };
+      return step;
+    }
+    default:
+      return step;
+  }
+}
+
+/**
+ * getBarrierRecoveryRoutine
+ *
+ * Post-processes a RoutineLevel and replaces any slots whose selected products
+ * violate barrier-recovery ingredient rules (see top-of-file comment).
+ * Called automatically by buildRoutineV5() when BARRIER_EMERGENCY is active.
+ */
+export function getBarrierRecoveryRoutine(
+  level: RoutineLevel,
+  baseType: BaseType,
+): RoutineLevel {
+  return {
+    ...level,
+    am: level.am.map((s) => applyBarrierRecoveryToStep(s, baseType)),
+    pm: level.pm.map((s) => applyBarrierRecoveryToStep(s, baseType)),
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Phase 3.5B: Age-adaptive ingredient concentration profiles
@@ -439,6 +601,8 @@ export function buildRoutineV5(
   // ── Projected improvement ─────────────────────────────────────────────────
   const projected_improvement = computeProjectedImprovement(scores, flags, tier);
 
+  const hasBarrierEmergency = flags.includes("BARRIER_EMERGENCY");
+
   return {
     // Core RoutineOutput fields (SlideProtocol.tsx reads these)
     baseType,
@@ -446,10 +610,18 @@ export function buildRoutineV5(
     advancedCaution,
     skinRescue: v4.skinRescue,
     routines: {
-      minimalist: v4.routines.minimalist,
-      committed:  v4.routines.committed,
-      advanced:   (tier === "Premium" && !deviceGated)
-        ? (v4.routines.advanced ?? null)
+      minimalist: hasBarrierEmergency
+        ? getBarrierRecoveryRoutine(v4.routines.minimalist, baseType)
+        : v4.routines.minimalist,
+      committed: hasBarrierEmergency
+        ? getBarrierRecoveryRoutine(v4.routines.committed, baseType)
+        : v4.routines.committed,
+      advanced: (tier === "Premium" && !deviceGated)
+        ? (v4.routines.advanced
+            ? (hasBarrierEmergency
+                ? getBarrierRecoveryRoutine(v4.routines.advanced, baseType)
+                : v4.routines.advanced)
+            : null)
         : null,
     },
     // V5 additive fields

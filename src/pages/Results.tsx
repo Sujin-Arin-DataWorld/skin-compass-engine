@@ -12,6 +12,8 @@ import SilkBackground from "@/components/SilkBackground";
 import SlideMacroDashboard from "@/components/results/SlideMacroDashboard";
 import SlideFinalDashboard from "@/components/results/SlideFinalDashboard";
 import SlideNav from "@/components/results/SlideNav";
+import StickyCartBar from "@/components/results/StickyCartBar";
+import { AGE_CYCLE_MAP } from "@/components/results/sharedResultsData";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { useProductStore } from "@/store/productStore";
 import type {
@@ -30,17 +32,17 @@ const TOTAL_SLIDES = 3;
 const SLIDE_LABELS = {
   en: [
     { key: "macro", short: "Analysis", full: "Macro Dashboard" },
-    { key: "lab", short: "Lab", full: "Special Care Lab" },
+    { key: "lab", short: "Focus Care", full: "Focus Care" },
     { key: "plan", short: "Plan", full: "Master Plan" },
   ],
   de: [
     { key: "macro", short: "Analyse", full: "Makro-Dashboard" },
-    { key: "lab", short: "Labor", full: "Spezielle Pflege" },
+    { key: "lab", short: "Intensivpflege", full: "Intensivpflege" },
     { key: "plan", short: "Plan", full: "Masterplan" },
   ],
   ko: [
     { key: "macro", short: "분석", full: "매크로 대시보드" },
-    { key: "lab", short: "연구소", full: "특수 케어" },
+    { key: "lab", short: "집중 케어", full: "집중 케어" },
     { key: "plan", short: "플랜", full: "마스터 플랜" },
   ],
 };
@@ -180,6 +182,30 @@ const ResultsPage = () => {
     return buildRoutineV5(result, implicitFlags, "Full");
   }, [result, implicitFlags]);
 
+  // Cart bar data: default to full routine, gets overridden by tier changes from SlideMacroDashboard
+  const [tierCartSteps, setTierCartSteps] = useState<any[] | null>(null);
+
+  const defaultCartSteps = useMemo(() => {
+    if (!routineOutput) return [];
+    const level = routineOutput.routines.committed;
+    const allSteps = [...level.am, ...level.pm];
+    const filtered = allSteps.filter((s): s is typeof s & { product: NonNullable<typeof s.product> } => s.product !== null);
+    const seen = new Set<string>();
+    return filtered.filter((s) => { if (seen.has(s.product.id)) return false; seen.add(s.product.id); return true; });
+  }, [routineOutput]);
+
+  // Use tier-specific steps when available, otherwise default
+  const cartSteps = tierCartSteps ?? defaultCartSteps;
+
+  const handleTierChange = useCallback((steps: any[]) => {
+    setTierCartSteps(steps);
+  }, []);
+
+  // Cycle days from EXP_AGE
+  const axisAnswers = useDiagnosisStore((s) => s.axisAnswers);
+  const expAge = axisAnswers?.EXP_AGE as number | undefined;
+  const cycleDays = AGE_CYCLE_MAP[expAge !== undefined && expAge in AGE_CYCLE_MAP ? expAge : 2].cycleDays;
+
   const [current, setCurrent] = useState(initialSlide);
   const [direction, setDirection] = useState(1);
 
@@ -257,7 +283,7 @@ const ResultsPage = () => {
   //
   const slides = [
     // Slide 0: Macro Dashboard
-    <SlideMacroDashboard key="slide-macro" result={result} onGoToLab={() => goTo(1)} />,
+    <SlideMacroDashboard key="slide-macro" result={result} onGoToLab={() => goTo(1)} onTierChange={handleTierChange} />,
 
     // Slide 1: Lab & Special Care (lazy)
     <Suspense
@@ -274,7 +300,7 @@ const ResultsPage = () => {
         </div>
       }
     >
-      <SlideLabSpecialCare result={result} />
+      <SlideLabSpecialCare result={result} onGoToMacro={() => goTo(0)} />
     </Suspense>,
 
     // Slide 2: Final Selection (Glassmorphism)
@@ -312,12 +338,17 @@ const ResultsPage = () => {
             if (info.offset.x < -60) goTo(current + 1);
             if (info.offset.x > 60) goTo(current - 1);
           }}
-          className="absolute inset-0 flex flex-col pt-[60px] pb-16"
+          className="absolute inset-0 flex flex-col pt-[96px] pb-[220px]"
           style={{ willChange: "transform" }}
         >
           {slides[current]}
         </motion.div>
       </AnimatePresence>
+
+      {/* Sticky cart bar — above SlideNav */}
+      {cartSteps.length > 0 && (
+        <StickyCartBar steps={cartSteps} cycleDays={cycleDays} slideNavHeight={0} />
+      )}
 
       {/* Navigation overlay */}
       <SlideNav

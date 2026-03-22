@@ -1,107 +1,133 @@
 /**
- * SlideLabSpecialCare.tsx
+ * SlideLabSpecialCare.tsx — Slide 1: Zone Care Redesign
  *
- * Slide 3 of the Unified Funnel: Lab & Special Care Box
+ * Layout (per SLIDE-1-ZONE-CARE-BRIEF.md):
+ *   1. Header: eyebrow + benefit title + dynamic desc + 3 summary boxes
+ *   2. NEEDS ATTENTION: severity-sorted zone cards (score ≥ 30) with inline K vs G accordion
+ *   3. MANAGED BY BASIC ROUTINE: muted zone pills (score < 30)
+ *   4. Education card "왜 부위별 케어가 필요한가요?"
  *
- * Renders:
- *   - Compact FaceMap with zone heatmap overlays
- *   - Empty Add-on Slots (dashed boxes with [ + ] icon) for each zone
- *   - Clicking [ + ] opens SpecialCareModal with DuelCard for that zone
- *   - Selected products fill the slots with product summaries
- *
- * Performance: Wrapped in React.memo. FaceMapOverlay is lazy-loaded.
- * Theming: All colors via CSS variables / Tailwind — zero hardcoded hex.
+ * No FaceMapOverlay. No modal. All comparison inline.
  */
 
-import { useState, useMemo, useCallback, lazy, Suspense, memo, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Check, FlaskConical, MapPin, ChevronDown, Droplets } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
-import { useLabSelectionStore } from '@/features/lab-selection/store/useLabSelectionStore';
-import SpecialCareModal from './SpecialCareModal';
-
-import {
-  ZoneDiagnosis,
-  AxisScore,
-  FaceZone,
-  Product,
-  PriceTier,
-  RequiredIngredient,
-  scoreToSeverity,
-} from '@/features/lab-selection/types';
-import type { DiagnosisResult, AxisKey, ZoneId } from '@/engine/types';
+import { useTheme } from 'next-themes';
+import { tokens } from '@/lib/designTokens';
+import DuelCard from '@/features/lab-selection/components/DuelCard';
+import type { FaceZone, ZoneDiagnosis, Product, PriceTier, RequiredIngredient } from '@/features/lab-selection/types';
+import type { DiagnosisResult, AxisKey } from '@/engine/types';
 import { CONCERN_TO_AXIS } from '@/engine/faceMapInference';
 import { AXIS_INGREDIENT_MAP } from '@/features/lab-selection/data/axisIngredientMap';
+import { scoreToSeverity } from '@/features/lab-selection/types';
 import type { SelectedZones } from '@/store/diagnosisStore';
 
-// Lazy-load the FaceMapOverlay to keep Slide 1/2 fast
-const FaceMapOverlay = lazy(() => import('@/features/lab-selection/components/FaceMapOverlay'));
-
-// ── Types & Mappings ──────────────────────────────────────────────────────────
+// ── Types & maps ───────────────────────────────────────────────────────────────
 
 type DiagnosisAxis = 'sebum' | 'hydration' | 'barrier' | 'sensitivity' | 'pores' | 'pigmentation' | 'aging' | 'texture';
+type LangKey = 'en' | 'de' | 'ko';
 
 const ENGINE_TO_LAB_AXIS: Partial<Record<AxisKey, DiagnosisAxis>> = {
-  seb: 'sebum',
-  hyd: 'hydration',
-  bar: 'barrier',
-  sen: 'sensitivity',
-  acne: 'pores',
-  pigment: 'pigmentation',
-  aging: 'aging',
-  texture: 'texture',
+  seb: 'sebum', hyd: 'hydration', bar: 'barrier', sen: 'sensitivity',
+  acne: 'pores', pigment: 'pigmentation', aging: 'aging', texture: 'texture',
 };
 
 const ZONE_ID_MAP: Record<string, FaceZone> = {
-  forehead: 'forehead',
-  eyes: 'eye_area',
-  nose: 'nose',
-  cheeks: 'cheeks',
-  mouth: 'mouth',
-  jawline: 'jawline',
-  neck: 'neck',
+  forehead: 'forehead', eyes: 'eye_area', nose: 'nose',
+  cheeks: 'cheeks', mouth: 'mouth', jawline: 'jawline', neck: 'neck',
 };
 
 const ZONE_LABELS: Record<string, { en: string; de: string; ko: string }> = {
-  forehead: { en: 'Forehead', de: 'Stirn', ko: '이마' },
-  eye_area: { en: 'Eye Area', de: 'Augenpartie', ko: '눈가' },
-  nose: { en: 'Nose', de: 'Nase', ko: '코' },
-  cheeks: { en: 'Cheeks', de: 'Wangen', ko: '볼' },
-  mouth: { en: 'Mouth', de: 'Mund', ko: '입가' },
-  jawline: { en: 'Jawline', de: 'Kiefer', ko: '턱선' },
-  neck: { en: 'Neck', de: 'Hals', ko: '목' },
-  whole_face: { en: 'Whole Face', de: 'Gesamt', ko: '전체' },
+  forehead:  { en: 'Forehead',  de: 'Stirn',       ko: '이마' },
+  eye_area:  { en: 'Eye Area',  de: 'Augenpartie',  ko: '눈가' },
+  nose:      { en: 'Nose',      de: 'Nase',         ko: '코' },
+  cheeks:    { en: 'Cheeks',    de: 'Wangen',       ko: '볼' },
+  mouth:     { en: 'Mouth',     de: 'Mund',         ko: '입가' },
+  jawline:   { en: 'Jawline',   de: 'Kiefer',       ko: '턱선' },
+  neck:      { en: 'Neck',      de: 'Hals',         ko: '목' },
+  whole_face:{ en: 'Face',      de: 'Gesicht',      ko: '얼굴' },
 };
 
-// ── Bridge helpers (reused from LabSelectionPage) ─────────────────────────────
+const CONCERN_AXIS_MAP: Record<string, AxisKey> = {
+  oiliness: 'seb', dryness: 'hyd', barrier: 'bar', sensitivity: 'sen',
+  acne: 'acne', breakouts: 'acne', pigment: 'pigment', dark_spots: 'pigment',
+  texture: 'texture', aging: 'aging', wrinkles: 'aging', uv_damage: 'ox',
+};
+
+// ── i18n ───────────────────────────────────────────────────────────────────────
+
+const C = {
+  zone_eyebrow:       { ko: '존 케어', de: 'ZONEN-PFLEGE', en: 'ZONE CARE' },
+  zone_title:         { ko: '이 부위에 집중하면 빠르게 개선돼요', de: 'Fokus auf diese Bereiche beschleunigt Ergebnisse', en: 'Focus here for faster results' },
+  zone_desc:          { ko: '기본 루틴은 전체 피부를 관리하지만, {zone} 부위는 추가 성분이 필요해요.', de: 'Ihre Basis-Routine pflegt die gesamte Haut, aber {zone} braucht spezielle Wirkstoffe.', en: 'Your basic routine covers overall skin, but {zone} needs specialized ingredients.' },
+  zone_urgent:        { ko: '긴급 관리 필요', de: 'Dringend', en: 'Urgent care' },
+  zone_moderate:      { ko: '보통 관리', de: 'Moderate Pflege', en: 'Moderate care' },
+  zone_sufficient:    { ko: '충분', de: 'Ausreichend', en: 'Sufficient' },
+  needs_attention:    { ko: '집중 관리 필요', de: 'AUFMERKSAMKEIT NÖTIG', en: 'NEEDS ATTENTION' },
+  moderate_header:    { ko: '보통 관리', de: 'MODERAT', en: 'MODERATE' },
+  zone_needs:         { ko: '필요: {ingredients}', de: 'Benötigt: {ingredients}', en: 'Needs: {ingredients}' },
+  zone_status_urgent: { ko: '기본 루틴에 없는 성분 — 추가 필요', de: 'Nicht in Basis-Routine — Ergänzung nötig', en: 'Not in basic routine — needs addition' },
+  zone_status_mod:    { ko: '기본 루틴으로 부분 관리 — 강화 추천', de: 'Teilweise abgedeckt — Verstärkung empfohlen', en: 'Partially covered — boost recommended' },
+  add_button:         { ko: '+ 추가', de: '+ Hinzufügen', en: '+ Add' },
+  collapse:           { ko: '접기', de: 'Zuklappen', en: 'Collapse' },
+  managed_title:      { ko: '기본 루틴으로 관리됨', de: 'Durch Basis-Routine abgedeckt', en: 'MANAGED BY BASIC ROUTINE' },
+  managed_desc:       { ko: '이 부위들은 기본 루틴으로 충분히 관리되고 있어요. 추가 제품이 필요하지 않습니다.', de: 'Diese Bereiche werden ausreichend durch Ihre Basisroutine abgedeckt. Keine zusätzlichen Produkte nötig.', en: 'These zones are sufficiently covered by your basic routine. No additional products needed.' },
+  managed_safe:       { ko: '{N}곳 안전 — 기본 루틴으로 충분', de: '{N} Zonen sicher — Basis-Routine reicht', en: '{N} zones safe — basic routine sufficient' },
+  why_zone_title:     { ko: '왜 부위별 케어가 필요한가요?', de: 'Warum braucht jede Zone eigene Pflege?', en: 'Why does each zone need its own care?' },
+  why_zone_body:      { ko: '얼굴의 각 부위는 피지선 밀도, 피부 두께, 자외선 노출량이 다릅니다. 이마의 피지선이 가장 많아서(단위면적당), 눈가는 피부가 가장 얇아서(0.5mm), 한 가지 제품으로는 모든 부위를 최적으로 관리할 수 없습니다.', de: 'Jeder Gesichtsbereich hat unterschiedliche Talgdrüsendichte, Hautdicke und UV-Exposition. Stirn hat die dichteste Talgdrüsenverteilung, Augenpartie hat die dünnste Haut (0,5 mm) — ein einziges Produkt kann nicht alle Bereiche optimal versorgen.', en: 'Each facial area has different sebaceous gland density, skin thickness, and UV exposure. The forehead has the highest gland density, the eye area the thinnest skin (0.5mm) — one product cannot optimally serve all zones.' },
+  why_zone_source:    { ko: 'Source: Journal of Dermatological Science · axisIngredientMap.ts 기반', de: 'Quelle: Journal of Dermatological Science', en: 'Source: Journal of Dermatological Science · axisIngredientMap.ts' },
+  barrier_emergency_warning: {
+    ko: '장벽 응급 상태에서는 추가 제품을 권장하지 않습니다. 먼저 2주간 장벽 회복 루틴 단계를 따라주세요.',
+    de: 'Keine zusätzlichen Produkte bei Barriere-Notfall empfohlen. Zuerst 2-Wochen-Routine-Schritte befolgen.',
+    en: 'Additional products not recommended during barrier emergency. Follow the 2-week barrier recovery routine steps first.',
+  },
+  barrier_view_routine: {
+    ko: '내 루틴에서 확인하기 →',
+    de: 'Meine Routine ansehen →',
+    en: 'View My Routine →',
+  },
+} as const;
+
+function tx(key: keyof typeof C, lang: LangKey, vars?: Record<string, string | number>): string {
+  const entry = C[key];
+  let s: string = entry[lang] ?? entry.en;
+  if (vars) Object.entries(vars).forEach(([k, v]) => { s = s.replace(`{${k}}`, String(v)); });
+  return s;
+}
+
+// ── Severity helpers ───────────────────────────────────────────────────────────
+
+function severityColor(score: number): string {
+  if (score >= 70) return '#E24B4A';
+  if (score >= 30) return '#BA7517';
+  return '#86868B';
+}
+
+// ── Bridge: diagnosisResult → ZoneDiagnosis[] (same as original) ───────────────
 
 function computeZoneAxisScores(
   zoneConcerns: string[],
-  concernSeverity: Record<string, 1 | 2 | 3>
-): AxisScore[] {
+  concernSeverity: Record<string, 1 | 2 | 3>,
+): Array<{ axis: DiagnosisAxis; score: number; severity: ReturnType<typeof scoreToSeverity> }> {
   const scores: Partial<Record<DiagnosisAxis, number>> = {};
-
   for (const concernId of zoneConcerns) {
     const engineAxis = CONCERN_TO_AXIS[concernId];
     if (!engineAxis) continue;
     const labAxis = ENGINE_TO_LAB_AXIS[engineAxis];
     if (!labAxis) continue;
-
-    const severity = concernSeverity[concernId] ?? 1;
-    scores[labAxis] = Math.min(100, Math.round((scores[labAxis] ?? 0) + (severity / 3) * 100));
+    const sev = concernSeverity[concernId] ?? 1;
+    scores[labAxis] = Math.min(100, Math.round((scores[labAxis] ?? 0) + (sev / 3) * 100));
   }
-
   return Object.entries(scores).map(([axis, score]) => ({
-    axis: axis as DiagnosisAxis,
-    score,
-    severity: scoreToSeverity(score),
+    axis: axis as DiagnosisAxis, score, severity: scoreToSeverity(score),
   }));
 }
 
-function inferProfile(axisScores: AxisScore[]) {
-  const scoreMap = Object.fromEntries(axisScores.map((a) => [a.axis, a.score]));
-  const s = (k: string) => scoreMap[k] ?? 0;
+function inferProfile(axisScores: Array<{ axis: DiagnosisAxis; score: number }>) {
+  const m = Object.fromEntries(axisScores.map(a => [a.axis, a.score]));
+  const s = (k: string) => m[k] ?? 0;
   if (s('sebum') >= 60 || s('pores') >= 60) return 'oily_acne' as const;
   if (s('barrier') >= 60 && s('hydration') >= 50) return 'dry_barrier' as const;
   if (s('sensitivity') >= 55) return 'sensitive' as const;
@@ -111,69 +137,60 @@ function inferProfile(axisScores: AxisScore[]) {
   return 'combination' as const;
 }
 
-function computeRequiredIngredients(zoneAxisScores: AxisScore[]): RequiredIngredient[] {
-  const ingredientsMap = new Map<string, RequiredIngredient>();
+function computeRequiredIngredients(zoneAxisScores: Array<{ axis: DiagnosisAxis; score: number; severity: string }>): RequiredIngredient[] {
+  const map = new Map<string, RequiredIngredient>();
   for (const { axis, score, severity } of zoneAxisScores) {
     if (score <= 0) continue;
-    const axisIngredients = AXIS_INGREDIENT_MAP[axis]?.[severity] ?? [];
-    for (const ing of axisIngredients) {
-      if (!ingredientsMap.has(ing.name_en)) {
-        ingredientsMap.set(ing.name_en, ing);
-      }
+    const ings = AXIS_INGREDIENT_MAP[axis]?.[severity as 'extreme' | 'severe' | 'moderate'] ?? [];
+    for (const ing of ings) {
+      if (!map.has(ing.name_en)) map.set(ing.name_en, ing);
     }
   }
-  return Array.from(ingredientsMap.values());
+  return Array.from(map.values());
 }
 
 function diagnosisToZoneDiagnoses(result: DiagnosisResult, selectedZones: SelectedZones): ZoneDiagnosis[] {
-  const globalAxisScores: AxisScore[] = (
-    Object.entries(result.axis_scores ?? {}) as [AxisKey, number][]
-  )
-    .filter(([engineKey]) => ENGINE_TO_LAB_AXIS[engineKey] !== undefined)
-    .map(([engineKey, score]) => ({
-      axis: ENGINE_TO_LAB_AXIS[engineKey]!,
+  const globalAxisScores = (Object.entries(result.axis_scores ?? {}) as [AxisKey, number][])
+    .filter(([k]) => ENGINE_TO_LAB_AXIS[k] !== undefined)
+    .map(([k, score]) => ({
+      axis: ENGINE_TO_LAB_AXIS[k]!,
       score: Math.round(score),
       severity: scoreToSeverity(Math.round(score)),
     }));
 
   const heatmap = result.zone_heatmap;
   if (heatmap && Object.keys(heatmap).length > 0) {
-    const zoneDiagnoses: ZoneDiagnosis[] = [];
+    const out: ZoneDiagnosis[] = [];
     for (const [zoneId, entry] of Object.entries(heatmap)) {
       if (!entry) continue;
       const faceZone = ZONE_ID_MAP[zoneId];
       if (!faceZone) continue;
-
-      let scaledScores: AxisScore[] = globalAxisScores.map((a) => ({ ...a, score: 0, severity: scoreToSeverity(0) }));
+      let scaledScores = globalAxisScores.map(a => ({ ...a, score: 0, severity: scoreToSeverity(0) }));
       const zoneData = selectedZones[zoneId];
-
-      if (zoneData && zoneData.concerns.length > 0) {
+      if (zoneData?.concerns?.length) {
         const computed = computeZoneAxisScores(zoneData.concerns, zoneData.severity ?? {});
         scaledScores = scaledScores.map(a => {
           const found = computed.find(c => c.axis === a.axis);
           return found ? found : a;
         });
       } else {
-        scaledScores = globalAxisScores.map((a) => ({ ...a }));
+        scaledScores = globalAxisScores.map(a => ({ ...a }));
       }
-
       const dominantLabAxis = ENGINE_TO_LAB_AXIS[entry.dominantAxis];
-      const withDominant = scaledScores.map((a) =>
+      const withDominant = scaledScores.map(a =>
         dominantLabAxis && a.axis === dominantLabAxis
           ? { ...a, score: Math.min(100, a.score + 15), severity: scoreToSeverity(Math.min(100, a.score + 15)) }
           : a
       );
-
-      zoneDiagnoses.push({
+      out.push({
         zone: faceZone,
         axis_scores: withDominant,
         matched_profile: inferProfile(withDominant),
         required_ingredients: computeRequiredIngredients(withDominant),
       });
     }
-    if (zoneDiagnoses.length > 0) return zoneDiagnoses;
+    if (out.length > 0) return out;
   }
-
   return [{
     zone: 'whole_face',
     axis_scores: globalAxisScores,
@@ -182,190 +199,209 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult, selectedZones: Select
   }];
 }
 
-// ── Severity labels ───────────────────────────────────────────────────────────
+// ── Zone data type ─────────────────────────────────────────────────────────────
 
-const SEVERITY_LABELS: Record<string, { en: string; de: string; ko: string }> = {
-  moderate: { en: 'Moderate', de: 'Mäßig', ko: '보통' },
-  severe:   { en: 'Severe', de: 'Schwer', ko: '심각' },
-  extreme:  { en: 'Extreme', de: 'Extrem', ko: '매우 심각' },
-};
-
-const AXIS_DISPLAY: Record<string, { en: string; de: string; ko: string }> = {
-  sebum:        { en: 'Sebum', de: 'Talg', ko: '피지' },
-  hydration:    { en: 'Hydration', de: 'Feuchtigkeit', ko: '수분' },
-  barrier:      { en: 'Barrier', de: 'Barriere', ko: '장벽' },
-  sensitivity:  { en: 'Sensitivity', de: 'Empfindlichkeit', ko: '민감성' },
-  pores:        { en: 'Pores', de: 'Poren', ko: '모공' },
-  pigmentation: { en: 'Pigmentation', de: 'Pigmentierung', ko: '색소' },
-  aging:        { en: 'Aging', de: 'Alterung', ko: '노화' },
-  texture:      { en: 'Texture', de: 'Textur', ko: '피부결' },
-};
-
-function miniScoreColor(score: number): string {
-  if (score >= 70) return 'hsl(0, 72%, 58%)';
-  if (score >= 50) return 'hsl(35, 80%, 55%)';
-  if (score >= 30) return 'hsl(45, 70%, 55%)';
-  return 'hsl(var(--primary))';
+interface ZoneData {
+  faceZone: FaceZone;
+  zoneId: string;
+  severity: number;
+  diagnosis: ZoneDiagnosis | null;
 }
 
-// ── ZoneAnalysisCard component ────────────────────────────────────────────────
+// ── Circular score ring ────────────────────────────────────────────────────────
+
+function CircularScore({ score, size = 52 }: { score: number; size?: number }) {
+  const r = (size - 7) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ * (1 - Math.min(100, Math.max(0, score)) / 100);
+  const color = severityColor(score);
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} opacity={0.15} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round"
+        strokeDasharray={circ} strokeDashoffset={offset}
+        style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central"
+        fontSize={size * 0.28} fontWeight={700} fill={color}
+        style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}>
+        {Math.round(score)}
+      </text>
+    </svg>
+  );
+}
+
+// ── Zone card (collapsed + inline accordion) ────────────────────────────────────
 
 interface ZoneCardProps {
-  diagnosis: ZoneDiagnosis;
-  selectedProduct: Product | null;
+  zd: ZoneData;
+  lang: LangKey;
+  isDark: boolean;
+  tok: ReturnType<typeof tokens>;
   isExpanded: boolean;
   onToggle: () => void;
-  onAddProduct: () => void;
-  language: string;
+  selectedProduct: Product | null;
+  onProductSelect: (zone: FaceZone, product: Product, tier: PriceTier) => void;
 }
 
-const ZoneAnalysisCard = memo(function ZoneAnalysisCard({
-  diagnosis, selectedProduct, isExpanded, onToggle, onAddProduct, language,
+const ZoneCard = memo(function ZoneCard({
+  zd, lang, isDark, tok, isExpanded, onToggle, selectedProduct, onProductSelect,
 }: ZoneCardProps) {
-  const lang = (language === 'ko' || language === 'de') ? language : 'en';
-  const label = ZONE_LABELS[diagnosis.zone]
-    ? ZONE_LABELS[diagnosis.zone][lang as 'en' | 'de' | 'ko']
-    : diagnosis.zone;
+  const { faceZone, severity, diagnosis } = zd;
+  const color = severityColor(severity);
+  const label = ZONE_LABELS[faceZone]?.[lang] ?? faceZone;
+  const reqIngNames = diagnosis?.required_ingredients
+    .filter(i => i.name_en !== 'HOLD_ALL_ACTIVES')
+    .slice(0, 3)
+    .map(i => i[lang === 'ko' ? 'name_kr' : 'name_en'] as string)
+    .join(' + ') ?? '';
 
-  // Top concerns for this zone (axis_scores > 0, sorted)
-  const topScores = useMemo(() =>
-    diagnosis.axis_scores
-      .filter(a => a.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 4),
-    [diagnosis]
-  );
-
-  // Brief summary for collapsed state
-  const briefSummary = topScores.slice(0, 2).map(a => {
-    const axLabel = AXIS_DISPLAY[a.axis]?.[lang as 'en' | 'de' | 'ko'] ?? a.axis;
-    const sevLabel = SEVERITY_LABELS[a.severity]?.[lang as 'en' | 'de' | 'ko'] ?? a.severity;
-    return `${axLabel} ${sevLabel}`;
-  }).join(' · ');
-
-  // Severity dot color (based on worst score)
-  const worstScore = topScores[0]?.score ?? 0;
-  const dotColor = miniScoreColor(worstScore);
+  const statusText = severity >= 70
+    ? tx('zone_status_urgent', lang)
+    : tx('zone_status_mod', lang);
 
   return (
-    <motion.div layout className="rounded-xl overflow-hidden transition-all"
+    <motion.div layout
       style={{
-        background: isExpanded ? 'hsl(var(--card) / 0.9)' : 'hsl(var(--card) / 0.6)',
-        border: isExpanded ? '1px solid hsl(var(--primary) / 0.3)' : '1px solid hsl(var(--border) / 0.4)',
-        backdropFilter: 'blur(6px)',
+        borderRadius: 12,
+        background: isDark ? 'rgba(28,28,30,0.55)' : 'rgba(255,255,255,0.72)',
+        border: `1px solid ${isExpanded ? color + '33' : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(94,139,104,0.08)')}`,
+        backdropFilter: 'blur(20px) saturate(1.2)',
+        overflow: 'hidden',
+        transition: 'border-color 0.2s',
       }}
     >
-      {/* Collapsed: zone name + brief summary */}
-      <button onClick={onToggle} className="w-full px-3.5 py-3 text-left flex items-center gap-2.5">
-        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: dotColor }} />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold" style={{ color: 'hsl(var(--foreground))' }}>{label}</p>
-          <p className="text-[0.65rem] truncate" style={{ color: 'hsl(var(--foreground-hint))' }}>{briefSummary}</p>
+      {/* Collapsed header */}
+      <div style={{
+        padding: 'clamp(14px, 2.5vw, 18px)',
+        display: 'flex', alignItems: 'center', gap: 'clamp(10px, 1.5vw, 14px)',
+      }}>
+        {/* Score ring */}
+        <CircularScore score={severity} size={48} />
+
+        {/* Zone info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{
+            fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 600,
+            color: tok.text, margin: 0,
+          }}>{label}</p>
+          {reqIngNames && (
+            <p style={{
+              fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary,
+              margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+            }}>
+              {tx('zone_needs', lang, { ingredients: reqIngNames })}
+            </p>
+          )}
+          <p style={{
+            fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', color, margin: '2px 0 0', fontWeight: 500,
+          }}>{statusText}</p>
         </div>
-        {selectedProduct && (
-          <span className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center"
-            style={{ background: 'hsl(var(--primary) / 0.15)' }}>
-            <Check size={10} style={{ color: 'hsl(var(--primary))' }} />
-          </span>
+
+        {/* Add / Collapse button */}
+        {selectedProduct && !isExpanded ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+            <span style={{ fontSize: 12, color: '#4A9E68' }}>✓</span>
+            <button onClick={onToggle} style={{
+              fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600,
+              padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(74,158,104,0.3)',
+              background: 'rgba(74,158,104,0.08)', color: '#4A9E68', cursor: 'pointer',
+              minHeight: 44,
+            }}>
+              {tx('collapse', lang)}
+            </button>
+          </div>
+        ) : (
+          <button onClick={onToggle} style={{
+            fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600,
+            padding: '6px 14px', borderRadius: 8, flexShrink: 0,
+            background: isExpanded
+              ? (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)')
+              : (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'),
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+            color: isExpanded ? tok.textTertiary : tok.textSecondary,
+            cursor: 'pointer', minHeight: 44,
+          }}>
+            {isExpanded ? tx('collapse', lang) : tx('add_button', lang)}
+          </button>
         )}
-        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown size={14} style={{ color: 'hsl(var(--foreground-hint))' }} />
-        </motion.div>
-      </button>
+      </div>
 
-      {/* Expanded: axis scores + ingredients + add product */}
+      {/* Inline accordion: DuelCard */}
       <AnimatePresence>
-        {isExpanded && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden"
+        {isExpanded && diagnosis && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1, transition: { height: { duration: 0.3 }, opacity: { duration: 0.25, delay: 0.05 } } }}
+            exit={{ height: 0, opacity: 0, transition: { height: { duration: 0.2 }, opacity: { duration: 0.15 } } }}
+            style={{ overflow: 'hidden' }}
           >
-            <div className="px-3.5 pb-3.5 space-y-3" style={{ borderTop: '1px solid hsl(var(--border) / 0.3)' }}>
-
-              {/* Circular axis scores */}
-              <div className="pt-3">
-                <p className="text-[0.55rem] font-bold tracking-[0.12em] uppercase mb-2" style={{ color: 'hsl(var(--primary))' }}>
-                  {lang === 'ko' ? '부위별 축 점수' : lang === 'de' ? 'Achsen-Analyse' : 'Axis Analysis'}
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  {topScores.map(({ axis, score }) => {
-                    const color = miniScoreColor(score);
-                    const r = 22;
-                    const circumference = 2 * Math.PI * r;
-                    const offset = circumference * (1 - score / 100);
-                    const axLabel = AXIS_DISPLAY[axis]?.[lang as 'en' | 'de' | 'ko'] ?? axis;
-                    return (
-                      <div key={axis} className="flex flex-col items-center gap-0.5">
-                        <svg width={54} height={54} viewBox="0 0 54 54" style={{ transform: 'rotate(-90deg)' }}>
-                          <circle cx={27} cy={27} r={r} fill="none" stroke="hsl(var(--border))" strokeWidth={3.5} opacity={0.3} />
-                          <circle cx={27} cy={27} r={r} fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round"
-                            strokeDasharray={circumference} strokeDashoffset={offset}
-                            style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
-                          <text x={27} y={27} textAnchor="middle" dominantBaseline="central"
-                            fontSize={12} fontWeight={700} fill={color}
-                            style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}>
-                            {Math.round(score)}
-                          </text>
-                        </svg>
-                        <span className="text-[0.5rem] font-bold tracking-wide uppercase" style={{ color }}>{axLabel}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Required ingredients */}
+            <div style={{
+              borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)'}`,
+              padding: '0 clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 18px)',
+            }}>
+              {/* Education: ingredient explanations */}
               {diagnosis.required_ingredients.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <Droplets size={10} style={{ color: 'hsl(var(--primary))' }} />
-                    <p className="text-[0.55rem] font-bold tracking-[0.12em] uppercase" style={{ color: 'hsl(var(--primary))' }}>
-                      {lang === 'ko' ? '필요 성분' : lang === 'de' ? 'Benötigte Wirkstoffe' : 'Required Ingredients'}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {diagnosis.required_ingredients.slice(0, 6).map((ing) => (
-                      <span key={ing.name_en}
-                        className="text-[0.6rem] font-medium px-2 py-0.5 rounded-full"
-                        style={{
-                          background: 'hsl(var(--primary) / 0.08)',
-                          color: 'hsl(var(--primary))',
-                          border: '1px solid hsl(var(--primary) / 0.15)',
-                        }}
-                      >
-                        {lang === 'ko' ? (ing as any).name_ko ?? ing.name_en : lang === 'de' ? (ing as any).name_de ?? ing.name_en : ing.name_en}
+                <div style={{ paddingTop: 12, marginBottom: 12 }}>
+                  <p style={{
+                    fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary,
+                    lineHeight: 1.6, margin: 0,
+                    wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+                  }}>
+                    {diagnosis.required_ingredients
+                      .filter(i => i.name_en !== 'HOLD_ALL_ACTIVES')
+                      .slice(0, 3)
+                      .map(i => {
+                        const desc = lang === 'ko'
+                          ? (i as any).description_ko
+                          : lang === 'de'
+                            ? (i as any).description_de
+                            : (i as any).description_en;
+                        return desc as string | undefined;
+                      })
+                      .filter(Boolean)
+                      .join(' ')}
+                  </p>
+                </div>
+              )}
+
+              {/* Required ingredients as chips */}
+              {diagnosis.required_ingredients.filter(i => i.name_en !== 'HOLD_ALL_ACTIVES').length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
+                  {diagnosis.required_ingredients
+                    .filter(i => i.name_en !== 'HOLD_ALL_ACTIVES')
+                    .slice(0, 6)
+                    .map(ing => (
+                      <span key={ing.name_en} style={{
+                        fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)',
+                        padding: '4px 10px', borderRadius: 99,
+                        background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                        color: isDark ? '#86868B' : '#6B7280',
+                      }}>
+                        {ing.name_en}
                       </span>
                     ))}
-                  </div>
                 </div>
               )}
 
-              {/* Selected product or Add button */}
-              {selectedProduct ? (
-                <div className="flex items-center gap-2 rounded-lg p-2"
-                  style={{ background: 'hsl(var(--primary) / 0.06)', border: '1px solid hsl(var(--primary) / 0.2)' }}>
-                  <Check size={12} style={{ color: 'hsl(var(--primary))' }} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[0.65rem] font-semibold truncate" style={{ color: 'hsl(var(--foreground))' }}>
-                      {selectedProduct.brand} — {lang === 'ko' ? (selectedProduct as any).name_kr ?? selectedProduct.name_en : selectedProduct.name_en}
-                    </p>
-                  </div>
-                  <button onClick={onAddProduct}
-                    className="text-[0.6rem] font-bold px-2 py-0.5 rounded-md"
-                    style={{ color: 'hsl(var(--primary))', background: 'hsl(var(--primary) / 0.1)' }}
-                  >{lang === 'ko' ? '변경' : lang === 'de' ? 'Ändern' : 'Change'}</button>
-                </div>
-              ) : (
-                <button onClick={onAddProduct}
-                  className="w-full flex items-center justify-center gap-2 rounded-lg py-2 transition-all"
-                  style={{ border: '1.5px dashed hsl(var(--primary) / 0.3)', background: 'hsl(var(--primary) / 0.03)' }}
-                >
-                  <Plus size={12} style={{ color: 'hsl(var(--primary))' }} />
-                  <span className="text-[0.65rem] font-bold" style={{ color: 'hsl(var(--primary))' }}>
-                    {lang === 'ko' ? '맞춤 제품 추가' : lang === 'de' ? 'Produkt hinzufügen' : 'Add Product'}
-                  </span>
-                </button>
-              )}
+              {/* Product selection heading */}
+              <p style={{
+                fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', fontWeight: 700,
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+                marginBottom: 4,
+              }}>
+                {`── ${label} ${tx('add_button', lang).replace('+ ', '')} ──`}
+              </p>
+
+              {/* DuelCard */}
+              <DuelCard
+                zone={faceZone}
+                matchedProfile={diagnosis.matched_profile}
+                requiredIngredients={diagnosis.required_ingredients}
+                onProductSelect={onProductSelect}
+                selectedProductId={selectedProduct?.id ?? null}
+              />
             </div>
           </motion.div>
         )}
@@ -374,246 +410,372 @@ const ZoneAnalysisCard = memo(function ZoneAnalysisCard({
   );
 });
 
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Section header ─────────────────────────────────────────────────────────────
+
+function SectionHeader({ label, color }: { label: string; color: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+      <span style={{
+        fontSize: 'clamp(0.5625rem, 0.7vw, 0.625rem)', fontWeight: 700,
+        letterSpacing: '0.15em', textTransform: 'uppercase', color,
+        padding: '3px 10px', borderRadius: 99,
+        background: color + '15', border: `1px solid ${color}30`,
+      }}>{label}</span>
+      <div style={{ flex: 1, height: 1, background: color + '20' }} />
+    </div>
+  );
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
 
 interface SlideLabSpecialCareProps {
   result: DiagnosisResult;
   onSpecialCareUpdate?: (picks: { zone: FaceZone; product: Product }[]) => void;
+  onGoToMacro?: () => void;
 }
 
 const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
   result,
   onSpecialCareUpdate,
+  onGoToMacro,
 }: SlideLabSpecialCareProps) {
   const { language } = useI18nStore();
-  const selectedZones = useDiagnosisStore((s) => s.selectedZones);
-  const {
-    setZoneDiagnoses,
-    evaluateGate,
-    zoneDiagnoses: storeZoneDiagnoses,
-  } = useLabSelectionStore();
+  const lang = (['ko', 'de'] as LangKey[]).includes(language as LangKey) ? language as LangKey : 'en';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tok = tokens(isDark);
 
-  // Bridge diagnosis to zone diagnoses
+  const selectedZones = useDiagnosisStore(s => s.selectedZones);
+  const storePicks = useDiagnosisStore(s => s.specialCarePicks);
+  const setStorePick = useDiagnosisStore(s => s.setSpecialCarePick);
+
+  const isBarrierEmergency = result.active_flags?.includes('BARRIER_EMERGENCY') ?? false;
+
+  // ── Zone diagnosis (bridge logic) ──────────────────────────────────────────
   const zoneDiagnoses = useMemo(
     () => diagnosisToZoneDiagnoses(result, selectedZones),
-    [result, selectedZones]
+    [result, selectedZones],
   );
 
-  // Seed store on mount
-  useEffect(() => {
-    if (zoneDiagnoses.length > 0) {
-      setZoneDiagnoses(zoneDiagnoses);
+  // ── Zone severity scores (same pipeline as SlideMacroDashboard teaser) ──────
+  const zoneDataList = useMemo<ZoneData[]>(() => {
+    const heatmap = result.zone_heatmap;
+    let items: Array<{ faceZone: FaceZone; zoneId: string; severity: number }>;
+
+    if (heatmap && Object.keys(heatmap).length > 0) {
+      items = Object.entries(heatmap)
+        .map(([zoneId, entry]) => {
+          const faceZone = ZONE_ID_MAP[zoneId];
+          if (!faceZone || !entry) return null;
+          return { faceZone, zoneId, severity: entry.intensity * 100 };
+        })
+        .filter((x): x is NonNullable<typeof x> => x !== null);
+    } else {
+      // Fallback via selectedZones + axis scores
+      items = Object.entries(selectedZones ?? {}).map(([zoneId, zone]) => {
+        const faceZone = ZONE_ID_MAP[zoneId];
+        if (!faceZone) return null;
+        if (!zone?.concerns?.length) return { faceZone, zoneId, severity: 0 };
+        const axes = zone.concerns.map(c => CONCERN_AXIS_MAP[c]).filter(Boolean) as AxisKey[];
+        const severity = axes.length > 0
+          ? Math.max(...axes.map(a => result.axis_scores[a] ?? 0))
+          : 50;
+        return { faceZone, zoneId, severity };
+      }).filter((x): x is NonNullable<typeof x> => x !== null);
     }
-  }, [zoneDiagnoses, setZoneDiagnoses]);
 
-  useEffect(() => {
-    if (storeZoneDiagnoses.length > 0) {
-      evaluateGate();
-    }
-  }, [storeZoneDiagnoses, evaluateGate]);
+    return items
+      .map(({ faceZone, zoneId, severity }) => ({
+        faceZone,
+        zoneId,
+        severity,
+        diagnosis: zoneDiagnoses.find(d => d.zone === faceZone) ?? null,
+      }))
+      .sort((a, b) => b.severity - a.severity);
+  }, [result, selectedZones, zoneDiagnoses]);
 
-  // Picks from Zustand store — survives unmount/remount during slide transitions
-  const storePicks = useDiagnosisStore((s) => s.specialCarePicks);
-  const setStorePick = useDiagnosisStore((s) => s.setSpecialCarePick);
-  const [modalState, setModalState] = useState<{
-    isOpen: boolean;
-    zone: FaceZone;
-    diagnosis: ZoneDiagnosis | null;
-  }>({ isOpen: false, zone: 'whole_face', diagnosis: null });
+  const urgentZones    = useMemo(() => zoneDataList.filter(z => z.severity >= 70), [zoneDataList]);
+  const moderateZones  = useMemo(() => zoneDataList.filter(z => z.severity >= 30 && z.severity < 70), [zoneDataList]);
+  const sufficientZones = useMemo(() => zoneDataList.filter(z => z.severity < 30), [zoneDataList]);
 
-  // Track which zone card is expanded to show analysis
+  const topZoneName = zoneDataList[0]
+    ? (ZONE_LABELS[zoneDataList[0].faceZone]?.[lang] ?? zoneDataList[0].faceZone)
+    : '';
+
+  // ── Expanded zone (only one at a time) ────────────────────────────────────
   const [expandedZone, setExpandedZone] = useState<FaceZone | null>(null);
 
-  const openModal = useCallback((zd: ZoneDiagnosis) => {
-    setModalState({ isOpen: true, zone: zd.zone, diagnosis: zd });
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setModalState(prev => ({ ...prev, isOpen: false }));
+  const handleToggle = useCallback((zone: FaceZone) => {
+    setExpandedZone(prev => prev === zone ? null : zone);
   }, []);
 
   const handleProductSelect = useCallback((zone: FaceZone, product: Product, _tier: PriceTier) => {
-    // Bridge lab Product type → engine Product type stored in Zustand
     setStorePick(zone, product as any);
   }, [setStorePick]);
 
-  // Notify parent of picks changes (for auto-save)
+  // Notify parent
   useEffect(() => {
     if (onSpecialCareUpdate) {
       onSpecialCareUpdate(
         Object.entries(storePicks).map(([zone, product]) => ({
           zone: zone as FaceZone,
           product: product as any,
-        }))
+        })),
       );
     }
   }, [storePicks, onSpecialCareUpdate]);
 
-  const zones = useMemo(() => zoneDiagnoses.map(d => d.zone), [zoneDiagnoses]);
-  const picksCount = Object.keys(storePicks).length;
+  // ── Summary box data ──────────────────────────────────────────────────────
+  const summaryBoxes = [
+    {
+      count: urgentZones.length,
+      label: tx('zone_urgent', lang),
+      bg: 'rgba(226,75,74,0.04)', border: 'rgba(226,75,74,0.12)', color: '#E24B4A',
+    },
+    {
+      count: moderateZones.length,
+      label: tx('zone_moderate', lang),
+      bg: 'rgba(186,117,23,0.04)', border: 'rgba(186,117,23,0.12)', color: '#BA7517',
+    },
+    {
+      count: sufficientZones.length,
+      label: tx('zone_sufficient', lang),
+      bg: isDark ? 'rgba(134,134,139,0.04)' : 'rgba(134,134,139,0.04)',
+      border: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
+      color: '#86868B',
+    },
+  ];
 
+  // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="results-slide flex flex-1 flex-col px-6 py-10 overflow-y-auto">
-      <div className="mx-auto w-full max-w-[800px]">
+    <div style={{
+      height: '100%', overflowY: 'auto', overflowX: 'hidden',
+      paddingBottom: 220,
+    }}>
+      <div style={{
+        maxWidth: 900, margin: '0 auto',
+        padding: 'clamp(16px, 3vw, 32px) clamp(16px, 4vw, 32px)',
+      }}>
 
-        {/* Eyebrow */}
-        <motion.p
-          className="slide-eyebrow mb-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+        {/* ── BARRIER_EMERGENCY BANNER ────────────────────────────────────── */}
+        {isBarrierEmergency && (
+          <div style={{
+            padding: 'clamp(10px, 1.5vw, 14px)', borderRadius: 12, marginBottom: 'clamp(12px, 2vw, 16px)',
+            background: 'rgba(226,75,74,0.06)', border: '1px solid rgba(226,75,74,0.12)',
+            display: 'flex', gap: 8, alignItems: 'flex-start',
+          }}>
+            <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>🛡️</span>
+            <div>
+              <p style={{
+                fontSize: 'clamp(0.6875rem, 0.9vw, 0.8125rem)', color: '#E24B4A',
+                margin: '0 0 6px', lineHeight: 1.5, fontWeight: 500,
+                wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+              }}>
+                {tx('barrier_emergency_warning', lang)}
+              </p>
+              <button
+                onClick={() => onGoToMacro?.()}
+                style={{
+                  fontSize: 'clamp(0.6875rem, 0.9vw, 0.8125rem)', fontWeight: 600,
+                  color: tok.accent, background: 'none', border: 'none', cursor: 'pointer',
+                  padding: 0, textDecoration: 'underline', textUnderlineOffset: 2,
+                }}
+              >
+                {tx('barrier_view_routine', lang)}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── HEADER ──────────────────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
         >
-          {language === 'ko' ? '맞춤 특수 케어' : language === 'de' ? 'Spezielle Pflege' : 'Special Care Lab'}
-        </motion.p>
+          {/* Eyebrow */}
+          <p style={{
+            fontSize: 'clamp(0.625rem, 1vw, 0.75rem)', fontWeight: 600,
+            letterSpacing: '0.18em', textTransform: 'uppercase',
+            color: tok.accent, marginBottom: 8,
+          }}>{tx('zone_eyebrow', lang)}</p>
 
-        {/* Headline */}
-        <motion.h2
-          className="font-display"
-          style={{
-            fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-            fontWeight: 400,
-            lineHeight: 1.2,
-            color: 'hsl(var(--foreground))',
-            marginBottom: '0.5rem',
-          }}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-        >
-          {language === 'ko'
-            ? '부위별 분석 결과'
-            : language === 'de'
-              ? 'Zonale Analyse'
-              : 'Zone Analysis & Care'}
-        </motion.h2>
+          {/* Title */}
+          <h2 style={{
+            fontSize: 'clamp(1.25rem, 2vw + 0.5rem, 1.75rem)', fontWeight: 600,
+            color: tok.text, margin: '0 0 8px', lineHeight: 1.2,
+            wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+          }}>{tx('zone_title', lang)}</h2>
 
-        <motion.p
-          className="slide-body mb-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-        >
-          {language === 'ko'
-            ? '부위를 탭하면 축 점수와 필요 성분을 확인할 수 있습니다. 맞춤 제품도 추가할 수 있어요.'
-            : language === 'de'
-              ? 'Tippen Sie auf eine Zone für die Achsenanalyse und Wirkstoffliste.'
-              : 'Tap a zone to view axis scores, required ingredients, and add targeted products.'}
-        </motion.p>
+          {/* Dynamic description */}
+          <p style={{
+            fontSize: 'clamp(0.8125rem, 1.2vw, 0.9375rem)', color: tok.textSecondary,
+            lineHeight: 1.5, margin: '0 0 clamp(16px, 3vw, 24px)',
+            wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+          }}>
+            {topZoneName
+              ? tx('zone_desc', lang, { zone: topZoneName })
+              : (lang === 'ko' ? '기본 루틴은 전체 피부를 관리하지만, 부위별 추가 성분이 필요해요.' : lang === 'de' ? 'Ihre Basis-Routine pflegt die gesamte Haut, aber einige Bereiche brauchen spezielle Wirkstoffe.' : 'Your basic routine covers overall skin, but some zones need specialized ingredients.')}
+          </p>
 
-        {/* FaceMap + Add-on slots layout */}
-        <div className="grid gap-6 md:grid-cols-[280px_1fr] items-start">
+          {/* Summary boxes */}
+          <div style={{ display: 'flex', gap: 'clamp(8px, 2vw, 16px)', marginBottom: 'clamp(20px, 4vw, 32px)' }}>
+            {summaryBoxes.map(({ count, label, bg, border, color }) => (
+              <div key={label} style={{
+                flex: 1, padding: 'clamp(12px, 2vw, 16px)',
+                borderRadius: 12, textAlign: 'center',
+                background: bg, border: `1px solid ${border}`,
+              }}>
+                <div style={{
+                  fontSize: 'clamp(1.25rem, 2vw, 1.5rem)', fontWeight: 600, color, lineHeight: 1,
+                }}>{count}</div>
+                <div style={{
+                  fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary,
+                  marginTop: 4, lineHeight: 1.3,
+                  wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+                }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
 
-          {/* Left: Compact face map */}
+        {/* ── NEEDS ATTENTION (urgent + moderate) ─────────────────────────── */}
+        {(urgentZones.length > 0 || moderateZones.length > 0) && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.15 }}
-            className="rounded-2xl border p-4"
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            style={{ marginBottom: 'clamp(20px, 4vw, 32px)' }}
+          >
+            {/* Urgent group */}
+            {urgentZones.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <SectionHeader label={tx('needs_attention', lang)} color="#E24B4A" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(8px, 1.5vw, 12px)' }}>
+                  {urgentZones.map((zd, i) => (
+                    <motion.div key={zd.faceZone}
+                      initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-40px' }}
+                      transition={{ duration: 0.35, delay: i * 0.06 }}
+                    >
+                      <ZoneCard
+                        zd={zd} lang={lang} isDark={isDark} tok={tok}
+                        isExpanded={expandedZone === zd.faceZone}
+                        onToggle={() => handleToggle(zd.faceZone)}
+                        selectedProduct={storePicks[zd.faceZone] as any ?? null}
+                        onProductSelect={handleProductSelect}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Moderate group */}
+            {moderateZones.length > 0 && (
+              <div>
+                <SectionHeader label={tx('moderate_header', lang)} color="#BA7517" />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(8px, 1.5vw, 12px)' }}>
+                  {moderateZones.map((zd, i) => (
+                    <motion.div key={zd.faceZone}
+                      initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-40px' }}
+                      transition={{ duration: 0.35, delay: i * 0.06 }}
+                    >
+                      <ZoneCard
+                        zd={zd} lang={lang} isDark={isDark} tok={tok}
+                        isExpanded={expandedZone === zd.faceZone}
+                        onToggle={() => handleToggle(zd.faceZone)}
+                        selectedProduct={storePicks[zd.faceZone] as any ?? null}
+                        onProductSelect={handleProductSelect}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ── MANAGED BY BASIC ROUTINE ──────────────────────────────────── */}
+        {sufficientZones.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
             style={{
-              borderColor: 'hsl(var(--border))',
-              background: 'hsl(var(--card))',
+              padding: 'clamp(14px, 2.5vw, 18px)', borderRadius: 12, marginBottom: 'clamp(16px, 3vw, 24px)',
+              background: isDark ? 'rgba(28,28,30,0.55)' : 'rgba(255,255,255,0.72)',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(94,139,104,0.08)'}`,
+              backdropFilter: 'blur(20px) saturate(1.2)',
             }}
           >
-            <div className="flex items-center gap-2 mb-3">
-              <MapPin size={14} style={{ color: 'hsl(var(--primary))' }} />
-              <p className="text-[0.65rem] font-bold tracking-widest uppercase" style={{ color: 'hsl(var(--primary))' }}>
-                {language === 'ko' ? '부위 분석' : language === 'de' ? 'Zonenanalyse' : 'Zone Analysis'}
-              </p>
-            </div>
-            <Suspense
-              fallback={
-                <div className="h-48 flex items-center justify-center">
-                  <div
-                    className="h-6 w-6 animate-spin rounded-full border-2"
-                    style={{
-                      borderColor: 'hsl(var(--border))',
-                      borderTopColor: 'hsl(var(--primary))',
-                    }}
-                  />
+            <p style={{
+              fontSize: 'clamp(0.5625rem, 0.7vw, 0.625rem)', fontWeight: 700,
+              letterSpacing: '0.15em', textTransform: 'uppercase',
+              color: tok.textTertiary, marginBottom: 10,
+            }}>{tx('managed_title', lang)}</p>
+
+            {/* Zone pills */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+              {sufficientZones.map(zd => (
+                <div key={zd.faceZone} style={{
+                  display: 'flex', alignItems: 'center', gap: 4,
+                  padding: '4px 10px', borderRadius: 99,
+                  background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+                }}>
+                  <span style={{ fontSize: 10, color: '#86868B' }}>{Math.round(zd.severity)}</span>
+                  <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary }}>
+                    {ZONE_LABELS[zd.faceZone]?.[lang] ?? zd.faceZone}
+                  </span>
                 </div>
-              }
-            >
-              <FaceMapOverlay
-                zones={zones}
-                activeZone={null}
-                onZoneClick={(zone) => {
-                  const zd = zoneDiagnoses.find(d => d.zone === zone);
-                  if (zd) openModal(zd);
-                }}
-              />
-            </Suspense>
-            <p className="text-[0.65rem] mt-2 text-center" style={{ color: 'hsl(var(--foreground-hint))' }}>
-              {language === 'ko' ? '부위를 탭하여 분석결과 보기' : language === 'de' ? 'Zone antippen für Analyse' : 'Tap a zone for analysis'}
-            </p>
-          </motion.div>
-
-          {/* Right: Zone analysis cards */}
-          <div className="flex flex-col gap-2">
-            {/* Section header */}
-            <div className="flex items-center gap-2 mb-1">
-              <FlaskConical size={14} style={{ color: 'hsl(var(--primary))' }} />
-              <p className="text-[0.65rem] font-bold tracking-widest uppercase" style={{ color: 'hsl(var(--foreground-hint))' }}>
-                {language === 'ko'
-                  ? `부위별 분석 (${zoneDiagnoses.length})`
-                  : language === 'de'
-                    ? `Zonenanalyse (${zoneDiagnoses.length})`
-                    : `Zone Analysis (${zoneDiagnoses.length})`}
-              </p>
+              ))}
             </div>
 
-            {/* Zone analysis cards */}
-            {zoneDiagnoses.map((zd, i) => (
-              <motion.div
-                key={zd.zone}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + i * 0.05 }}
-              >
-                <ZoneAnalysisCard
-                  diagnosis={zd}
-                  selectedProduct={storePicks[zd.zone] as any ?? null}
-                  isExpanded={expandedZone === zd.zone}
-                  onToggle={() => setExpandedZone(prev => prev === zd.zone ? null : zd.zone)}
-                  onAddProduct={() => openModal(zd)}
-                  language={language}
-                />
-              </motion.div>
-            ))}
+            <p style={{
+              fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary,
+              lineHeight: 1.5, margin: '0 0 10px',
+              wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+            }}>{tx('managed_desc', lang)}</p>
 
-            {/* Summary count */}
-            {picksCount > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mt-2 rounded-lg px-3 py-2 text-center"
-                style={{
-                  background: 'hsl(var(--primary) / 0.06)',
-                  border: '1px solid hsl(var(--primary) / 0.2)',
-                }}
-              >
-                <p className="text-xs font-medium" style={{ color: 'hsl(var(--primary))' }}>
-                  {language === 'ko'
-                    ? `${picksCount}개 특수 케어 제품 선택됨`
-                    : language === 'de'
-                      ? `${picksCount} Spezialpflege-Produkt${picksCount > 1 ? 'e' : ''} ausgewählt`
-                      : `${picksCount} special care product${picksCount > 1 ? 's' : ''} selected`}
-                </p>
-              </motion.div>
-            )}
-          </div>
-        </div>
+            {/* Green safety badge */}
+            <span style={{
+              display: 'inline-block',
+              fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', fontWeight: 600,
+              padding: '4px 12px', borderRadius: 99,
+              background: 'rgba(74,158,104,0.06)',
+              border: '1px solid rgba(74,158,104,0.15)',
+              color: isDark ? '#4A9E68' : '#3D6B4A',
+            }}>
+              {tx('managed_safe', lang, { N: sufficientZones.length })}
+            </span>
+          </motion.div>
+        )}
+
+        {/* ── EDUCATION CARD ──────────────────────────────────────────────── */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.25 }}
+          style={{
+            padding: 'clamp(14px, 2.5vw, 18px)', borderRadius: 12,
+            background: tok.bgCard, border: `1px solid ${tok.border}`,
+          }}
+        >
+          <p style={{
+            fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 600,
+            color: tok.text, margin: '0 0 8px',
+            wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+          }}>{tx('why_zone_title', lang)}</p>
+          <p style={{
+            fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary,
+            lineHeight: 1.6, margin: '0 0 8px',
+            wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
+          }}>{tx('why_zone_body', lang)}</p>
+          <p style={{
+            fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', color: tok.textTertiary,
+            margin: 0, fontStyle: 'italic',
+          }}>{tx('why_zone_source', lang)}</p>
+        </motion.div>
+
       </div>
-
-      {/* Modal */}
-      {modalState.diagnosis && (
-        <SpecialCareModal
-          isOpen={modalState.isOpen}
-          zone={modalState.zone}
-          matchedProfile={modalState.diagnosis.matched_profile}
-          requiredIngredients={modalState.diagnosis.required_ingredients}
-          onProductSelect={handleProductSelect}
-          onClose={closeModal}
-        />
-      )}
     </div>
   );
 });

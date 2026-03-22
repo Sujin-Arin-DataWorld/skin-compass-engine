@@ -14,6 +14,7 @@ import {
 } from '../types';
 import { PH_CONFLICTS, ZONE_COLORS } from '../data/textureRules';
 import { inferTimeOfDay, buildZoneOverlay } from '../utils/routineHelpers';
+import { useDiagnosisStore } from '@/store/diagnosisStore';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -139,6 +140,8 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
       next.set(zone, { product, tier });
       return { selectedProducts: next, finalRoutine: null };
     });
+    // Sync to diagnosisStore.specialCarePicks so StickyCartBar / Results stays updated
+    useDiagnosisStore.getState().setSpecialCarePick(zone, product as any);
   },
 
   // ── removeProduct ───────────────────────────────────────────────────────────

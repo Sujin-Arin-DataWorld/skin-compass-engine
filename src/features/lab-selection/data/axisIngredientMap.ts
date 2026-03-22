@@ -317,7 +317,7 @@ export const AXIS_INGREDIENT_MAP: AxisMap = {
         min_concentration: 0.1, max_concentration: 0.3, unit: '%', priority: 'nice_to_have', contraindicated_with: ['L-Ascorbic Acid'] },
     ],
     moderate: [
-      { name_en: 'Adenosine', name_kr: '아데노신', 
+      { name_en: 'Adenosine', name_kr: '아데노신',
         description_ko: '한국 식약처 인증 주름 개선 성분입니다. 세포 에너지를 높여 피부 재생과 탄력 회복을 돕습니다.',
         description_en: 'A KFDA-certified anti-wrinkle ingredient. Boosts cellular energy to aid skin regeneration and elasticity recovery.',
         description_de: 'Ein KFDA-zertifizierter Anti-Falten-Wirkstoff. Steigert die Zellenergie zur Unterstützung der Hautregeneration und Elastizitätswiederherstellung.',
@@ -325,3 +325,56 @@ export const AXIS_INGREDIENT_MAP: AxisMap = {
     ],
   },
 };
+
+// ── Match score calculation ──────────────────────────────────────────────────
+// Used by SlideLabSpecialCare / DuelCard to show "{matched}/{total} 성분 매칭"
+
+const MATCH_ALIASES: Record<string, string[]> = {
+  'salicylic acid (bha)':          ['salicylic acid', 'bha', 'beta hydroxy'],
+  'niacinamide':                   ['niacinamide', 'nicotinamide'],
+  'zinc pca':                      ['zinc pca', 'zinc oxide', 'zinc'],
+  'hyaluronic acid (multi-weight)':['hyaluronic acid', 'sodium hyaluronate'],
+  'hyaluronic acid':               ['hyaluronic acid', 'sodium hyaluronate'],
+  'panthenol':                     ['panthenol', 'dexpanthenol', 'provitamin b5'],
+  'ectoin':                        ['ectoin'],
+  'squalane':                      ['squalane', 'squalene'],
+  'centella asiatica extract':     ['centella', 'cica', 'madecassoside', 'asiaticoside'],
+  'ceramide np':                   ['ceramide'],
+  'madecassoside':                 ['madecassoside', 'cica', 'centella'],
+  'allantoin':                     ['allantoin'],
+  'tranexamic acid':               ['tranexamic acid'],
+  'alpha-arbutin':                 ['arbutin', 'alpha-arbutin'],
+  'azelaic acid':                  ['azelaic acid'],
+  'l-ascorbic acid':               ['ascorbic acid', 'vitamin c', 'ethyl ascorbic'],
+  'aha (glycolic acid)':           ['glycolic acid', 'aha', 'lactic acid', 'alpha hydroxy'],
+  'retinol':                       ['retinol', 'retinal', 'vitamin a'],
+  'lactic acid':                   ['lactic acid'],
+  'peptides':                      ['peptide', 'palmitoyl', 'matrixyl', 'argireline'],
+  'ferulic acid':                  ['ferulic acid'],
+  'adenosine':                     ['adenosine'],
+  'cholesterol':                   ['cholesterol'],
+  'fatty acids':                   ['fatty acid', 'stearic acid', 'palmitic acid'],
+  'green tea extract':             ['green tea', 'camellia sinensis'],
+};
+
+export function calculateMatchScore(
+  requiredIngredients: RequiredIngredient[],
+  productIngredientNames: string[],
+): { matched: number; total: number; percentage: number } {
+  const effective = requiredIngredients.filter(r => r.name_en !== 'HOLD_ALL_ACTIVES');
+  if (effective.length === 0) return { matched: 0, total: 0, percentage: 0 };
+
+  const normProduct = productIngredientNames.map(i => i.toLowerCase());
+
+  const matched = effective.filter(req => {
+    const key = req.name_en.toLowerCase();
+    const aliases = MATCH_ALIASES[key] ?? [key];
+    return normProduct.some(pi => aliases.some(alias => pi.includes(alias)));
+  }).length;
+
+  return {
+    matched,
+    total: effective.length,
+    percentage: Math.round((matched / effective.length) * 100),
+  };
+}

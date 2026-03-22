@@ -145,11 +145,12 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
 
         <Link to={`/formula/${product.id}`} className="block relative w-full aspect-square max-w-[160px] mx-auto group cursor-pointer">
           <div className="w-full h-full bg-white dark:bg-white/5 rounded-xl shadow-sm flex items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105">
-            {product.image ? (
-              <img src={product.image} alt={product.name.en} className="max-w-full max-h-full object-contain" />
-            ) : (
-              <div className="w-full h-full bg-gray-50 dark:bg-white/5 rounded-lg flex items-center justify-center text-[#1A1A1A] dark:text-gray-300 text-xs">No Image</div>
-            )}
+            <img
+              src={`/productsimage/${product.id}.jpeg`}
+              alt={product.name.en}
+              className="max-w-full max-h-full object-contain"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
           </div>
 
           {/* Texture feel overlay */}

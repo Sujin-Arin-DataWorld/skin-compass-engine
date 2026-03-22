@@ -88,12 +88,9 @@ function ProductEditor() {
             {products.map((p) => (
                 <div key={p.id} className="rounded-2xl border border-border bg-card p-6 md:p-8 shadow-sm">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center border border-border/50">
-                            {p.image ? (
-                                <img src={p.image} alt={p.name.en} className="w-8 h-8 object-contain" />
-                            ) : (
-                                <span className="text-xl">🧴</span>
-                            )}
+                        <div className="relative w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center border border-border/50 overflow-hidden">
+                            <span className="text-xl">🧴</span>
+                            <img src={`/productsimage/${p.id}.jpeg`} alt={p.name.en} className="absolute inset-0 w-full h-full object-contain p-1" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                         </div>
                         <div>
                             <p className="text-[0.6rem] font-bold tracking-widest uppercase text-primary">{p.brand} · {p.id}</p>

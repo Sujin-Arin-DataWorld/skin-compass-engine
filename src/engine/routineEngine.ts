@@ -115,8 +115,8 @@ export interface RoutineOutput {
   skinRescue: SkinRescueProtocol | null;
   routines: {
     minimalist: RoutineLevel;      // 3-step
-    committed:  RoutineLevel;      // 5-step
-    advanced:   RoutineLevel | null; // 5-step + Device (null = safety gate active)
+    committed: RoutineLevel;      // 5-step
+    advanced: RoutineLevel | null; // 5-step + Device (null = safety gate active)
   };
 }
 
@@ -129,7 +129,7 @@ export const DEVICE_MODE_MAP: Record<TargetTrouble, { en: string; de: string; ko
     ko: "EMS 더마샷 + 마이크로커런트 모드",
   },
   "intense-hydration": {
-    en: "Booster Mode — Electroporation for deep absorption",
+    en: " Mode — Electroporation for deep absorption",
     de: "Booster-Modus — Elektroporation für Tiefenwirkung",
     ko: "부스터 모드 — 전기영동으로 깊은 흡수",
   },
@@ -763,13 +763,13 @@ function buildSkinRescueProtocol(
   const routine: RoutineLevel = {
     label: "3-step",
     am: [
-      pickSos("cleanser",    "am", 1),
-      pickSos("serum",       "am", 2),
+      pickSos("cleanser", "am", 1),
+      pickSos("serum", "am", 2),
       pickSos("moisturizer", "am", 3),
     ],
     pm: [
-      pickSos("cleanser",    "pm", 1),
-      pickSos("serum",       "pm", 2),
+      pickSos("cleanser", "pm", 1),
+      pickSos("serum", "pm", 2),
       pickSos("moisturizer", "pm", 3),
     ],
   };
@@ -863,15 +863,15 @@ function buildRoutineLevel(
       label,
       // AM: Cleanser → Serum → Moisturizer → SPF
       am: [
-        pick("cleanser",    "am", 1),
-        pick("serum",       "am", 2),
+        pick("cleanser", "am", 1),
+        pick("serum", "am", 2),
         pick("moisturizer", "am", 3),
-        pick("spf",         "am", 4),
+        pick("spf", "am", 4),
       ],
       // PM: Cleanser → Serum → Moisturizer
       pm: [
-        pick("cleanser",    "pm", 1),
-        pick("serum",       "pm", 2),
+        pick("cleanser", "pm", 1),
+        pick("serum", "pm", 2),
         pick("moisturizer", "pm", 3),
       ],
     };
@@ -882,19 +882,19 @@ function buildRoutineLevel(
     label,
     // AM: Cleanser → Toner → Serum → Treatment → Moisturizer → SPF
     am: [
-      pick("cleanser",    "am", 1),
-      pick("toner",       "am", 2),
-      pick("serum",       "am", 3),
-      pick("treatment",   "am", 4),
+      pick("cleanser", "am", 1),
+      pick("toner", "am", 2),
+      pick("serum", "am", 3),
+      pick("treatment", "am", 4),
       pick("moisturizer", "am", 5),
-      pick("spf",         "am", 6),
+      pick("spf", "am", 6),
     ],
     // PM: Cleanser → Toner → Serum → Treatment → Moisturizer
     pm: [
-      pick("cleanser",    "pm", 1),
-      pick("toner",       "pm", 2),
-      pick("serum",       "pm", 3),
-      pick("treatment",   "pm", 4),
+      pick("cleanser", "pm", 1),
+      pick("toner", "pm", 2),
+      pick("serum", "pm", 3),
+      pick("treatment", "pm", 4),
       pick("moisturizer", "pm", 5),
     ],
   };
@@ -948,12 +948,12 @@ export function buildRoutine(
   implicitFlags: ImplicitFlags,
   axisResponses: AxisResponses
 ): RoutineOutput {
-  const baseType      = deriveBaseType(vector.sebum, vector.hydration);
+  const baseType = deriveBaseType(vector.sebum, vector.hydration);
   const targetTrouble = deriveTargetTrouble(vector);
 
   // ── B-3: Skin Rescue Hard Override (FIRST — no exceptions) ───────────────
   const rescueCheck = isSkinRescueRequired(axisResponses, implicitFlags, vector);
-  const skinRescue  = rescueCheck.required
+  const skinRescue = rescueCheck.required
     ? buildSkinRescueProtocol(baseType, rescueCheck.trigger!)
     : null;
 
@@ -964,10 +964,10 @@ export function buildRoutine(
 
   const advancedCaution: RoutineOutput["advancedCaution"] = safetyBlocked
     ? {
-        en: "Advanced device therapy is currently paused. Your barrier score indicates skin that is not yet ready for EMS / Microcurrent stimulation. Focus on the 5-step repair protocol for 4–6 weeks before re-assessing.",
-        de: "Die fortgeschrittene Gerätetherapie ist derzeit pausiert. Ihr Barriere-Score zeigt, dass Ihre Haut noch nicht für EMS / Mikrostrom-Stimulation bereit ist. Konzentrieren Sie sich 4–6 Wochen auf das 5-Schritt-Reparaturprotokoll.",
-        ko: "현재 고급 기기 테라피가 일시 중단되었습니다. 배리어 점수가 EMS / 마이크로커런트 자극을 받기에 아직 적합하지 않은 상태입니다. 4–6주 동안 5단계 회복 루틴에 집중한 후 재평가하세요.",
-      }
+      en: "Advanced device therapy is currently paused. Your barrier score indicates skin that is not yet ready for EMS / Microcurrent stimulation. Focus on the 5-step repair protocol for 4–6 weeks before re-assessing.",
+      de: "Die fortgeschrittene Gerätetherapie ist derzeit pausiert. Ihr Barriere-Score zeigt, dass Ihre Haut noch nicht für EMS / Mikrostrom-Stimulation bereit ist. Konzentrieren Sie sich 4–6 Wochen auf das 5-Schritt-Reparaturprotokoll.",
+      ko: "현재 고급 기기 테라피가 일시 중단되었습니다. 배리어 점수가 EMS / 마이크로커런트 자극을 받기에 아직 적합하지 않은 상태입니다. 4–6주 동안 5단계 회복 루틴에 집중한 후 재평가하세요.",
+    }
     : null;
 
   return {
@@ -977,8 +977,8 @@ export function buildRoutine(
     skinRescue,
     routines: {
       minimalist: buildRoutineLevel("3-step", baseType, targetTrouble),
-      committed:  buildRoutineLevel("5-step", baseType, targetTrouble),
-      advanced:   safetyBlocked ? null : buildAdvancedLevel(baseType, targetTrouble),
+      committed: buildRoutineLevel("5-step", baseType, targetTrouble),
+      advanced: safetyBlocked ? null : buildAdvancedLevel(baseType, targetTrouble),
     },
   };
 }

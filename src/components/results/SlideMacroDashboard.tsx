@@ -19,6 +19,7 @@ import {
   AXIS_INTERPRETATIONS, CRITICAL_MESSAGES, FLAG_MESSAGES,
   getProductPrice, AGE_CYCLE_MAP, ROLE_EMOJI,
 } from './sharedResultsData';
+import BarrierRecoveryMode from './BarrierRecoveryMode';
 
 // ── Axis Labels KO ──────────────────────────────────────────────────────────
 const AXIS_LABELS_KO: Record<AxisKey, string> = {
@@ -66,10 +67,6 @@ const C = {
   zone_teaser_no_extra: { ko: '모든 부위가 기본 루틴으로 관리됩니다', de: 'Alle Zonen werden durch die Basisroutine abgedeckt', en: 'All zones are covered by the basic routine' },
   zone_teaser_desc: { ko: '기본 루틴에 포함되지 않는 부위별 특수 성분이 필요해요', de: 'Spezielle Wirkstoffe, die nicht in der Basisroutine enthalten sind', en: 'Specialized ingredients not included in your basic routine' },
   zone_teaser_cta: { ko: '집중 케어에서 확인하기 →', de: 'In Intensivpflege ansehen →', en: 'View in Focus Care →' },
-  barrier_warning_title: { ko: '⚠️ 장벽 응급 상태 감지', de: '⚠️ Barriere-Notfall erkannt', en: '⚠️ Barrier emergency detected' },
-  barrier_warning_routine: { ko: '모든 액티브 성분을 2주간 중단하세요. 아래 루틴은 장벽 회복 후 시작하세요.', de: 'Pausieren Sie alle Wirkstoffe für 2 Wochen. Die folgende Routine beginnt nach der Barriere-Erholung.', en: 'Pause all active ingredients for 2 weeks. The routine below starts after barrier recovery.' },
-  barrier_warning_zone: { ko: '장벽 응급 상태에서는 추가 제품을 권장하지 않습니다. 먼저 2주간 장벽 회복 프로토콜을 따르세요.', de: 'Im Barriere-Notfall empfehlen wir keine zusätzlichen Produkte. Folgen Sie zuerst dem 2-Wochen-Erholungsprotokoll.', en: "We don't recommend additional products during barrier emergency. Follow the 2-week recovery protocol first." },
-  barrier_after_recovery: { ko: '장벽 회복 후 시작', de: 'Nach Erholung', en: 'After recovery' },
   skin_cycle_eyebrow: { ko: '당신의 피부 주기', de: 'IHR HAUTZYKLUS', en: 'YOUR SKIN CYCLE' },
   skin_cycle_unit: { ko: '일', de: 'Tage', en: 'days' },
   skin_cycle_age_desc: { ko: '{age} 평균 피부 재생 주기', de: 'Durchschnittlicher Hauterneuerungszyklus für {age}', en: 'Average skin renewal cycle for {age}' },
@@ -81,21 +78,7 @@ const C = {
   day_end: { ko: '각질 탈락', de: 'Zellabschuppung', en: 'Cell shedding' },
   role_label: { ko: '역할', de: 'Rolle', en: 'Role' },
   form_label: { ko: '제형', de: 'Form.', en: 'Form.' },
-  // ── BARRIER_EMERGENCY strategy block (STEP 2A / 4) ──────────────────────
-  barrier_recovery_strategy_title: {
-    ko: '장벽 회복 프로토콜 — 비우기 · 채우기 · 잠그기',
-    de: 'Hautbarriere-Erholung — Leeren · Füllen · Versiegeln',
-    en: 'Barrier Recovery Protocol — Empty · Fill · Lock',
-  },
-  barrier_step1_empty: { ko: '비우기', de: 'Leeren', en: 'Empty' },
-  barrier_step2_fill:  { ko: '채우기', de: 'Füllen', en: 'Fill' },
-  barrier_step3_lock:  { ko: '잠그기', de: 'Versiegeln', en: 'Lock' },
-  barrier_products_selected: {
-    ko: '피부 장벽 복구에 집중한 루틴 제품을 선정했어요.',
-    de: 'Produkte für den Barriere-Erholungsmodus ausgewählt.',
-    en: 'Products selected for barrier recovery mode.',
-  },
-  // ── BARRIER_EMERGENCY zone care teaser (STEP 2B / 4) ────────────────────
+  // ── BARRIER_EMERGENCY zone care teaser ──────────────────────────────────
   barrier_zone_teaser_focus: {
     ko: '민감성이 높아 지금은 피부 장벽 복구에 집중합니다.',
     de: 'Hohe Sensitivität — Fokus auf Barriere-Erholung.',
@@ -408,59 +391,15 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
             <motion.div key="routine" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.25 }}>
 
-              {/* BARRIER EMERGENCY BANNER — shows warning if active */}
-              {isBarrierEmergency && (
-                <div style={{
-                  padding: 'clamp(10px, 1.5vw, 14px)', borderRadius: 12, marginBottom: 10,
-                  background: 'rgba(226,75,74,0.06)', border: '1px solid rgba(226,75,74,0.12)',
-                  display: 'flex', gap: 8, alignItems: 'flex-start',
-                }}>
-                  <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>🛡️</span>
-                  <div>
-                    <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 600, color: '#E24B4A', margin: '0 0 4px' }}>
-                      {tx('barrier_warning_title', lang)}
-                    </p>
-                    <p style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.8125rem)', color: tok.textSecondary, margin: 0, lineHeight: 1.5 }}>
-                      {tx('barrier_warning_routine', lang)}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* BARRIER RECOVERY STRATEGY BLOCK — 3-step protocol when active */}
-              {isBarrierEmergency && (
-                <div style={{
-                  padding: 'clamp(10px, 1.5vw, 14px)', borderRadius: 12, marginBottom: 10,
-                  background: isDark ? 'rgba(74,158,104,0.05)' : 'rgba(94,139,104,0.05)',
-                  border: `1px solid ${isDark ? 'rgba(74,158,104,0.12)' : 'rgba(94,139,104,0.12)'}`,
-                }}>
-                  <p style={{
-                    fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 600,
-                    color: tok.text, margin: '0 0 8px', lineHeight: 1.4,
-                  }}>{tx('barrier_recovery_strategy_title', lang)}</p>
-                  <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
-                    {(['barrier_step1_empty', 'barrier_step2_fill', 'barrier_step3_lock'] as const).map((key, i) => (
-                      <div key={key} style={{
-                        flex: 1, textAlign: 'center', padding: '6px 4px', borderRadius: 8,
-                        background: isDark ? 'rgba(74,158,104,0.08)' : 'rgba(94,139,104,0.08)',
-                      }}>
-                        <div style={{
-                          fontSize: 'clamp(0.5625rem, 0.8vw, 0.6875rem)', fontWeight: 700,
-                          color: tok.textTertiary, marginBottom: 2,
-                        }}>{i + 1}</div>
-                        <div style={{
-                          fontSize: 'clamp(0.625rem, 0.85vw, 0.75rem)', fontWeight: 600, color: tok.accent,
-                        }}>{tx(key, lang)}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <p style={{
-                    fontSize: 'clamp(0.6875rem, 0.9vw, 0.8125rem)', color: tok.textSecondary,
-                    margin: 0, lineHeight: 1.5,
-                  }}>{tx('barrier_products_selected', lang)}</p>
-                </div>
-              )}
-
+              {isBarrierEmergency ? (
+                <BarrierRecoveryMode
+                  lang={lang}
+                  isDark={isDark}
+                  tok={tok}
+                  onAddToCart={(productId) => { console.log('[BarrierRecovery] Add to cart:', productId); }}
+                />
+              ) : (
+              <>
               {/* Tier selector */}
               <div style={{ display: 'flex', gap: 4, marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
                 {tierTabs.map((tab) => {
@@ -513,169 +452,6 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
                 )}
               </div>
 
-              {/* Step cards — 3-phase layout when BARRIER_EMERGENCY, flat list otherwise */}
-              {isBarrierEmergency && (() => {
-                const phases: Array<{ key: string; roles: string[]; labelKey: 'barrier_step1_empty' | 'barrier_step2_fill' | 'barrier_step3_lock'; color: string }> = [
-                  { key: 'empty', roles: ['cleanser'], labelKey: 'barrier_step1_empty', color: '#4A9E68' },
-                  { key: 'fill',  roles: ['toner', 'serum', 'treatment'], labelKey: 'barrier_step2_fill', color: '#378ADD' },
-                  { key: 'lock',  roles: ['moisturizer', 'spf', 'device'], labelKey: 'barrier_step3_lock', color: '#BA7517' },
-                ];
-                return (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(10px, 1.5vw, 14px)' }}>
-                    {phases.map((phase) => {
-                      const phaseSteps = currentSteps.filter(s => phase.roles.includes(s.role));
-                      if (phaseSteps.length === 0) return null;
-                      return (
-                        <div key={phase.key}>
-                          {/* Phase label */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                            <span style={{
-                              fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', fontWeight: 700,
-                              letterSpacing: '0.12em', textTransform: 'uppercase',
-                              padding: '3px 10px', borderRadius: 99,
-                              background: `${phase.color}18`, color: phase.color,
-                              border: `1px solid ${phase.color}33`,
-                            }}>{tx(phase.labelKey, lang)}</span>
-                            <div style={{ flex: 1, height: 1, background: `${phase.color}22` }} />
-                          </div>
-                          {/* Steps in this phase */}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vw, 8px)' }}>
-                            {phaseSteps.map((step, i) => {
-                              const globalIdx = currentSteps.indexOf(step);
-                              const price = getProductPrice(step.product.id);
-                              const isKeyStep = topAxis && step.product.keyIngredients.some((ing) =>
-                                (topAxis.axis === 'ox' && /vitamin\s*c|ascorb|antioxid/i.test(ing)) ||
-                                (topAxis.axis === 'bar' && /ceramide|panthe|centella/i.test(ing)) ||
-                                (topAxis.axis === 'hyd' && /hyaluron|glycerin/i.test(ing)) ||
-                                (topAxis.axis === 'acne' && /salicyl|bha|niacin/i.test(ing)) ||
-                                (topAxis.axis === 'seb' && /niacin|zinc|bha/i.test(ing)) ||
-                                (topAxis.axis === 'aging' && /retinol|peptide|adenosine/i.test(ing)) ||
-                                (topAxis.axis === 'pigment' && /vitamin\s*c|arbutin|tranexam/i.test(ing)) ||
-                                (topAxis.axis === 'sen' && /centella|panthe|allantoin/i.test(ing)) ||
-                                (topAxis.axis === 'texture' && /bha|aha|niacin/i.test(ing))
-                              );
-                              const isExpanded = expandedId === step.product.id;
-                              const insight = AIX_CONTENT[step.role] ?? AIX_CONTENT['serum'];
-                              const topAxes = Object.entries(result.axis_scores).filter(([_, s]) => s > 30).sort((a, b) => b[1] - a[1]).slice(0, 3) as [AxisKey, number][];
-                              const proj = routines.full.projected_improvement[topAxis?.axis ?? 'hyd'];
-                              return (
-                                <motion.div key={`${activeTier}-${timing}-${step.product.id}`}
-                                  initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
-                                  viewport={{ once: true, margin: '-40px' }}
-                                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                                  style={{
-                                    borderRadius: 12, overflow: 'hidden',
-                                    background: isKeyStep ? 'rgba(226,75,74,0.03)' : tok.bgCard,
-                                    border: `1px solid ${isKeyStep ? 'rgba(226,75,74,0.1)' : tok.border}`,
-                                  }}
-                                >
-                                  <button onClick={() => setExpandedId(isExpanded ? null : step.product.id)}
-                                    style={{ width: '100%', padding: 'clamp(12px, 2vw, 16px)', textAlign: 'left', border: 'none', cursor: 'pointer', background: 'transparent', display: 'flex', alignItems: 'center', gap: 10 }}>
-                                    <span style={{
-                                      width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                      fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', fontWeight: 600, flexShrink: 0,
-                                      background: `${phase.color}20`, color: phase.color,
-                                    }}>{globalIdx + 1}</span>
-                                    <div style={{
-                                      width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                                      background: categoryTint(step.role),
-                                      display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-                                    }}>{ROLE_EMOJI[step.role] ?? '💊'}</div>
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                        <span style={{
-                                          fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600,
-                                          letterSpacing: '0.1em', textTransform: 'uppercase',
-                                          color: isKeyStep ? '#E24B4A' : tok.textTertiary,
-                                        }}>
-                                          {step.role.toUpperCase()}{isKeyStep ? ` — ${tx('step_targets', lang)}` : ''}
-                                        </span>
-                                      </div>
-                                      <p style={{
-                                        fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500,
-                                        color: tok.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis',
-                                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                                      }}>{step.product.name[lang] ?? step.product.name.en}</p>
-                                      <p style={{
-                                        fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: tok.textSecondary, margin: 0,
-                                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                      }}>{step.product.keyIngredients.slice(0, 2).join(', ')}</p>
-                                      {isKeyStep && topAxis && (
-                                        <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: scoreColor(topAxis.score), margin: '2px 0 0', fontWeight: 500 }}>
-                                          {tx('step_score_goal', lang, { a: axisLabel(topAxis.axis, lang), c: proj.currentScore, g: proj.targetScore4w, w: 8 })}
-                                        </p>
-                                      )}
-                                    </div>
-                                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                      {price > 0 && <div style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color: tok.text }}>€{price}</div>}
-                                      <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                                        <ChevronDown size={14} style={{ color: tok.textTertiary }} />
-                                      </motion.div>
-                                    </div>
-                                  </button>
-                                  <AnimatePresence>
-                                    {isExpanded && (
-                                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                                        style={{ overflow: 'hidden' }}>
-                                        <div style={{ padding: '0 clamp(12px, 2vw, 16px) clamp(12px, 2vw, 16px)', borderTop: `1px solid ${tok.border}` }}>
-                                          <div style={{ paddingTop: 8 }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                                              <Sparkles size={12} style={{ color: tok.accent }} />
-                                              <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
-                                                {tx('why_ingredient', lang)}
-                                              </span>
-                                            </div>
-                                            <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary, lineHeight: 1.5, margin: '0 0 8px' }}>{insight[lang]}</p>
-                                          </div>
-                                          <div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                                              <Brain size={12} style={{ color: tok.accent }} />
-                                              <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
-                                                {tx('matching_logic', lang)}
-                                              </span>
-                                            </div>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginBottom: 8 }}>
-                                              {[{ l: tx('role_label', lang), v: step.role }, { l: tx('form_label', lang), v: step.product.formulation ?? '—' }].map(({ l, v }) => (
-                                                <div key={l} style={{ borderRadius: 6, padding: '4px 6px', background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
-                                                  <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textSecondary }}>{l} </span>
-                                                  <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600, color: tok.text }}>{v}</span>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          </div>
-                                          <div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-                                              <Brain size={12} style={{ color: tok.accent }} />
-                                              <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
-                                                {tx('aix_matching', lang)}
-                                              </span>
-                                            </div>
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                                              {topAxes.map(([a, s]) => (
-                                                <span key={a} style={{
-                                                  fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, padding: '3px 8px', borderRadius: 99,
-                                                  background: `${scoreColor(s)}15`, border: `1px solid ${scoreColor(s)}33`, color: scoreColor(s),
-                                                }}>{axisLabel(a, lang)} {Math.round(s)}</span>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </motion.div>
-                                    )}
-                                  </AnimatePresence>
-                                </motion.div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })()}
-
-              {!isBarrierEmergency && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vw, 8px)' }}>
                 {currentSteps.map((step, i) => {
                   const price = getProductPrice(step.product.id);
@@ -719,8 +495,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
                         <div style={{
                           width: 40, height: 40, borderRadius: 10, flexShrink: 0,
                           background: categoryTint(step.role),
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-                        }}>{ROLE_EMOJI[step.role] ?? '💊'}</div>
+                          position: 'relative', overflow: 'hidden',
+                        }}>
+                          <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>{ROLE_EMOJI[step.role] ?? '💊'}</span>
+                          <img src={`/productsimage/${step.product.id}.jpeg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                        </div>
                         {/* Product info */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -812,7 +591,6 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
                   );
                 })}
               </div>
-              )}
 
               {/* Routine total */}
               <div style={{
@@ -870,6 +648,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange }:
                     </p>
                   )}
                 </motion.button>
+              )}
+              </>
               )}
             </motion.div>
           ) : (

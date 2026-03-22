@@ -822,8 +822,8 @@
     },
     {
       "id": "KR_tag_sun_blue",
-      "name_kr": "태그 커버 선 베이스 03 클리어 블루",
-      "name_en": "TAG Cover Sun Base 03 Clear Blue",
+      "name_kr": "태그 커버 선 베이스 03 블루",
+      "name_en": "TAG Cover Sun Base 03 Blue",
       "brand": "TAG",
       "country": "KR",
       "market_tier": "budget_daiso",
@@ -897,7 +897,7 @@
       }
     },
     {
-      "id": "DE_baleamed_washgel",
+      "id": "DE_balea_med_washgel",
       "name_kr": "메드 울트라 센서티브 워시젤",
       "name_en": "Med Ultra Sensitive Washgel",
       "brand": "Balea Med",
@@ -3820,10 +3820,10 @@
       }
     },
     {
-      "id": "DE_baleamed_reichhaltige_creme",
-      "name_kr": "메드 울트라 센서티브 리치 크림",
-      "name_en": "Med Ultra Sensitive Rich Cream",
-      "name_de": "Med Ultra Sensitive Reichhaltige Creme",
+      "id": "DE_baleamed_Barrierschutz_creme",
+      "name_kr": "메드 울트라 센서티브 배리어보호 크림",
+      "name_en": "Med Ultra Sensitive Barrier Protection Cream",
+      "name_de": "Med Ultra Sensitive Barrierschutz Creme",
       "brand": "Balea Med",
       "brand_kr": "발레아 메드",
       "country": "DE",
@@ -9647,6 +9647,492 @@
       "full_inci_list": "MANUAL_CHECK_REQUIRED",
       "cpnp_2026_compliance": {
         "is_cpnp_2026_safe": "Unknown",
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
+    },
+    {
+      "id": "KR_rawquest_barrier_sunessence",
+      "name_kr": "베리어 리커버리 선에센스 SPF50+/PA++++",
+      "name_en": "Barrier Recovery Sun Essence SPF50+/PA++++",
+      "brand": "RAWQUEST",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "mid",
+      "price_eur": 16.0,
+      "price_krw": 25000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.32,
+      "routine_slot": "sunscreen",
+      "texture_type": "essence",
+      "texture_description_kr": "수분 에센스",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Niacinamide",
+          "name_kr": "나이아신아마이드",
+          "name_inci": "Niacinamide",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "brightening"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "하이알루로닉애씨드",
+          "name_inci": "Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Hydrolyzed Hyaluronic Acid",
+          "name_kr": "하이드롤라이즈드하이알루로닉애씨드",
+          "name_inci": "Hydrolyzed Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Sodium Hyaluronate",
+          "name_kr": "소듐하이알루로네이트",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Titanium Dioxide",
+          "name_kr": "티타늄디옥사이드",
+          "name_inci": "Titanium Dioxide (CI 77891)",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "uv_filter_physical"
+        },
+        {
+          "name_en": "Diethylamino Hydroxybenzoyl Hexyl Benzoate",
+          "name_kr": "다이에틸아미노하이드록시벤조일헥실벤조에이트",
+          "name_inci": "Diethylamino Hydroxybenzoyl Hexyl Benzoate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "uv_filter_chemical"
+        },
+        {
+          "name_en": "Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine",
+          "name_kr": "비스에틸헥실옥시페놀메톡시페닐트리아진",
+          "name_inci": "Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "uv_filter_chemical"
+        },
+        {
+          "name_en": "Ethylhexyl Triazone",
+          "name_kr": "에틸헥실트리아존",
+          "name_inci": "Ethylhexyl Triazone",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "uv_filter_chemical"
+        }
+      ],
+      "target_profiles": [
+        "dry_sensitive",
+        "combination"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "barrier_damage",
+        "dryness",
+        "uv_protection",
+        "hydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "스킨케어 마지막 단계에서 적당량을 덜어 얼굴 전체에 고르게 펴 발라줍니다.",
+      "application_instruction_en": "Apply an appropriate amount evenly over the face as the last step of skincare.",
+      "application_instruction_de": "Als letzten Schritt der Hautpflege eine angemessene Menge gleichmäßig auf dem Gesicht verteilen.",
+      "one_liner_kr": "판테놀 + 나이아신아마이드 + 3종 히알루론산 UV 보습 선에센스",
+      "one_liner_en": "Panthenol & Niacinamide & Triple Hyaluronic Acid UV moisturizing sun essence",
+      "one_liner_de": "Panthenol & Niacinamide & Dreifach-Hyaluronsäure UV-Feuchtigkeits-Sonnessenz",
+      "name_de": "Barrier Recovery Sun Essence SPF50+/PA++++",
+      "brand_kr": "로우퀘스트",
+      "full_inci_list": "Water, Dibutyl Adipate, Propanediol, Titanium Dioxide (CI 77891), Isononyl Isononanoate, Diethylamino Hydroxybenzoyl Hexyl Benzoate, Niacinamide, Polymethylsilsesquioxane, Hydrolyzed Hyaluronic Acid, Hyaluronic Acid, Sodium Hyaluronate, Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine, Coco-Caprylate/Caprate, Ethylhexyl Triazone, Panthenol, Polysilicone-15, Terephthalylidene Dicamphor Sulfonic Acid, Pentylene Glycol, Potassium Cetyl Phosphate, Polyhydroxystearic Acid, Sodium Polyacryloyldimethyl Taurate, 1,2-Hexanediol, Tromethamine, Polyacrylate Crosspolymer-6, Aluminum Hydroxide, Hydroxyacetophenone, Stearic Acid, Polyglyceryl-3 Distearate, Ammonium Polyacryloyldimethyl Taurate",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": true,
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "Titanium Dioxide (CI 77891) UV 필터 사용 — EU에서 흡입 노출(스프레이) 주의 필요. 2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
+    },
+    {
+      "id": "KR_rawquest_barrier_cleanser",
+      "name_kr": "베리어 인핸싱 클렌저",
+      "name_en": "Barrier Enhancing Cleanser",
+      "brand": "RAWQUEST",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "mid",
+      "price_eur": 16.0,
+      "price_krw": 25000,
+      "volume_ml": 190,
+      "price_per_ml_eur": 0.084,
+      "routine_slot": "cleanser",
+      "texture_type": "foam",
+      "texture_description_kr": "약산성 폼",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "하이알루로닉애씨드",
+          "name_inci": "Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Hydrolyzed Hyaluronic Acid",
+          "name_kr": "하이드롤라이즈드하이알루로닉애씨드",
+          "name_inci": "Hydrolyzed Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Sodium Hyaluronate",
+          "name_kr": "소듐하이알루로네이트",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Coconut Oil",
+          "name_kr": "코코넛야자오일",
+          "name_inci": "Cocos Nucifera (Coconut) Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        },
+        {
+          "name_en": "Cocoa Extract",
+          "name_kr": "카카오추출물",
+          "name_inci": "Theobroma Cacao (Cocoa) Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "antioxidant"
+        }
+      ],
+      "target_profiles": [
+        "dry_sensitive",
+        "combination"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "barrier_damage",
+        "dryness",
+        "sensitivity",
+        "hydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "젖은 손바닥에 적당량을 덜어 물과 함께 거품을 만들고 얼굴을 부드럽게 마사지하듯 문질러준 후 미온수로 깨끗이 헹구어 줍니다.",
+      "application_instruction_en": "Lather an appropriate amount on wet palms with water, gently massage the face, then rinse thoroughly with lukewarm water.",
+      "application_instruction_de": "Eine angemessene Menge auf nassen Handflächen mit Wasser aufschäumen, das Gesicht sanft massieren und mit lauwarmem Wasser gründlich abspülen.",
+      "one_liner_kr": "판테놀 + 3종 히알루론산 약산성 장벽 강화 클렌저",
+      "one_liner_en": "Panthenol & Triple Hyaluronic Acid mildly acidic barrier-strengthening cleanser",
+      "one_liner_de": "Panthenol & Dreifach-Hyaluronsäure mild-saurer Barriere-stärkender Reiniger",
+      "name_de": "Barrier Enhancing Cleanser",
+      "brand_kr": "로우퀘스트",
+      "full_inci_list": "Water, Glycerin, Sodium C14-16 Olefin Sulfonate, Coco-Betaine, Sorbitol, Butylene Glycol, Potassium Benzoate, Ethylhexylglycerin, Sodium Chloride, Propanediol, Citric Acid, Coco-Glucoside, Panthenol, Acrylates Copolymer, Polyquaternium-10, Polyglyceryl-4 Caprate, Polyglyceryl-6 Caprylate, Decyl Glucoside, Musa Sapientum (Banana) Fruit Extract, Hydrangea Macrophylla Leaf Extract, Hedera Helix (Ivy) Leaf/Stem Extract, Theobroma Cacao (Cocoa) Extract, Trisodium Ethylenediamine Disuccinate, Cocos Nucifera (Coconut) Oil, Arbutus Unedo Fruit Extract, 1,2-Hexanediol, Gardenia Jasminoides Flower Extract, Hyaluronic Acid, Hydrolyzed Hyaluronic Acid, Sodium Hyaluronate, Amyris Balsamifera Bark Oil, Osmanthus Fragrans Flower Extract, Dipotassium Phosphate, Acetyl Glutamine, Cellulose Gum",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": true,
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
+    },
+    {
+      "id": "KR_rawquest_barrier_toner_essence",
+      "name_kr": "베리어 인핸싱 토너 투 에센스",
+      "name_en": "Barrier Enhancing Toner to Essence",
+      "brand": "RAWQUEST",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "mid",
+      "price_eur": 23.0,
+      "price_krw": 35000,
+      "volume_ml": 200,
+      "price_per_ml_eur": 0.115,
+      "routine_slot": "toner_essence",
+      "texture_type": "essence",
+      "texture_description_kr": "토너-에센스 하이브리드",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Squalane",
+          "name_kr": "스쿠알란",
+          "name_inci": "Squalane",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "하이알루로닉애씨드",
+          "name_inci": "Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Hydrolyzed Hyaluronic Acid",
+          "name_kr": "하이드롤라이즈드하이알루로닉애씨드",
+          "name_inci": "Hydrolyzed Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Sodium Hyaluronate",
+          "name_kr": "소듐하이알루로네이트",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Fructan",
+          "name_kr": "프룩탄",
+          "name_inci": "Fructan",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Coconut Oil",
+          "name_kr": "코코넛야자오일",
+          "name_inci": "Cocos Nucifera (Coconut) Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        }
+      ],
+      "target_profiles": [
+        "dry_sensitive",
+        "combination"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "barrier_damage",
+        "dryness",
+        "sensitivity",
+        "hydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "세안 후 적당량을 덜어 피부결을 따라 얼굴 전체에 부드럽게 펴 발라 흡수시켜 줍니다.",
+      "application_instruction_en": "After cleansing, apply an appropriate amount and gently smooth over the entire face following the skin texture.",
+      "application_instruction_de": "Nach der Reinigung eine angemessene Menge entlang der Hautstruktur sanft auf dem gesamten Gesicht verteilen.",
+      "one_liner_kr": "판테놀 + 스쿠알란 + 3종 히알루론산 토너-에센스 올인원 장벽 케어",
+      "one_liner_en": "Panthenol & Squalane & Triple Hyaluronic Acid toner-essence all-in-one barrier care",
+      "one_liner_de": "Panthenol & Squalan & Dreifach-Hyaluronsäure Toner-Essenz All-in-One Barrierepflege",
+      "name_de": "Barrier Enhancing Toner to Essence",
+      "brand_kr": "로우퀘스트",
+      "full_inci_list": "Water, Glycerin, Dipropylene Glycol, Propanediol, 1,2-Hexanediol, Erythritol, Butylene Glycol, Panthenol, Cetyl Ethylhexanoate, Ethylhexyl Palmitate, Squalane, Hydroxyacetophenone, Sucrose Distearate, Ammonium Polyacryloyldimethyl Taurate, Sodium Polyacryloyldimethyl Taurate, Caprylic/Capric Triglyceride, Glyceryl Acrylate/Acrylic Acid Copolymer, Glycereth-25 PCA Isostearate, Hydrogenated Polydecene, Hydrogenated Lecithin, Ethylhexylglycerin, Hydrangea Macrophylla Leaf Extract, Zea Mays (Corn) Kernel Extract, Disodium EDTA, Dipotassium Phosphate, Acetyl Glutamine, Trideceth-10, Musa Sapientum (Banana) Fruit Extract, Hyaluronic Acid, Hydrolyzed Hyaluronic Acid, Sodium Hyaluronate, Fructan, Hedera Helix (Ivy) Leaf/Stem Extract, Theobroma Cacao (Cocoa) Extract, Cocos Nucifera (Coconut) Oil, Arbutus Unedo Fruit Extract, Glucose, Gardenia Jasminoides Flower Extract, Amyris Balsamifera Bark Oil, Osmanthus Fragrans Flower Extract, Cellulose Gum",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": true,
+        "pfas_detected": [],
+        "allergens_to_declare_2026": [],
+        "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
+      }
+    },
+    {
+      "id": "KR_rawquest_barrier_recovery_cream",
+      "name_kr": "베리어 리커버리 크림",
+      "name_en": "Barrier Recovery Cream",
+      "brand": "RAWQUEST",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "mid",
+      "price_eur": 25.0,
+      "price_krw": 38000,
+      "volume_ml": 80,
+      "price_per_ml_eur": 0.313,
+      "routine_slot": "cream",
+      "texture_type": "cream",
+      "texture_description_kr": "리치 크림",
+      "ingredients": [
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Squalane",
+          "name_kr": "스쿠알란",
+          "name_inci": "Squalane",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        },
+        {
+          "name_en": "Ceramide NP",
+          "name_kr": "세라마이드엔피",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Shea Butter",
+          "name_kr": "시어버터",
+          "name_inci": "Butyrospermum Parkii (Shea) Butter",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        },
+        {
+          "name_en": "Meadowfoam Seed Oil",
+          "name_kr": "메도우폼씨오일",
+          "name_inci": "Limnanthes Alba (Meadowfoam) Seed Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        },
+        {
+          "name_en": "Macadamia Seed Oil",
+          "name_kr": "마카다미아씨오일",
+          "name_inci": "Macadamia Integrifolia Seed Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        },
+        {
+          "name_en": "Jojoba Seed Oil",
+          "name_kr": "호호바씨오일",
+          "name_inci": "Simmondsia Chinensis (Jojoba) Seed Oil",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "emollient"
+        },
+        {
+          "name_en": "Beta-Glucan",
+          "name_kr": "베타-글루칸",
+          "name_inci": "Beta-Glucan",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Hyaluronic Acid",
+          "name_kr": "하이알루로닉애씨드",
+          "name_inci": "Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Hydrolyzed Hyaluronic Acid",
+          "name_kr": "하이드롤라이즈드하이알루로닉애씨드",
+          "name_inci": "Hydrolyzed Hyaluronic Acid",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Sodium Hyaluronate",
+          "name_kr": "소듐하이알루로네이트",
+          "name_inci": "Sodium Hyaluronate",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "hydration"
+        },
+        {
+          "name_en": "Mugwort Leaf Extract",
+          "name_kr": "쑥잎추출물",
+          "name_inci": "Artemisia Princeps Leaf Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Echinacea Extract",
+          "name_kr": "자주천인국추출물",
+          "name_inci": "Echinacea Purpurea Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "dry_sensitive",
+        "combination"
+      ],
+      "target_age_range": "20-40",
+      "skin_concerns": [
+        "barrier_damage",
+        "dryness",
+        "sensitivity",
+        "hydration",
+        "irritation"
+      ],
+      "application_zones": [
+        "whole_face",
+        "body"
+      ],
+      "application_method": "leave_on",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "얼굴은 물론 전신의 피부 건조 및 가려움 등이 고민되는 부위에 적당량을 덜어 부드럽게 펴 발라 흡수시켜 줍니다.",
+      "application_instruction_en": "Apply an appropriate amount to dry or itchy areas on the face and body, gently smooth and let absorb.",
+      "application_instruction_de": "Eine angemessene Menge auf trockene oder juckende Stellen im Gesicht und am Körper auftragen, sanft verteilen und einziehen lassen.",
+      "one_liner_kr": "판테놀 + 세라마이드NP + 스쿠알란 + 3종 히알루론산 초장벽 리커버리 크림",
+      "one_liner_en": "Panthenol & Ceramide NP & Squalane & Triple Hyaluronic Acid ultra-barrier recovery cream",
+      "one_liner_de": "Panthenol & Ceramide NP & Squalan & Dreifach-Hyaluronsäure Ultra-Barriere-Regenerationscreme",
+      "name_de": "Barrier Recovery Cream",
+      "brand_kr": "로우퀘스트",
+      "full_inci_list": "Water, Glycerin, Panthenol, Squalane, 1,2-Hexanediol, Cetearyl Olivate, Limnanthes Alba (Meadowfoam) Seed Oil, Macadamia Integrifolia Seed Oil, Butylene Glycol, Sorbitan Olivate, Hydrogenated Polydecene, Butyrospermum Parkii (Shea) Butter, Cetearyl Alcohol, Synthetic Beeswax, Propanediol, Caprylic/Capric Triglyceride, Polyglyceryl-2 Stearate, Polyglyceryl-3 Methylglucose Distearate, Vinyl Dimethicone, Glyceryl Stearate, Hydrolyzed Jojoba Esters, Glycereth-26, Stearyl Alcohol, Polyglyceryl-3 Distearate, Ceramide NP, Carbomer, Simmondsia Chinensis (Jojoba) Seed Oil, Sodium Polyacryloyldimethyl Taurate, Hydrogenated Lecithin, Tromethamine, Tocopherol, Glyceryl Stearate Citrate, Artemisia Princeps Leaf Extract, Helianthus Annuus (Sunflower) Seed Oil, Beta-Sitosterol, Dipotassium Glycyrrhizate, Ethylhexylglycerin, Polyglyceryl-10 Stearate, Disodium EDTA, Beta-Glucan, Dipotassium Phosphate, Acetyl Glutamine, Hyaluronic Acid, Hydrolyzed Hyaluronic Acid, Sodium Hyaluronate, Trideceth-10, Musa Sapientum (Banana) Fruit Extract, Hedera Helix (Ivy) Leaf/Stem Extract, Theobroma Cacao (Cocoa) Extract, Ammonium Polyacryloyldimethyl Taurate, Cocos Nucifera (Coconut) Oil, Arbutus Unedo Fruit Extract, Gardenia Jasminoides Flower Extract, Amyris Balsamifera Bark Oil, Osmanthus Fragrans Flower Extract, Echinacea Purpurea Extract, Cellulose Gum",
+      "cpnp_2026_compliance": {
+        "is_cpnp_2026_safe": true,
         "pfas_detected": [],
         "allergens_to_declare_2026": [],
         "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."

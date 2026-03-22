@@ -101,12 +101,9 @@ export default function FormulaDetail() {
 
                     {/* Product Image Area */}
                     <div className="flex items-center justify-center py-12 px-8">
-                        <div className="w-48 h-48 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center shadow-sm">
-                            {product.image ? (
-                                <img src={product.image} alt={product.name.en} className="max-w-full max-h-full object-contain p-4" />
-                            ) : (
-                                <span className="text-6xl opacity-30">🧴</span>
-                            )}
+                        <div className="relative w-48 h-48 bg-gray-50 dark:bg-white/5 rounded-2xl flex items-center justify-center shadow-sm overflow-hidden">
+                            <span className="text-6xl opacity-30">🧴</span>
+                            <img src={`/productsimage/${product.id}.jpeg`} alt={product.name.en} className="absolute inset-0 w-full h-full object-contain p-4" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                         </div>
                     </div>
 

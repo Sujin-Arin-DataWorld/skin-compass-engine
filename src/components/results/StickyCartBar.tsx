@@ -137,10 +137,10 @@ const StickyCartBar = memo(function StickyCartBar({
               <div key={s.product.id} style={{
                 width: 24, height: 24, borderRadius: 6,
                 background: categoryTint(s.role),
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 12,
+                position: 'relative', overflow: 'hidden', flexShrink: 0,
               }}>
-                {ROLE_EMOJI[s.role] ?? '💊'}
+                <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>{ROLE_EMOJI[s.role] ?? '💊'}</span>
+                <img src={`/productsimage/${s.product.id}.jpeg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
               </div>
             ))}
           </div>

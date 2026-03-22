@@ -96,16 +96,9 @@ export default function Cart() {
                       className="rounded-2xl border border-border bg-card p-4 flex items-center gap-4"
                     >
                       {/* Image / placeholder */}
-                      <div className="w-16 h-16 rounded-xl bg-primary/8 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                        {item.product.image ? (
-                          <img
-                            src={item.product.image}
-                            alt={item.product.name.en}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-2xl">🧴</span>
-                        )}
+                      <div className="relative w-16 h-16 rounded-xl bg-primary/8 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                        <span className="text-2xl">🧴</span>
+                        <img src={`/productsimage/${item.product.id}.jpeg`} alt={item.product.name.en} className="absolute inset-0 w-full h-full object-contain" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                       </div>
 
                       {/* Info */}

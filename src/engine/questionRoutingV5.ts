@@ -664,23 +664,24 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         type: "multi",
         text: t("Do you currently use any anti-aging actives?", "Verwenden Sie derzeit Anti-Aging-Wirkstoffe?", "현재 안티에이징 성분을 사용 중인가요?"),
         required: false,
-        axisHints: { aging: -0.2 }, // usage of actives slightly reduces concern score
+        axisHints: { aging: -0.15 },
+        exclusiveIds: ["active_none"],
         options: [
           withGloss(
-            opt("active_retinol",  0, "Retinol",    "Retinol",    "레티놀"),
+            opt("active_retinol",  1, "Retinol",    "Retinol",    "레티놀"),
             "Vitamin A derivative that speeds cell turnover — reduces fine lines, acne marks, and uneven tone. Start with low concentrations.",
             "Vitamin-A-Derivat, das die Zellerneuerung beschleunigt — reduziert Fältchen, Akneflecken und ungleichmäßigen Teint.",
             "세포 재생을 촉진하는 비타민 A 유도체로, 잔주름·여드름 흔적·피부톤 개선에 효과적입니다. 낮은 농도부터 시작하세요."
           ),
-          opt("active_vitc",     0, "Vitamin C",  "Vitamin C",  "비타민 C"),
+          opt("active_vitc",     1, "Vitamin C",  "Vitamin C",  "비타민 C"),
           withGloss(
-            opt("active_peptide",  0, "Peptides",   "Peptide",    "펩타이드"),
+            opt("active_peptide",  1, "Peptides",   "Peptide",    "펩타이드"),
             "Short chains of amino acids that signal your skin to produce more collagen and elastin — key for firmness and anti-aging.",
             "Kurze Aminosäureketten, die die Haut zur Kollagen- und Elastinproduktion anregen — essenziell für Festigkeit.",
             "피부에 콜라겐·엘라스틴 생성을 신호하는 짧은 아미노산 사슬로, 탄력 개선에 핵심적입니다."
           ),
           withGloss(
-            opt("active_aha_bha",  0, "AHA / BHA",  "AHA / BHA",  "AHA / BHA"),
+            opt("active_aha_bha",  1, "AHA / BHA",  "AHA / BHA",  "AHA / BHA"),
             "AHAs (e.g. Glycolic Acid) exfoliate the surface; BHAs (e.g. Salicylic Acid) exfoliate deep inside pores. Both improve texture and tone.",
             "AHAs (z.B. Glykolsäure) exfoliieren die Oberfläche; BHAs (z.B. Salicylsäure) exfoliieren tief in den Poren.",
             "AHA(예: 글리콜릭산)는 표면을, BHA(예: 살리실산)는 모공 안쪽을 각질 제거해요."
@@ -874,7 +875,7 @@ const CONCERN_TO_AXES: Record<string, number[]> = {
   blackheads_f:  [1, 3],
   whiteheads_f:  [1, 4],
   lines_f:       [6],
-  breakouts_f:   [1, 4],
+  breakouts_f:   [3, 4],
 
   // Eyes
   fine_lines_e:  [6],

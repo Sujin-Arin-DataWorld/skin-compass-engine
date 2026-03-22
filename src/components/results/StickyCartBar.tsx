@@ -40,10 +40,19 @@ function t(key: keyof typeof COPY, lang: LangKey, vars?: Record<string, string |
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+interface BarrierProduct {
+  id: string;
+  price: number;
+  role: string;
+  emoji: string;
+}
+
 interface StickyCartBarProps {
   steps: Array<RoutineStep & { product: MockProduct }>;
   cycleDays: number;
   slideNavHeight?: number;
+  /** When set, overrides steps for pricing/thumbnails (BARRIER_EMERGENCY mode) */
+  barrierProducts?: BarrierProduct[];
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -54,6 +63,7 @@ const StickyCartBar = memo(function StickyCartBar({
   steps,
   cycleDays,
   slideNavHeight = 56,
+  barrierProducts,
 }: StickyCartBarProps) {
   const { language } = useI18nStore();
   const lang = (language === 'de' || language === 'ko') ? language : 'en' as LangKey;
@@ -64,17 +74,21 @@ const StickyCartBar = memo(function StickyCartBar({
   const ctaTok = ctaTokens(isDark);
   const glassTok = glassTokens(isDark);
 
+  const isBarrierMode = (barrierProducts?.length ?? 0) > 0;
+
   const pricing = useMemo(() => {
-    const totalOriginal = steps.reduce((sum, s) => sum + getProductPrice(s.product.id), 0);
+    const totalOriginal = isBarrierMode
+      ? barrierProducts!.reduce((sum, p) => sum + p.price, 0)
+      : steps.reduce((sum, s) => sum + getProductPrice(s.product.id), 0);
     const totalDiscounted = Math.round(totalOriginal * (1 - DISCOUNT_PCT));
     const supplyDays = cycleDays * 2;
     const supplyWeeks = Math.round(supplyDays / 7);
     const dailyPrice = supplyDays > 0 ? (totalDiscounted / supplyDays).toFixed(2) : '0.00';
     const monthlyPrice = supplyDays > 0 ? (totalDiscounted / (supplyDays / 30)).toFixed(2) : '0.00';
     return { totalOriginal, totalDiscounted, supplyWeeks, dailyPrice, monthlyPrice };
-  }, [steps, cycleDays]);
+  }, [steps, cycleDays, barrierProducts, isBarrierMode]);
 
-  const productCount = steps.length;
+  const productCount = isBarrierMode ? (barrierProducts?.length ?? 0) : steps.length;
 
   const prefersReducedMotion = typeof window !== 'undefined'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;

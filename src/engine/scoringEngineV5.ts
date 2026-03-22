@@ -64,7 +64,7 @@ export interface ScoreProvenance {
     zoneConcerns:      { zone: ZoneId; concernId: string; contribution: number }[];
     deepDiveQuestions: { questionId: string; contribution: number }[];
     foundationModifiers: { factor: string; multiplier: number }[];
-    crossAxisBonus:    { pattern: string; bonusPercent: number } | null;
+    crossAxisBonuses:  { pattern: string; bonusPercent: number }[];
   };
 }
 
@@ -78,7 +78,12 @@ export interface ScoringOutput {
 // Zone concern → axis mapping
 // ─────────────────────────────────────────────────────────────────────────────
 
-interface ConcernEntry { axis: AxisKey; flag?: string }
+interface ConcernEntry {
+  axis: AxisKey;
+  flag?: string;
+  secondaryAxis?: AxisKey;
+  secondaryWeight?: number;  // fraction of primary contribution (0-1)
+}
 
 /**
  * Canonical mapping of every Phase 02 concern chip ID to its primary axis.
@@ -89,10 +94,10 @@ interface ConcernEntry { axis: AxisKey; flag?: string }
 const CONCERN_AXIS_MAP: Record<string, ConcernEntry> = {
   // ── Forehead ────────────────────────────────────────────────────────────────
   oily_f:          { axis: "seb" },
-  blackheads_f:    { axis: "texture" },   // pores → texture
-  whiteheads_f:    { axis: "texture" },
+  blackheads_f:    { axis: "texture", secondaryAxis: "seb", secondaryWeight: 0.25 },
+  whiteheads_f:    { axis: "texture", secondaryAxis: "acne", secondaryWeight: 0.30 },
   lines_f:         { axis: "aging" },
-  breakouts_f:     { axis: "texture" },
+  breakouts_f:     { axis: "texture", secondaryAxis: "acne", secondaryWeight: 0.45 },
 
   // ── Eyes ────────────────────────────────────────────────────────────────────
   fine_lines_e:    { axis: "aging" },
@@ -101,17 +106,17 @@ const CONCERN_AXIS_MAP: Record<string, ConcernEntry> = {
   dryness_e:       { axis: "hyd" },
 
   // ── Nose ────────────────────────────────────────────────────────────────────
-  pores_n:         { axis: "texture" },   // pores → texture
-  blackheads_n:    { axis: "texture" },   // pores → texture
+  pores_n:         { axis: "texture" },
+  blackheads_n:    { axis: "texture", secondaryAxis: "seb", secondaryWeight: 0.25 },
   oily_n:          { axis: "seb" },
   redness_n:       { axis: "sen" },
 
   // ── Cheeks ──────────────────────────────────────────────────────────────────
   redness_c:       { axis: "sen" },
-  acne_c:          { axis: "texture" },
+  acne_c:          { axis: "acne", secondaryAxis: "texture", secondaryWeight: 0.35 },
   dryness_c:       { axis: "hyd" },
   pigment_c:       { axis: "pigment" },
-  pores_c:         { axis: "texture" },   // pores → texture
+  pores_c:         { axis: "texture" },
 
   // ── Mouth ───────────────────────────────────────────────────────────────────
   dryness_m:       { axis: "hyd" },
@@ -120,9 +125,9 @@ const CONCERN_AXIS_MAP: Record<string, ConcernEntry> = {
   perioral_m:      { axis: "sen" },
 
   // ── Jawline ─────────────────────────────────────────────────────────────────
-  hormonal_j:      { axis: "acne", flag: "HORMONAL_ACNE" },  // hormonal → acne + flag
+  hormonal_j:      { axis: "acne", flag: "HORMONAL_ACNE" },
   cystic_j:        { axis: "acne" },
-  texture_j:       { axis: "texture" },
+  texture_j:       { axis: "texture", secondaryAxis: "acne", secondaryWeight: 0.20 },
   sagging_j:       { axis: "aging" },
 
   // ── Neck ────────────────────────────────────────────────────────────────────
@@ -204,7 +209,16 @@ function questionSeverity(
 
   if (q.type === "multi") {
     if (!Array.isArray(answer) || !q.options?.length) return 0;
-    return answer.length / q.options.length;
+    // For multi-select with negative axisHints, only count options with score > 0
+    // ("None" selections should not count as meaningful severity)
+    const positiveOpts = q.options.filter(o => o.score > 0);
+    if (positiveOpts.length === 0) return answer.length / q.options.length;
+    const meaningfulSelections = answer.filter(id =>
+      q.options!.find(o => o.id === id)?.score! > 0
+    );
+    return positiveOpts.length > 0
+      ? meaningfulSelections.length / positiveOpts.length
+      : 0;
   }
 
   if (q.type === "slider") {
@@ -274,23 +288,21 @@ function buildFoundationMods(
     mods.pigment.push({ factor: "climate_tropical",  multiplier: 1.08 });
   }
 
-  // ── Age modifiers (Phase 3.5B) ───────────────────────────────────────────────
+  // ── Age modifiers — EXCLUSIVE BRACKET (take highest only, no cumulative stacking) ──
   const age = f.age_bracket ?? -1; // -1 = not answered
+  const AGE_AGING_MOD: Record<number, number> = { 3: 1.15, 4: 1.25, 5: 1.35 };
+  const AGE_HYD_MOD:   Record<number, number> = { 3: 1.10, 4: 1.18, 5: 1.25 };
+  const AGE_BAR_MOD:   Record<number, number> = { 4: 1.10, 5: 1.18 };
 
-  if (age >= 3) { // 40+
-    mods.aging.push({ factor: "age_40plus", multiplier: 1.15 });
-    mods.hyd.push(  { factor: "age_40plus_dryness", multiplier: 1.10 });
+  if (age >= 3) {
+    mods.aging.push({ factor: `age_${age}0s`, multiplier: AGE_AGING_MOD[age] ?? 1.0 });
+    mods.hyd.push(  { factor: `age_${age}0s_dryness`, multiplier: AGE_HYD_MOD[age] ?? 1.0 });
+    if (age >= 4) {
+      mods.bar.push({ factor: `age_${age}0s_barrier`, multiplier: AGE_BAR_MOD[age] ?? 1.0 });
+    }
   }
-  if (age >= 4) { // 50+
-    mods.aging.push({ factor: "age_50plus", multiplier: 1.20 });
-    mods.bar.push(  { factor: "age_50plus_barrier", multiplier: 1.10 });
-    mods.hyd.push(  { factor: "age_50plus_dryness", multiplier: 1.15 });
-  }
-  if (age >= 5) { // 60+
-    mods.aging.push({ factor: "age_60plus", multiplier: 1.25 });
-    mods.hyd.push(  { factor: "age_60plus_dryness", multiplier: 1.20 });
-    mods.bar.push(  { factor: "age_60plus_barrier", multiplier: 1.15 });
-    mods.seb.push(  { factor: "age_60plus_seb_decrease", multiplier: 0.85 });
+  if (age >= 5) {
+    mods.seb.push({ factor: "age_60plus_seb_decrease", multiplier: 0.85 });
   }
   if (age >= 0 && age <= 1) { // under 29
     mods.seb.push(  { factor: "age_young_seb",  multiplier: 1.10 });
@@ -326,17 +338,16 @@ function buildFoundationMods(
   // ── Outdoor exposure (Exposome) ───────────────────────────────────────────────
   const outdoor = f.outdoor ?? 0;
   if (outdoor >= 2) { // 3+ hours daily
-    mods.ox.push(      { factor: "outdoor_high_uv",      multiplier: 1.15 });
+    mods.ox.push(      { factor: "outdoor_high_uv",      multiplier: 1.20 });
     mods.pigment.push( { factor: "outdoor_high_pigment",  multiplier: 1.08 });
   }
 
-  // ── Altitude exposure ─────────────────────────────────────────────────────────
+  // ── Altitude exposure — single modifier, no stacking ──────────────────────────
   const altitude = f.altitude ?? 0;
-  if (altitude >= 1) { // occasional or regular
-    mods.ox.push({ factor: "altitude_uv_increase", multiplier: 1.20 });
-  }
-  if (altitude >= 2) { // regular (stacks with above)
-    mods.ox.push({ factor: "altitude_regular", multiplier: 1.10 });
+  if (altitude >= 2) {
+    mods.ox.push({ factor: "altitude_regular", multiplier: 1.30 });
+  } else if (altitude >= 1) {
+    mods.ox.push({ factor: "altitude_occasional", multiplier: 1.18 });
   }
 
   // ── Menopause modifiers (clinical: 30% collagen loss in first 5 years) ────────
@@ -347,17 +358,18 @@ function buildFoundationMods(
     mods.aging.push({ factor: "perimenopause_collagen_start",   multiplier: 1.10 });
   }
   if (meno === "meno_post_early") {
-    // MOST CRITICAL PERIOD — fastest collagen loss
-    mods.aging.push({ factor: "postmeno_early_collagen_crisis", multiplier: 1.30 });
+    // Brincat et al.: 30% collagen loss in first 5 post-menopausal years
+    mods.aging.push({ factor: "postmeno_early_collagen_crisis", multiplier: 1.35 });
     mods.hyd.push(  { factor: "postmeno_early_ceramide_loss",   multiplier: 1.25 });
     mods.bar.push(  { factor: "postmeno_early_barrier_collapse",multiplier: 1.20 });
     mods.seb.push(  { factor: "postmeno_early_seb_drop",        multiplier: 0.80 });
   }
   if (meno === "meno_post_late") {
+    // Plateau phase — loss rate decelerates
     mods.aging.push({ factor: "postmeno_late_chronic",      multiplier: 1.20 });
     mods.hyd.push(  { factor: "postmeno_late_chronic_dry",  multiplier: 1.18 });
-    mods.bar.push(  { factor: "postmeno_late_thin_skin",    multiplier: 1.15 });
-    mods.seb.push(  { factor: "postmeno_late_low_seb",      multiplier: 0.75 });
+    mods.bar.push(  { factor: "postmeno_late_thin_skin",    multiplier: 1.12 });
+    mods.seb.push(  { factor: "postmeno_late_low_seb",      multiplier: 0.78 });
   }
 
   return mods;
@@ -375,7 +387,7 @@ export function computeScores(input: ScoringInput): ScoringOutput {
   type ProvEntry = ScoreProvenance["breakdown"];
   const prov: Record<AxisKey, ProvEntry> = Object.fromEntries(
     AXIS_KEYS.map(a => [a, {
-      zoneConcerns: [], deepDiveQuestions: [], foundationModifiers: [], crossAxisBonus: null,
+      zoneConcerns: [], deepDiveQuestions: [], foundationModifiers: [], crossAxisBonuses: [],
     }])
   ) as Record<AxisKey, ProvEntry>;
 
@@ -425,6 +437,19 @@ export function computeScores(input: ScoringInput): ScoringOutput {
       for (const c of axisConcerns) {
         prov[axis].zoneConcerns.push({ zone: zoneId as ZoneId, concernId: c.id, contribution: perConcern });
       }
+
+      // §1: Secondary axis contribution (dual-axis split)
+      for (const c of axisConcerns) {
+        const cEntry = CONCERN_AXIS_MAP[c.id];
+        if (cEntry?.secondaryAxis) {
+          const secContrib = zoneContrib * (cEntry.secondaryWeight ?? 0.3);
+          raw[cEntry.secondaryAxis] += secContrib;
+          hasAnyConcern.add(cEntry.secondaryAxis);
+          prov[cEntry.secondaryAxis].zoneConcerns.push({
+            zone: zoneId as ZoneId, concernId: c.id, contribution: secContrib,
+          });
+        }
+      }
     }
   }
 
@@ -435,16 +460,62 @@ export function computeScores(input: ScoringInput): ScoringOutput {
   // bar — proxy: barrier stress is co-present with hyd + sen concerns
   // ───────────────────────────────────────────────────────────────────────────
 
-  // ox baseline: stress (0-28) + climate bonus (4-20), capped at 45
-  const stressOxBase  = ([8, 18, 28] as number[])[foundation.stress] ?? 8;
+  // §4: ox baseline — risk-capped at 18 (sigmoid ≈ 31, "watch" grade)
+  const stressOxBase  = ([4, 12, 20] as number[])[foundation.stress] ?? 4;
   const c = (foundation.climate ?? "").toLowerCase();
-  const climateOxBonus = c.includes("pollut") ? 20 : c.includes("tropical") ? 8 : 4;
-  const oxBaseline = Math.min(stressOxBase + climateOxBonus, 45);
+  const climateOxBonus = c.includes("pollut") ? 10 : c.includes("tropical") ? 4 : 2;
+  const OX_RISK_CAP = 18;
+  const oxBaseline = Math.min(stressOxBase + climateOxBonus, OX_RISK_CAP);
   raw.ox += oxBaseline;
   prov.ox.zoneConcerns.push({ zone: "forehead", concernId: "__ox_baseline__", contribution: oxBaseline });
 
-  // bar baseline: 45% of hyd layer-1 contribution + 30% of sen contribution, max 25
-  const barBaseline = Math.min(raw.hyd * 0.45 + raw.sen * 0.30, 25);
+  // Flatten zoneData to concernSeverity map for inferFromFaceMap (used by barrier patterns + L2 compensation)
+  const flatSeverity: Record<string, 1 | 2 | 3> = {};
+  for (const zoneConcerns of Object.values(zoneData)) {
+    for (const [cId, sev] of Object.entries(zoneConcerns)) {
+      flatSeverity[cId] = sev as 1 | 2 | 3;
+    }
+  }
+  const inference = Object.keys(flatSeverity).length > 0
+    ? inferFromFaceMap(flatSeverity)
+    : null;
+
+  // §8: Barrier pattern detection — direct chip-derived bar contribution
+  const barrierPatterns: { zone: string; concerns: string[]; contribution: number }[] = [];
+  const dryRedZones = [
+    { dry: "dryness_c", red: "redness_c", zone: "cheeks", weight: 1.0 },
+    { dry: "dryness_e", red: "fine_lines_e", zone: "eyes", weight: 0.6 },
+    { dry: "neck_dry",  red: "neck_red", zone: "neck", weight: 0.7 },
+  ];
+  for (const { dry, red, zone, weight } of dryRedZones) {
+    const drySev = flatSeverity[dry] ?? 0;
+    const redSev = flatSeverity[red] ?? 0;
+    if (drySev > 0 && redSev > 0) {
+      const avgSev = (drySev + redSev) / 2;
+      const contrib = (avgSev / 3) * (LAYER1_MAX / ZONES.length) * weight;
+      raw.bar += contrib;
+      hasAnyConcern.add("bar");
+      barrierPatterns.push({ zone, concerns: [dry, red], contribution: contrib });
+    }
+  }
+  // Perioral sensitivity → oral barrier stress
+  const perioralSev = flatSeverity["perioral_m"] ?? 0;
+  if (perioralSev >= 2) {
+    const contrib = (perioralSev / 3) * (LAYER1_MAX / ZONES.length) * 0.8;
+    raw.bar += contrib;
+    hasAnyConcern.add("bar");
+    barrierPatterns.push({ zone: "mouth", concerns: ["perioral_m"], contribution: contrib });
+  }
+  for (const bp of barrierPatterns) {
+    prov.bar.zoneConcerns.push({
+      zone: bp.zone as ZoneId,
+      concernId: `__barrier_pattern_${bp.concerns.join("+")}__`,
+      contribution: bp.contribution,
+    });
+  }
+
+  // §8: bar baseline — reduced coefficients (direct chip signal now supplements)
+  const barBaseline = Math.min(raw.hyd * 0.45 + raw.sen * 0.35, 30);
   raw.bar += barBaseline;
   prov.bar.zoneConcerns.push({ zone: "forehead", concernId: "__bar_baseline__", contribution: barBaseline });
 
@@ -506,25 +577,14 @@ export function computeScores(input: ScoringInput): ScoringOutput {
   // so it doesn't under-score compared to the old all-questions model.
   // ───────────────────────────────────────────────────────────────────────────
 
-  // Flatten zoneData to concernSeverity map for inferFromFaceMap
-  const flatSeverity: Record<string, 1 | 2 | 3> = {};
-  for (const zoneConcerns of Object.values(zoneData)) {
-    for (const [cId, sev] of Object.entries(zoneConcerns)) {
-      flatSeverity[cId] = sev as 1 | 2 | 3;
-    }
-  }
-  const inference = Object.keys(flatSeverity).length > 0
-    ? inferFromFaceMap(flatSeverity)
-    : null;
-
   if (inference) {
     for (const axis of AXIS_KEYS) {
       if (inference.resolvedAxes.includes(axis) && l2[axis].answered === 0) {
-        // Implied L2 = proportional to how much Layer 1 contributed
-        const chipContribution = raw[axis]; // raw score so far (Layer 1 only at this point)
+        // §5: Implied L2 = 40% of theoretical max, capped at 35%
+        const chipContribution = raw[axis];
         const impliedL2 = Math.min(
-          (chipContribution / LAYER1_MAX) * LAYER2_MAX * 0.6,  // 60% of theoretical max
-          LAYER2_MAX * 0.5  // hard cap at 50% of L2 max
+          (chipContribution / LAYER1_MAX) * LAYER2_MAX * 0.40,
+          LAYER2_MAX * 0.35
         );
         raw[axis] += impliedL2;
         prov[axis].deepDiveQuestions.push({
@@ -546,6 +606,9 @@ export function computeScores(input: ScoringInput): ScoringOutput {
       raw[axis] *= mod.multiplier;
       prov[axis].foundationModifiers.push(mod);
     }
+    // §3: Post-modifier raw score cap — prevents modifier chains from exceeding 80
+    const L3_RAW_CAP = LAYER1_MAX + LAYER2_MAX; // = 80
+    raw[axis] = Math.min(raw[axis], L3_RAW_CAP);
   }
 
   // Atopy implicit flag: amplifies sensitivity + barrier
@@ -565,59 +628,58 @@ export function computeScores(input: ScoringInput): ScoringOutput {
   // Applied on pre-sigmoid raw scores (multiplicative, one-time per pattern).
   // ───────────────────────────────────────────────────────────────────────────
 
+  // §10: Cross-axis patterns — thresholds recalibrated for new L3/L4 model
+
   // 1. Dehydrated-Oily: simultaneous high sebum + high dehydration
-  if (raw.seb >= 40 && raw.hyd >= 40) {
+  if (raw.seb >= 35 && raw.hyd >= 35) {
     raw.seb *= 1.12; raw.hyd *= 1.12;
-    prov.seb.crossAxisBonus = { pattern: "Dehydrated-Oily", bonusPercent: 12 };
-    prov.hyd.crossAxisBonus = { pattern: "Dehydrated-Oily", bonusPercent: 12 };
+    prov.seb.crossAxisBonuses.push({ pattern: "Dehydrated-Oily", bonusPercent: 12 });
+    prov.hyd.crossAxisBonuses.push({ pattern: "Dehydrated-Oily", bonusPercent: 12 });
   }
 
   // 2. Barrier Stress: compromised barrier + reactive sensitivity
-  if (raw.bar >= 40 && raw.sen >= 40) {
+  if (raw.bar >= 30 && raw.sen >= 18) {
     raw.bar *= 1.15; raw.sen *= 1.15;
-    prov.bar.crossAxisBonus = { pattern: "Barrier Stress", bonusPercent: 15 };
-    prov.sen.crossAxisBonus = { pattern: "Barrier Stress", bonusPercent: 15 };
+    prov.bar.crossAxisBonuses.push({ pattern: "Barrier Stress", bonusPercent: 15 });
+    prov.sen.crossAxisBonuses.push({ pattern: "Barrier Stress", bonusPercent: 15 });
   }
 
   // 3. Hormonal Acne Cascade: jawline hormonal flag + elevated acne
   if (activeFlags.includes("HORMONAL_ACNE") && raw.acne >= 35) {
     raw.acne *= 1.20;
-    prov.acne.crossAxisBonus = { pattern: "Hormonal Acne Cascade", bonusPercent: 20 };
+    prov.acne.crossAxisBonuses.push({ pattern: "Hormonal Acne Cascade", bonusPercent: 20 });
   }
 
   // 4. Photo-Aging: pigmentation + aging co-elevation
   if (raw.pigment >= 40 && raw.aging >= 40) {
     raw.pigment *= 1.10; raw.aging *= 1.10;
-    prov.pigment.crossAxisBonus = { pattern: "Photo-Aging", bonusPercent: 10 };
-    prov.aging.crossAxisBonus   = { pattern: "Photo-Aging", bonusPercent: 10 };
+    prov.pigment.crossAxisBonuses.push({ pattern: "Photo-Aging", bonusPercent: 10 });
+    prov.aging.crossAxisBonuses.push({ pattern: "Photo-Aging", bonusPercent: 10 });
   }
 
   // 5. Congestion Complex: excess sebum drives texture deterioration
   if (raw.seb >= 40 && raw.texture >= 40) {
     raw.texture *= 1.15;
-    prov.texture.crossAxisBonus = { pattern: "Congestion Complex", bonusPercent: 15 };
+    prov.texture.crossAxisBonuses.push({ pattern: "Congestion Complex", bonusPercent: 15 });
   }
 
   // 6. PIH Cascade — acne + pigmentation co-elevation
-  // Post-inflammatory hyperpigmentation: breakout marks become dark spots
   if (raw.acne >= 35 && raw.pigment >= 30) {
     raw.pigment *= 1.12;
-    prov.pigment.crossAxisBonus = { pattern: "PIH Cascade", bonusPercent: 12 };
+    prov.pigment.crossAxisBonuses.push({ pattern: "PIH Cascade", bonusPercent: 12 });
   }
 
   // 7. Stress-Sebum Loop — high stress + elevated sebum
-  // Cortisol-driven oil overproduction feeds acne cycle
   if (foundation.stress >= 2 && raw.seb >= 40) {
     raw.seb *= 1.10;
     raw.acne = Math.min(raw.acne * 1.08, 95);
-    prov.seb.crossAxisBonus = { pattern: "Stress-Sebum Loop", bonusPercent: 10 };
+    prov.seb.crossAxisBonuses.push({ pattern: "Stress-Sebum Loop", bonusPercent: 10 });
   }
 
-  // 8. Dry-Aging Acceleration — dehydration + aging
-  // Dehydration makes wrinkles appear deeper; compromised barrier accelerates aging
-  if (raw.hyd >= 40 && raw.aging >= 35) {
+  // 8. Dry-Aging Acceleration — dehydration + aging (lowered thresholds)
+  if (raw.hyd >= 35 && raw.aging >= 30) {
     raw.aging *= 1.12;
-    prov.aging.crossAxisBonus = { pattern: "Dry-Aging Acceleration", bonusPercent: 12 };
+    prov.aging.crossAxisBonuses.push({ pattern: "Dry-Aging Acceleration", bonusPercent: 12 });
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -647,12 +709,13 @@ export function computeScores(input: ScoringInput): ScoringOutput {
     }
   }
 
-  // makeup_stability: inverse function of sebum and hydration deficiency
-  // Range 3-8 (low baseline — no direct concern chips collected)
+  // §2: makeup_stability — both high seb AND high hyd reduce stability
+  // Added barrier contribution (TEWL-driven product migration)
   const makeupRaw =
     3 +
-    ((100 - scores.seb) / 100) * 3 +  // low seb → higher stability
-    (scores.hyd / 100)         * 2;    // high hyd → higher stability
+    ((100 - scores.seb) / 100) * 2.5 +  // low seb → better hold
+    ((100 - scores.hyd) / 100) * 1.5 +  // low dehydration → better hold
+    ((100 - scores.bar) / 100) * 1.0;   // good barrier → better hold
   scores.makeup_stability = clamp(Math.round(makeupRaw), 3, 8);
 
   // ───────────────────────────────────────────────────────────────────────────

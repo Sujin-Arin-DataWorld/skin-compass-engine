@@ -340,7 +340,7 @@ function ConcernSection({
                           <Link to={`/formula/${product.id}`}>
                             <div className="relative w-full aspect-square bg-stone-50 dark:bg-black/[0.12] flex items-center justify-center p-3 overflow-hidden">
                               <div className="w-12 h-12 rounded-full" style={{ background: "rgba(45,107,74,0.08)" }} />
-                              <img src={`/productsimage/${product.id}.jpeg`} alt={name} className="absolute inset-0 w-full h-full object-contain p-3" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                              <img src={`/productsImage/${product.id}.jpg`} alt={name} className="absolute inset-0 w-full h-full object-contain p-3" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                             </div>
                           </Link>
                           <div className="p-3">
@@ -504,7 +504,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                             <Link to={`/formula/${product.id}`}>
                               <div className="relative w-full aspect-square bg-stone-50 dark:bg-black/[0.12] flex items-center justify-center p-3 overflow-hidden">
                                 <div className="w-12 h-12 rounded-full" style={{ background: "rgba(45,107,74,0.08)" }} />
-                                <img src={`/productsimage/${product.id}.jpeg`} alt={name} className="absolute inset-0 w-full h-full object-contain p-3" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                                <img src={`/productsImage/${product.id}.jpg`} alt={name} className="absolute inset-0 w-full h-full object-contain p-3" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                               </div>
                             </Link>
                             <div className="p-3">

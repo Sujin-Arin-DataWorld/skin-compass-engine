@@ -5,7 +5,7 @@
  * Replaces the normal tier selector (3-step / 5-step / 5+Device) with a
  * guided "Empty → Fill → Lock" recovery journey.
  *
- * Image pattern: /productsimage/${product.id}.jpeg
+ * Image pattern: /productsImage/${product.id}.jpg
  * onError fallback → shows product.emoji
  */
 
@@ -201,33 +201,21 @@ export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: 
               gap: 10,
               marginTop: 8,
             }}>
-              {/* LEFT: 40×40 image with emoji fallback */}
+              {/* LEFT: 56×56 product image with emoji fallback */}
               <div style={{
-                width: 40, height: 40, borderRadius: 8, flexShrink: 0,
+                width: 56, height: 56, borderRadius: 10, flexShrink: 0,
                 background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
                 position: 'relative', overflow: 'hidden',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
-                <span style={{ fontSize: 20, position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {product.emoji}
-                </span>
+                {/* Emoji shown until image loads (or as fallback) */}
+                <span style={{ fontSize: 24, lineHeight: 1 }}>{product.emoji}</span>
                 <img
-                  src={`/productsimage/${product.id}.jpeg`}
+                  src={`/productsImage/${product.id}.jpg`}
                   alt={product.name[lang]}
                   style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
-                    if (fallback) fallback.style.display = 'flex';
-                  }}
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
                 />
-                {/* Second fallback span (shown by onError above) */}
-                <span style={{
-                  fontSize: 20, position: 'absolute', inset: 0, display: 'none',
-                  alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {product.emoji}
-                </span>
               </div>
 
               {/* MIDDLE: name + ingredients + badge */}

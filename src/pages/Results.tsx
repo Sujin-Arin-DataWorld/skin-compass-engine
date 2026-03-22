@@ -14,6 +14,7 @@ import SlideFinalDashboard from "@/components/results/SlideFinalDashboard";
 import SlideNav from "@/components/results/SlideNav";
 import StickyCartBar from "@/components/results/StickyCartBar";
 import { AGE_CYCLE_MAP } from "@/components/results/sharedResultsData";
+import { BARRIER_RECOVERY_PHASES } from "@/components/results/BarrierRecoveryProducts";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { useProductStore } from "@/store/productStore";
 import type {
@@ -87,7 +88,7 @@ function makeMockResult(products: Product[]): DiagnosisResult {
         zoneConcerns:        [{ zone: "cheeks", concernId: "redness_c", contribution: 18 }, { zone: "cheeks", concernId: "stinging_c", contribution: 12 }],
         deepDiveQuestions:   [{ questionId: "SEN_01", contribution: 20 }],
         foundationModifiers: [{ factor: "high_stress", multiplier: 1.15 }],
-        crossAxisBonus:      null,
+        crossAxisBonuses:    [],
       },
     },
     {
@@ -96,7 +97,7 @@ function makeMockResult(products: Product[]): DiagnosisResult {
         zoneConcerns:        [{ zone: "cheeks", concernId: "dryness_c", contribution: 15 }],
         deepDiveQuestions:   [{ questionId: "BAR_01", contribution: 18 }],
         foundationModifiers: [{ factor: "low_sleep", multiplier: 1.10 }],
-        crossAxisBonus:      { pattern: "barrier_stress", bonusPercent: 8 },
+        crossAxisBonuses:    [{ pattern: "barrier_stress", bonusPercent: 8 }],
       },
     },
   ];
@@ -200,6 +201,16 @@ const ResultsPage = () => {
   const handleTierChange = useCallback((steps: any[]) => {
     setTierCartSteps(steps);
   }, []);
+
+  // Barrier emergency — flat product list for StickyCartBar pricing
+  const isBarrierEmergency = result?.active_flags?.includes('BARRIER_EMERGENCY') ?? false;
+  const barrierCartProducts = useMemo(() =>
+    isBarrierEmergency
+      ? BARRIER_RECOVERY_PHASES.flatMap((ph) =>
+          ph.products.map((p) => ({ id: p.id, price: p.price, role: p.role, emoji: p.emoji }))
+        )
+      : undefined,
+  [isBarrierEmergency]);
 
   // Cycle days from EXP_AGE
   const axisAnswers = useDiagnosisStore((s) => s.axisAnswers);
@@ -346,8 +357,13 @@ const ResultsPage = () => {
       </AnimatePresence>
 
       {/* Sticky cart bar — above SlideNav */}
-      {cartSteps.length > 0 && (
-        <StickyCartBar steps={cartSteps} cycleDays={cycleDays} slideNavHeight={0} />
+      {(isBarrierEmergency || cartSteps.length > 0) && (
+        <StickyCartBar
+          steps={cartSteps}
+          cycleDays={cycleDays}
+          slideNavHeight={0}
+          barrierProducts={barrierCartProducts}
+        />
       )}
 
       {/* Navigation overlay */}

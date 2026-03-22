@@ -228,7 +228,7 @@ export interface ScoreProvenance {
     zoneConcerns:        { zone: ZoneId; concernId: string; contribution: number }[];
     deepDiveQuestions:   { questionId: string; contribution: number }[];
     foundationModifiers: { factor: string; multiplier: number }[];
-    crossAxisBonus:      { pattern: string; bonusPercent: number } | null;
+    crossAxisBonuses:    { pattern: string; bonusPercent: number }[];
   };
 }
 

@@ -153,9 +153,9 @@ export function computeSkinAge(
   // Good hydration (low hyd score = less dehydration) → younger
   if (scores.hyd <= 30) skinAge -= 2;
 
-  // High oxidative stress → UV damage ages skin
-  if      (scores.ox >= 60) skinAge += 3;
-  else if (scores.ox <= 25) skinAge -= 2;
+  // §11: ox >= 50 now indicates genuine chip-confirmed damage
+  if      (scores.ox >= 50) skinAge += 3;
+  else if (scores.ox <= 20) skinAge -= 2;
 
   // Menopause acceleration
   if (menoStatus === "meno_post_early" && scores.aging >= 50) skinAge += 4;

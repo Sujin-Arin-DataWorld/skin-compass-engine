@@ -181,13 +181,13 @@ function ProvenanceDrawer({ prov, lang }: ProvenanceDrawerProps) {
     (s, q) => s + q.contribution, 0
   );
 
-  const { foundationModifiers, crossAxisBonus } = prov.breakdown;
+  const { foundationModifiers, crossAxisBonuses } = prov.breakdown;
 
   const hasAny =
     zoneConcerns.length > 0 ||
     deepDiveTotal > 1 ||
     foundationModifiers.length > 0 ||
-    crossAxisBonus != null;
+    crossAxisBonuses.length > 0;
 
   if (!hasAny) {
     return (
@@ -261,16 +261,16 @@ function ProvenanceDrawer({ prov, lang }: ProvenanceDrawerProps) {
       )}
 
       {/* Cross-axis bonus */}
-      {crossAxisBonus && (
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      {crossAxisBonuses.map((cab, i) => (
+        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontSize: "0.7rem", color: "hsl(var(--foreground))" }}>
-            {t("Pattern interaction", "Muster-Interaktion", "패턴 상호작용")} · {crossAxisBonus.pattern}
+            {t("Pattern interaction", "Muster-Interaktion", "패턴 상호작용")} · {cab.pattern}
           </span>
           <span style={{ fontSize: "0.7rem", fontWeight: 600, color: "hsl(var(--severity-moderate))" }}>
-            +{crossAxisBonus.bonusPercent}%
+            +{cab.bonusPercent}%
           </span>
         </div>
-      )}
+      ))}
 
     </div>
   );

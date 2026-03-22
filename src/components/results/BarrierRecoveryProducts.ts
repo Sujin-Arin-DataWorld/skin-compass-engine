@@ -2,9 +2,8 @@
  * BarrierRecoveryProducts.ts
  *
  * Static product + phase data for the BARRIER_EMERGENCY recovery journey.
- * These products map to IDs already present in MOCK_PRODUCT_PRICES (sharedResultsData.ts).
- * Product images are derived dynamically: `/productsimage/${product.id}.jpeg`
- * — no image_url field needed; onError shows emoji fallback.
+ * Product IDs match the image filenames in /public/productsImage/ (without extension).
+ * Images are loaded as `/productsImage/${product.id}.jpg` in BarrierRecoveryMode.tsx.
  */
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -56,12 +55,12 @@ export const BARRIER_RECOVERY_PHASES: BarrierPhase[] = [
     },
     products: [
       {
-        id:             'madeca-cleanser',
-        name:           { ko: '마데카MD 진정 젤 클렌저', en: 'Madeca MD Soothing Gel Cleanser', de: 'Madeca MD Gel-Reiniger' },
-        keyIngredients: 'Centella Asiatica 60% · pH 5.2',
-        badge:          { ko: '약산성', en: 'Low pH', de: 'Niedrig-pH' },
+        id:             'DE_balea_med_washgel',
+        name:           { ko: '메드 울트라 센서티브 워시젤', en: 'Med Ultra Sensitive Washgel', de: 'Med Ultra Sensitive Washgel' },
+        keyIngredients: 'Panthenol · Allantoin · pH 5.5',
+        badge:          { ko: '민감성 전용', en: 'Sensitive', de: 'Sensitiv' },
         role:           'cleanser',
-        price:          14,
+        price:          2.95,
         emoji:          '🫧',
       },
     ],
@@ -74,17 +73,26 @@ export const BARRIER_RECOVERY_PHASES: BarrierPhase[] = [
     color:    '#378ADD',
     bgColor:  'rgba(55,138,221,0.06)',
     instruction: {
-      ko: '판테놀 · 알란토인 · 히알루론산으로 진정 및 수분을 공급하세요',
-      en: 'Replenish with Panthenol · Allantoin · Hyaluronic Acid',
-      de: 'Mit Panthenol · Allantoin · Hyaluronsäure auffüllen',
+      ko: '판테놀 · 히알루론산 · 스쿠알란으로 진정 및 수분을 공급하세요',
+      en: 'Replenish with Panthenol · Triple Hyaluronic Acid · Squalane',
+      de: 'Mit Panthenol · Hyaluronsäure · Squalan auffüllen',
     },
     products: [
       {
-        id:             'barrier-serum-recovery',
-        name:           { ko: '배리어 리커버리 세럼', en: 'Barrier Recovery Serum', de: 'Barriere-Erholungsserum' },
-        keyIngredients: 'Panthenol 5% · Allantoin · Centella',
+        id:             'KR_rawquest_barrier_toner_essence',
+        name:           { ko: '베리어 인핸싱 토너 투 에센스', en: 'Barrier Enhancing Toner to Essence', de: 'Barrier Enhancing Toner to Essence' },
+        keyIngredients: 'Panthenol · Squalane · Triple Hyaluronic Acid',
+        role:           'toner_essence',
+        price:          23.0,
+        emoji:          '💧',
+      },
+      {
+        id:             'DE_colibri_barrier_booster',
+        name:           { ko: '배리어 부스터', en: 'Barrier Booster', de: 'Barrier Booster' },
+        keyIngredients: 'Ceramides (5 Types) · Cholesterol · Fatty Acids',
+        badge:          { ko: '5종 세라마이드', en: '5 Ceramides', de: '5 Ceramide' },
         role:           'serum',
-        price:          28,
+        price:          29.95,
         emoji:          '🔬',
       },
     ],
@@ -97,26 +105,26 @@ export const BARRIER_RECOVERY_PHASES: BarrierPhase[] = [
     color:    '#4A9E68',
     bgColor:  'rgba(74,158,104,0.06)',
     instruction: {
-      ko: '세라마이드 · 콜레스테롤 · 지방산으로 지질막을 복구하고\n미네랄 선크림으로 피부를 보호하세요',
-      en: 'Repair lipid layer with Ceramides · Cholesterol · Fatty Acids\nProtect with mineral SPF',
-      de: 'Lipidschicht mit Ceramiden · Cholesterin · Fettsäuren reparieren\nMit Mineral-LSF schützen',
+      ko: '세라마이드 · 판테놀 · 스쿠알란으로 지질막을 복구하고\nSPF50+ 선에센스로 2차 손상을 막으세요',
+      en: 'Repair lipid layer with Ceramides · Panthenol · Squalane\nProtect with SPF50+ sun essence',
+      de: 'Lipidschicht mit Ceramiden · Panthenol · Squalan reparieren\nMit SPF50+ Sonnenessenz schützen',
     },
     products: [
       {
-        id:             'barrier-moist-recovery',
-        name:           { ko: '배리어 리커버리 크림', en: 'Barrier Recovery Cream', de: 'Barriere-Erholungscreme' },
-        keyIngredients: 'Ceramide NP · Cholesterol · Fatty Acids',
+        id:             'KR_rawquest_barrier_recovery_cream',
+        name:           { ko: '베리어 리커버리 크림', en: 'Barrier Recovery Cream', de: 'Barrier Recovery Cream' },
+        keyIngredients: 'Ceramide NP · Panthenol · Squalane · Triple HA',
         role:           'moisturizer',
-        price:          26,
-        emoji:          '🛡',
+        price:          25.0,
+        emoji:          '🛡️',
       },
       {
-        id:             'barrier-spf-mineral',
-        name:           { ko: '미네랄 선크림 SPF50+', en: 'Mineral Sunscreen SPF50+', de: 'Mineral-Sonnenschutz SPF50+' },
-        keyIngredients: 'Zinc Oxide · Titanium Dioxide',
-        badge:          { ko: '미네랄', en: 'Mineral', de: 'Mineralisch' },
-        role:           'spf',
-        price:          22,
+        id:             'KR_rawquest_barrier_sunessence',
+        name:           { ko: '베리어 리커버리 선에센스 SPF50+', en: 'Barrier Recovery Sun Essence SPF50+', de: 'Barrier Recovery Sun Essence SPF50+' },
+        keyIngredients: 'Panthenol · Niacinamide · Triple HA · PA++++',
+        badge:          { ko: '미네랄 SPF', en: 'SPF50+', de: 'LSF50+' },
+        role:           'sunscreen',
+        price:          16.0,
         emoji:          '☀️',
       },
     ],

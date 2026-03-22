@@ -146,7 +146,7 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
         <Link to={`/formula/${product.id}`} className="block relative w-full aspect-square max-w-[160px] mx-auto group cursor-pointer">
           <div className="w-full h-full bg-white dark:bg-white/5 rounded-xl shadow-sm flex items-center justify-center p-4 transition-transform duration-300 group-hover:scale-105">
             <img
-              src={`/productsimage/${product.id}.jpeg`}
+              src={`/productsImage/${product.id}.jpg`}
               alt={product.name.en}
               className="max-w-full max-h-full object-contain"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}

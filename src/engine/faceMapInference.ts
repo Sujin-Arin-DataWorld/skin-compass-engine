@@ -83,6 +83,14 @@ export function inferFromFaceMap(
     //   severity 1 → ~2.1 pts, severity 2 → ~4.3 pts, severity 3 → ~6.4 pts
     //   (based on LAYER1_MAX=45 / 7 zones ≈ 6.4 pts max per zone-axis)
     chipScores[axis] += (severity / 3) * 6.4;
+
+    // §1-A: Secondary axis contributions (dual-axis split)
+    if (concernId === "acne_c")      chipScores.texture += (severity / 3) * 6.4 * 0.35;
+    if (concernId === "breakouts_f") chipScores.acne    += (severity / 3) * 6.4 * 0.45;
+    if (concernId === "whiteheads_f")chipScores.acne    += (severity / 3) * 6.4 * 0.30;
+    if (concernId === "blackheads_f")chipScores.seb     += (severity / 3) * 6.4 * 0.25;
+    if (concernId === "blackheads_n")chipScores.seb     += (severity / 3) * 6.4 * 0.25;
+    if (concernId === "texture_j")   chipScores.acne    += (severity / 3) * 6.4 * 0.20;
   }
 
   // ── 2. Infer skin type from spatial oiliness/dryness distribution ──────────
@@ -146,8 +154,11 @@ export function inferFromFaceMap(
     const score = chipScores[axis];
     if (score === 0) continue; // not triggered → skip
 
-    // Score >= 20: user selected severe (3) on ≥1 concern, or moderate on 2+
-    if (score >= 20) {
+    // Score >= 12: sev=3 on both chips of a small-chip axis (seb, acne, pigment)
+    //   OR sev=2 on 2+ chips of a multi-chip axis.
+    //   Threshold tuned so seb (max ~13), acne (max ~19), pigment (max ~19)
+    //   can all reach resolved and receive implied L2 compensation.
+    if (score >= 12) {
       resolvedAxes.push(axis);
     } else {
       ambiguousAxes.push(axis);

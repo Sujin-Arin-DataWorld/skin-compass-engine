@@ -115,6 +115,7 @@ export interface DetectedPattern {
 export interface LocalizedContent {
   de: string;
   en: string;
+  ko?: string;
 }
 
 export interface Product {

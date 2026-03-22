@@ -22,7 +22,7 @@ export const useProductStore = create<ProductState>()(
             resetProducts: () => set({ products: CLINICAL_PRODUCTS }),
         }),
         {
-            name: "skin-compass-products-v1",
+            name: "skin-compass-products-v2",
         }
     )
 );

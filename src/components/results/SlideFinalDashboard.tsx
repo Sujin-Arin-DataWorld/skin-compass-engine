@@ -174,6 +174,9 @@ export default function SlideFinalDashboard({ result }: Props) {
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div style={{
+      flex: 1,
+      overflowY: 'auto',
+      overflowX: 'hidden',
       paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 34px))',
       paddingTop: 'env(safe-area-inset-top, 0px)',
     }}>
@@ -955,13 +958,14 @@ function Section2HowToStart({
   isDark,
   ctaTok,
 }: Section2Props) {
+  const navigate = useNavigate();
   const prefersReducedMotion = typeof window !== 'undefined'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
 
   const tier2Features: Array<{ text: string; isAccent: boolean }> = [
     {
       text: tx(
-        '{W}주마다 자동 리필 ({age}대 기준)',
+        '{W}주마다 자동 리필 ({age} 기준)',
         'Automatisches Nachfüllen alle {W} Wochen (für {age}er)',
         'Auto-refill every {W} weeks (for {age}s)',
         lang, { W: supplyWeeks, age: ageLabel },
@@ -1114,6 +1118,7 @@ function Section2HowToStart({
 
         {/* CTA Button */}
         <motion.button
+          onClick={() => navigate('/checkout')}
           whileHover={prefersReducedMotion ? {} : {
             y: -1,
             boxShadow: isDark
@@ -1246,6 +1251,7 @@ function Section2HowToStart({
 
         {/* CTA Button (outline) */}
         <motion.button
+          onClick={() => navigate('/checkout?plan=refill')}
           whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
           style={{
             width: '100%', padding: 10, borderRadius: 12,

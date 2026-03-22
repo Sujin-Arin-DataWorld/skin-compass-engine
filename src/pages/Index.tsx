@@ -255,6 +255,7 @@ function ConcernSection({
   addLabel: string;
 }) {
   const [active, setActive] = useState<ConcernKey | null>(null);
+  const { language } = useI18nStore();
 
   const filteredProducts = active
     ? products.filter((p) => p.target_axes?.includes(CONCERN_META[active].axis))
@@ -330,7 +331,8 @@ function ConcernSection({
                   >
                     {filteredProducts.map((product) => {
                       const state = cartStates[product.id] ?? "idle";
-                      const name = typeof product.name === "string" ? product.name : (product.name.de ?? product.name.en);
+                      const pn = product.name;
+                      const name = typeof pn === "string" ? pn : ((pn as any)[language] ?? pn.de ?? pn.en);
                       return (
                         <div
                           key={product.id}
@@ -494,7 +496,8 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                     >
                       {rowProducts.map((product) => {
                         const state = cartStates[product.id] ?? "idle";
-                        const name = typeof product.name === "string" ? product.name : (product.name.de ?? product.name.en);
+                        const pn = product.name;
+                        const name = typeof pn === "string" ? pn : ((pn as any)[language] ?? pn.de ?? pn.en);
                         return (
                           <div
                             key={product.id}

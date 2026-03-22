@@ -53,6 +53,7 @@ interface StickyCartBarProps {
   slideNavHeight?: number;
   /** When set, overrides steps for pricing/thumbnails (BARRIER_EMERGENCY mode) */
   barrierProducts?: BarrierProduct[];
+  onCta?: () => void;
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -64,6 +65,7 @@ const StickyCartBar = memo(function StickyCartBar({
   cycleDays,
   slideNavHeight = 56,
   barrierProducts,
+  onCta,
 }: StickyCartBarProps) {
   const { language } = useI18nStore();
   const lang = (language === 'de' || language === 'ko') ? language : 'en' as LangKey;
@@ -171,6 +173,7 @@ const StickyCartBar = memo(function StickyCartBar({
 
         {/* Row 3: CTA Button */}
         <motion.button
+          onClick={onCta}
           whileHover={prefersReducedMotion ? {} : {
             boxShadow: isDark
               ? '0 0 0 4px rgba(45,107,74,0.15), 0 8px 32px rgba(45,107,74,0.25)'
@@ -196,6 +199,7 @@ const StickyCartBar = memo(function StickyCartBar({
         >
           {t('cart_cta', lang, { X: pricing.monthlyPrice })}
         </motion.button>
+
 
         {/* Row 4: Trust badges */}
         <div style={{

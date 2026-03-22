@@ -1,264 +1,546 @@
 import { Product } from "@/engine/types";
 
+/**
+ * Curated product catalogue for the main-page routine showcase.
+ *
+ * Products are ordered so the RoutineShowcase (Index.tsx) can slice
+ * the array to populate each tier row:
+ *  - Row 0 (Entry / 3-step):  first 6 products
+ *  - Row 1 (Full  / 5-step):  first 8 products
+ *  - Row 2 (Premium / 5+dev): all products
+ *
+ * Only products that have a matching image in /public/productsImage/ are listed.
+ */
+
 export const CLINICAL_PRODUCTS: Product[] = [
-    {
-        id: "formula-1",
-        brand: "DERMATICA",
-        phase: "Phase 1",
-        type: "Cleanser",
-
-        // Commerce
-        price: 34.00,
-        price_eur: 34.00,
-        volume: "150ml",
-        unitPrice: "€22.67 / 100ml",
-        shelfLife: "12M",
-        stockStatus: "available",
-
-        // Content
-        name: {
-            en: "Barrier Balance Gel Cleanser",
-            de: "Barrier Balance Reinigungsgel"
-        },
-        benefitSummary: {
-            en: "Gently removes impurities without compromising the lipid barrier.",
-            de: "Entfernt sanft Unreinheiten, ohne die Lipidbarriere zu beeinträchtigen."
-        },
-        description: {
-            en: "Formulated with a precision pH to match healthy skin, this non-foaming gel cleanser purifies pores while delivering essential ceramides. It prevents the post-wash tightness associated with barrier disruption.",
-            de: "Dieses nicht schäumende Reinigungsgel wurde mit einem präzisen pH-Wert für gesunde Haut formuliert. Es reinigt die Poren und liefert gleichzeitig essenzielle Ceramide. Es verhindert das Spannungsgefühl nach der Reinigung, das mit einer Störung der Hautbarriere einhergeht."
-        },
-        howToUse: {
-            en: "Massage 1-2 pumps onto damp skin for 60 seconds. Rinse thoroughly with lukewarm water. Use morning and night.",
-            de: "1-2 Pumpstöße auf die feuchte Haut geben und 60 Sekunden lang einmassieren. Mit lauwarmem Wasser gründlich abspülen. Morgens und abends anwenden."
-        },
-        ingredients: [
-            "Aqua (Water)", "Glycerin", "Sodium Cocoyl Isethionate", "Cetearyl Alcohol",
-            "Ceramide NP", "Ceramide AP", "Ceramide EOP", "Phytosphingosine",
-            "Cholesterol", "Sodium Lauroyl Lactylate", "Carbomer", "Xanthan Gum",
-            "Phenoxyethanol", "Ethylhexylglycerin"
-        ],
-
-        // Scientific Metadata
-        phLevel: 5.5,
-        targetVector: "bar",
-        vectorImpact: {
-            bar: +25,
-            sen: +15,
-            hyd: +10
-        },
-
-        // Legacy
-        tier: ["Entry", "Full", "Premium"],
-        shopify_handle: "barrier-balance-cleanser",
-        key_ingredients: ["Ceramide NP", "Glycerin", "Phytosphingosine"],
-        target_axes: ["bar", "sen", "hyd"],
-        for_skin: ["sensitive", "dry", "combination"],
-        texture_feel: "Gel-to-milk",
-        image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&q=80&w=400"
+  // ── 1. Cleanser ─────────────────────────────────────────────────────────────
+  {
+    id: "KR_cosrx_bha_cleanser",
+    brand: "COSRX",
+    phase: "Step 1",
+    type: "Cleanser",
+    price: 6.0,
+    price_eur: 6.0,
+    volume: "150ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "살리실산 데일리 젠틀 클렌저",
+      en: "Salicylic Acid Daily Gentle Cleanser",
+      de: "Salicylic Acid Daily Gentle Cleanser",
     },
-    {
-        id: "formula-2",
-        brand: "SKINCEUTICALS",
-        phase: "Phase 2",
-        type: "Serum",
-
-        price: 68.00,
-        price_eur: 68.00,
-        volume: "30ml",
-        unitPrice: "€226.67 / 100ml",
-        shelfLife: "12M",
-        stockStatus: "available",
-
-        name: {
-            en: "Hydration Multiplier B5",
-            de: "Hydratations-Multiplikator B5"
-        },
-        benefitSummary: {
-            en: "Floods the stratum corneum with multi-molecular weight hydration.",
-            de: "Versorgt das Stratum corneum mit tiefenwirksamer Feuchtigkeit durch unterschiedliche Molekulargewichte."
-        },
-        description: {
-            en: "An unadulterated hydration engine. Combines three molecular weights of Hyaluronic Acid with Vitamin B5 to bind water not just on the surface, but deep within the epidermal layers, physically plumping skin cells.",
-            de: "Ein reiner Feuchtigkeitsbooster. Kombiniert drei Molekulargewichte von Hyaluronsäure mit Vitamin B5, um Wasser nicht nur an der Oberfläche, sondern tief in den epidermalen Schichten zu binden und die Hautzellen physisch aufzupolstern."
-        },
-        howToUse: {
-            en: "Apply 3-4 drops to cleansed, slightly damp face, neck, and chest. Pat gently until absorbed.",
-            de: "3-4 Tropfen auf das gereinigte, leicht feuchte Gesicht, Hals und Dekolleté auftragen. Sanft einklopfen, bis es eingezogen ist."
-        },
-        ingredients: [
-            "Aqua/Water", "Sodium Hyaluronate", "Panthenol", "Phenoxyethanol",
-            "Calcium Pantothenate", "Madecassoside"
-        ],
-
-        phLevel: 5.8,
-        targetVector: "hyd",
-        vectorImpact: {
-            hyd: +30,
-            bar: +10,
-            texture: +15
-        },
-
-        tier: ["Full", "Premium"],
-        shopify_handle: "hydration-multiplier-b5",
-        key_ingredients: ["Hyaluronic Acid", "Vitamin B5", "Madecassoside"],
-        target_axes: ["hyd", "bar", "texture"],
-        for_skin: ["all"],
-        texture_feel: "Weightless serum",
-        image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=400"
+    benefitSummary: {
+      en: "Low-pH gel cleanser with BHA for pore clarity without barrier disruption.",
+      de: "pH-freundliches Gel mit BHA für reine Poren ohne Barriereschädigung.",
+      ko: "저자극 약산성 BHA 클렌저로 모공 관리.",
     },
-    {
-        id: "formula-3",
-        brand: "PAULA'S CHOICE",
-        phase: "Phase 3",
-        type: "Treatment",
-
-        price: 42.00,
-        price_eur: 42.00,
-        volume: "30ml",
-        unitPrice: "€140.00 / 100ml",
-        shelfLife: "6M",
-        stockStatus: "available",
-
-        name: {
-            en: "Clarifying BHA 2% Liquid",
-            de: "Klärendes BHA 2% Liquid"
-        },
-        benefitSummary: {
-            en: "Unclogs pores and normalizes sebum production from within the follicle.",
-            de: "Befreit die Poren und normalisiert die Hautöl-Produktion tief im Follikel."
-        },
-        description: {
-            en: "This lipid-soluble liquid exfoliant penetrates deep into the sebaceous glands to dissolve congested follicular debris. It actively halts the acne cascade by reducing inflammation and regulating sebum discharge.",
-            de: "Dieses fettlösliche flüssige Peeling dringt tief in die Öl-Drüsen ein, um verstopfte Abfallstoffe in den Follikeln aufzulösen. Es stoppt aktiv die Akne-Kaskade, indem es Entzündungen reduziert und die Ölabsonderung reguliert."
-        },
-        howToUse: {
-            en: "Lightly soak a cotton pad and apply over the entire face, focusing on congested areas. Do not rinse. Start with PM use every other day.",
-            de: "Ein Wattepad leicht tränken und über das gesamte Gesicht streichen, dabei auf verstopfte Bereiche konzentrieren. Nicht abspülen. Anfangs jeden zweiten Tag abends anwenden."
-        },
-        ingredients: [
-            "Aqua", "Methylpropanediol", "Butylene Glycol", "Salicylic Acid",
-            "Polysorbate 20", "Camellia Oleifera (Green Tea) Leaf Extract",
-            "Sodium Hydroxide", "Tetrasodium EDTA"
-        ],
-
-        phLevel: 3.5,
-        targetVector: "seb",
-        vectorImpact: {
-            seb: -25,
-            acne: -30,
-            texture: +20
-        },
-
-        tier: ["Full", "Premium"],
-        shopify_handle: "clarifying-bha-2",
-        key_ingredients: ["Salicylic Acid 2%", "Green Tea Extract"],
-        target_axes: ["seb", "acne", "texture"],
-        for_skin: ["oily", "combination", "acne-prone"],
-        texture_feel: "Water-light liquid",
-        image: "https://images.unsplash.com/photo-1629198688000-71f23e745b6e?auto=format&fit=crop&q=80&w=400"
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "cosrx-bha-cleanser",
+    key_ingredients: ["Salicylic Acid", "Tea Tree", "Betaine"],
+    target_axes: ["seb", "texture"],
+    for_skin: ["oily", "combination", "acne-prone"],
+    image: "/productsImage/KR_cosrx_bha_cleanser.jpg",
+  },
+  {
+    id: "DE_balea_med_washgel",
+    brand: "Balea Med",
+    phase: "Step 1",
+    type: "Cleanser",
+    price: 2.95,
+    price_eur: 2.95,
+    volume: "150ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "메드 울트라 센서티브 워시젤",
+      en: "Med Ultra Sensitive Washgel",
+      de: "Med Ultra Sensitive Washgel",
     },
-    {
-        id: "formula-4",
-        brand: "LA ROCHE-POSAY",
-        phase: "Phase 4",
-        type: "Moisturiser",
-
-        price: 29.50,
-        price_eur: 29.50,
-        volume: "40ml",
-        unitPrice: "€73.75 / 100ml",
-        shelfLife: "12M",
-        stockStatus: "available",
-
-        name: {
-            en: "Toleriane Lipid Recovery Cream",
-            de: "Toleriane Lipid Recovery Creme"
-        },
-        benefitSummary: {
-            en: "Seals the skin barrier and instantly calms neurogenic inflammation.",
-            de: "Versiegelt die Hautbarriere und beruhigt sofort neurogene Entzündungen."
-        },
-        description: {
-            en: "An ultra-minimalist cocoon for compromised skin. Infused with Neurosensine to interrupt inflammatory signaling, and thermal spring water to remineralize the surface. Locks in moisture while shutting down sensitivity pathways.",
-            de: "Ein ultra-minimalistischer Kokon für angegriffene Haut. Angereichert mit Neurosensine zur Unterbrechung entzündlicher Signale und Thermalwasser zur Remineralisierung der Oberfläche. Schließt Feuchtigkeit ein und dämpft gleichzeitig Empfindlichkeitsreaktionen."
-        },
-        howToUse: {
-            en: "Apply deeply into face and neck every morning and evening after treatments.",
-            de: "Jeden Morgen und Abend nach der Behandlung tief in Gesicht und Hals einmassieren."
-        },
-        ingredients: [
-            "Aqua/Water", "Isocetyl Stearate", "Squalane", "Butyrospermum Parkii Butter/Shea Butter",
-            "Dimethicone", "Glycerin", "Aluminum Starch Octenylsuccinate", "Pentylene Glycol",
-            "PEG-100 Stearate", "Glyceryl Stearate", "Cetyl Alcohol", "Sodium Hydroxide",
-            "Acetyl Dipeptide-1 Cetyl Ester", "Acrylates/C10-30 Alkyl Acrylate Crosspolymer"
-        ],
-
-        phLevel: 5.5,
-        targetVector: "sen",
-        vectorImpact: {
-            sen: -20,
-            bar: +20,
-            hyd: +15
-        },
-
-        tier: ["Entry", "Full", "Premium"],
-        shopify_handle: "toleriane-recovery",
-        key_ingredients: ["Neurosensine", "Shea Butter", "Squalane"],
-        target_axes: ["sen", "bar", "hyd"],
-        for_skin: ["all", "sensitive"],
-        texture_feel: "Comforting cream",
-        image: "https://images.unsplash.com/photo-1608248593842-8eb4793282eb?auto=format&fit=crop&q=80&w=400"
+    benefitSummary: {
+      en: "Fragrance-free gel cleanser with Panthenol & Allantoin for sensitive skin.",
+      de: "Parfümfreies Waschgel mit Panthenol & Allantoin für empfindliche Haut.",
+      ko: "무향 판테놀 + 알란토인 순한 세안젤.",
     },
-    {
-        id: "formula-5",
-        brand: "HELIOCARE",
-        phase: "Phase 5",
-        type: "Sunscreen",
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "balea-med-washgel",
+    key_ingredients: ["Panthenol", "Allantoin"],
+    target_axes: ["sen", "bar"],
+    for_skin: ["sensitive", "dry"],
+    image: "/productsImage/DE_balea_med_washgel.jpg",
+  },
 
-        price: 36.00,
-        price_eur: 36.00,
-        volume: "50ml",
-        unitPrice: "€72.00 / 100ml",
-        shelfLife: "12M",
-        stockStatus: "available",
+  // ── 2. Toner / Essence ──────────────────────────────────────────────────────
+  {
+    id: "KR_rawquest_barrier_toner_essence",
+    brand: "RAWQUEST",
+    phase: "Step 2",
+    type: "Toner Essence",
+    price: 23.0,
+    price_eur: 23.0,
+    volume: "150ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "배리어 인핸싱 토너 투 에센스",
+      en: "Barrier Enhancing Toner to Essence",
+      de: "Barrier Enhancing Toner-zu-Essenz",
+    },
+    benefitSummary: {
+      en: "Ceramide-rich toner-essence hybrid to prep and repair the barrier.",
+      de: "Ceramidreiche Toner-Essenz-Hybride zur Vorbereitung und Reparatur der Barriere.",
+      ko: "세라마이드 토너 에센스 하이브리드로 장벽 강화.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "rawquest-toner-essence",
+    key_ingredients: ["Ceramide NP", "Panthenol", "Madecassoside"],
+    target_axes: ["bar", "hyd"],
+    for_skin: ["all", "sensitive", "dry"],
+    image: "/productsImage/KR_rawquest_barrier_toner_essence.jpg",
+  },
 
-        name: {
-            en: "360° Advanced Shield SPF 50+",
-            de: "360° Advanced Shield LSF 50+"
-        },
-        benefitSummary: {
-            en: "Complete spectrum defense against UVA, UVB, visible light, and IR-A.",
-            de: "Umfassender Schutz vor UVA-, UVB-Strahlung, sichtbarem Licht und Infrarot-A."
-        },
-        description: {
-            en: "Beyond UV protection. This advanced formula neutralizes free radicals caused by multi-spectrum radiation utilizing Fernblock technology. It prevents structural collagen degradation and tyrosinase activation.",
-            de: "Mehr als nur UV-Schutz. Diese fortschrittliche Formel neutralisiert mit der Fernblock-Technologie freie Radikale, die durch Multispektralstrahlung entstehen. Sie verhindert den strukturellen Kollagenabbau und die Tyrosinase-Aktivierung."
-        },
-        howToUse: {
-            en: "Shake well. Apply a generous, even layer (approx. 2 finger lengths) as the final step of your AM routine. Reapply every 2 hours if exposed to direct sunlight.",
-            de: "Gut schütteln. Eine großzügige, gleichmäßige Schicht (ca. 2 Fingerlängen) als letzten Schritt der Morgenroutine auftragen. Bei direkter Sonneneinstrahlung alle 2 Stunden erneuern."
-        },
-        ingredients: [
-            "Aqua", "Titanium Dioxide", "Zinc Oxide", "Polypodium Leucotomos Leaf Extract",
-            "Ethylhexyl Methoxycinnamate", "Diethylamino Hydroxybenzoyl Hexyl Benzoate",
-            "Octocrylene", "Glycerin", "Tocopheryl Acetate", "Ascorbic Acid"
-        ],
+  // ── 3. Serum ────────────────────────────────────────────────────────────────
+  {
+    id: "KR_torriden_cica_serum",
+    brand: "Torriden",
+    phase: "Step 3",
+    type: "Serum",
+    price: 15.0,
+    price_eur: 15.0,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "밸런스풀 시카 컨트롤 세럼",
+      en: "Balanceful Cica Control Serum",
+      de: "Balanceful Cica Control Serum",
+    },
+    benefitSummary: {
+      en: "Cica + Niacinamide + Zinc PCA serum for sebum control and soothing.",
+      de: "Cica + Niacinamid + Zink PCA Serum für Ölkontrolle und Beruhigung.",
+      ko: "시카 + 나이아신아마이드 피지 조절 진정 세럼.",
+    },
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "torriden-cica-serum",
+    key_ingredients: ["Niacinamide", "Zinc PCA", "Centella Asiatica"],
+    target_axes: ["seb", "sen", "bar"],
+    for_skin: ["oily", "sensitive", "combination"],
+    image: "/productsImage/KR_torriden_cica_serum.jpg",
+  },
+  {
+    id: "DE_colibri_barrier_booster",
+    brand: "Colibri Skincare",
+    phase: "Step 3",
+    type: "Serum",
+    price: 29.95,
+    price_eur: 29.95,
+    volume: "30ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "배리어 부스터",
+      en: "Barrier Booster",
+      de: "Barrier Booster",
+    },
+    benefitSummary: {
+      en: "5-ceramide + cholesterol + panthenol serum for deep barrier repair.",
+      de: "5-Ceramid + Cholesterol + Panthenol Serum für tiefe Barriere-Reparatur.",
+      ko: "5종 세라마이드 + 콜레스테롤 장벽 복원 세럼.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "colibri-barrier-booster",
+    key_ingredients: ["Ceramide NP/AP/EOP/NS/AS", "Cholesterol", "Panthenol"],
+    target_axes: ["bar", "hyd"],
+    for_skin: ["dry", "sensitive", "mature"],
+    image: "/productsImage/DE_colibri_barrier_booster.jpg",
+  },
 
-        phLevel: 6.0,
-        targetVector: "pigment",
-        vectorImpact: {
-            ox: -25,
-            pigment: -15,
-            aging: +20
-        },
+  // ── 4. Moisturizer ──────────────────────────────────────────────────────────
+  {
+    id: "KR_drgeo_cica_allinone",
+    brand: "Dr.Geo",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 3.5,
+    price_eur: 3.5,
+    volume: "150ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "시카 카밍 올인원 밀크",
+      en: "Cica Calming All-in-one Milk",
+      de: "Cica Calming All-in-one Milk",
+    },
+    benefitSummary: {
+      en: "Centella + Panthenol soothing all-in-one milk for daily moisture.",
+      de: "Centella + Panthenol beruhigende All-in-one Milch für tägliche Feuchtigkeit.",
+      ko: "병풀추출물 + 판테놀 수분 진정 올인원.",
+    },
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "drgeo-cica-allinone",
+    key_ingredients: ["Centella Asiatica", "Panthenol"],
+    target_axes: ["sen", "hyd", "bar"],
+    for_skin: ["all"],
+    image: "/productsImage/KR_drgeo_cica_allinone.jpg",
+  },
+  {
+    id: "KR_medicube_collagen_jelly",
+    brand: "medicube",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 28.0,
+    price_eur: 28.0,
+    volume: "110ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "에이지알 콜라겐 나이아신아마이드 젤리 크림",
+      en: "Age-R Collagen Niacinamide Jelly Cream",
+      de: "Age-R Collagen Niacinamide Jelly Creme",
+    },
+    benefitSummary: {
+      en: "Collagen peptide + Niacinamide bouncy jelly cream for firming.",
+      de: "Kollagenpeptid + Niacinamid Jelly Creme für Festigung.",
+      ko: "콜라겐 펩타이드 + 나이아신아마이드 탄력 젤리 크림.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "medicube-collagen-jelly",
+    key_ingredients: ["Collagen Peptide", "Niacinamide"],
+    target_axes: ["aging", "hyd"],
+    for_skin: ["all", "mature"],
+    image: "/productsImage/KR_medicube_collagen_jelly.jpg",
+  },
+  {
+    id: "KR_rawquest_barrier_recovery_cream",
+    brand: "RAWQUEST",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 25.0,
+    price_eur: 25.0,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "배리어 리커버리 크림",
+      en: "Barrier Recovery Cream",
+      de: "Barrier Recovery Creme",
+    },
+    benefitSummary: {
+      en: "Triple ceramide + cholesterol cream to rebuild the skin's lipid barrier.",
+      de: "Dreifach-Ceramid + Cholesterol Creme zum Wiederaufbau der Lipidbarriere.",
+      ko: "3종 세라마이드 + 콜레스테롤 장벽 복원 크림.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "rawquest-barrier-cream",
+    key_ingredients: ["Ceramide NP", "Cholesterol", "Phytosphingosine"],
+    target_axes: ["bar", "sen", "hyd"],
+    for_skin: ["sensitive", "dry"],
+    image: "/productsImage/KR_rawquest_barrier_recovery_cream.jpg",
+  },
+  {
+    id: "DE_baleamed_Barrierschutz_creme",
+    brand: "Balea Med",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 3.95,
+    price_eur: 3.95,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "메드 울트라 센서티브 배리어슈츠 크림",
+      en: "Med Ultra Sensitive Barrier Protection Cream",
+      de: "Med Ultra Sensitive Barrierschutzpflege",
+    },
+    benefitSummary: {
+      en: "DAAB-certified barrier cream with skinlipid technology for sensitive skin.",
+      de: "DAAB-zertifizierte Barrierecreme mit Skinlipid-Technologie für empfindliche Haut.",
+      ko: "DAAB 인증 피부장벽 보호 크림.",
+    },
+    tier: ["Entry", "Full"],
+    shopify_handle: "baleamed-barrier-cream",
+    key_ingredients: ["Skinlipid Complex", "Panthenol"],
+    target_axes: ["bar", "sen"],
+    for_skin: ["sensitive", "dry"],
+    image: "/productsImage/DE_baleamed_Barrierschutz_creme.jpg",
+  },
+  {
+    id: "KR_illiyoon_ceramide_ato_cream",
+    brand: "ILLIYOON",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 15.0,
+    price_eur: 15.0,
+    volume: "200ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "세라마이드 아토 집중크림",
+      en: "Ceramide Ato Concentrate Cream",
+      de: "Ceramide Ato Konzentratcreme",
+    },
+    benefitSummary: {
+      en: "Ceramide capsule cream for long-lasting barrier reinforcement and moisture.",
+      de: "Ceramid-Kapsel-Creme für langanhaltende Barriere-Verstärkung und Feuchtigkeit.",
+      ko: "세라마이드 캡슐 크림으로 장벽 강화 및 보습.",
+    },
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "illiyoon-ceramide-cream",
+    key_ingredients: ["Ceramide", "Panthenol", "Sunflower Oil"],
+    target_axes: ["bar", "hyd"],
+    for_skin: ["all", "dry", "sensitive"],
+    image: "/productsImage/KR_illiyoon_ceramide_ato_cream.jpg",
+  },
 
-        tier: ["Entry", "Full", "Premium"],
-        shopify_handle: "360-advanced-shield",
-        key_ingredients: ["Fernblock", "Titanium Dioxide", "Zinc Oxide"],
-        target_axes: ["pigment", "ox", "aging"],
-        for_skin: ["all"],
-        texture_feel: "Invisible fluid",
-        image: "https://images.unsplash.com/photo-1556228720-1c2a46220a2e?auto=format&fit=crop&q=80&w=400"
-    }
+  // ── 5. SPF / Sunscreen ─────────────────────────────────────────────────────
+  {
+    id: "KR_tag_sun_blue",
+    brand: "TAG",
+    phase: "Step 5",
+    type: "Sunscreen",
+    price: 3.5,
+    price_eur: 3.5,
+    volume: "32ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "태그 커버 선 베이스 03 블루",
+      en: "TAG Cover Sun Base 03 Blue",
+      de: "TAG Cover Sun Base 03 Clear Blue",
+    },
+    benefitSummary: {
+      en: "Matte tone-up sunscreen with Niacinamide for oily skin.",
+      de: "Mattierender Tone-up Sonnenschutz mit Niacinamid für ölige Haut.",
+      ko: "나이아신아마이드 무광 톤업 선크림.",
+    },
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "tag-sun-blue",
+    key_ingredients: ["UV Filters", "Niacinamide", "Centella Extract"],
+    target_axes: ["pigment"],
+    for_skin: ["oily", "combination"],
+    image: "/productsImage/KR_tag_sun_blue.jpg",
+  },
+  {
+    id: "KR_rawquest_barrier_sunessence",
+    brand: "RAWQUEST",
+    phase: "Step 5",
+    type: "Sunscreen",
+    price: 16.0,
+    price_eur: 16.0,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "배리어 리커버리 선 에센스 SPF50+",
+      en: "Barrier Recovery Sun Essence SPF50+/PA++++",
+      de: "Barrier Recovery Sonnen-Essenz SPF50+/PA++++",
+    },
+    benefitSummary: {
+      en: "Barrier-safe sun essence with ceramide for sensitive, recovering skin.",
+      de: "Barrierefreundliche Sonnen-Essenz mit Ceramiden für empfindliche Haut.",
+      ko: "세라마이드 배리어 케어 선에센스.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "rawquest-sun-essence",
+    key_ingredients: ["UV Filters", "Ceramide NP", "Centella Asiatica"],
+    target_axes: ["bar", "pigment"],
+    for_skin: ["sensitive", "dry"],
+    image: "/productsImage/KR_rawquest_barrier_sunessence.jpg",
+  },
+  {
+    id: "KR_isntree_hyaluronic_sun_gel",
+    brand: "ISNTREE",
+    phase: "Step 5",
+    type: "Sunscreen",
+    price: 14.0,
+    price_eur: 14.0,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "히알루론산 워터리 선젤 SPF50+",
+      en: "Hyaluronic Acid Watery Sun Gel SPF50+",
+      de: "Hyaluronsäure Watery Sun Gel SPF50+",
+    },
+    benefitSummary: {
+      en: "Lightweight watery sunscreen with Hyaluronic Acid, no white cast.",
+      de: "Leichter, wässriger Sonnenschutz mit Hyaluronsäure, kein Weißeln.",
+      ko: "히알루론산 워터리 선젤, 백탁 없음.",
+    },
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "isntree-sun-gel",
+    key_ingredients: ["UV Filters", "Hyaluronic Acid"],
+    target_axes: ["pigment", "hyd"],
+    for_skin: ["all"],
+    image: "/productsImage/KR_isntree_hyaluronic_sun_gel.jpg",
+  },
+
+  // ── 6. Treatment / Retinol ──────────────────────────────────────────────────
+  {
+    id: "KR_boncept_retinol_2500",
+    brand: "Boncept",
+    phase: "Step 3",
+    type: "Treatment",
+    price: 3.5,
+    price_eur: 3.5,
+    volume: "12ml",
+    shelfLife: "6M",
+    stockStatus: "available",
+    name: {
+      ko: "레티놀 2500 IU 링클 샷",
+      en: "Retinol 2500 IU Wrinkle Shot",
+      de: "Retinol 2500 IU Falten-Shot",
+    },
+    benefitSummary: {
+      en: "High-strength spot retinol for wrinkles and pigmentation.",
+      de: "Hochkonzentriertes Spot-Retinol gegen Falten und Pigmentierung.",
+      ko: "고농도 레티놀 스팟 트리트먼트.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "boncept-retinol-2500",
+    key_ingredients: ["Retinol 2500 IU"],
+    target_axes: ["aging", "pigment", "texture"],
+    for_skin: ["mature", "pigmentation"],
+    image: "/productsImage/KR_boncept_retinol_2500.jpg",
+  },
+
+  // ── 7. Extra Moisturizers ───────────────────────────────────────────────────
+  {
+    id: "KR_aestura_atobarrier",
+    brand: "AESTURA",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 18.0,
+    price_eur: 18.0,
+    volume: "120ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "아토배리어 365 크림",
+      en: "Atobarrier 365 Cream",
+      de: "Atobarrier 365 Creme",
+    },
+    benefitSummary: {
+      en: "MLE® technology cream that mimics the skin's natural lipid structure.",
+      de: "MLE®-Technologie Creme, die die natürliche Lipidstruktur der Haut nachahmt.",
+      ko: "MLE® 기술 피부 유사 지질 크림.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "aestura-atobarrier",
+    key_ingredients: ["MLE Complex", "Ceramide"],
+    target_axes: ["bar", "sen", "hyd"],
+    for_skin: ["sensitive", "dry"],
+    image: "/productsImage/KR_aestura_atobarrier.jpg",
+  },
+  {
+    id: "KR_realbarrier_extreme_cream",
+    brand: "Real Barrier",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 22.0,
+    price_eur: 22.0,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "리얼배리어 익스트림 크림",
+      en: "Extreme Cream",
+      de: "Extreme Creme",
+    },
+    benefitSummary: {
+      en: "Ceramide + Madecassoside high-barrier cream for extreme dryness.",
+      de: "Ceramid + Madecassosid Hochbarriere-Creme für extreme Trockenheit.",
+      ko: "세라마이드 + 마데카소사이드 고보습 장벽 크림.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "realbarrier-extreme-cream",
+    key_ingredients: ["Ceramide NP", "Madecassoside"],
+    target_axes: ["bar", "hyd"],
+    for_skin: ["dry", "sensitive"],
+    image: "/productsImage/KR_realbarrier_extreme_cream.jpg",
+  },
+  {
+    id: "DE_balea_men_ultra_sensitive_cream",
+    brand: "Balea",
+    phase: "Step 4",
+    type: "Moisturiser",
+    price: 3.95,
+    price_eur: 3.95,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "MEN 울트라 센서티브 인텐시브 크림",
+      en: "MEN Ultra Sensitive Intensive Cream (DAAB Certified)",
+      de: "MEN Ultra Sensitive Intensive Creme (DAAB zertifiziert)",
+    },
+    benefitSummary: {
+      en: "DAAB-certified intensive cream for sensitive skin with Bisabolol.",
+      de: "DAAB-zertifizierte Intensivpflege für empfindliche Haut mit Bisabolol.",
+      ko: "DAAB 인증 민감 피부 인텐시브 크림.",
+    },
+    tier: ["Entry", "Full"],
+    shopify_handle: "balea-men-sensitive-cream",
+    key_ingredients: ["Bisabolol", "Panthenol"],
+    target_axes: ["sen", "bar"],
+    for_skin: ["sensitive", "all"],
+    image: "/productsImage/DE_balea_men_ultra_sensitive_cream.jpg",
+  },
+
+  // ── 8. Extra Serum ──────────────────────────────────────────────────────────
+  {
+    id: "KR_torriden_divein_serum",
+    brand: "Torriden",
+    phase: "Step 3",
+    type: "Serum",
+    price: 13.0,
+    price_eur: 13.0,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "다이브인 저분자 히알루론산 세럼",
+      en: "DIVE-IN Low Molecular Hyaluronic Acid Serum",
+      de: "DIVE-IN Niedermolekulares Hyaluronsäure Serum",
+    },
+    benefitSummary: {
+      en: "5 types of Hyaluronic Acid for deep hydration and plumping.",
+      de: "5 Arten von Hyaluronsäure für tiefe Feuchtigkeit und Aufpolsterung.",
+      ko: "5종 히알루론산 저분자 세럼으로 깊은 수분 충전.",
+    },
+    tier: ["Entry", "Full", "Premium"],
+    shopify_handle: "torriden-divein-serum",
+    key_ingredients: ["Hyaluronic Acid (5 types)", "Panthenol", "Allantoin"],
+    target_axes: ["hyd", "bar"],
+    for_skin: ["all", "dehydrated"],
+    image: "/productsImage/KR_torriden_divein_serum.JPG",
+  },
+
+  // ── 9. Retinol Cream ────────────────────────────────────────────────────────
+  {
+    id: "KR_boncept_retinol_500",
+    brand: "Boncept",
+    phase: "Step 4",
+    type: "Treatment",
+    price: 3.5,
+    price_eur: 3.5,
+    volume: "50ml",
+    shelfLife: "12M",
+    stockStatus: "available",
+    name: {
+      ko: "레티놀 500 IU 크림",
+      en: "Retinol 500 IU Cream",
+      de: "Retinol 500 IU Creme",
+    },
+    benefitSummary: {
+      en: "Gentle retinol cream for beginners — wrinkle smoothing and brightening.",
+      de: "Sanfte Retinol-Creme für Einsteiger — Faltenglättung und Aufhellung.",
+      ko: "초보자용 순한 레티놀 크림 — 주름 개선 및 톤업.",
+    },
+    tier: ["Full", "Premium"],
+    shopify_handle: "boncept-retinol-500",
+    key_ingredients: ["Retinol 500 IU"],
+    target_axes: ["aging", "texture"],
+    for_skin: ["all", "mature"],
+    image: "/productsImage/KR_boncept_retinol_500.jpg",
+  },
 ];

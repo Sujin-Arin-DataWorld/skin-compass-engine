@@ -340,6 +340,7 @@ const ResultsPage = () => {
           cycleDays={cycleDays}
           slideNavHeight={0}
           barrierProducts={cartItems}
+          onCta={() => current < TOTAL_SLIDES - 1 ? goTo(TOTAL_SLIDES - 1) : navigate('/checkout')}
         />
       )}
 

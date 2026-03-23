@@ -1526,7 +1526,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
           {/* Mobile bottom-sheet drawer */}
           <AnimatePresence>
             {isMobile && activeZone && (
-              <div className="fixed inset-0 z-50 flex flex-col justify-end">
+              <div className="fixed inset-0 z-[60] flex flex-col justify-end">
                 <motion.div
                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   onClick={() => setActiveZone(null)}
@@ -1569,9 +1569,9 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
                       renderActions={false}
                     />
                   </div>
-                  {/* Sticky action buttons — always visible at bottom */}
+                  {/* Sticky action buttons — always visible at bottom, above bottom nav */}
                   <div style={{
-                    padding: "12px 20px calc(12px + env(safe-area-inset-bottom, 34px))",
+                    padding: "12px 20px calc(12px + 64px + env(safe-area-inset-bottom, 34px))",
                     borderTop: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)"}`,
                     background: isDark ? "#14141a" : "#ffffff",
                     flexShrink: 0,

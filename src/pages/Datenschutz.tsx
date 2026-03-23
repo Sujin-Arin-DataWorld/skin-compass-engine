@@ -11,9 +11,11 @@ const Datenschutz = () => (
           <h2 className="font-medium text-foreground">1. Verantwortlicher</h2>
           <p className="mt-2">
             Verantwortlicher für die Datenverarbeitung auf dieser Website im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:<br />
-            Skin Strategy Lab GmbH<br />
-            Musterstraße 123<br />
-            10115 Berlin, Deutschland<br />
+            Sujin Park<br />
+            (Skin Strategy Lab)<br />
+            {/* TODO: Jin — 실제 주소로 교체 */}
+            [Kurfürstenstraße] [14]<br />
+            [60486] Frankfurt am Main, Deutschland<br />
             E-Mail: datenschutz@skinstrategylab.de
           </p>
         </section>
@@ -219,8 +221,8 @@ const Datenschutz = () => (
         </section>
 
         <section>
-          <h2 className="font-medium text-foreground">9. Kontakt Datenschutzbeauftragter</h2>
-          <p className="mt-2">Unseren Datenschutzbeauftragten erreichen Sie unter: datenschutz@skinstrategylab.de</p>
+          <h2 className="font-medium text-foreground">9. Kontakt für Datenschutzanfragen</h2>
+          <p className="mt-2">Für Datenschutzanfragen erreichen Sie uns unter: datenschutz@skinstrategylab.de</p>
         </section>
       </div>
     </div>

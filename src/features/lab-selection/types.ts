@@ -24,7 +24,10 @@ export type RoutineSlot =
 export type FaceZone =
   | 'whole_face' | 't_zone' | 'forehead' | 'nose'
   | 'cheeks' | 'mouth' | 'jawline' | 'eye_area' | 'neck'
-  | 'spot_only' | 'dry_areas_only' | 'oily_areas_only';
+  | 'spot_only' | 'dry_areas_only' | 'oily_areas_only'
+  // Slot-based virtual zones (used when no face-map zone data is available)
+  | 'slot_cleanser' | 'slot_toner' | 'slot_serum_am' | 'slot_moisturizer'
+  | 'slot_spf' | 'slot_serum_pm' | 'slot_eye_cream';
 
 export type ApplicationMethod =
   | 'wash_off' | 'leave_on' | 'sheet_mask'

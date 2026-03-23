@@ -81,6 +81,14 @@ const ZONE_LABEL: Record<string, { ko: string; en: string; de: string }> = {
   spot_only: { ko: '트러블 부위', en: 'Spot Areas', de: 'Problemzonen' },
   dry_areas_only: { ko: '건조 부위', en: 'Dry Areas', de: 'Trockene Partien' },
   oily_areas_only: { ko: '유분 부위', en: 'Oily Areas', de: 'Fettige Partien' },
+  // Slot-based virtual zones
+  slot_cleanser:    { ko: '클렌저', en: 'Cleanser', de: 'Reiniger' },
+  slot_toner:       { ko: '토너 / 에센스', en: 'Toner / Essence', de: 'Toner / Essenz' },
+  slot_serum_am:    { ko: '아침 세럼', en: 'Morning Serum', de: 'Morgen-Serum' },
+  slot_moisturizer: { ko: '모이스처라이저', en: 'Moisturizer', de: 'Feuchtigkeitspflege' },
+  slot_spf:         { ko: '선크림 / SPF', en: 'Sunscreen / SPF', de: 'Sonnenschutz' },
+  slot_serum_pm:    { ko: '저녁 세럼', en: 'Evening Serum', de: 'Abend-Serum' },
+  slot_eye_cream:   { ko: '아이 크림', en: 'Eye Cream', de: 'Augencreme' },
 };
 
 function getZoneLabel(zone: FaceZone, lang: string): string {

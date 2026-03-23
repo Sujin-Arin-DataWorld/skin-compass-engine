@@ -117,13 +117,17 @@ const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56
   const textColor = isDark ? '#F5F5F7' : '#1B2838'; // tok.text
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="currentColor" strokeWidth={3.5} opacity={0.1} />
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round"
-          strokeDasharray={circ} strokeDashoffset={offset} style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', overflow: 'visible' }}>
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5} opacity={0.15} />
+        <motion.circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round"
+          strokeDasharray={circ}
+          initial={{ strokeDashoffset: circ }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        />
         <text x={size/2} y={size/2} textAnchor="middle" dominantBaseline="central"
           fontSize={size * 0.32} fontWeight={600} fill={textColor}
-          style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}
+          transform={`rotate(90, ${size/2}, ${size/2})`}
         >{Math.round(score)}</text>
       </svg>
       <span style={{

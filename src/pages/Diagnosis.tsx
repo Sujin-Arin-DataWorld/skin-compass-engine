@@ -229,7 +229,7 @@ function MobileFoundationStepper({
   return (
     <div style={{ padding: "0 4px", maxWidth: 440, margin: "0 auto" }}>
       {/* Progress bar */}
-      <div style={{ display: "flex", gap: 4, marginBottom: 20 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 10 }}>
         {Array.from({ length: TOTAL_MOBILE_STEPS }).map((_, i) => (
           <div key={i} style={{
             flex: 1, height: 3, borderRadius: 2,
@@ -243,9 +243,9 @@ function MobileFoundationStepper({
 
       {/* Counter */}
       <div style={{
-        fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase",
+        fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase",
         color: tokens(isDark).textTertiary,
-        fontFamily: "var(--font-sans)", marginBottom: 16,
+        fontFamily: "var(--font-sans)", marginBottom: 10,
       }}>
         {currentIndex + 1} / {TOTAL_MOBILE_STEPS}
       </div>
@@ -271,16 +271,16 @@ function MobileFoundationStepper({
       ) : q ? (
         /* Foundation question step */
         <>
-          <div style={{ fontSize: 26, marginBottom: 8 }}>{q.icon}</div>
+          <div style={{ fontSize: 22, marginBottom: 4 }}>{q.icon}</div>
           <h3 style={{
-            fontSize: 18, fontWeight: 400, marginBottom: 6, lineHeight: 1.4,
+            fontSize: 16, fontWeight: 400, marginBottom: 4, lineHeight: 1.4,
             color: tokens(isDark).text, fontFamily: "var(--font-sans)",
           }}>
             {fqText(q, lang)}
           </h3>
           {fqHint(q, lang) && (
             <p style={{
-              fontSize: 13, lineHeight: 1.5, marginBottom: 20,
+              fontSize: 12, lineHeight: 1.4, marginBottom: 14,
               color: tokens(isDark).textTertiary,
               fontFamily: "var(--font-sans)", fontStyle: "italic",
             }}>
@@ -602,7 +602,7 @@ const DiagnosisPage: React.FC = () => {
       {/* ── Page content ────────────────────────────────────────────────────── */}
       <div style={{
         maxWidth: 960, margin: "0 auto",
-        padding: isMobile ? "60px 20px 120px" : "88px 24px 64px"
+        padding: isMobile ? "58px 20px 120px" : "88px 24px 64px"
       }}>
 
         {/* Progress bar */}
@@ -624,8 +624,8 @@ const DiagnosisPage: React.FC = () => {
           })}
         </div>
         <p style={{
-          fontSize: 12, letterSpacing: "0.22em", color: tok.accentMuted,
-          textTransform: "uppercase", fontFamily: "var(--font-sans)", marginBottom: isMobile ? 14 : 36
+          fontSize: 11, letterSpacing: "0.22em", color: tok.accentMuted,
+          textTransform: "uppercase", fontFamily: "var(--font-sans)", marginBottom: isMobile ? 6 : 36
         }}>
           {phase === "foundation" && (lang === "de" ? "Phase 01 · Basis-Scan" : lang === "ko" ? "Phase 01 · 기초 스캔" : "Phase 01 · Foundation Scan")}
           {phase === "scanning" && (lang === "de" ? "Scan wird initialisiert…" : lang === "ko" ? "스캔 초기화 중…" : "Initiating Skin Scan…")}
@@ -639,12 +639,12 @@ const DiagnosisPage: React.FC = () => {
             <motion.div key="foundation"
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}>
-              <h1 style={{ fontSize: isMobile ? 26 : 32, fontWeight: 300, color: tok.accent, marginBottom: 6 }}>
+              <h1 style={{ fontSize: isMobile ? 20 : 32, fontWeight: 300, color: tok.accent, marginBottom: isMobile ? 2 : 6 }}>
                 {lang === "de" ? "Ihr Alltag & Ihre Haut" : lang === "ko" ? "일상 생활과 피부" : "Your Daily Life & Skin"}
               </h1>
               <p style={{
-                fontSize: 15, color: tok.textSecondary, marginBottom: 36,
-                fontFamily: "var(--font-sans)", maxWidth: 480, lineHeight: 1.6
+                fontSize: isMobile ? 13 : 15, color: tok.textSecondary, marginBottom: isMobile ? 16 : 36,
+                fontFamily: "var(--font-sans)", maxWidth: 480, lineHeight: 1.5
               }}>
                 {lang === "de" ? "Wir beginnen mit Ihrem Lebensstil — dem Fundament, das Ihre Haut täglich prägt."
                   : lang === "ko" ? "피부를 형성하는 가장 기본적인 생활 습관부터 시작합니다."

@@ -189,13 +189,17 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult, selectedZones: Select
     if (zoneDiagnoses.length > 0) return zoneDiagnoses;
   }
 
-  // Fallback: single whole_face diagnosis
-  return [{
-    zone: 'whole_face',
+  // Fallback: slot-based routine — one panel per routine step so users always see 7 product selections
+  const SLOT_ZONES: FaceZone[] = [
+    'slot_cleanser', 'slot_toner', 'slot_serum_am',
+    'slot_moisturizer', 'slot_spf', 'slot_serum_pm', 'slot_eye_cream',
+  ];
+  return SLOT_ZONES.map(zone => ({
+    zone,
     axis_scores: globalAxisScores,
     matched_profile: inferProfile(globalAxisScores),
     required_ingredients: computeRequiredIngredients(globalAxisScores),
-  }];
+  }));
 }
 
 

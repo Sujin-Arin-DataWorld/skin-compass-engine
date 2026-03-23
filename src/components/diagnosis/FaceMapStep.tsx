@@ -45,6 +45,17 @@ const ZONE_LABELS: Record<ZoneId, Record<Lang, string>> = {
   neck: { en: "Neck", de: "Hals", ko: "목" },
 };
 
+// Shortened labels for mobile to prevent clipping
+const ZONE_LABELS_SHORT: Record<ZoneId, Record<Lang, string>> = {
+  forehead: { en: "Forehead", de: "Stirn", ko: "이마" },
+  nose: { en: "T-Zone", de: "T-Zone", ko: "코·T존" },
+  eyes: { en: "Eyes", de: "Augen", ko: "눈가" },
+  cheeks: { en: "Cheeks", de: "Wangen", ko: "볼" },
+  mouth: { en: "Mouth", de: "Mund", ko: "입가" },
+  jawline: { en: "Jawline", de: "Kiefer", ko: "턱선" },
+  neck: { en: "Neck", de: "Hals", ko: "목" },
+};
+
 // ─── Zone concern data ────────────────────────────────────────────────────────
 const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
   forehead: [
@@ -388,6 +399,14 @@ const gt = (t: LocalizedText, lang: Lang): string =>
 
 // ─── FaceSVG ──────────────────────────────────────────────────────────────────
 // Zone outline paths with gold stroke and glow effects
+// Mobile-safe annotation endpoint adjustments to keep labels within visible bounds
+const MOBILE_ANNOT_OVERRIDES: Partial<Record<ZoneId, { x2: number; y2?: number }>> = {
+  forehead: { x2: 55 },
+  eyes:     { x2: 420 },
+  mouth:    { x2: 400 },
+  neck:     { x2: 395 },
+};
+
 function FaceSVG({
   activeZone, selectedZones, onZoneClick, lang, concernSeverity, isMobile = false,
 }: {
@@ -424,7 +443,7 @@ function FaceSVG({
         </filter>
       </defs>
 
-      {ZONES_DEF.map(({ zone, outlinePath, annotLine, hitPath }, zoneIdx) => {
+      {ZONES_DEF.map(({ zone, outlinePath, annotLine: rawAnnotLine, hitPath }, zoneIdx) => {
         const isSelected = selectedZones.has(zone);
         const isActive = activeZone === zone;
         const isHovered = hoveredZone === zone;
@@ -439,8 +458,13 @@ function FaceSVG({
 
         const d0 = zoneIdx * 0.5;
 
+        // On mobile, pull annotation endpoints inward to prevent label clipping
+        const annotLine = rawAnnotLine && isMobile && MOBILE_ANNOT_OVERRIDES[zone]
+          ? { ...rawAnnotLine, ...MOBILE_ANNOT_OVERRIDES[zone] }
+          : rawAnnotLine;
+
         const lp = annotLine ? annotLabelProps(annotLine) : null;
-        const label = ZONE_LABELS[zone][lang];
+        const label = isMobile ? ZONE_LABELS_SHORT[zone][lang] : ZONE_LABELS[zone][lang];
 
         // Zone max severity
         const zoneMaxSeverity = Math.max(
@@ -569,12 +593,12 @@ function FaceSVG({
                 fill={strokeColor}
                 style={{
                   fontFamily: "var(--font-sans)",
-                  fontSize: isMobile ? "24px" : "14px",
+                  fontSize: isMobile ? "16px" : "14px",
                   fontWeight: lit ? 600 : 400,
                   letterSpacing: "0.02em",
                   paintOrder: "stroke",
                   stroke: isDark ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.5)",
-                  strokeWidth: isMobile ? "3px" : "0",
+                  strokeWidth: isMobile ? "2px" : "0",
                   strokeLinejoin: "round",
                   animation: lit
                     ? "none"
@@ -1356,59 +1380,71 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
             gap: 28,
             padding: isMobile ? "0 8px" : "0 20px",
           }}>
-            {/* Face image card */}
+            {/* Face image card — overflow visible so SVG labels aren't clipped */}
             <div style={{
               position: "relative",
               width: "100%",
               maxWidth: isMobile ? "420px" : "520px",
               aspectRatio: "600/700",
               flexShrink: 0,
-              borderRadius: 28,
-              background: isDark ? faceMap.dark.imageBg : faceMap.light.imageBg, /*사진배경색깔*/
-              boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
-              border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
               margin: isMobile ? "0 auto" : "0",
-              overflow: "hidden",
             }}>
-              {/* Skeleton shimmer while image loads */}
-              {!imageLoaded && (
-                <div style={{
-                  position: "absolute", inset: 0, borderRadius: 28,
-                  background: isDark
-                    ? "linear-gradient(110deg, #1a1a22 30%, #25252f 50%, #1a1a22 70%)"
-                    : "linear-gradient(110deg, #f0ebe4 30%, #faf5ee 50%, #f0ebe4 70%)",
-                  backgroundSize: "200% 100%",
-                  animation: "fms-skeleton-shimmer 1.5s ease-in-out infinite",
-                  willChange: "transform",
-                }} />
-              )}
-              {/* Composite: image + vignette + SVG — fades in together */}
+              {/* Image layer — overflow hidden for rounded corners */}
               <div style={{
+                position: "absolute", inset: 0,
+                borderRadius: 28,
+                overflow: "hidden",
+                background: isDark ? faceMap.dark.imageBg : faceMap.light.imageBg,
+                boxShadow: isDark ? "0 32px 88px rgba(0,0,0,0.6)" : "0 20px 40px rgba(0,0,0,0.12)",
+                border: `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.08)"}`,
+              }}>
+                {/* Skeleton shimmer while image loads */}
+                {!imageLoaded && (
+                  <div style={{
+                    position: "absolute", inset: 0, borderRadius: 28,
+                    background: isDark
+                      ? "linear-gradient(110deg, #1a1a22 30%, #25252f 50%, #1a1a22 70%)"
+                      : "linear-gradient(110deg, #f0ebe4 30%, #faf5ee 50%, #f0ebe4 70%)",
+                    backgroundSize: "200% 100%",
+                    animation: "fms-skeleton-shimmer 1.5s ease-in-out infinite",
+                    willChange: "transform",
+                  }} />
+                )}
+                {/* Image + vignette — fades in together */}
+                <div style={{
+                  opacity: imageLoaded ? 1 : 0,
+                  transition: "opacity 0.5s ease",
+                  width: "100%", height: "100%",
+                }}>
+                  <img
+                    src={facemapImg}
+                    alt="Clinical face map"
+                    // @ts-expect-error fetchpriority not yet in React types
+                    fetchpriority="high"
+                    onLoad={() => setImageLoaded(true)}
+                    style={{
+                      width: "100%", height: "100%",
+                      objectFit: "cover",
+                      borderRadius: 28,
+                      filter: isDark ? "brightness(0.85) contrast(1.1)" : "none",
+                      transition: "filter 0.3s ease",
+                    }}
+                  />
+                  <div style={{
+                    position: "absolute", inset: 0, pointerEvents: "none",
+                    borderRadius: 28,
+                    background: isDark
+                      ? "radial-gradient(ellipse at 50% 45%, transparent 20%, rgba(18,18,20,0.6) 100%)"
+                      : "radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(242,240,237,0.4) 100%)",
+                  }} />
+                </div>
+              </div>
+              {/* SVG overlay — outside overflow:hidden so labels aren't clipped */}
+              <div style={{
+                position: "absolute", inset: 0,
                 opacity: imageLoaded ? 1 : 0,
                 transition: "opacity 0.5s ease",
-                width: "100%", height: "100%",
               }}>
-                <img
-                  src={facemapImg}
-                  alt="Clinical face map"
-                  // @ts-expect-error fetchpriority not yet in React types
-                  fetchpriority="high"
-                  onLoad={() => setImageLoaded(true)}
-                  style={{
-                    width: "100%", height: "100%",
-                    objectFit: "cover",
-                    borderRadius: 28,
-                    filter: isDark ? "brightness(0.85) contrast(1.1)" : "none",
-                    transition: "filter 0.3s ease",
-                  }}
-                />
-                <div style={{
-                  position: "absolute", inset: 0, pointerEvents: "none",
-                  borderRadius: 28,
-                  background: isDark
-                    ? "radial-gradient(ellipse at 50% 45%, transparent 20%, rgba(18,18,20,0.6) 100%)"
-                    : "radial-gradient(ellipse at 50% 45%, transparent 30%, rgba(242,240,237,0.4) 100%)",
-                }} />
                 <FaceSVG
                   activeZone={activeZone}
                   selectedZones={selectedZones}

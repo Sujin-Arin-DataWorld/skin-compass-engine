@@ -91,7 +91,8 @@ const INGREDIENT_ALIASES: Record<string, string[]> = {
 };
 
 function filterProductsByIngredients(products: Product[], requiredIngredientIds: string[]): Product[] {
-  if (requiredIngredientIds.length === 0) return [];
+  // BUG FIX: was `return []` — now returns all products when no specific requirements
+  if (requiredIngredientIds.length === 0) return products;
   const searchTerms: string[] = [];
   for (const id of requiredIngredientIds) {
     const aliases = INGREDIENT_ALIASES[id.toLowerCase()];
@@ -112,6 +113,17 @@ function filterProductsByIngredients(products: Product[], requiredIngredientIds:
     );
   });
 }
+
+// Maps slot-based virtual zones → the routine_slot values they cover
+const SLOT_ROUTINE_SLOTS: Partial<Record<string, string[]>> = {
+  slot_cleanser:    ['cleanser', 'cleanser_oil'],
+  slot_toner:       ['toner', 'toner_exfoliant', 'essence', 'toner_essence'],
+  slot_serum_am:    ['serum_am', 'serum_am_pm'],
+  slot_moisturizer: ['moisturizer_light', 'moisturizer_rich', 'moisturizer_allinone', 'moisturizer', 'moisturizer_night'],
+  slot_spf:         ['spf', 'sunscreen'],
+  slot_serum_pm:    ['serum_pm', 'serum_spot', 'serum_am_pm'],
+  slot_eye_cream:   ['eye_cream'],
+};
 
 // ── Skeleton ───────────────────────────────────────────────────────────────────
 
@@ -362,14 +374,29 @@ export default function DuelCard({
   const { products: allProducts, isLoading, error, refetch } = useProducts({});
 
   const zoneProducts = useMemo(() => {
+    const reqNames = requiredIngredients
+      .filter(r => r.name_en !== 'HOLD_ALL_ACTIVES')
+      .map(r => r.name_en);
+
+    const slotSlots = SLOT_ROUTINE_SLOTS[zone];
+    if (slotSlots) {
+      // Slot-based mode: filter by routine_slot first, then ingredient match
+      const bySlot = allProducts.filter(p => slotSlots.includes(p.routine_slot));
+      if (reqNames.length === 0) return bySlot;
+      const ingFiltered = filterProductsByIngredients(bySlot, reqNames);
+      // Fallback: if ingredient filter is too strict for this slot (e.g. SPF w/ BHA requirement), show all slot products
+      return ingFiltered.length > 0 ? ingFiltered : bySlot;
+    }
+
+    // Face-zone mode: filter by application_zones, then by ingredients
     const byZone = allProducts.filter(p =>
       (p.application_zones as string[]).includes(zone) ||
       (p.application_zones as string[]).includes('whole_face')
     );
-    const reqNames = requiredIngredients
-      .filter(r => r.name_en !== 'HOLD_ALL_ACTIVES')
-      .map(r => r.name_en);
-    return filterProductsByIngredients(byZone, reqNames);
+    if (reqNames.length === 0) return byZone;
+    const ingFiltered = filterProductsByIngredients(byZone, reqNames);
+    // Fallback: if no products match required ingredients, show all zone products
+    return ingFiltered.length > 0 ? ingFiltered : byZone;
   }, [allProducts, zone, requiredIngredients]);
 
   const availableTiers = useMemo((): PriceTier[] =>

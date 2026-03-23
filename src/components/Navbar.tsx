@@ -15,17 +15,15 @@ import { useNavStore } from "@/store/navStore";
 // ── Logo ──────────────────────────────────────────────────────────────────────
 function Logo() {
   return (
-    <Link to="/" className="flex flex-col items-center md:items-start group" aria-label="Skin Strategy Lab">
-      {/* 폰트 고유의 상하 여백을 무시하고 정렬하기 위해 leading-none 추가 */}
+    <Link to="/" className="flex flex-col items-start group" aria-label="Skin Strategy Lab">
       <span
-        className="font-display text-[1.05rem] md:text-[1.3rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[var(--ssl-accent-deep)] dark:group-hover:text-[var(--ssl-accent)] leading-none"
+        className="font-display text-[0.82rem] md:text-[1.3rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[var(--ssl-accent-deep)] dark:group-hover:text-[var(--ssl-accent)] leading-none"
         style={{ fontFamily: "var(--font-display)", letterSpacing: "0.06em" }}
       >
         SKIN STRATEGY
       </span>
-      {/* 억지로 위로 끌어올리던 음수 마진(mt-[-2px])을 없애고 자연스러운 여백(mt-[4px]) 부여 */}
       <span
-        className="font-body text-[0.48rem] md:text-[0.58rem] font-medium uppercase text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] mt-[3px] md:mt-[5px] leading-none"
+        className="font-body text-[0.38rem] md:text-[0.58rem] font-medium uppercase text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] mt-[2px] md:mt-[5px] leading-none"
         style={{ letterSpacing: "0.22em" }}
       >
         — LAB —
@@ -107,11 +105,11 @@ const Navbar = () => {
     <>
       {/* ── Main bar ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b pt-[env(safe-area-inset-top)]" style={{ background: 'var(--ssl-bg)', borderColor: 'var(--ssl-border)', backdropFilter: 'blur(24px) saturate(1.4)', WebkitBackdropFilter: 'blur(24px) saturate(1.4)' }}>
-        {/* Mobile: CSS Grid for perfect centering; Desktop: flex */}
-        <div className="grid grid-cols-[76px_1fr_76px] md:flex w-full items-center h-14 px-4 md:px-8 lg:px-10">
+        {/* Mobile: flex with justify-between for logo-left/icons-right; Desktop: flex */}
+        <div className="flex md:flex w-full items-center justify-between h-14 px-4 md:px-8 lg:px-10">
 
-          {/* Logo — 강제 translate 이동 제거하고 items-center로 자연스러운 수직 중앙 정렬 */}
-          <div className="flex justify-center items-center md:justify-start md:flex-none md:mr-8">
+          {/* Logo — left-aligned on mobile, with flex-none so it doesn't grow */}
+          <div className="flex items-center md:justify-start md:flex-none md:mr-8">
             <Logo />
           </div>
 
@@ -170,7 +168,7 @@ const Navbar = () => {
 
           {/* ── Right icon cluster ── */}
           {/* 모바일에서는 정확히 76px 너비를 차지하여 좌측 스페이서와 완벽한 대칭을 이룸 */}
-          <div className="flex items-center justify-end gap-1">
+          <div className="flex items-center justify-end gap-1 ml-auto">
             {/* Search (all screens) */}
             <button className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" aria-label="Search">
               <Search className="h-[1.1rem] w-[1.1rem]" />

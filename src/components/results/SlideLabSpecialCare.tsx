@@ -216,14 +216,17 @@ function CircularScore({ score, size = 52 }: { score: number; size?: number }) {
   const offset = circ * (1 - Math.min(100, Math.max(0, score)) / 100);
   const color = severityColor(score);
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', flexShrink: 0 }}>
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', flexShrink: 0, overflow: 'visible' }}>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} opacity={0.15} />
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round"
-        strokeDasharray={circ} strokeDashoffset={offset}
-        style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+      <motion.circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round"
+        strokeDasharray={circ}
+        initial={{ strokeDashoffset: circ }}
+        animate={{ strokeDashoffset: offset }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      />
       <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central"
         fontSize={size * 0.28} fontWeight={700} fill={color}
-        style={{ transform: 'rotate(90deg)', transformOrigin: 'center' }}>
+        transform={`rotate(90, ${size / 2}, ${size / 2})`}>
         {Math.round(score)}
       </text>
     </svg>

@@ -14,8 +14,8 @@ const Impressum = () => (
             <p className="font-medium text-foreground">Sujin Park</p>
             <p>(Skin Strategy Lab)</p>
             {/* TODO: Jin — 실제 주소로 교체 */}
-            <p>[Kurfürstenstraße] [14]</p>
-            <p>[60486] Frankfurt am Main</p>
+            <p>Kurfürstenstraße 14</p>
+            <p>60486 Frankfurt am Main</p>
             <p>Deutschland</p>
           </div>
         </section>

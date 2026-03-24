@@ -14,8 +14,8 @@ const Datenschutz = () => (
             Sujin Park<br />
             (Skin Strategy Lab)<br />
             {/* TODO: Jin — 실제 주소로 교체 */}
-            [Kurfürstenstraße] [14]<br />
-            [60486] Frankfurt am Main, Deutschland<br />
+            Kurfürstenstraße 14<br />
+            60486 Frankfurt am Main, Deutschland<br />
             E-Mail: datenschutz@skinstrategylab.de
           </p>
         </section>

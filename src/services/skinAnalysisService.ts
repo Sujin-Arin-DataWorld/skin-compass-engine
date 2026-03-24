@@ -2,6 +2,7 @@
 // Calls Supabase Edge Functions as a secure proxy to Groq API.
 
 import type { AnalysisApiResponse } from '@/types/skinAnalysis';
+import { supabase } from '@/integrations/supabase/client';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -9,6 +10,9 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 /**
  * Sends a base64 face image to the Supabase Edge Function which calls Groq
  * and returns the 10-axis skin analysis scores.
+ *
+ * If the user is logged in, their auth token is forwarded so the Edge Function
+ * can associate the analysis with their account (non-anonymous).
  */
 export async function analyzeSkinImage(
   imageBase64: string,
@@ -16,12 +20,23 @@ export async function analyzeSkinImage(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30_000);
 
+  // Forward user's auth token if logged in, otherwise use anon key
+  let authToken = SUPABASE_ANON_KEY;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      authToken = session.access_token;
+    }
+  } catch {
+    // Fall back to anon key — analysis still works for anonymous users
+  }
+
   try {
     const res = await fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({ image_base64: imageBase64 }),
       signal: controller.signal,

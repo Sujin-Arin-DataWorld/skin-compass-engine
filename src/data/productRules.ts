@@ -1,7 +1,26 @@
-// Prompt 4 UPDATE — Product trigger_condition rules
-// These will be expanded with real product data from Jin.
-// triggerCondition is a pure function: (scores) => boolean
-
+/**
+ * PRODUCT RULES — EXPANSION NEEDED
+ *
+ * Current: 5 rules
+ * Target: Cover all 8 skin profiles × key product categories
+ * Product DB: ~135 products in product_db_merged.json
+ *
+ * Priority expansion areas:
+ *   - Eye cream rules (missing entirely)
+ *   - Premium tier rules (>€50 products)
+ *   - Men's cleanser rules
+ *   - Sensitive skin + device-compatibility rules
+ *   - Acne/blemish-specific product rules
+ *   - Combined condition rules (e.g., oily + sensitive)
+ *
+ * Rule schema reference:
+ *   triggerCondition: (scores: SkinAxisScores) => boolean
+ *   products: linked via productId (matches productDatabase IDs)
+ *   priority: lower number = higher priority
+ *   targetAxes: string[] (axes this product addresses)
+ *
+ * TODO: Expand rule set from product database audit.
+ */
 import type { ProductRule } from '@/types/skinAnalysis';
 
 export const PRODUCT_RULES: ProductRule[] = [

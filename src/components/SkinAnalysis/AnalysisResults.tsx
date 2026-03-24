@@ -386,14 +386,17 @@ export default function AnalysisResults({
               style={{ background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)' }}
             >
               <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: '#4ade80' }}>
-                피부 상태가 양호합니다! 현재 루틴을 유지하세요.
+                {language === 'ko' ? '피부 상태가 양호합니다! 현재 루틴을 유지하세요.' : language === 'de' ? 'Ihr Hautzustand ist gut! Behalten Sie Ihre aktuelle Routine bei.' : 'Your skin looks great! Keep up your current routine.'}
+              </p>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'rgba(255,255,255,0.35)', marginTop: '6px' }}>
+                {language === 'ko' ? '더 많은 맞춤 추천이 곧 추가됩니다' : language === 'de' ? 'Weitere personalisierte Empfehlungen folgen in Kürze' : 'More personalized recommendations coming soon'}
               </p>
               <button
                 onClick={handleNavigateToLab}
                 className="mt-2 text-sm"
                 style={{ fontFamily: 'var(--font-sans)', color: 'rgba(255,255,255,0.4)' }}
               >
-                전체 제품 둘러보기 →
+                {language === 'ko' ? '전체 제품 둘러보기 →' : language === 'de' ? 'Alle Produkte ansehen →' : 'Browse all products →'}
               </button>
             </div>
           )}

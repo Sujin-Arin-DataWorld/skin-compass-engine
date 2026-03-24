@@ -3,23 +3,21 @@
 
 import { useEffect, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
+import { useI18nStore, translations } from '@/store/i18nStore';
 
 interface AnalysisLoadingProps {
   capturedImage: string; // base64, mirrored for display
   onRetake: () => void;
 }
 
-const STEPS = [
-  '피부 톤을 분석하고 있습니다...',
-  '모공과 피부결을 측정 중입니다...',
-  '수분도와 유분기를 계산 중입니다...',
-  '맞춤 솔루션을 준비 중입니다...',
-];
-
 export default function AnalysisLoading({
   capturedImage,
   onRetake,
 }: AnalysisLoadingProps) {
+  const { language } = useI18nStore();
+  const t = translations[language];
+  const STEPS = t.skinAnalysis.loadingSteps;
+
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
@@ -27,7 +25,7 @@ export default function AnalysisLoading({
       setActiveStep((s) => Math.min(s + 1, STEPS.length - 1));
     }, 1500);
     return () => clearInterval(interval);
-  }, []);
+  }, [STEPS.length]);
 
   return (
     <div
@@ -72,7 +70,7 @@ export default function AnalysisLoading({
 
       {/* Progress steps */}
       <div className="relative z-10 flex flex-col items-center gap-3 px-8 mt-auto mb-32 w-full max-w-sm">
-        {STEPS.map((step, i) => (
+        {STEPS.map((step: string, i: number) => (
           <div
             key={step}
             className="flex items-center gap-3 transition-all duration-500"
@@ -126,7 +124,7 @@ export default function AnalysisLoading({
         }}
       >
         <RotateCcw size={14} />
-        다시 촬영
+        {t.camera.retakeButton}
       </button>
     </div>
   );

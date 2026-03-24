@@ -55,9 +55,37 @@ export default defineConfig(({ mode }) => ({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: "NetworkFirst",
-            options: { cacheName: "supabase-cache", expiration: { maxEntries: 20 } },
+            // Supabase Edge Functions (AI analysis, feedback) — NEVER cache
+            urlPattern: /^https:\/\/.*\.supabase\.co\/functions\/.*/i,
+            handler: 'NetworkOnly' as const,
+          },
+          {
+            // Supabase Auth — NEVER cache
+            urlPattern: /^https:\/\/.*\.supabase\.co\/auth\/.*/i,
+            handler: 'NetworkOnly' as const,
+          },
+          {
+            // Supabase REST API — NEVER cache
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/.*/i,
+            handler: 'NetworkOnly' as const,
+          },
+          {
+            // Supabase Storage (product images, skin images) — cache with revalidation
+            urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/.*/i,
+            handler: 'StaleWhileRevalidate' as const,
+            options: {
+              cacheName: 'supabase-storage',
+              expiration: { maxEntries: 50, maxAgeSeconds: 7 * 24 * 60 * 60 },
+            },
+          },
+          {
+            // Static assets (fonts, icons, images) — aggressive cache
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico|woff2?)$/i,
+            handler: 'CacheFirst' as const,
+            options: {
+              cacheName: 'static-assets',
+              expiration: { maxEntries: 100, maxAgeSeconds: 30 * 24 * 60 * 60 },
+            },
           },
         ],
       },

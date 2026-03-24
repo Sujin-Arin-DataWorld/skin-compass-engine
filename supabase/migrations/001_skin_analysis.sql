@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS skin_analysis_logs (
   --           "pigment":33,"texture":22,"aging":18,"ox":25,"makeup_stability":68}
 
   -- Model metadata (critical for Phase 2 comparison)
-  model_version TEXT NOT NULL DEFAULT 'groq-llama-3.2-vision-v1',
+  model_version TEXT NOT NULL DEFAULT 'groq-llama-4-scout-v1',
   inference_latency_ms INTEGER,
 
   -- User validation — THE GOLD STANDARD for Phase 2 training data

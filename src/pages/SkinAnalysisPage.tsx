@@ -9,6 +9,23 @@ import AnalysisLoading from '@/components/SkinAnalysis/AnalysisLoading';
 import AnalysisResults from '@/components/SkinAnalysis/AnalysisResults';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { analyzeSkinImage } from '@/services/skinAnalysisService';
+import { useI18nStore, translations } from '@/store/i18nStore';
+
+// ── Multilingual meta for /skin-analysis ────────────────────────────────────
+const SKIN_ANALYSIS_META = {
+  ko: {
+    title: 'AI 피부 분석 | SkinStrategyLab',
+    description: '60초 AI 피부 진단으로 10가지 축의 피부 상태를 분석하고 맞춤 스킨케어를 추천받으세요.',
+  },
+  en: {
+    title: 'AI Skin Analysis | SkinStrategyLab',
+    description: 'Analyze your skin across 10 axes with a 60-second AI diagnosis and get personalized skincare recommendations.',
+  },
+  de: {
+    title: 'KI-Hautanalyse | SkinStrategyLab',
+    description: 'Analysieren Sie Ihre Haut in 10 Achsen mit einer 60-Sekunden-KI-Diagnose und erhalten Sie personalisierte Hautpflege-Empfehlungen.',
+  },
+} as const;
 
 export default function SkinAnalysisPage() {
   const {
@@ -24,13 +41,22 @@ export default function SkinAnalysisPage() {
     resetAnalysis,
   } = useSkinAnalysisStore();
 
+  const { language } = useI18nStore();
+  const t = translations[language];
+
   // ── Dynamic Meta Tags for Social Sharing ──────────────────────────────────
   useEffect(() => {
-    // Save original title to restore on unmount if needed
     const prevTitle = document.title;
-    document.title = "AI Skin Analysis — Skin Strategy Lab";
+    const meta = SKIN_ANALYSIS_META[language] ?? SKIN_ANALYSIS_META.en;
 
-    // Update OG meta tags for crawlers that support JS
+    document.title = meta.title;
+
+    // Update <meta name="description">
+    const descEl = document.querySelector('meta[name="description"]');
+    const prevDesc = descEl?.getAttribute('content') ?? '';
+    if (descEl) descEl.setAttribute('content', meta.description);
+
+    // Update OG meta tags
     const updateMeta = (property: string, content: string) => {
       let element = document.querySelector(`meta[property="${property}"]`);
       if (!element) {
@@ -41,16 +67,15 @@ export default function SkinAnalysisPage() {
       element.setAttribute('content', content);
     };
 
-    updateMeta("og:title", "AI 피부 분석 — Skin Strategy Lab");
-    updateMeta("og:description", "30초 만에 AI가 당신의 피부를 10가지 축으로 정밀 분석합니다.");
+    updateMeta("og:title", meta.title);
+    updateMeta("og:description", meta.description);
     updateMeta("og:url", "https://www.skinstrategylab.de/skin-analysis");
 
     return () => {
       document.title = prevTitle;
-      // Note: We don't necessarily need to revert OG tags on unmount in an SPA
-      // as they are usually only read on initial load or by crawlers.
+      if (descEl) descEl.setAttribute('content', prevDesc);
     };
-  }, []);
+  }, [language]);
 
   // ── Camera captured an image ──────────────────────────────────────────────
   const handleCapture = useCallback(
@@ -62,10 +87,10 @@ export default function SkinAnalysisPage() {
         const response = await analyzeSkinImage(base64);
         setAnalysisResult(response.scores, 'ai_photo_analysis', response.analysis_id);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '분석 중 오류가 발생했습니다.');
+        setError(err instanceof Error ? err.message : t.camera.analysisError);
       }
     },
-    [setCapturedImage, setStep, setAnalysisResult, setError],
+    [setCapturedImage, setStep, setAnalysisResult, setError, t],
   );
 
   const handleClose = useCallback(() => {
@@ -111,7 +136,7 @@ export default function SkinAnalysisPage() {
               marginBottom: '8px',
             }}
           >
-            AI Skin Analysis
+            {t.skinAnalysis.badge}
           </p>
           <h1
             style={{
@@ -123,7 +148,7 @@ export default function SkinAnalysisPage() {
               lineHeight: 1.3,
             }}
           >
-            30초 AI 피부 분석
+            {t.skinAnalysis.heading}
           </h1>
           <p
             style={{
@@ -132,15 +157,15 @@ export default function SkinAnalysisPage() {
               color: 'rgba(255,255,255,0.5)',
               marginBottom: '36px',
               lineHeight: 1.6,
+              whiteSpace: 'pre-line',
             }}
           >
-            카메라로 얼굴을 촬영하면 AI가 10가지 피부 축을
-            <br />분석하고 맞춤 솔루션을 제안합니다.
+            {t.skinAnalysis.subheading}
           </p>
 
           {/* Axis chips */}
           <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {['피지', '수분', '장벽', '민감도', '트러블', '색소', '피부결', '노화', '산화', '화장지속'].map((label) => (
+            {t.skinAnalysis.axisLabels.map((label: string) => (
               <span
                 key={label}
                 className="rounded-full px-3 py-1"
@@ -169,7 +194,7 @@ export default function SkinAnalysisPage() {
               fontWeight: 500,
             }}
           >
-            카메라 시작 →
+            {t.skinAnalysis.startCamera}
           </button>
 
           <p
@@ -180,7 +205,7 @@ export default function SkinAnalysisPage() {
               color: 'rgba(255,255,255,0.25)',
             }}
           >
-            촬영된 이미지는 분석 후 즉시 처리되며 개인 정보를 보호합니다.
+            {t.skinAnalysis.privacyNote}
           </p>
         </motion.div>
       </div>
@@ -213,7 +238,7 @@ export default function SkinAnalysisPage() {
               marginBottom: '8px',
             }}
           >
-            분석 실패
+            {t.camera.analysisFailed}
           </p>
           <p
             style={{
@@ -237,7 +262,7 @@ export default function SkinAnalysisPage() {
             }}
           >
             <RefreshCw size={16} />
-            다시 시도
+            {t.camera.retry}
           </button>
         </motion.div>
       </div>

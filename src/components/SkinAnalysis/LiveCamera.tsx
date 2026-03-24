@@ -3,6 +3,7 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { X, ImageIcon } from 'lucide-react';
+import { useI18nStore, translations } from '@/store/i18nStore';
 
 interface LiveCameraProps {
   onCapture: (imageBase64: string, imageBlob: Blob) => void;
@@ -16,8 +17,6 @@ const OVAL_HEIGHT_PCT = 0.45; // 45% of viewport height
 const CROP_PADDING = 0.15;   // 15% safety margin
 const MAX_SIZE = 512;
 const JPEG_QUALITY_PRIMARY = 0.8;
-const JPEG_QUALITY_FALLBACK = 0.65;
-const SIZE_LIMIT_BYTES = 150_000;
 
 export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -27,6 +26,9 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
   const [cameraState, setCameraState] = useState<CameraState>('starting');
   const [errorMsg, setErrorMsg] = useState('');
   const [flashing, setFlashing] = useState(false);
+
+  const { language } = useI18nStore();
+  const t = translations[language];
 
   // ── Start camera ──────────────────────────────────────────────────────────
   const startCamera = useCallback(async () => {
@@ -48,15 +50,15 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     } catch (err) {
       const name = err instanceof Error ? err.name : '';
       if (name === 'NotAllowedError') {
-        setErrorMsg('카메라 권한이 거부되었습니다.');
+        setErrorMsg(t.camera.permissionNeeded);
       } else if (name === 'NotFoundError') {
-        setErrorMsg('카메라를 찾을 수 없습니다.');
+        setErrorMsg(t.camera.permissionNeeded);
       } else {
-        setErrorMsg('카메라를 열 수 없습니다.');
+        setErrorMsg(t.camera.permissionNeeded);
       }
       setCameraState('fallback');
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     startCamera();
@@ -119,20 +121,22 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     // Draw raw (unflipped) frame — AI needs real orientation, not mirror
     ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
 
-    // Use toDataURL (synchronous) — avoids iOS Safari toBlob callback bug
+    // Iterative compression loop — target ≤190KB (Supabase bucket limit: 200KB)
+    const STORAGE_MAX_BYTES = 190_000;
     const tryExport = (quality: number): { base64: string; sizeBytes: number } | null => {
       const dataURL = canvas.toDataURL('image/jpeg', quality);
       if (!dataURL || dataURL === 'data:,') return null;
       const b64 = dataURL.split(',')[1];
       if (!b64) return null;
-      // Approximate byte size from base64 length
       const sizeBytes = Math.ceil(b64.length * 0.75);
       return { base64: b64, sizeBytes };
     };
 
-    let result = tryExport(JPEG_QUALITY_PRIMARY);
-    if (result && result.sizeBytes > SIZE_LIMIT_BYTES) {
-      result = tryExport(JPEG_QUALITY_FALLBACK);
+    let quality = JPEG_QUALITY_PRIMARY; // 0.8
+    let result = tryExport(quality);
+    while (result && result.sizeBytes > STORAGE_MAX_BYTES && quality > 0.3) {
+      quality -= 0.1;
+      result = tryExport(quality);
     }
     if (!result) return;
 
@@ -228,7 +232,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
               color: '#fff',
             }}
           >
-            카메라 권한이 필요합니다
+            {t.camera.permissionNeeded}
           </p>
           <p
             className="mb-1"
@@ -238,7 +242,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
               color: 'rgba(255,255,255,0.55)',
             }}
           >
-            {errorMsg || '직접 사진을 선택해주세요.'}
+            {errorMsg || t.camera.selectPhoto}
           </p>
           <p
             className="mb-6"
@@ -248,8 +252,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
               color: 'rgba(255,255,255,0.35)',
             }}
           >
-            Chrome 또는 Safari에서 접속하시면 라이브 카메라를 사용할 수
-            있습니다.
+            {t.camera.browserHint}
           </p>
 
           <label
@@ -263,7 +266,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
               fontWeight: 500,
             }}
           >
-            사진 선택하기
+            {t.camera.selectFile}
             <input
               type="file"
               accept="image/*"
@@ -308,7 +311,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
           className="oval-guide absolute"
           style={{
             left: '50%',
-            top: '50%',
+            top: '44%',
             transform: 'translate(-50%, -50%)',
             width: `${OVAL_WIDTH_PCT * 100}vw`,
             height: `${OVAL_HEIGHT_PCT * 100}dvh`,
@@ -345,13 +348,13 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
             textShadow: '0 1px 4px rgba(0,0,0,0.6)',
           }}
         >
-          밝은 곳에서 가이드라인에 맞춰주세요
+          {t.camera.guideHint}
         </p>
       </div>
 
       {/* Below-oval hint */}
       <div
-        className="absolute bottom-40 left-0 right-0 flex justify-center z-10 pointer-events-none"
+        className="absolute bottom-44 left-0 right-0 flex justify-center z-10 pointer-events-none"
       >
         <p
           style={{
@@ -361,13 +364,13 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
             textShadow: '0 1px 4px rgba(0,0,0,0.6)',
           }}
         >
-          얼굴을 타원 안에 맞춰주세요
+          {t.camera.guideText}
         </p>
       </div>
 
       {/* Capture button */}
       <div
-        className="absolute bottom-12 left-0 right-0 flex justify-center z-10"
+        className="absolute bottom-20 left-0 right-0 flex justify-center z-10"
       >
         <button
           onClick={capture}

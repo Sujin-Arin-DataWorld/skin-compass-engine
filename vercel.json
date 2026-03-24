@@ -1,5 +1,10 @@
 {
   "rewrites": [
+    {
+      "source": "/skin-analysis",
+      "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(bot|crawl|spider|facebookexternalhit|kakaotalk|whatsapp|slackbot|linkedinbot|discordbot|telegrambot|twitterbot|preview).*" }],
+      "destination": "/api/og-skin-analysis"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [

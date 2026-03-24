@@ -68,21 +68,44 @@ Deno.serve(async (req: Request) => {
     const groqKey = Deno.env.get("GROQ_API_KEY");
     if (!groqKey) throw new Error("GROQ_API_KEY not configured");
 
+    // ── Prepare Supabase client + identify user IN PARALLEL with Groq call ──
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const identifyUser = async (): Promise<{ userId: string; isAnonymous: boolean }> => {
+      const authHeader = req.headers.get("Authorization") ?? "";
+      if (authHeader.startsWith("Bearer ")) {
+        const token = authHeader.slice(7);
+        const { data: { user } } = await supabase.auth.getUser(token);
+        if (user) return { userId: user.id, isAnonymous: false };
+      }
+      // Anonymous device fingerprint
+      const ua = req.headers.get("user-agent") ?? "";
+      const lang = req.headers.get("accept-language") ?? "";
+      const encoder = new TextEncoder();
+      const data = encoder.encode(ua + lang);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+      const anonId = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+      return { userId: anonId, isAnonymous: true };
+    };
+
     const startMs = Date.now();
 
-    // ── Call Groq API ──────────────────────────────────────────────────────
-    const groqRes = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
+    // ── Run Groq API call and user identification IN PARALLEL ────────────────
+    const [groqRes, userInfo] = await Promise.all([
+      fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${groqKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama-3.2-11b-vision-preview",
+          model: "meta-llama/llama-4-scout-17b-16e-instruct",
           temperature: 0.1,
-          max_tokens: 300,
+          max_tokens: 4096,
           response_format: { type: "json_object" },
           messages: [
             { role: "system", content: SYSTEM_PROMPT },
@@ -97,18 +120,19 @@ Deno.serve(async (req: Request) => {
                 },
                 {
                   type: "text",
-                  text:
-                    "Analyze this face photo and return ONLY a valid JSON object with the 10 skin axis scores.",
+                  text: "Analyze this face photo and return ONLY a valid JSON object with the 10 skin axis scores.",
                 },
               ],
             },
           ],
         }),
-      },
-    );
+      }),
+      identifyUser(),
+    ]);
 
     const inferenceLatencyMs = Date.now() - startMs;
 
+    // ── Handle Groq response ────────────────────────────────────────────────
     if (!groqRes.ok) {
       if (groqRes.status === 429) {
         return new Response(
@@ -149,58 +173,29 @@ Deno.serve(async (req: Request) => {
           : 50;
     }
 
-    // ── Identify user (Prompt 3 UPDATE) ───────────────────────────────────
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const { userId, isAnonymous } = userInfo;
 
-    const authHeader = req.headers.get("Authorization") ?? "";
-    let userId: string | null = null;
-    let isAnonymous = true;
+    // ── Insert DB record (non-fatal — user still gets results) ──────────────
+    let analysisId: string = crypto.randomUUID();
+    try {
+      const { data: insertData } = await supabase
+        .from("skin_analysis_logs")
+        .insert({
+          user_id: userId,
+          is_anonymous: isAnonymous,
+          scores_json: scores,
+          model_version: "groq-llama-4-scout-v1",
+          inference_latency_ms: inferenceLatencyMs,
+        })
+        .select("id")
+        .single();
 
-    if (authHeader.startsWith("Bearer ")) {
-      const token = authHeader.slice(7);
-      const {
-        data: { user },
-      } = await supabase.auth.getUser(token);
-      if (user) {
-        userId = user.id;
-        isAnonymous = false;
-      }
+      if (insertData?.id) analysisId = insertData.id;
+    } catch (dbErr) {
+      console.warn("DB insert failed (non-fatal):", dbErr);
     }
-
-    // Anonymous device fingerprint from User-Agent + Accept-Language
-    if (!userId) {
-      const ua = req.headers.get("user-agent") ?? "";
-      const lang = req.headers.get("accept-language") ?? "";
-      const encoder = new TextEncoder();
-      const data = encoder.encode(ua + lang);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hex = hashArray
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join("");
-      // Format as UUID
-      userId = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
-    }
-
-    // ── Insert DB record ───────────────────────────────────────────────────
-    const { data: insertData } = await supabase
-      .from("skin_analysis_logs")
-      .insert({
-        user_id: userId,
-        is_anonymous: isAnonymous,
-        scores_json: scores,
-        model_version: "groq-llama-3.2-vision-v1",
-        inference_latency_ms: inferenceLatencyMs,
-      })
-      .select("id")
-      .single();
-
-    const analysisId: string = insertData?.id ?? crypto.randomUUID();
 
     // ── Save image to Storage asynchronously (fire-and-forget) ─────────────
-    // Image saving is non-blocking — user gets scores fast.
     const imagePromise = (async () => {
       try {
         const imageBytes = Uint8Array.from(atob(image_base64), (c) =>
@@ -213,7 +208,7 @@ Deno.serve(async (req: Request) => {
             contentType: "image/jpeg",
             upsert: false,
           });
-        if (!uploadError && insertData?.id) {
+        if (!uploadError && analysisId) {
           const { data: urlData } = supabase.storage
             .from("skin-images")
             .getPublicUrl(filePath);
@@ -221,7 +216,7 @@ Deno.serve(async (req: Request) => {
             await supabase
               .from("skin_analysis_logs")
               .update({ image_url: urlData.publicUrl })
-              .eq("id", insertData.id);
+              .eq("id", analysisId);
           }
         }
       } catch {
@@ -229,14 +224,13 @@ Deno.serve(async (req: Request) => {
       }
     })();
 
-    // Allow fire-and-forget (Deno edge functions need explicit waitUntil or just don't await)
     void imagePromise;
 
     return new Response(
       JSON.stringify({
         analysis_id: analysisId,
         scores,
-        model: "groq-llama-3.2-vision",
+        model: "groq-llama-4-scout",
         version: "1.0",
       }),
       {

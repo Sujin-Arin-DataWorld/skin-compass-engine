@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
 import type { SkinAxisScores, AnalysisStep, ScoreSource } from '@/types/skinAnalysis';
 
 // Prompt 4.5 — Zustand Store Bridge (AI scores → existing system)
@@ -89,11 +89,41 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
     }),
     {
       name: 'skin-analysis-store',
-      storage: createJSONStorage(() => localStorage),
+      storage: {
+        getItem: (name) => {
+          try {
+            const raw = localStorage.getItem(name);
+            return raw ? JSON.parse(raw) : null;
+          } catch {
+            return null;
+          }
+        },
+        setItem: (name, value) => {
+          try {
+            localStorage.setItem(name, JSON.stringify(value));
+          } catch {
+            // QuotaExceededError — trim oldest history entries and retry
+            console.warn('localStorage quota exceeded, trimming old analysis entries');
+            try {
+              const current = JSON.parse(localStorage.getItem(name) || '{}');
+              if (current?.state?.analysisHistory) {
+                current.state.analysisHistory = current.state.analysisHistory.slice(0, 5);
+                localStorage.setItem(name, JSON.stringify(current));
+              }
+            } catch {
+              // Last resort — clear this key entirely
+              localStorage.removeItem(name);
+            }
+          }
+        },
+        removeItem: (name) => {
+          localStorage.removeItem(name);
+        },
+      },
       // Only persist the history array — all other state is ephemeral per-session
       partialize: (state) => ({
         analysisHistory: state.analysisHistory,
-      }),
+      }) as SkinAnalysisState,
     },
   ),
 );

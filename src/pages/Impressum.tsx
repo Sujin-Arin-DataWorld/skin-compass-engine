@@ -23,7 +23,7 @@ const Impressum = () => (
         <section>
           <h2 className="font-medium text-foreground mb-3">Kontakt</h2>
           <div className="space-y-1">
-            <p>E-Mail: <a href="mailto:kontakt@skinstrategylab.de" className="text-primary hover:underline">kontakt@skinstrategylab.de</a></p>
+            <p>E-Mail: <a href="mailto:info@skinstrategylab.de" className="text-primary hover:underline">info@skinstrategylab.de</a></p>
           </div>
         </section>
 

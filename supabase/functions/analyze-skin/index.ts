@@ -1,0 +1,259 @@
+// Prompt 3 (UPDATED with Prompt 3 UPDATE — DB saving)
+// Supabase Edge Function: analyze-skin
+// Secure proxy to Groq API. Never exposes GROQ_API_KEY to the frontend.
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+};
+
+const AXIS_KEYS = [
+  "seb",
+  "hyd",
+  "bar",
+  "sen",
+  "acne",
+  "pigment",
+  "texture",
+  "aging",
+  "ox",
+  "makeup_stability",
+];
+
+const SYSTEM_PROMPT = `You are a professional dermatology AI assistant for SkinStrategyLab, a skincare analysis platform.
+Analyze the provided face photograph and evaluate the skin condition across 10 axes.
+
+SCORING RULES:
+- Each score is 0 to 100 (integer only).
+- Be specific and vary your scores. Do NOT default everything to 50.
+- Base your analysis on visible skin characteristics in the image.
+
+THE 10 AXES:
+- seb (Sebum/Oiliness): 0=very dry skin, 100=extremely oily. Look for: shine on forehead/nose, enlarged pores in T-zone, visible oil.
+- hyd (Hydration): 0=severely dehydrated, 100=well-hydrated and plump. Look for: skin plumpness, fine dehydration lines, dullness.
+- bar (Barrier Health): 0=severely compromised, 100=healthy intact barrier. Look for: visible redness, flaking, rough patches, irritation signs.
+- sen (Sensitivity): 0=resilient thick skin, 100=extremely sensitive reactive skin. Look for: redness around nose/cheeks, visible capillaries, blotchiness.
+- acne (Acne/Blemish Severity): 0=completely clear, 100=severe active acne. Look for: active pimples, comedones, inflamed spots, post-acne marks.
+- pigment (Pigmentation Irregularity): 0=perfectly even tone, 100=heavy uneven pigmentation. Look for: dark spots, melasma patches, sun damage, freckle clusters.
+- texture (Texture/Pore Visibility): 0=porcelain smooth, 100=very rough/visible pores. Look for: visible pores, bumpy texture, rough areas, acne scars.
+- aging (Aging Signs): 0=no visible aging, 100=advanced aging. Look for: fine lines, wrinkles (forehead, crow's feet, nasolabial), sagging, loss of elasticity.
+- ox (Oxidative Stress/Dullness): 0=radiant glowing skin, 100=extremely dull and tired. Look for: overall skin brightness, sallowness, uneven glow.
+- makeup_stability (Makeup Hold Estimate): 0=makeup melts instantly, 100=all-day hold. Infer from oil level, pore size, and skin texture balance.
+
+RESPONSE FORMAT:
+Return ONLY a valid JSON object. No explanation, no markdown, no extra text.
+Example: {"seb":42,"hyd":65,"bar":72,"sen":28,"acne":15,"pigment":33,"texture":22,"aging":18,"ox":25,"makeup_stability":68}`;
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const { image_base64 } = await req.json();
+
+    if (!image_base64) {
+      return new Response(
+        JSON.stringify({ error: "image_base64 is required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const groqKey = Deno.env.get("GROQ_API_KEY");
+    if (!groqKey) throw new Error("GROQ_API_KEY not configured");
+
+    const startMs = Date.now();
+
+    // ── Call Groq API ──────────────────────────────────────────────────────
+    const groqRes = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${groqKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "llama-3.2-11b-vision-preview",
+          temperature: 0.1,
+          max_tokens: 300,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:image/jpeg;base64,${image_base64}`,
+                  },
+                },
+                {
+                  type: "text",
+                  text:
+                    "Analyze this face photo and return ONLY a valid JSON object with the 10 skin axis scores.",
+                },
+              ],
+            },
+          ],
+        }),
+      },
+    );
+
+    const inferenceLatencyMs = Date.now() - startMs;
+
+    if (!groqRes.ok) {
+      if (groqRes.status === 429) {
+        return new Response(
+          JSON.stringify({
+            error: "분석 서버가 혼잡합니다. 잠시 후 다시 시도해주세요.",
+          }),
+          {
+            status: 429,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+      const errBody = await groqRes.text();
+      throw new Error(`Groq API error ${groqRes.status}: ${errBody}`);
+    }
+
+    const groqData = await groqRes.json();
+    const raw = groqData.choices?.[0]?.message?.content ?? "";
+
+    // ── Parse scores ───────────────────────────────────────────────────────
+    let parsed: Record<string, unknown>;
+    try {
+      parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+    } catch {
+      // Retry: extract first {...} block from response
+      const match = String(raw).match(/\{[\s\S]*?\}/);
+      if (!match) throw new Error("AI 응답을 파싱할 수 없습니다.");
+      parsed = JSON.parse(match[0]);
+    }
+
+    // Validate — clamp to 0-100, default missing axes to 50
+    const scores: Record<string, number> = {};
+    for (const key of AXIS_KEYS) {
+      const val = parsed[key];
+      scores[key] =
+        typeof val === "number" && val >= 0 && val <= 100
+          ? Math.round(val)
+          : 50;
+    }
+
+    // ── Identify user (Prompt 3 UPDATE) ───────────────────────────────────
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const authHeader = req.headers.get("Authorization") ?? "";
+    let userId: string | null = null;
+    let isAnonymous = true;
+
+    if (authHeader.startsWith("Bearer ")) {
+      const token = authHeader.slice(7);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser(token);
+      if (user) {
+        userId = user.id;
+        isAnonymous = false;
+      }
+    }
+
+    // Anonymous device fingerprint from User-Agent + Accept-Language
+    if (!userId) {
+      const ua = req.headers.get("user-agent") ?? "";
+      const lang = req.headers.get("accept-language") ?? "";
+      const encoder = new TextEncoder();
+      const data = encoder.encode(ua + lang);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hex = hashArray
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+      // Format as UUID
+      userId = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
+    }
+
+    // ── Insert DB record ───────────────────────────────────────────────────
+    const { data: insertData } = await supabase
+      .from("skin_analysis_logs")
+      .insert({
+        user_id: userId,
+        is_anonymous: isAnonymous,
+        scores_json: scores,
+        model_version: "groq-llama-3.2-vision-v1",
+        inference_latency_ms: inferenceLatencyMs,
+      })
+      .select("id")
+      .single();
+
+    const analysisId: string = insertData?.id ?? crypto.randomUUID();
+
+    // ── Save image to Storage asynchronously (fire-and-forget) ─────────────
+    // Image saving is non-blocking — user gets scores fast.
+    const imagePromise = (async () => {
+      try {
+        const imageBytes = Uint8Array.from(atob(image_base64), (c) =>
+          c.charCodeAt(0),
+        );
+        const filePath = `${userId}/${Date.now()}.jpg`;
+        const { error: uploadError } = await supabase.storage
+          .from("skin-images")
+          .upload(filePath, imageBytes, {
+            contentType: "image/jpeg",
+            upsert: false,
+          });
+        if (!uploadError && insertData?.id) {
+          const { data: urlData } = supabase.storage
+            .from("skin-images")
+            .getPublicUrl(filePath);
+          if (urlData?.publicUrl) {
+            await supabase
+              .from("skin_analysis_logs")
+              .update({ image_url: urlData.publicUrl })
+              .eq("id", insertData.id);
+          }
+        }
+      } catch {
+        // Non-fatal — analysis still succeeds without image
+      }
+    })();
+
+    // Allow fire-and-forget (Deno edge functions need explicit waitUntil or just don't await)
+    void imagePromise;
+
+    return new Response(
+      JSON.stringify({
+        analysis_id: analysisId,
+        scores,
+        model: "groq-llama-3.2-vision",
+        version: "1.0",
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  } catch (err) {
+    console.error("analyze-skin error:", err);
+    return new Response(
+      JSON.stringify({
+        error:
+          err instanceof Error ? err.message : "Internal server error",
+      }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
+  }
+});

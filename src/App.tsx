@@ -28,6 +28,7 @@ import Wishlist from "./pages/Wishlist";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
+import SkinAnalysisPage from "./pages/SkinAnalysisPage";
 // LabSelectionPage deprecated — merged into unified funnel at /results?slide=2
 // import LabSelectionPage from "./pages/LabSelectionPage";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -225,6 +226,8 @@ function AppInner() {
             </ProtectedRoute>
           }
         />
+        {/* AI skin camera analysis — public route (camera requires HTTPS) */}
+        <Route path="/skin-analysis" element={<SkinAnalysisPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />

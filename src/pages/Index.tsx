@@ -6,7 +6,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import {
   FlaskConical, ShieldCheck, Package, Sparkles,
   Droplets, ShieldAlert, Droplet, Timer, Sun, Layers, Shield, CircleDot, Leaf,
-  ChevronLeft, ChevronRight, ShoppingBag, Check, Loader2,
+  ChevronLeft, ChevronRight, ShoppingBag, Check, Loader2, Camera,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
@@ -558,6 +558,172 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
   );
 }
 
+// ── AI Analysis Banner ────────────────────────────────────────────────────────
+const AI_AXIS_PREVIEW = [
+  { key: "hyd",     score: 72, ko: "수분",   en: "Hydration",  de: "Feuchtigkeit" },
+  { key: "seb",     score: 38, ko: "피지",   en: "Oiliness",   de: "Talg" },
+  { key: "bar",     score: 85, ko: "장벽",   en: "Barrier",    de: "Barriere" },
+  { key: "aging",   score: 24, ko: "노화",   en: "Aging",      de: "Alterung" },
+  { key: "pigment", score: 51, ko: "색소",   en: "Pigment",    de: "Pigment" },
+];
+
+function AIAnalysisBanner({ isDark, accent, accentDeep, language }: { isDark: boolean; accent: string; accentDeep: string; language: string }) {
+  const title = language === "ko" ? "30초 AI 피부 분석" : language === "de" ? "30-Sekunden KI-Hautanalyse" : "30-Second AI Skin Analysis";
+  const sub = language === "ko"
+    ? "카메라 한 장으로 피지·수분·장벽 등\n10가지 피부 축을 즉시 분석합니다."
+    : language === "de"
+      ? "Analysieren Sie 10 Hautachsen sofort\nmit nur einem Kamerabild."
+      : "Analyze 10 skin axes instantly\nwith just one camera photo.";
+  const ctaAI = language === "ko" ? "AI로 분석하기" : language === "de" ? "Mit KI analysieren" : "Analyze with AI";
+  const ctaDiag = language === "ko" ? "설문으로 진단하기" : language === "de" ? "Per Fragebogen" : "Take questionnaire";
+  const badge = language === "ko" ? "신규" : language === "de" ? "NEU" : "NEW";
+
+  return (
+    <section
+      className="relative overflow-hidden py-16 md:py-20 px-5 md:px-10"
+      style={{ background: isDark ? "rgba(13,13,18,0.95)" : "#0d0d12" }}
+    >
+      {/* Background glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse 60% 70% at 85% 50%, rgba(201,169,110,0.08) 0%, rgba(183,110,121,0.05) 50%, transparent 100%)" }}
+      />
+
+      <div className="relative mx-auto max-w-5xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center">
+
+          {/* Left: Text */}
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* NEW badge */}
+            <span
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-widest mb-4"
+              style={{ background: "rgba(201,169,110,0.15)", border: "1px solid rgba(201,169,110,0.4)", color: "#c9a96e", fontFamily: "var(--font-sans)" }}
+            >
+              ✦ {badge}
+            </span>
+
+            <h2
+              className="text-3xl md:text-4xl font-light text-white mb-4 leading-[1.2] break-keep"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {title}
+            </h2>
+            <p
+              className="text-white/55 text-base leading-relaxed mb-8 whitespace-pre-line break-keep"
+              style={{ fontFamily: "var(--font-sans)" }}
+            >
+              {sub}
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <motion.div whileTap={{ scale: 0.97 }}>
+                <Link
+                  to="/skin-analysis"
+                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-wide transition-all"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(201,169,110,0.25), rgba(183,110,121,0.25))`,
+                    border: "1px solid rgba(201,169,110,0.5)",
+                    color: "#c9a96e",
+                    fontFamily: "var(--font-sans)",
+                    boxShadow: "0 4px 20px rgba(201,169,110,0.15)",
+                  }}
+                >
+                  <Camera size={15} />
+                  {ctaAI} →
+                </Link>
+              </motion.div>
+              <Link
+                to="/diagnosis"
+                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all"
+                style={{
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  color: "rgba(255,255,255,0.5)",
+                  fontFamily: "var(--font-sans)",
+                }}
+              >
+                {ctaDiag} →
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Right: Animated score preview */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col gap-3"
+          >
+            {/* Phone-style card */}
+            <div
+              className="rounded-3xl p-5 mx-auto w-full max-w-[280px] md:max-w-none"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+            >
+              {/* Camera oval placeholder */}
+              <div
+                className="rounded-2xl mb-4 flex items-center justify-center relative overflow-hidden"
+                style={{ height: "120px", background: "rgba(0,0,0,0.3)" }}
+              >
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: "70px", height: "96px",
+                    border: "1.5px dashed rgba(255,255,255,0.3)",
+                    boxShadow: "0 0 0 9999px rgba(0,0,0,0.45)",
+                  }}
+                />
+                <Camera size={20} color="rgba(255,255,255,0.3)" style={{ position: "absolute" }} />
+              </div>
+
+              {/* Axis score chips */}
+              <div className="flex flex-col gap-2">
+                {AI_AXIS_PREVIEW.map(({ key, score, ko, en, de: deLabel }, i) => {
+                  const label = language === "ko" ? ko : language === "de" ? deLabel : en;
+                  const isGood = ["hyd", "bar", "makeup_stability"].includes(key);
+                  const health = isGood ? score : 100 - score;
+                  const barColor = health >= 70 ? "#4ade80" : health >= 40 ? "#facc15" : "#f87171";
+                  return (
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, x: 12 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.2 + i * 0.06, duration: 0.4 }}
+                      className="flex items-center gap-3"
+                    >
+                      <span className="w-14 text-right flex-shrink-0" style={{ fontFamily: "var(--font-sans)", fontSize: "11px", color: "rgba(255,255,255,0.5)" }}>
+                        {label}
+                      </span>
+                      <div className="flex-1 rounded-full overflow-hidden" style={{ height: "4px", background: "rgba(255,255,255,0.08)" }}>
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{ background: barColor }}
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${score}%` }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.3 + i * 0.06, duration: 0.7 }}
+                        />
+                      </div>
+                      <span className="w-6 flex-shrink-0" style={{ fontFamily: "var(--font-numeric)", fontSize: "11px", color: "rgba(255,255,255,0.6)" }}>
+                        {score}
+                      </span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── Diagnosis Banner ──────────────────────────────────────────────────────────
 function DiagnosisBanner({ headline, sub, cta, accent, accentDeep, isDark }: { headline: string; sub: string; cta: string, accent: string, accentDeep: string, isDark: boolean }) {
   return (
@@ -758,6 +924,7 @@ export default function Index() {
       <main>
         <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} accent={accent} accentDeep={accentDeep} isDark={isDark} />
         <UspStrip items={p1.home.usp as unknown as { label: string }[]} accent={accent} isDark={isDark} />
+        <AIAnalysisBanner isDark={isDark} accent={accent} accentDeep={accentDeep} language={language} />
         {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
         <ConcernSection
           title={p1.home.concernTitle}

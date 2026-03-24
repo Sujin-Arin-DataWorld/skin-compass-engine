@@ -1,7 +1,7 @@
 // Prompt 3 — PART C: SkinAnalysisPage
 // State machine: idle → camera → analyzing → result → error
 
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, AlertCircle, RefreshCw } from 'lucide-react';
 import LiveCamera from '@/components/SkinAnalysis/LiveCamera';
@@ -23,6 +23,34 @@ export default function SkinAnalysisPage() {
     setError,
     resetAnalysis,
   } = useSkinAnalysisStore();
+
+  // ── Dynamic Meta Tags for Social Sharing ──────────────────────────────────
+  useEffect(() => {
+    // Save original title to restore on unmount if needed
+    const prevTitle = document.title;
+    document.title = "AI Skin Analysis — Skin Strategy Lab";
+
+    // Update OG meta tags for crawlers that support JS
+    const updateMeta = (property: string, content: string) => {
+      let element = document.querySelector(`meta[property="${property}"]`);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute('property', property);
+        document.head.appendChild(element);
+      }
+      element.setAttribute('content', content);
+    };
+
+    updateMeta("og:title", "AI 피부 분석 — Skin Strategy Lab");
+    updateMeta("og:description", "30초 만에 AI가 당신의 피부를 10가지 축으로 정밀 분석합니다.");
+    updateMeta("og:url", "https://www.skinstrategylab.de/skin-analysis");
+
+    return () => {
+      document.title = prevTitle;
+      // Note: We don't necessarily need to revert OG tags on unmount in an SPA
+      // as they are usually only read on initial load or by crawlers.
+    };
+  }, []);
 
   // ── Camera captured an image ──────────────────────────────────────────────
   const handleCapture = useCallback(

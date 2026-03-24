@@ -38,7 +38,7 @@ export default function AnalysisLoading({
       <div
         className="absolute inset-0"
         style={{
-          backgroundImage: `url(${capturedImage})`,
+          backgroundImage: `url(data:image/jpeg;base64,${capturedImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           transform: 'scaleX(-1)',

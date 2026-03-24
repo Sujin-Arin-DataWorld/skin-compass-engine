@@ -66,7 +66,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
   }, [startCamera]);
 
   // ── Capture ───────────────────────────────────────────────────────────────
-  const capture = useCallback(async () => {
+  const capture = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas || cameraState !== 'live') return;
@@ -119,29 +119,30 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     // Draw raw (unflipped) frame — AI needs real orientation, not mirror
     ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
 
-    const tryExport = (quality: number): Promise<{ base64: string; blob: Blob } | null> =>
-      new Promise((resolve) => {
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) return resolve(null);
-            const reader = new FileReader();
-            reader.onload = () => {
-              const b64 = (reader.result as string).split(',')[1];
-              resolve({ base64: b64, blob });
-            };
-            reader.readAsDataURL(blob);
-          },
-          'image/jpeg',
-          quality,
-        );
-      });
+    // Use toDataURL (synchronous) — avoids iOS Safari toBlob callback bug
+    const tryExport = (quality: number): { base64: string; sizeBytes: number } | null => {
+      const dataURL = canvas.toDataURL('image/jpeg', quality);
+      if (!dataURL || dataURL === 'data:,') return null;
+      const b64 = dataURL.split(',')[1];
+      if (!b64) return null;
+      // Approximate byte size from base64 length
+      const sizeBytes = Math.ceil(b64.length * 0.75);
+      return { base64: b64, sizeBytes };
+    };
 
-    let result = await tryExport(JPEG_QUALITY_PRIMARY);
-    if (result && result.blob.size > SIZE_LIMIT_BYTES) {
-      result = await tryExport(JPEG_QUALITY_FALLBACK);
+    let result = tryExport(JPEG_QUALITY_PRIMARY);
+    if (result && result.sizeBytes > SIZE_LIMIT_BYTES) {
+      result = tryExport(JPEG_QUALITY_FALLBACK);
     }
     if (!result) return;
-    onCapture(result.base64, result.blob);
+
+    // Build a Blob for the onCapture signature (still needed by callers)
+    const binaryStr = atob(result.base64);
+    const bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'image/jpeg' });
+
+    onCapture(result.base64, blob);
   }, [cameraState, onCapture]);
 
   // ── File input fallback (KakaoTalk, LINE in-app browsers) ─────────────────

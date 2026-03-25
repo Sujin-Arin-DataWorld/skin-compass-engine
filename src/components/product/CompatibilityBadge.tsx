@@ -16,7 +16,7 @@ import type { Product } from '@/engine/types';
 
 const LABELS = {
   ko: {
-    matchScore: '매칭 점수',
+    matchScore: '솔루션 적합도',
     aiMatchAnalysis: 'AI 매칭 분석',
     greatMatch: '좋은 매칭',
     goodMatch: '적합',
@@ -34,7 +34,7 @@ const LABELS = {
     gradeD: '부적합',
   },
   en: {
-    matchScore: 'Match Score',
+    matchScore: 'Solution Fit',
     aiMatchAnalysis: 'AI Match Analysis',
     greatMatch: 'Great Match',
     goodMatch: 'Good Match',
@@ -203,7 +203,7 @@ function CompactBadge({
         backdropFilter: 'blur(8px)',
         boxShadow: `0 2px 8px ${gradeColor}20`,
       }}
-      title={`Match Score: ${score}`}
+      title={`Solution Fit: ${score}`}
     >
       <span
         style={{

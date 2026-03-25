@@ -172,7 +172,7 @@ const Datenschutz = () => (
 
           <h3 className="mt-4 font-medium text-foreground text-xs uppercase tracking-wider opacity-80">5.7 Einhaltung der Google API Services User Data Policy (Compliance)</h3>
           <p className="mt-2">
-            Die Nutzung von über Google APIs erhaltenen Informationen durch Skin Strategy Lab erfolgt in Übereinstimmung mit der{" "}
+            Die Nutzung von über Google APIs erhaltenen Informationen durch Skin Strategy Lab erfolgt in Routine-Fit mit der{" "}
             <a
               href="https://developers.google.com/terms/api-services-user-data-policy"
               target="_blank"

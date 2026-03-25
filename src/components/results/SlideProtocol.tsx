@@ -295,7 +295,7 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
   const copy = {
     eyebrow: { en: "Your Personalised Protocol", de: "Ihr Persönliches Protokoll", ko: "맞춤 루틴" },
     sub: { en: "Personalised sequence based on your skin profile", de: "Personalisierte Sequenz basierend auf Ihrem Hautprofil", ko: "피부 프로필 기반 맞춤 시퀀스" },
-    match: { en: "protocol match", de: "Protokoll-Übereinstimmung", ko: "프로토콜 일치율" },
+    match: { en: "protocol match", de: "Protokoll-Routine-Fit", ko: "프로토콜 일치율" },
     signals: { en: "signals", de: "Signale", ko: "신호" },
     baseLabel: { en: "Skin Type", de: "Hauttyp", ko: "피부 타입" },
     targetLabel: { en: "Priority Target", de: "Haupt-Ziel", ko: "우선 케어" },

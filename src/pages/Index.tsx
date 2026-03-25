@@ -159,7 +159,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                 <img
                   src={img}
                   alt={allSlides[i]?.headline ?? ""}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className={`absolute inset-0 w-full h-full object-cover ${i === 0 ? 'object-top md:object-[92%_center]' : ''}`}
                   style={{ zIndex: 0 }}
                   loading={i === 0 ? "eager" : "lazy"}
                 />
@@ -212,7 +212,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
                   transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-white text-4xl md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] mb-5 font-light break-keep"
+                  className={`text-white ${(i === 0 || i === 1) ? 'text-[34px]' : 'text-4xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-5' : 'mb-3 md:mb-5'} font-light break-keep`}
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {allSlides[i]?.headline?.split('\n').map((line, idx, arr) => (
@@ -231,7 +231,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-white/80 text-base md:text-lg leading-relaxed mb-8 max-w-lg break-keep"
+                  className={`text-white/80 text-base md:text-lg leading-relaxed ${isAIScanSlide ? 'mb-8' : 'mb-4 md:mb-8'} max-w-lg break-keep`}
                   style={{ fontFamily: "var(--font-sans)" }}
                 >
                   {allSlides[i]?.sub?.split('\n').map((line, idx, arr) => (
@@ -251,7 +251,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 10 }}
                   transition={{ duration: 0.5, delay: 0.24 }}
-                  className="flex items-center gap-3 flex-wrap max-sm:justify-center"
+                  className={`flex items-center gap-3 flex-wrap ${isAIScanSlide ? 'max-sm:justify-center' : 'max-sm:justify-start'}`}
                 >
                   {/* PRIMARY CTA (filled green pill) */}
                   <motion.div whileTap={{ scale: 0.97 }}>

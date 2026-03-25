@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useI18nStore } from '@/store/i18nStore';
 import type { ProductRule, SkinAxisScores } from '@/types/skinAnalysis';
 import { AXIS_KO_SHORT } from '@/data/productRules';
+import CompatibilityBadge from '@/components/product/CompatibilityBadge';
+import type { Product } from '@/engine/types';
 
 interface ProductRecommendationCardProps {
   rule: ProductRule;
@@ -38,8 +40,28 @@ export default function ProductRecommendationCard({
         background: 'rgba(255,255,255,0.04)',
         border: '1px solid rgba(255,255,255,0.1)',
         boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+        position: 'relative',
       }}
     >
+      {/* Match score badge — top right */}
+      <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
+        <CompatibilityBadge
+          product={{
+            id: rule.productId,
+            name: rule.name,
+            brand: '',
+            phase: '',
+            type: '',
+            price_eur: 0,
+            tier: [],
+            shopify_handle: '',
+            key_ingredients: rule.targetAxes.map(a => a),
+            target_axes: rule.targetAxes as Product['target_axes'],
+            for_skin: [],
+          } as Product}
+          variant="compact"
+        />
+      </div>
       {/* Product image */}
       <div
         className="w-20 h-20 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"

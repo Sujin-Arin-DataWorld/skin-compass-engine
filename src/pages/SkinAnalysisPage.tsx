@@ -8,8 +8,12 @@ import LiveCamera from '@/components/SkinAnalysis/LiveCamera';
 import AnalysisLoading from '@/components/SkinAnalysis/AnalysisLoading';
 import AnalysisResults from '@/components/SkinAnalysis/AnalysisResults';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
+import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { analyzeSkinImage } from '@/services/skinAnalysisService';
+import { supabase } from '@/integrations/supabase/client';
 import { useI18nStore, translations } from '@/store/i18nStore';
+import type { SkinAxisScores as ProfileAxisScores, SkinType, SkinConcern } from '@/types/skinProfile';
+import type { SkinAxisScores } from '@/types/skinAnalysis';
 
 // ── Multilingual meta for /skin-analysis ────────────────────────────────────
 const SKIN_ANALYSIS_META = {
@@ -26,6 +30,30 @@ const SKIN_ANALYSIS_META = {
     description: 'Analysieren Sie Ihre Haut in 10 Achsen mit einer 60-Sekunden-KI-Diagnose und erhalten Sie personalisierte Hautpflege-Empfehlungen.',
   },
 } as const;
+
+// ── Derive skin type from analysis scores ─────────────────────────────────────
+function deriveSkinType(scores: SkinAxisScores): SkinType {
+  if (scores.sen >= 65) return 'sensitive';
+  if (scores.seb >= 65 && scores.hyd >= 50) return 'oily';
+  if (scores.hyd <= 35 && scores.seb <= 35) return 'dry';
+  if (scores.seb >= 50 && scores.hyd <= 45) return 'combination';
+  return 'normal';
+}
+
+// ── Derive primary concerns from high scores ─────────────────────────────────
+function derivePrimaryConcerns(scores: SkinAxisScores): SkinConcern[] {
+  const concerns: SkinConcern[] = [];
+  if (scores.acne >= 50) concerns.push('acne');
+  if (scores.hyd <= 40) concerns.push('dehydration');
+  if (scores.pigment >= 50) concerns.push('pigmentation');
+  if (scores.sen >= 55) concerns.push('sensitivity');
+  if (scores.aging >= 50) concerns.push('aging');
+  if (scores.bar >= 55) concerns.push('barrier_damage');
+  if (scores.seb >= 60) concerns.push('excess_sebum');
+  if (scores.texture >= 55) concerns.push('texture');
+  if (scores.ox >= 55) concerns.push('oxidation');
+  return concerns.slice(0, 5); // cap at top 5
+}
 
 export default function SkinAnalysisPage() {
   const {
@@ -86,6 +114,42 @@ export default function SkinAnalysisPage() {
       try {
         const response = await analyzeSkinImage(base64);
         setAnalysisResult(response.scores, 'ai_photo_analysis', response.analysis_id);
+
+        // ── Persist to user_skin_profiles if logged in (non-blocking) ──────
+        (async () => {
+          try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return; // Guest mode — skip DB save
+
+            const profileScores: ProfileAxisScores = {
+              seb: response.scores.seb,
+              hyd: response.scores.hyd,
+              bar: response.scores.bar,
+              sen: response.scores.sen,
+              acne: response.scores.acne,
+              pigment: response.scores.pigment,
+              texture: response.scores.texture,
+              aging: response.scores.aging,
+              ox: response.scores.ox,
+              makeup_stability: response.scores.makeup_stability,
+            };
+
+            const saved = await useSkinProfileStore.getState().saveAnalysisResult({
+              userId: user.id,
+              scores: profileScores,
+              skinType: deriveSkinType(response.scores),
+              primaryConcerns: derivePrimaryConcerns(response.scores),
+              analysisMethod: 'camera',
+              confidenceScore: 0.75,
+            });
+
+            if (saved) {
+              console.log('[SkinAnalysis] Profile persisted:', saved.id);
+            }
+          } catch (e) {
+            console.warn('[SkinAnalysis] Profile save failed (non-fatal):', e);
+          }
+        })();
       } catch (err) {
         setError(err instanceof Error ? err.message : t.camera.analysisError);
       }

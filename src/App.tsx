@@ -9,6 +9,7 @@ import { ThemeProvider, useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
+import { useSkinProfileStore } from "@/store/useSkinProfileStore";
 import { brand } from "@/lib/designTokens";
 import GdprConsentModal from "./components/GdprConsentModal";
 import Index from "./pages/Index";
@@ -83,6 +84,10 @@ function AppInner() {
     // Sync persisted state with the actual Supabase session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session?.user ?? null);
+      // Also fetch skin profile on mount if already signed in (Step 4 guide requirement)
+      if (session?.user) {
+        useSkinProfileStore.getState().fetchActiveProfile(session.user.id);
+      }
     });
 
     // Keep Zustand in sync with every auth event (sign-in, sign-out, token refresh)
@@ -90,6 +95,15 @@ function AppInner() {
     const { data: { subscription } } = (supabase as any).auth.onAuthStateChange(
       async (event: string, session: { user?: { id: string; app_metadata?: { provider?: string } } } | null) => {
         setSession((session?.user ?? null) as Parameters<typeof setSession>[0]);
+
+        // ── Skin profile persistence: fetch on sign-in, clear on sign-out ──
+        const skinProfileStore = useSkinProfileStore.getState();
+        if (event === "SIGNED_IN" && session?.user) {
+          skinProfileStore.fetchActiveProfile(session.user.id);
+        }
+        if (event === "SIGNED_OUT") {
+          skinProfileStore.clearProfile();
+        }
 
         // ── GDPR gate: trigger for all non-email social sign-ins (Google, Apple, etc.)
         if (

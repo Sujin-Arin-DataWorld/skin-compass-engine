@@ -10,7 +10,8 @@
       "Bash(node -e \"const p = require\\(''/Users/sujinpark/Desktop/skin-compass-engine/package.json''\\); console.log\\(JSON.stringify\\({zustand: p.dependencies?.zustand, immer: p.dependencies?.immer}, null, 2\\)\\)\")",
       "Read(//Users/sujinpark/Desktop/**)",
       "Bash(grep -l \"framer-motion\\\\|motion\" /Users/sujinpark/Desktop/skin-compass-engine/src/components/**/*.tsx)",
-      "Bash(npm install vite-plugin-pwa --save-dev)"
+      "Bash(npm install vite-plugin-pwa --save-dev)",
+      "Read(//Users/sujinpark/**)"
     ],
     "additionalDirectories": [
       "/tmp"

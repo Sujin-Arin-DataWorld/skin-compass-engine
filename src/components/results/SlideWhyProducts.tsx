@@ -8,6 +8,7 @@ import { DiagnosisResult, Product, AXIS_LABELS, AxisKey } from "@/engine/types";
 import { useCartStore } from "@/store/cartStore";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useAuthStore } from "@/store/authStore";
+import CompatibilityBadge from "@/components/product/CompatibilityBadge";
 
 function getBarColor(score: number): string {
   if (score >= 70) return "hsl(var(--severity-severe))";
@@ -151,6 +152,11 @@ function EnhancedProductCard({ product, result, index }: { product: Product; res
               className="max-w-full max-h-full object-contain"
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
+          </div>
+
+          {/* Compatibility badge — compact mode, top-right overlay */}
+          <div className="absolute top-1.5 right-1.5 z-10">
+            <CompatibilityBadge product={product} variant="compact" />
           </div>
 
           {/* Texture feel overlay */}

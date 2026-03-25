@@ -1,0 +1,316 @@
+/* =================================================
+   src/components/home/AISkinAnalysisHero.module.css
+   Animations + responsive layout for AI hero section
+   ================================================= */
+
+/* ── Section background ── */
+
+.heroSection {
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0;
+  background: linear-gradient(160deg, #1a1a18 0%, #22211d 40%, #1d1d1a 100%);
+}
+
+/* Radial gradient overlays */
+.heroSection::before,
+.heroSection::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Sage glow — left side */
+.heroSection::before {
+  width: 600px;
+  height: 600px;
+  top: -10%;
+  left: -5%;
+  background: radial-gradient(circle, rgba(138, 154, 123, 0.05) 0%, transparent 70%);
+}
+
+/* Gold glow — right side */
+.heroSection::after {
+  width: 500px;
+  height: 500px;
+  bottom: -10%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(196, 162, 101, 0.04) 0%, transparent 70%);
+}
+
+/* ── Grain texture overlay ── */
+
+.grainOverlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ── Grid layout ── */
+
+.heroGrid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── Scroll-triggered fade-up animations ──
+   Controlled by isVisible state + CSS transitions.
+   NOT @keyframes. This allows re-triggering and avoids React re-render issues. */
+
+.fadeElement {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fadeElement.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered delays for each text element */
+.fadeDelay0 { transition-delay: 0s; }
+.fadeDelay1 { transition-delay: 0.1s; }
+.fadeDelay2 { transition-delay: 0.2s; }
+.fadeDelay3 { transition-delay: 0.3s; }
+.fadeDelay4 { transition-delay: 0.45s; }
+
+/* Floating cards — longer delay, appear after text */
+.fadeDelay5 { transition-delay: 1.0s; }
+.fadeDelay6 { transition-delay: 1.3s; }
+
+/* ── Badge dot pulse — CONTINUOUS loop, @keyframes OK here ── */
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.pulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #8a9a7b;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* ── Video container glow — CONTINUOUS loop, @keyframes OK here ── */
+
+@keyframes glowCycle {
+  0%, 100% {
+    box-shadow: 0 0 40px rgba(138, 154, 123, 0.08),
+                0 0 80px rgba(138, 154, 123, 0.04);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(196, 162, 101, 0.08),
+                0 0 80px rgba(196, 162, 101, 0.04);
+  }
+}
+
+.videoContainer {
+  position: relative;
+  max-width: 540px;
+  border-radius: 20px;
+  overflow: hidden;
+  animation: glowCycle 6s ease-in-out infinite;
+}
+
+/* Top edge gradient line */
+.videoContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(196, 162, 101, 0.25) 50%, transparent 100%);
+  z-index: 3;
+}
+
+/* Bottom edge gradient fade to dark */
+.videoContainer::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background: linear-gradient(to top, #1a1a18 0%, transparent 100%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── Floating glassmorphism cards ── */
+
+.floatingCard {
+  position: absolute;
+  z-index: 4;
+  border-radius: 12px;
+  background: rgba(26, 26, 24, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 240, 232, 0.08);
+  padding: 12px 16px;
+}
+
+.floatingZoneCard {
+  bottom: 16px;
+  left: 16px;
+}
+
+.floatingScoreBadge {
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 20px;
+}
+
+/* ── CTA Buttons ── */
+
+.ctaPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background-color: #8a9a7b;
+  color: #fff;
+  font-family: 'Hahmlet', serif;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.ctaPrimary:hover {
+  background-color: #97a88a;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(138, 154, 123, 0.25);
+}
+
+.ctaSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background-color: transparent;
+  color: rgba(245, 240, 232, 0.5);
+  font-family: 'Hahmlet', serif;
+  font-size: 15px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(245, 240, 232, 0.1);
+  cursor: pointer;
+}
+
+.ctaSecondary:hover {
+  border-color: rgba(245, 240, 232, 0.25);
+  color: rgba(245, 240, 232, 0.7);
+}
+
+/* ── Feature pills ── */
+
+.featurePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: rgba(245, 240, 232, 0.04);
+  border: 1px solid rgba(245, 240, 232, 0.06);
+  font-family: 'SUIT', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(245, 240, 232, 0.45);
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ══════════════════════════════════════════════════ */
+
+/* ── Tablet / single column: ≤ 900px ── */
+@media (max-width: 900px) {
+  .heroSection {
+    padding: 56px 0;
+  }
+
+  .heroGrid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    text-align: center;
+  }
+
+  .textColumn {
+    order: 1;
+  }
+
+  .videoColumn {
+    order: 2;
+  }
+
+  .videoContainer {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .ctaRow {
+    justify-content: center;
+  }
+
+  .featurePillRow {
+    justify-content: center;
+  }
+}
+
+/* ── Mobile: ≤ 480px ── */
+@media (max-width: 480px) {
+  .heroSection {
+    padding: 40px 0;
+  }
+
+  .heroGrid {
+    padding: 0 20px;
+    gap: 32px;
+  }
+
+  .heroHeading {
+    font-size: 26px !important;
+  }
+
+  /* Stack CTAs vertically, full width */
+  .ctaRow {
+    flex-direction: column;
+  }
+
+  .ctaPrimary,
+  .ctaSecondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Hide floating zone card on mobile (too cluttered) */
+  .floatingZoneCard {
+    display: none;
+  }
+}

@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
+import CompatibilityBadge from "@/components/product/CompatibilityBadge";
 
 const PHASE_META: Record<string, { icon: string; name: string; desc: string }> = {
     "1": { icon: "💧", name: "Cleanse", desc: "Remove impurities without disrupting barrier integrity." },
@@ -141,6 +142,16 @@ export default function FormulaDetail() {
                         </button>
                     </div>
                 </motion.div>
+
+                {/* AI Compatibility Analysis — expanded badge */}
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="mb-8"
+                >
+                    <CompatibilityBadge product={product} variant="expanded" />
+                </motion.section>
 
                 {/* The Strategy Section */}
                 {lowestTarget && (

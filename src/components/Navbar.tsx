@@ -17,14 +17,14 @@ function Logo() {
   return (
     <Link to="/" className="flex flex-col items-start group" aria-label="Skin Strategy Lab">
       <span
-        className="font-display text-[0.82rem] md:text-[1.3rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[var(--ssl-accent-deep)] dark:group-hover:text-[var(--ssl-accent)] leading-none"
-        style={{ fontFamily: "var(--font-display)", letterSpacing: "0.06em" }}
+        className="font-display text-[0.82rem] md:text-[1.00rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[var(--ssl-accent-deep)] dark:group-hover:text-[var(--ssl-accent)] leading-none"
+        style={{ fontFamily: "var(--font-display)", letterSpacing: "0.07em" }}
       >
         SKIN STRATEGY
       </span>
       <span
-        className="font-body text-[0.38rem] md:text-[0.58rem] font-medium uppercase text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] mt-[2px] md:mt-[5px] leading-none"
-        style={{ letterSpacing: "0.22em" }}
+        className="font-body text-[0.4rem] md:text-[0.70rem] font-medium uppercase text-[var(--ssl-accent-deep)] dark:text-[var(--ssl-accent)] mt-[2px] md:mt-[4px] leading-none"
+        style={{ letterSpacing: "0.24em" }}
       >
         — LAB —
       </span>
@@ -106,10 +106,10 @@ const Navbar = () => {
       {/* ── Main bar ── */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b pt-[env(safe-area-inset-top)]" style={{ background: 'var(--ssl-bg)', borderColor: 'var(--ssl-border)', backdropFilter: 'blur(24px) saturate(1.4)', WebkitBackdropFilter: 'blur(24px) saturate(1.4)' }}>
         {/* Mobile: flex with justify-between for logo-left/icons-right; Desktop: flex */}
-        <div className="flex md:flex w-full items-center justify-between h-14 px-4 md:px-8 lg:px-10">
+        <div className="flex md:flex w-full items-center justify-between h-12 md:h-[52px] px-4 md:px-8 lg:px-10">
 
           {/* Logo — left-aligned on mobile, with flex-none so it doesn't grow */}
-          <div className="flex items-center md:justify-start md:flex-none md:mr-8">
+          <div className="flex items-center translate-y-[12px] md:translate-y-1.5 md:justify-start md:flex-none md:mr-8">
             <Logo />
           </div>
 

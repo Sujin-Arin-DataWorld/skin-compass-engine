@@ -114,7 +114,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
   }, [emblaApi]);
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: "min(75svh, 720px)" }}>
+    <section className="relative w-full overflow-hidden h-[82svh] md:h-[92svh] max-h-[720px] md:max-h-[850px]">
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
           {HERO_IMAGES.map((img, i) => {
@@ -145,7 +145,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                       className="absolute inset-0 w-full h-full object-cover md:translate-x-[13%]"
                       loading="lazy"
                     />
-                    {/* Overlay wrapper: right half for chip alignment */} /스캔라인 & ㄱㄴ 브래킷 /
+                    {/* Overlay wrapper: right half for chip alignment /*스캔라인 & ㄱㄴ 브래킷 */}
                     {current === i && (
                       <div className="absolute inset-0 z-[5] pointer-events-none">
                         <div className="absolute top-0 left-0 w-full md:left-[37%] md:w-[50%] h-full">
@@ -198,7 +198,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                 }}
               />
               {/* Text + CTA */}
-              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-16 px-8 md:px-20 lg:px-28" style={{ zIndex: 10 }}>
+              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-20 px-8 md:px-20 lg:px-28" style={{ zIndex: 10 }}>
                 <motion.p
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
@@ -886,7 +886,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-white dark:bg-transparent">
       <Navbar />
-      <div className="h-16" />
+      <div className="h-12 md:h-[52px]" />
       <RecheckBanner />
 
       <main>

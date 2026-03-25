@@ -106,7 +106,7 @@ export default function AISkinAnalysisHero() {
               marginBottom: 20,
             }}
           >
-            카메라 한 장으로
+            사진 한 장으로
             <br />
             <span style={{ color: '#d4b87a', fontWeight: 500 }}>
               나만의 피부 프로필
@@ -129,8 +129,8 @@ export default function AISkinAnalysisHero() {
               maxWidth: 420,
             }}
           >
-            피지·수분·장벽·민감도 등 10가지 축으로 피부 상태를 정밀 분석하고,
-            7개 얼굴 존별 맞춤 솔루션을 제안합니다.
+            피지·수분·장벽·민감도 등 10가지 기준으로 피부 상태를 정밀 분석하고,
+            7개의 얼굴 부위별 맞춤 솔루션을 제안합니다.
           </p>
 
           {/* ── 4. CTA Buttons ── */}
@@ -206,7 +206,7 @@ export default function AISkinAnalysisHero() {
                     color: '#f5f0e8',
                   }}
                 >
-                  7개 얼굴 존 분석
+                  7개의 얼굴 부위 분석
                 </span>
               </div>
               <p
@@ -218,7 +218,9 @@ export default function AISkinAnalysisHero() {
                   margin: 0,
                 }}
               >
-                이마 · 양볼 · 코 · 턱 · 턱선
+                이마 · 볼 · 코 · 눈가
+                <br />
+                입가 · 턱 · 턱선
               </p>
             </div>
 
@@ -246,7 +248,7 @@ export default function AISkinAnalysisHero() {
                   marginTop: 4,
                 }}
               >
-                궁합 점수
+                매칭 점수
               </span>
             </div>
           </div>

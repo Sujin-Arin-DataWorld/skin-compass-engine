@@ -578,7 +578,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
         >
           🔬{" "}
           {language === "ko"
-            ? "진단은 전 세계 피부과 의사가 사용하는 임상 방법론을 기반으로 합니다 — SOS 피지 척도, TEWL 장벽 평가, APIA 프레임워크. 카메라 없이도 정확한 분석이 가능합니다."
+            ? "진단은 전 세계 피부과 의사가 사용하는 임상 방법론을 기반으로 합니다 — SOS 피지 척도, TEWL 장벽 평가, APIA 프레임워크. 사진 없이도 정확한 분석이 가능합니다."
             : language === "de"
               ? "Ihre Diagnose basiert auf Methoden der klinischen Dermatologie weltweit — darunter die SOS-Skala, TEWL-Barrierebewertung und das APIA-Framework. Keine Kamera nötig."
               : "Your diagnosis uses methods from clinical dermatology worldwide — including the SOS scale, TEWL barrier assessment, and the APIA framework. No camera needed."}

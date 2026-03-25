@@ -26,6 +26,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
   const [cameraState, setCameraState] = useState<CameraState>('starting');
   const [errorMsg, setErrorMsg] = useState('');
   const [flashing, setFlashing] = useState(false);
+  const [captureError, setCaptureError] = useState('');
 
   const { language } = useI18nStore();
   const t = translations[language];
@@ -45,6 +46,15 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
+        // iOS Safari: videoWidth/videoHeight can be 0 even after play() resolves.
+        // Wait for loadedmetadata to guarantee non-zero dimensions before going 'live'.
+        if (videoRef.current.videoWidth === 0) {
+          await new Promise<void>((res) => {
+            const v = videoRef.current!;
+            if (v.readyState >= 1) { res(); return; }
+            v.addEventListener('loadedmetadata', () => res(), { once: true });
+          });
+        }
       }
       setCameraState('live');
     } catch (err) {
@@ -79,12 +89,17 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     setFlashing(true);
     setTimeout(() => setFlashing(false), 300);
 
-    // Stop tracks after capture to save battery
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-
     const vw = video.videoWidth;
     const vh = video.videoHeight;
     console.log('[Capture] 2. Video dimensions:', vw, vh);
+
+    // Guard: iOS Safari can report 0×0 dimensions if metadata isn't ready yet
+    if (!vw || !vh) {
+      console.error('[Capture] 2b. Video dimensions not ready — aborting');
+      setCaptureError(language === 'ko' ? '촬영 준비 중입니다. 잠시 후 다시 누르세요.' : 'Camera initializing — please tap again.');
+      setTimeout(() => setCaptureError(''), 2500);
+      return;
+    }
 
     // ── iOS safety: pre-resize if source exceeds safe canvas area ──
     // iOS Safari canvas limit is ~16.7MP (4096×4096).
@@ -152,6 +167,10 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
 
     // Draw raw (unflipped) frame — AI needs real orientation, not mirror
     ctx.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+
+    // Stop tracks NOW (after frame is captured) — stopping before drawImage can
+    // blank the video element on iOS, producing an all-black or 0×0 capture.
+    streamRef.current?.getTracks().forEach((t) => t.stop());
 
     // Iterative compression loop — target ≤190KB (Supabase bucket limit: 200KB)
     const STORAGE_MAX_BYTES = 190_000;
@@ -413,6 +432,23 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
           {t.camera.guideText}
         </p>
       </div>
+
+      {/* Capture error toast */}
+      {captureError && (
+        <div className="absolute bottom-40 left-0 right-0 flex justify-center z-10 px-6 pointer-events-none">
+          <p
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '13px',
+              color: '#ffb3b3',
+              textAlign: 'center',
+              textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+            }}
+          >
+            {captureError}
+          </p>
+        </div>
+      )}
 
       {/* Capture button */}
       <div

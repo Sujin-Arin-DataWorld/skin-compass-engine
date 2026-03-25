@@ -7,6 +7,7 @@ import {
   FlaskConical, ShieldCheck, Package, Sparkles,
   Droplets, ShieldAlert, Droplet, Timer, Sun, Layers, Shield, CircleDot, Leaf,
   ChevronLeft, ChevronRight, ShoppingBag, Check, Loader2,
+  Camera, ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
@@ -21,6 +22,7 @@ import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
 import { tokens } from "@/lib/designTokens";
 import AISkinAnalysisHero from "@/components/home/AISkinAnalysisHero";
+import AIScanOverlay from "@/components/hero/AIScanOverlay";
 
 // ── Design tokens (consumed from designTokens.ts via tokens() helper) ─────────
 const BRONZE = "var(--ssl-accent-deep)";  // kept for non-active icon fallback
@@ -46,14 +48,59 @@ const HERO_IMAGES = [
   "/assets/hero-face.png",
   "/assets/hero-model.png",
   "/assets/kbeauty-lineup.png",
+  "/assets/hero-ai-scan.png",    // Slide 4: transparent PNG (man portrait)
 ];
+
+// TODO: Move HERO4_COPY to the global i18n JSON files for single source of truth
+const HERO4_COPY: Record<string, { id: string; headline: string; sub: string; cta: string }> = {
+  ko: {
+    id: 'ai-scan',
+    headline: "AI가 30초 만에\n피부를 읽습니다",
+    sub: "사진 한 장으로 10축 정밀 분석\n당신만의 루틴을 설계합니다",
+    cta: "AI 스캔",
+  },
+  en: {
+    id: 'ai-scan',
+    headline: "Your skin,\nread in 30 seconds",
+    sub: "10-axis precision analysis from one photo\nDesigning your personal routine",
+    cta: "AI scan",
+  },
+  de: {
+    id: 'ai-scan',
+    headline: "Ihre Haut,\nin 30 Sekunden gelesen",
+    sub: "10-Achsen-Präzisionsanalyse mit einem Foto\nIhre persönliche Routine wird erstellt",
+    cta: "KI-Scan",
+  },
+};
+
+// TODO: Move DUAL_CTA to the global i18n JSON files for single source of truth
+const DUAL_CTA = {
+  ai_scan:       { ko: "AI 스캔",      en: "AI scan",       de: "KI-Scan"    },
+  questionnaire: { ko: "설문 진단",     en: "Questionnaire", de: "Fragebogen"  },
+} as const;
 
 type CartBtnState = "idle" | "adding" | "added";
 
 // ── Hero Slider ───────────────────────────────────────────────────────────────
-function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline: string; sub: string; cta: string }[], accent: string, accentDeep: string, isDark: boolean }) {
+function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
+  slides: { headline: string; sub: string; cta: string }[];
+  accent: string;
+  accentDeep: string;
+  isDark: boolean;
+  language: string;
+}) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [current, setCurrent] = useState(0);
+
+  // Merge slide 4 into allSlides
+  const hero4 = HERO4_COPY[language] ?? HERO4_COPY.en;
+  const allSlides: { id?: string; headline: string; sub: string; cta: string }[] = [
+    ...slides.slice(0, 3),
+    hero4,
+  ];
+
+  const ctaAI = DUAL_CTA.ai_scan[language as keyof typeof DUAL_CTA.ai_scan] ?? DUAL_CTA.ai_scan.en;
+  const ctaQuiz = DUAL_CTA.questionnaire[language as keyof typeof DUAL_CTA.questionnaire] ?? DUAL_CTA.questionnaire.en;
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -70,29 +117,74 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
     <section className="relative w-full overflow-hidden" style={{ height: "min(75svh, 720px)" }}>
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
-          {HERO_IMAGES.map((img, i) => (
+          {HERO_IMAGES.map((img, i) => {
+            // Robust slide identification via id field (not magic index)
+            const isAIScanSlide = (allSlides[i] as { id?: string })?.id === 'ai-scan';
+            // Ghost button color: adapt for light/dark + slide 4
+            const ghostColor = (isAIScanSlide || isDark) ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.6)';
+            const ghostBorder = (isAIScanSlide || isDark) ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)';
+
+            return (
             <div key={i} className="relative flex-[0_0_100%] h-full min-w-0">
-              <img
-                src={img}
-                alt={slides[i]?.headline ?? ""}
-                className="absolute inset-0 w-full h-full object-cover"
-                style={{ zIndex: 0 }}
-                loading={i === 0 ? "eager" : "lazy"}
-              />
-              {/* Dark gradient: left-to-right text readability */}
-              <div
-                className="absolute inset-0"
-                style={{ background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)", zIndex: 1 }}
-              />
-              {/* Dreamy mist overlay — sage green (light) / champagne gold (dark) */}
+              {isAIScanSlide ? (
+                <>
+                  {/* Slide 4: dark base background (fullscreen) */}
+                  <div
+                    className="absolute inset-0 z-0"
+                    style={{
+                      background: isDark
+                        ? "linear-gradient(135deg, #0a0d12 0%, #111418 50%, #0d1210 100%)"
+                        : "linear-gradient(135deg, #0e1114 0%, #141a1e 50%, #0f1612 100%)",
+                    }}
+                  />
+                  {/* Group: portrait + overlay move together */}
+                  <div className="absolute inset-0 z-[1]">
+                    <img
+                      src={img}
+                      alt={allSlides[i]?.headline ?? ""}
+                      className="absolute inset-0 w-full h-full object-cover md:translate-x-[13%]"
+                      loading="lazy"
+                    />
+                    {/* Overlay wrapper: right half for chip alignment */} /스캔라인 & ㄱㄴ 브래킷 /
+                    {current === i && (
+                      <div className="absolute inset-0 z-[5] pointer-events-none">
+                        <div className="absolute top-0 left-0 w-full md:left-[37%] md:w-[50%] h-full">
+                          <AIScanOverlay />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <img
+                  src={img}
+                  alt={allSlides[i]?.headline ?? ""}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ zIndex: 0 }}
+                  loading={i === 0 ? "eager" : "lazy"}
+                />
+              )}
+              {/* Dark gradient overlay */}
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: isDark
-                    ? "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(45,107,74,0.32) 0%, rgba(160,130,80,0.14) 55%, transparent 100%)"
-                    : "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(122,158,130,0.50) 0%, rgba(45,79,57,0.22) 55%, transparent 100%)",
-                  zIndex: 2,
-                  mixBlendMode: isDark ? "screen" : "multiply",
+                  background: isAIScanSlide
+                    ? "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 35%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)"
+                    : "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)",
+                  zIndex: isAIScanSlide ? 2 : 1,
+                }}
+              />
+              {/* Dreamy mist overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: isAIScanSlide
+                    ? "radial-gradient(ellipse 50% 60% at 75% 30%, rgba(201,169,110,0.08) 0%, rgba(45,107,74,0.06) 50%, transparent 100%)"
+                    : isDark
+                      ? "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(45,107,74,0.32) 0%, rgba(160,130,80,0.14) 55%, transparent 100%)"
+                      : "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(122,158,130,0.50) 0%, rgba(45,79,57,0.22) 55%, transparent 100%)",
+                  zIndex: isAIScanSlide ? 3 : 2,
+                  mixBlendMode: isAIScanSlide ? "normal" : isDark ? "screen" : "multiply",
                 }}
               />
               {/* Soft inset border glow */}
@@ -102,10 +194,11 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                   boxShadow: isDark
                     ? "inset 0 0 140px rgba(45,107,74,0.22), inset 0 -60px 80px rgba(160,130,80,0.10)"
                     : "inset 0 0 140px rgba(122,158,130,0.28), inset 0 -60px 80px rgba(45,79,57,0.12)",
-                  zIndex: 3,
+                  zIndex: isAIScanSlide ? 4 : 3,
                 }}
               />
-              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-16 px-8 md:px-20 lg:px-28" style={{ zIndex: 4 }}>
+              {/* Text + CTA */}
+              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-16 px-8 md:px-20 lg:px-28" style={{ zIndex: 10 }}>
                 <motion.p
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
@@ -122,7 +215,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                   className="text-white text-4xl md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] mb-5 font-light break-keep"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  {slides[i]?.headline?.split('\n').map((line, idx, arr) => (
+                  {allSlides[i]?.headline?.split('\n').map((line, idx, arr) => (
                     <span key={idx}>
                       {line}
                       {idx < arr.length - 1 && (
@@ -141,7 +234,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                   className="text-white/80 text-base md:text-lg leading-relaxed mb-8 max-w-lg break-keep"
                   style={{ fontFamily: "var(--font-sans)" }}
                 >
-                  {slides[i]?.sub?.split('\n').map((line, idx, arr) => (
+                  {allSlides[i]?.sub?.split('\n').map((line, idx, arr) => (
                     <span key={idx}>
                       {line}
                       {idx < arr.length - 1 && (
@@ -153,15 +246,18 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                     </span>
                   ))}
                 </motion.p>
+                {/* ── Dual CTA ── */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 10 }}
                   transition={{ duration: 0.5, delay: 0.24 }}
+                  className="flex items-center gap-3 flex-wrap max-sm:justify-center"
                 >
+                  {/* PRIMARY CTA (filled green pill) */}
                   <motion.div whileTap={{ scale: 0.97 }}>
                     <Link
-                      to="/diagnosis"
-                      className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97] active:shadow-[0_2px_12px_rgba(45,79,57,0.2)] dark:active:shadow-[0_2px_12px_rgba(45,107,74,0.15)]"
+                      to={isAIScanSlide ? "/skin-analysis" : "/diagnosis"}
+                      className="inline-flex items-center gap-2 rounded-full px-7 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold tracking-wide max-sm:w-full max-sm:justify-center hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97] active:shadow-[0_2px_12px_rgba(45,79,57,0.2)] dark:active:shadow-[0_2px_12px_rgba(45,107,74,0.15)]"
                       style={{
                         background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
                         color: isDark ? "#F5F5F7" : "#fff",
@@ -170,13 +266,50 @@ function HeroSlider({ slides, accent, accentDeep, isDark }: { slides: { headline
                         fontFamily: "var(--font-sans)",
                       }}
                     >
-                      {slides[i]?.cta}
+                      {isAIScanSlide ? (
+                        <>
+                          <Camera size={15} strokeWidth={2} />
+                          {ctaAI}
+                        </>
+                      ) : (
+                        <>
+                          <ClipboardList size={15} strokeWidth={1.8} />
+                          {allSlides[i]?.cta}
+                        </>
+                      )}
+                    </Link>
+                  </motion.div>
+                  {/* SECONDARY CTA (ghost outline pill) */}
+                  <motion.div whileTap={{ scale: 0.97 }}>
+                    <Link
+                      to={isAIScanSlide ? "/diagnosis" : "/skin-analysis"}
+                      className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 md:px-6 md:py-3 text-sm font-medium tracking-wide transition-all duration-200 max-sm:w-full max-sm:justify-center"
+                      style={{
+                        border: `1px solid ${ghostBorder}`,
+                        color: ghostColor,
+                        fontFamily: "var(--font-sans)",
+                        backdropFilter: "blur(4px)",
+                        WebkitBackdropFilter: "blur(4px)",
+                      }}
+                    >
+                      {isAIScanSlide ? (
+                        <>
+                          <ClipboardList size={14} strokeWidth={1.5} />
+                          {ctaQuiz}
+                        </>
+                      ) : (
+                        <>
+                          <Camera size={14} strokeWidth={1.5} />
+                          {ctaAI}
+                        </>
+                      )}
                     </Link>
                   </motion.div>
                 </motion.div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -757,7 +890,7 @@ export default function Index() {
       <RecheckBanner />
 
       <main>
-        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} accent={accent} accentDeep={accentDeep} isDark={isDark} />
+        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} accent={accent} accentDeep={accentDeep} isDark={isDark} language={language} />
         <UspStrip items={p1.home.usp as unknown as { label: string }[]} accent={accent} isDark={isDark} />
         <AISkinAnalysisHero />
         {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}

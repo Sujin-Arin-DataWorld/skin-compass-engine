@@ -5,6 +5,7 @@ import { useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, AlertCircle, RefreshCw } from 'lucide-react';
 import LiveCamera from '@/components/SkinAnalysis/LiveCamera';
+import LifestyleSurvey from '@/components/SkinAnalysis/LifestyleSurvey';
 import AnalysisLoading from '@/components/SkinAnalysis/AnalysisLoading';
 import AnalysisResults from '@/components/SkinAnalysis/AnalysisResults';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
@@ -62,8 +63,10 @@ export default function SkinAnalysisPage() {
     scores,
     analysisId,
     errorMessage,
+    lifestyleAnswers,
     setStep,
     setCapturedImage,
+    setLifestyleAnswers,
     setAnalysisResult,
     setError,
     resetAnalysis,
@@ -112,8 +115,13 @@ export default function SkinAnalysisPage() {
       setStep('analyzing');
 
       try {
-        const response = await analyzeSkinImage(base64);
-        setAnalysisResult(response.scores, 'ai_photo_analysis', response.analysis_id);
+        const response = await analyzeSkinImage(base64, lifestyleAnswers ?? undefined);
+        const hasLifestyle = lifestyleAnswers !== null;
+        setAnalysisResult(
+          response.scores,
+          'ai_photo_analysis',
+          response.analysis_id,
+        );
 
         // ── Persist to user_skin_profiles if logged in (non-blocking) ──────
         (async () => {
@@ -140,7 +148,7 @@ export default function SkinAnalysisPage() {
               skinType: deriveSkinType(response.scores),
               primaryConcerns: derivePrimaryConcerns(response.scores),
               analysisMethod: 'camera',
-              confidenceScore: 0.75,
+              confidenceScore: hasLifestyle ? 0.92 : 0.75,
             });
 
             if (saved) {
@@ -154,7 +162,7 @@ export default function SkinAnalysisPage() {
         setError(err instanceof Error ? err.message : t.camera.analysisError);
       }
     },
-    [setCapturedImage, setStep, setAnalysisResult, setError, t],
+    [setCapturedImage, setStep, setAnalysisResult, setError, t, lifestyleAnswers],
   );
 
   const handleClose = useCallback(() => {
@@ -247,7 +255,7 @@ export default function SkinAnalysisPage() {
           </div>
 
           <button
-            onClick={() => setStep('camera')}
+            onClick={() => setStep('survey')}
             className="w-full rounded-2xl py-4 text-center transition-all active:scale-[0.98]"
             style={{
               background: 'linear-gradient(135deg, rgba(201,169,110,0.25) 0%, rgba(183,110,121,0.25) 100%)',
@@ -335,6 +343,19 @@ export default function SkinAnalysisPage() {
 
   return (
     <AnimatePresence mode="wait">
+      {/* Survey */}
+      {currentStep === 'survey' && (
+        <motion.div key="survey" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <LifestyleSurvey
+            onComplete={(answers) => {
+              setLifestyleAnswers(answers);
+              setStep('camera');
+            }}
+            onClose={handleClose}
+          />
+        </motion.div>
+      )}
+
       {/* Camera */}
       {currentStep === 'camera' && (
         <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>

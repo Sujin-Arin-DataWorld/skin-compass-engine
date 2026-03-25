@@ -16,6 +16,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
  */
 export async function analyzeSkinImage(
   imageBase64: string,
+  lifestyle?: Record<string, number | string>,
 ): Promise<AnalysisApiResponse> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30_000);
@@ -32,13 +33,18 @@ export async function analyzeSkinImage(
   }
 
   try {
+    const body: Record<string, unknown> = { image_base64: imageBase64 };
+    if (lifestyle && Object.keys(lifestyle).length > 0) {
+      body.lifestyle = lifestyle;
+    }
+
     const res = await fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${authToken}`,
       },
-      body: JSON.stringify({ image_base64: imageBase64 }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
 

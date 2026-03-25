@@ -5,12 +5,27 @@ import { useState } from 'react';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { submitFeedback } from '@/services/skinAnalysisService';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
+import { useI18nStore } from '@/store/i18nStore';
+
+const TX = {
+  thanks:    { ko: '소중한 피드백 감사합니다! 🙏', en: 'Thank you for your feedback! 🙏', de: 'Vielen Dank für Ihr Feedback! 🙏' },
+  question:  { ko: '분석 결과가 정확한가요?', en: 'Was the analysis accurate?', de: 'War die Analyse genau?' },
+  accurate:  { ko: '정확해요', en: 'Accurate', de: 'Genau' },
+  inaccurate:{ ko: '아니에요', en: 'Not quite', de: 'Nicht ganz' },
+  placeholder:{ ko: '어떤 부분이 다른가요? (선택 사항)', en: 'What felt different? (optional)', de: 'Was war anders? (optional)' },
+  submitting:{ ko: '전송 중...', en: 'Sending...', de: 'Senden...' },
+  submit:    { ko: '제출', en: 'Submit', de: 'Senden' },
+} as const;
+
+type Lang = 'ko' | 'en' | 'de';
 
 interface FeedbackWidgetProps {
   analysisId: string;
 }
 
 export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
+  const { language } = useI18nStore();
+  const lang = language as Lang;
   const setFeedbackGiven = useSkinAnalysisStore((s) => s.setFeedbackGiven);
   const [voted, setVoted] = useState<'accurate' | 'inaccurate' | null>(null);
   const [showComment, setShowComment] = useState(false);
@@ -56,7 +71,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
             color: '#c9a96e',
           }}
         >
-          소중한 피드백 감사합니다! 🙏
+          {TX.thanks[lang] ?? TX.thanks.en}
         </p>
       </div>
     );
@@ -78,7 +93,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
           color: 'rgba(255,255,255,0.75)',
         }}
       >
-        분석 결과가 정확한가요?
+        {TX.question[lang] ?? TX.question.en}
       </p>
 
       {!voted && (
@@ -95,7 +110,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
             }}
           >
             <ThumbsUp size={15} />
-            정확해요
+            {TX.accurate[lang] ?? TX.accurate.en}
           </button>
           <button
             onClick={() => handleVote('inaccurate')}
@@ -109,7 +124,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
             }}
           >
             <ThumbsDown size={15} />
-            아니에요
+            {TX.inaccurate[lang] ?? TX.inaccurate.en}
           </button>
         </div>
       )}
@@ -119,7 +134,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            placeholder="어떤 부분이 다른가요? (선택 사항)"
+            placeholder={TX.placeholder[lang] ?? TX.placeholder.en}
             rows={2}
             className="w-full rounded-xl px-3 py-2 resize-none text-sm"
             style={{
@@ -142,7 +157,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
               opacity: submitting ? 0.5 : 1,
             }}
           >
-            {submitting ? '전송 중...' : '제출'}
+             {submitting ? (TX.submitting[lang] ?? TX.submitting.en) : (TX.submit[lang] ?? TX.submit.en)}
           </button>
         </div>
       )}

@@ -1,9 +1,10 @@
 // Prompt 2 — Analysis loading screen
 // Shows frozen captured photo + scanner animation + multi-step progress
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useI18nStore, translations } from '@/store/i18nStore';
+import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 
 interface AnalysisLoadingProps {
   capturedImage: string; // base64, mirrored for display
@@ -16,7 +17,23 @@ export default function AnalysisLoading({
 }: AnalysisLoadingProps) {
   const { language } = useI18nStore();
   const t = translations[language];
-  const STEPS = t.skinAnalysis.loadingSteps;
+  const hasLifestyle = useSkinAnalysisStore((s) => s.lifestyleAnswers !== null);
+
+  const LIFESTYLE_STEP: Record<string, string> = {
+    en: 'Integrating lifestyle data...',
+    de: 'Lebensstildaten werden integriert...',
+    ko: '생활 습관 데이터 결합 중...',
+  };
+
+  const STEPS = useMemo(() => {
+    const base = [...t.skinAnalysis.loadingSteps] as string[];
+    if (hasLifestyle) {
+      // Insert lifestyle step after the 2nd step (before "preparing solutions")
+      const insertAt = Math.min(2, base.length);
+      base.splice(insertAt, 0, LIFESTYLE_STEP[language] ?? LIFESTYLE_STEP.en);
+    }
+    return base;
+  }, [t, hasLifestyle, language]);
 
   const [activeStep, setActiveStep] = useState(0);
 

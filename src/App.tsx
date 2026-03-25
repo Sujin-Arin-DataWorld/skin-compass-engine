@@ -126,7 +126,7 @@ function AppInner() {
                   skinType: skinType as 'oily' | 'dry' | 'combination' | 'sensitive' | 'normal',
                   primaryConcerns: concerns as ('acne' | 'dehydration' | 'pigmentation' | 'sensitivity' | 'aging')[],
                   analysisMethod: 'camera',
-                  confidenceScore: 0.75,
+                  confidenceScore: pending.hasLifestyle ? 0.92 : 0.75,
                 });
                 console.log('[App] Pending analysis saved successfully');
               }

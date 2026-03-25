@@ -53,7 +53,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { image_base64 } = await req.json();
+    const { image_base64, lifestyle } = await req.json();
 
     if (!image_base64) {
       return new Response(
@@ -63,6 +63,30 @@ Deno.serve(async (req: Request) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         },
       );
+    }
+
+    // ── Build lifestyle context string for Groq (if provided) ────────────
+    let lifestyleContext = "";
+    if (lifestyle && typeof lifestyle === "object" && Object.keys(lifestyle).length > 0) {
+      const AGE_MAP: Record<number, string> = { 0: "Under 20", 1: "20-29", 2: "30-39", 3: "40-49", 4: "50-59", 5: "60+" };
+      const GENDER_MAP: Record<number, string> = { 0: "Female", 1: "Male", 2: "Non-binary" };
+      const SLEEP_MAP: Record<number, string> = { 1: "<5h (very poor)", 2: "5-6h (insufficient)", 3: "7h (adequate)", 4: "8h+ (excellent)" };
+      const WATER_MAP: Record<number, string> = { 1: "1-2 glasses (very low)", 2: "3-5 glasses (moderate)", 3: "6+ glasses (good)" };
+      const STRESS_MAP: Record<number, string> = { 1: "Low", 2: "Moderate", 3: "High" };
+      const SEASONAL_MAP: Record<number, string> = { 0: "No significant change", 1: "Oilier summer / drier winter", 2: "Dry year-round / worse in winter", 3: "Oily year-round / worse in summer" };
+
+      const lines: string[] = [];
+      if (lifestyle.age_bracket !== undefined) lines.push(`- Age range: ${AGE_MAP[lifestyle.age_bracket as number] ?? lifestyle.age_bracket}`);
+      if (lifestyle.gender !== undefined) lines.push(`- Gender: ${GENDER_MAP[lifestyle.gender as number] ?? lifestyle.gender}`);
+      if (lifestyle.sleep !== undefined) lines.push(`- Sleep: ${SLEEP_MAP[lifestyle.sleep as number] ?? lifestyle.sleep}`);
+      if (lifestyle.water !== undefined) lines.push(`- Water intake: ${WATER_MAP[lifestyle.water as number] ?? lifestyle.water}`);
+      if (lifestyle.stress !== undefined) lines.push(`- Stress level: ${STRESS_MAP[lifestyle.stress as number] ?? lifestyle.stress}`);
+      if (lifestyle.climate !== undefined) lines.push(`- Climate: ${lifestyle.climate}`);
+      if (lifestyle.seasonal_change !== undefined) lines.push(`- Seasonal variation: ${SEASONAL_MAP[lifestyle.seasonal_change as number] ?? lifestyle.seasonal_change}`);
+
+      if (lines.length > 0) {
+        lifestyleContext = `\n\nLIFESTYLE CONTEXT (use these factors to adjust your visual scoring — e.g. low water intake should lower hyd, high stress should increase seb/sen, poor sleep should increase bar/aging):\n${lines.join("\n")}`;
+      }
     }
 
     const groqKey = Deno.env.get("GROQ_API_KEY");
@@ -120,7 +144,7 @@ Deno.serve(async (req: Request) => {
                 },
                 {
                   type: "text",
-                  text: "Analyze this face photo and return ONLY a valid JSON object with the 10 skin axis scores.",
+                  text: `Analyze this face photo and return ONLY a valid JSON object with the 10 skin axis scores.${lifestyleContext}`,
                 },
               ],
             },
@@ -184,6 +208,7 @@ Deno.serve(async (req: Request) => {
           user_id: userId,
           is_anonymous: isAnonymous,
           scores_json: scores,
+          lifestyle_json: lifestyle ?? null,
           model_version: "groq-llama-4-scout-v1",
           inference_latency_ms: inferenceLatencyMs,
         })

@@ -21,6 +21,10 @@ interface SkinAnalysisState {
   capturedImageBase64: string | null;
   setCapturedImage: (base64: string | null) => void;
 
+  // Lifestyle survey answers (collected before camera capture)
+  lifestyleAnswers: Record<string, number | string> | null;
+  setLifestyleAnswers: (answers: Record<string, number | string>) => void;
+
   // Analysis results
   scores: SkinAxisScores | null;
   scoreSource: ScoreSource | null;
@@ -52,6 +56,9 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
       capturedImageBase64: null,
       setCapturedImage: (base64) => set({ capturedImageBase64: base64 }),
 
+      lifestyleAnswers: null,
+      setLifestyleAnswers: (answers) => set({ lifestyleAnswers: answers }),
+
       scores: null,
       scoreSource: null,
       analysisId: null,
@@ -80,6 +87,7 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
         set({
           currentStep: 'idle',
           capturedImageBase64: null,
+          lifestyleAnswers: null,
           scores: null,
           scoreSource: null,
           analysisId: null,

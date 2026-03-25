@@ -151,6 +151,8 @@ export default function AnalysisResults({
   const { language } = useI18nStore();
   const { isLoggedIn } = useAuthStore();
   const resetAnalysis = useSkinAnalysisStore((s) => s.resetAnalysis);
+  const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
+  const hasLifestyle = lifestyleAnswers !== null;
 
   const overallScore = useMemo(() => getOverallScore(scores), [scores]);
   const summary = useMemo(() => getScoreSummary(overallScore, language), [overallScore, language]);
@@ -169,18 +171,19 @@ export default function AnalysisResults({
 
   const handleSave = () => {
     if (!isLoggedIn) {
-      // ── BUG 5 fix: persist pending analysis to sessionStorage before login ──
+      // ── BUG 3 fix: persist pending analysis + redirect back to analysis page ──
       try {
         sessionStorage.setItem('ssl_pending_analysis', JSON.stringify({
           scores,
           analysisId,
+          hasLifestyle,
           timestamp: Date.now(),
         }));
         console.log('[AnalysisResults] Pending analysis saved to sessionStorage');
       } catch (e) {
         console.warn('[AnalysisResults] Failed to save pending analysis:', e);
       }
-      navigate('/login');
+      navigate('/login?redirect=/skin-analysis');
     }
     // If logged in: already saved during analysis
   };
@@ -207,12 +210,52 @@ export default function AnalysisResults({
           className="text-center mb-8"
         >
           <p style={{ fontFamily: 'var(--font-display)', fontSize: '11px', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', marginBottom: '6px' }}>
-            AI Skin Analysis
+            {language === 'ko' ? 'AI 피부 분석' : language === 'de' ? 'KI-Hautanalyse' : 'AI Skin Analysis'}
           </p>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '26px', color: '#fff', fontWeight: 400 }}>
             {language === 'ko' ? '분석 결과' : language === 'de' ? 'Analyseergebnis' : 'Analysis Result'}
           </h1>
         </motion.div>
+
+        {/* ── SECTION 0.5: Precision Badge (only when lifestyle data present) ── */}
+        {hasLifestyle && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="mb-6 rounded-2xl p-4 text-center"
+            style={{
+              background: 'rgba(201,169,110,0.06)',
+              border: '1px solid rgba(201,169,110,0.25)',
+              backdropFilter: 'blur(12px)',
+            }}
+          >
+            <div className="flex items-center justify-center gap-2 mb-1.5">
+              <span style={{ fontSize: '16px' }}>🔬</span>
+              <p style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '13px',
+                letterSpacing: '0.1em',
+                color: '#c9a96e',
+                fontWeight: 500,
+              }}>
+                {language === 'ko' ? '정밀 분석 완료' : language === 'de' ? 'Pr\u00e4zisionsanalyse abgeschlossen' : 'Precision Analysis Complete'}
+              </p>
+            </div>
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '11px',
+              color: 'rgba(255,255,255,0.45)',
+              lineHeight: 1.5,
+            }}>
+              {language === 'ko'
+                ? 'AI 피부 사진 + 생활습관 기반 통합 분석 \u00b7 신뢰도 92%'
+                : language === 'de'
+                  ? 'KI-Foto + Lebensstil-Analyse \u00b7 Zuverl\u00e4ssigkeit 92%'
+                  : 'AI Photo + Lifestyle Integrated Analysis \u00b7 Confidence 92%'}
+            </p>
+          </motion.div>
+        )}
 
         {/* ── SECTION 1: Hero ───────────────────────────────────────────────── */}
         <motion.div

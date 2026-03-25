@@ -135,15 +135,15 @@ export default function ProductRecommendationCard({
                     : undefined,
                 }}
               >
-                {AXIS_KO_SHORT[axis] ?? axis} {score}점
-                {isHighSeverity ? ' → 개선 필요' : ''}
+                {AXIS_KO_SHORT[axis] ?? axis} {score}{language === 'ko' ? '점' : language === 'de' ? 'P.' : 'pt'}
+                {isHighSeverity ? (language === 'ko' ? ' → 개선 필요' : language === 'de' ? ' → Pflege nötig' : ' → Needs care') : ''}
               </span>
             );
           })}
         </div>
 
         <button
-          onClick={() => navigate('/results?slide=2')}
+          onClick={() => navigate(`/formula/${rule.productId}`)}
           className="rounded-full px-3 py-1 text-xs"
           style={{
             background: 'rgba(201,169,110,0.15)',
@@ -152,7 +152,7 @@ export default function ProductRecommendationCard({
             fontFamily: 'var(--font-sans)',
           }}
         >
-          자세히 보기 →
+          {language === 'ko' ? '자세히 보기 →' : language === 'de' ? 'Details →' : 'View details →'}
         </button>
       </div>
     </div>

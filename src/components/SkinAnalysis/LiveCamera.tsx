@@ -116,6 +116,8 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
       const tmpCtx = tmpCanvas.getContext('2d');
       if (!tmpCtx) {
         console.error('[Capture] Failed to create temp canvas context');
+        setCaptureError(language === 'ko' ? '촬영에 실패했습니다. 다시 시도해주세요.' : 'Capture failed — please try again.');
+        setTimeout(() => setCaptureError(''), 3000);
         return;
       }
       tmpCtx.drawImage(video, 0, 0, tmpCanvas.width, tmpCanvas.height);
@@ -168,9 +170,9 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     // Draw raw (unflipped) frame — AI needs real orientation, not mirror
     ctx.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
 
-    // Stop tracks NOW (after frame is captured) — stopping before drawImage can
-    // blank the video element on iOS, producing an all-black or 0×0 capture.
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    // NOTE: Stream tracks are stopped AFTER successful onCapture (below).
+    // Stopping here would kill the camera before export validation,
+    // making retry impossible if export fails.
 
     // Iterative compression loop — target ≤190KB (Supabase bucket limit: 200KB)
     const STORAGE_MAX_BYTES = 190_000;
@@ -199,6 +201,8 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     }
     if (!result) {
       console.error('[Capture] All export attempts failed — canvas too large?');
+      setCaptureError(language === 'ko' ? '이미지 저장에 실패했습니다. 다시 촬영해주세요.' : 'Image export failed — please retake.');
+      setTimeout(() => setCaptureError(''), 3000);
       return;
     }
 
@@ -210,9 +214,12 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
     const blob = new Blob([bytes], { type: 'image/jpeg' });
 
+    // Stop camera tracks only after successful capture — keeps camera live for retry on failure
+    streamRef.current?.getTracks().forEach((t) => t.stop());
+
     onCapture(result.base64, blob);
     console.log('[Capture] 5. onCapture called successfully');
-  }, [cameraState, onCapture]);
+  }, [cameraState, onCapture, language]);
 
   // ── File input fallback (KakaoTalk, LINE in-app browsers) ─────────────────
   const handleFileInput = useCallback(

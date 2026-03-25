@@ -89,7 +89,7 @@ export default function AISkinAnalysisHero() {
                   color: '#a3b394',
                 }}
               >
-                AI 피부 분석
+                정밀 AI 피부 스캔
               </span>
             </div>
           </div>
@@ -106,14 +106,14 @@ export default function AISkinAnalysisHero() {
               marginBottom: 20,
             }}
           >
-            사진 한 장으로
+            피부가 머금은 고유의 결,
             <br />
             <span style={{ color: '#d4b87a', fontWeight: 500 }}>
-              나만의 피부 프로필
+              데이터
             </span>
-            을
+            로
             <br />
-            즉시 생성합니다
+            마주하는 첫 순간
           </h2>
 
           {/* ── 3. Description ── */}
@@ -129,8 +129,8 @@ export default function AISkinAnalysisHero() {
               maxWidth: 420,
             }}
           >
-            피지·수분·장벽·민감도 등 10가지 기준으로 피부 상태를 정밀 분석하고,
-            7개의 얼굴 부위별 맞춤 솔루션을 제안합니다.
+            10가지 정밀 지표와 7개 부위의 입체적 매핑으로,
+            당신만을 위한 솔루션을 제안합니다
           </p>
 
           {/* ── 4. CTA Buttons ── */}
@@ -149,7 +149,7 @@ export default function AISkinAnalysisHero() {
               type="button"
             >
               <CameraIcon size={18} />
-              AI로 분석하기
+              AI로 분석받기
             </button>
             <button
               className={styles.ctaSecondary}

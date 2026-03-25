@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.ico", "robots.txt"],
+      includeAssets: ["SSL.png", "robots.txt"],
       manifest: {
         name: "SkinStrategyLab",
         short_name: "SkinStrategy",

@@ -2,7 +2,7 @@
 // Supabase Edge Function: analyze-skin
 // Secure proxy to Groq API. Never exposes GROQ_API_KEY to the frontend.
 
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "@supabase/supabase-js";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

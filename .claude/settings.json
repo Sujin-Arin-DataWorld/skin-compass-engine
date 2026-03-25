@@ -14,7 +14,8 @@
       "Read(//Users/sujinpark/**)"
     ],
     "additionalDirectories": [
-      "/tmp"
+      "/tmp",
+      "/Users/sujinpark/Downloads"
     ]
   }
 }

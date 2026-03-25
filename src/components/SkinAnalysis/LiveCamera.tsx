@@ -67,11 +67,13 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     };
   }, [startCamera]);
 
-  // ── Capture ───────────────────────────────────────────────────────────────
+  // ── Capture (iOS-safe: pre-resize to avoid 4K canvas silent fail) ──────────
   const capture = useCallback(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas || cameraState !== 'live') return;
+
+    console.log('[Capture] 1. Button clicked');
 
     // Flash effect
     setFlashing(true);
@@ -82,6 +84,31 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
 
     const vw = video.videoWidth;
     const vh = video.videoHeight;
+    console.log('[Capture] 2. Video dimensions:', vw, vh);
+
+    // ── iOS safety: pre-resize if source exceeds safe canvas area ──
+    // iOS Safari canvas limit is ~16.7MP (4096×4096).
+    // If video is 4K (4032×3024 = 12.2MP), direct drawImage can fail silently.
+    const MAX_CAPTURE_SIZE = 1280;
+    let sourceCanvas: HTMLCanvasElement | HTMLVideoElement = video;
+    let srcW = vw, srcH = vh;
+
+    if (vw > MAX_CAPTURE_SIZE || vh > MAX_CAPTURE_SIZE) {
+      const scale = Math.min(MAX_CAPTURE_SIZE / vw, MAX_CAPTURE_SIZE / vh, 1);
+      const tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width = Math.round(vw * scale);
+      tmpCanvas.height = Math.round(vh * scale);
+      const tmpCtx = tmpCanvas.getContext('2d');
+      if (!tmpCtx) {
+        console.error('[Capture] Failed to create temp canvas context');
+        return;
+      }
+      tmpCtx.drawImage(video, 0, 0, tmpCanvas.width, tmpCanvas.height);
+      sourceCanvas = tmpCanvas;
+      srcW = tmpCanvas.width;
+      srcH = tmpCanvas.height;
+      console.log('[Capture] 2b. Pre-resized to:', srcW, srcH);
+    }
 
     // Map oval guide to video resolution
     const viewW = window.innerWidth;
@@ -91,17 +118,17 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     const ovalX = (viewW - ovalW) / 2;
     const ovalY = (viewH - ovalH) / 2;
 
-    // Scale from viewport to video resolution
-    const scaleX = vw / viewW;
-    const scaleY = vh / viewH;
+    // Scale from viewport to (possibly pre-resized) source resolution
+    const scaleX = srcW / viewW;
+    const scaleY = srcH / viewH;
 
     const padX = ovalW * CROP_PADDING;
     const padY = ovalH * CROP_PADDING;
 
     const cropX = Math.max(0, (ovalX - padX) * scaleX);
     const cropY = Math.max(0, (ovalY - padY) * scaleY);
-    const cropW = Math.min(vw - cropX, (ovalW + 2 * padX) * scaleX);
-    const cropH = Math.min(vh - cropY, (ovalH + 2 * padY) * scaleY);
+    const cropW = Math.min(srcW - cropX, (ovalW + 2 * padX) * scaleX);
+    const cropH = Math.min(srcH - cropY, (ovalH + 2 * padY) * scaleY);
 
     // Resize to max 512×512 maintaining aspect ratio
     const aspect = cropW / cropH;
@@ -116,20 +143,33 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     canvas.width = outW;
     canvas.height = outH;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('[Capture] Failed to get output canvas context');
+      return;
+    }
+
+    console.log('[Capture] 3. Canvas dimensions:', outW, outH);
 
     // Draw raw (unflipped) frame — AI needs real orientation, not mirror
-    ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
+    ctx.drawImage(sourceCanvas, cropX, cropY, cropW, cropH, 0, 0, outW, outH);
 
     // Iterative compression loop — target ≤190KB (Supabase bucket limit: 200KB)
     const STORAGE_MAX_BYTES = 190_000;
-    const tryExport = (quality: number): { base64: string; sizeBytes: number } | null => {
-      const dataURL = canvas.toDataURL('image/jpeg', quality);
-      if (!dataURL || dataURL === 'data:,') return null;
-      const b64 = dataURL.split(',')[1];
-      if (!b64) return null;
-      const sizeBytes = Math.ceil(b64.length * 0.75);
-      return { base64: b64, sizeBytes };
+    const tryExport = (q: number): { base64: string; sizeBytes: number } | null => {
+      try {
+        const dataURL = canvas.toDataURL('image/jpeg', q);
+        if (!dataURL || dataURL === 'data:,') {
+          console.error('[Capture] toDataURL returned empty at quality', q);
+          return null;
+        }
+        const b64 = dataURL.split(',')[1];
+        if (!b64) return null;
+        const sizeBytes = Math.ceil(b64.length * 0.75);
+        return { base64: b64, sizeBytes };
+      } catch (e) {
+        console.error('[Capture] toDataURL threw:', e);
+        return null;
+      }
     };
 
     let quality = JPEG_QUALITY_PRIMARY; // 0.8
@@ -138,7 +178,12 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
       quality -= 0.1;
       result = tryExport(quality);
     }
-    if (!result) return;
+    if (!result) {
+      console.error('[Capture] All export attempts failed — canvas too large?');
+      return;
+    }
+
+    console.log('[Capture] 4. Image captured, size:', result.sizeBytes, 'bytes');
 
     // Build a Blob for the onCapture signature (still needed by callers)
     const binaryStr = atob(result.base64);
@@ -147,6 +192,7 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
     const blob = new Blob([bytes], { type: 'image/jpeg' });
 
     onCapture(result.base64, blob);
+    console.log('[Capture] 5. onCapture called successfully');
   }, [cameraState, onCapture]);
 
   // ── File input fallback (KakaoTalk, LINE in-app browsers) ─────────────────

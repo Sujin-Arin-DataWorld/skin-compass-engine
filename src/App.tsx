@@ -100,6 +100,42 @@ function AppInner() {
         const skinProfileStore = useSkinProfileStore.getState();
         if (event === "SIGNED_IN" && session?.user) {
           skinProfileStore.fetchActiveProfile(session.user.id);
+
+          // ── BUG 5 fix: persist pending analysis saved before login ──
+          try {
+            const pendingRaw = sessionStorage.getItem('ssl_pending_analysis');
+            if (pendingRaw) {
+              const pending = JSON.parse(pendingRaw);
+              // Only process if saved within last 30 minutes
+              if (pending?.scores && Date.now() - (pending.timestamp || 0) < 30 * 60 * 1000) {
+                console.log('[App] Found pending analysis, saving to DB...');
+                const s = pending.scores;
+                // Derive skin type
+                const skinType = s.sen >= 65 ? 'sensitive' : s.seb >= 65 && s.hyd >= 50 ? 'oily' : s.hyd <= 35 && s.seb <= 35 ? 'dry' : s.seb >= 50 && s.hyd <= 45 ? 'combination' : 'normal';
+                // Derive concerns
+                const concerns: string[] = [];
+                if (s.acne >= 50) concerns.push('acne');
+                if (s.hyd <= 40) concerns.push('dehydration');
+                if (s.pigment >= 50) concerns.push('pigmentation');
+                if (s.sen >= 55) concerns.push('sensitivity');
+                if (s.aging >= 50) concerns.push('aging');
+
+                await skinProfileStore.saveAnalysisResult({
+                  userId: session.user.id,
+                  scores: s,
+                  skinType: skinType as 'oily' | 'dry' | 'combination' | 'sensitive' | 'normal',
+                  primaryConcerns: concerns as ('acne' | 'dehydration' | 'pigmentation' | 'sensitivity' | 'aging')[],
+                  analysisMethod: 'camera',
+                  confidenceScore: 0.75,
+                });
+                console.log('[App] Pending analysis saved successfully');
+              }
+              sessionStorage.removeItem('ssl_pending_analysis');
+            }
+          } catch (e) {
+            console.warn('[App] Pending analysis save failed:', e);
+            sessionStorage.removeItem('ssl_pending_analysis');
+          }
         }
         if (event === "SIGNED_OUT") {
           skinProfileStore.clearProfile();

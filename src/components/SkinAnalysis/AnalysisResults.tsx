@@ -1,5 +1,5 @@
 // Prompt 4 (+ Prompt 4 UPDATE) — AI Analysis Results
-// Hero + Radar Chart + Axis Cards + Feedback + Product Recommendations
+// AI Analysis Results — Axis Cards + Feedback + Product Recommendations
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
@@ -12,7 +12,7 @@ import FeedbackWidget from './FeedbackWidget';
 import ProductRecommendationCard from './ProductRecommendationCard';
 import { PRODUCT_RULES, AXIS_KO_SHORT } from '@/data/productRules';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
-import { RADAR_AXES, AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO } from '@/engine/types';
+import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO } from '@/engine/types';
 
 interface AnalysisResultsProps {
   scores: SkinAxisScores;
@@ -34,11 +34,41 @@ function getOverallScore(scores: SkinAxisScores): number {
   return Math.round(sum / keys.length);
 }
 
+type ScoreTier = 'excellent' | 'good' | 'attention' | 'critical';
+
+function getScoreTier(score: number): ScoreTier {
+  if (score >= 80) return 'excellent';
+  if (score >= 65) return 'good';
+  if (score >= 45) return 'attention';
+  return 'critical';
+}
+
+const TIER_MESSAGES: Record<ScoreTier, Record<string, string>> = {
+  excellent: {
+    ko: '훌륭해요! 현재 루틴이 피부에 딱 맞고 있어요.',
+    en: 'Wonderful! Your current routine is working beautifully.',
+    de: 'Wunderbar! Ihre aktuelle Routine passt perfekt zu Ihrer Haut.',
+  },
+  good: {
+    ko: '전반적으로 좋은 상태예요. 몇 가지 포인트만 더 관리하면 완벽해질 거예요.',
+    en: 'Your skin is in good shape. A few targeted adjustments will make it perfect.',
+    de: 'Ihre Haut ist in guter Verfassung. Einige gezielte Anpassungen werden sie perfekt machen.',
+  },
+  attention: {
+    ko: '지금이 케어 골든타임이에요. 맞춤 솔루션을 준비했습니다.',
+    en: 'Now is the golden time for care. We\'ve prepared a tailored solution for you.',
+    de: 'Jetzt ist die goldene Zeit für Pflege. Wir haben eine maßgeschneiderte Lösung für Sie.',
+  },
+  critical: {
+    ko: '집중 케어가 필요한 시점이에요. 전문 솔루션으로 함께 회복해요.',
+    en: 'Your skin needs focused care right now. Let\'s restore it together with expert solutions.',
+    de: 'Ihre Haut braucht jetzt intensive Pflege. Lassen Sie uns sie mit Expertenlösungen wiederherstellen.',
+  },
+};
+
 function getScoreSummary(score: number, lang: string): string {
-  if (score >= 80) return lang === 'ko' ? '피부 상태가 매우 좋습니다! ✨' : lang === 'de' ? 'Ihr Hautzustand ist ausgezeichnet! ✨' : 'Your skin is in excellent condition! ✨';
-  if (score >= 60) return lang === 'ko' ? '전반적으로 양호하지만 개선할 부분이 있어요' : lang === 'de' ? 'Insgesamt gut, aber verbesserungswürdig' : 'Overall good, but some areas need attention';
-  if (score >= 40) return lang === 'ko' ? '관리가 필요한 부분이 있습니다' : lang === 'de' ? 'Einige Bereiche benötigen Pflege' : 'Some areas need care';
-  return lang === 'ko' ? '집중 케어가 필요합니다' : lang === 'de' ? 'Intensive Pflege erforderlich' : 'Intensive care needed';
+  const tier = getScoreTier(score);
+  return TIER_MESSAGES[tier][lang] ?? TIER_MESSAGES[tier]['en'];
 }
 
 function getAxisInsight(key: string, score: number, lang: string): string {
@@ -66,86 +96,13 @@ function getAxisInsight(key: string, score: number, lang: string): string {
   return level === 'high' ? 'Very good' : level === 'low' ? 'Needs improvement' : 'Within normal range';
 }
 
+// Clinical Elegance palette — no raw green/yellow/red
 function getBarColor(key: string, score: number): string {
   const isGood = ['hyd', 'bar', 'makeup_stability'].includes(key);
   const health = isGood ? score : 100 - score;
-  if (health >= 70) return '#4ade80'; // green
-  if (health >= 40) return '#facc15'; // yellow
-  return '#f87171'; // red
-}
-
-// ── Inline SVG Radar Chart ────────────────────────────────────────────────────
-function AIRadarChart({ scores, lang }: { scores: SkinAxisScores; lang: string }) {
-  const labels = lang === 'ko' ? AXIS_LABELS_KO : lang === 'de' ? AXIS_LABELS_DE : AXIS_LABELS;
-  const n = RADAR_AXES.length;
-  const VIEWBOX = 340, CENTER = VIEWBOX / 2, RADIUS = 100;
-
-  // For AI scores: show raw values (some axes high=good, some high=bad)
-  // We scale by health direction for visual display
-  const points = RADAR_AXES.map((key, i) => {
-    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-    const raw = scores[key as keyof SkinAxisScores] ?? 50;
-    const health = toHealthScore(key, raw);
-    const MIN = 0.15, MAX = 0.95;
-    const r = (MIN + (health / 100) * (MAX - MIN)) * RADIUS;
-    return { x: CENTER + r * Math.cos(angle), y: CENTER + r * Math.sin(angle) };
-  });
-  const poly = points.map((p) => `${p.x},${p.y}`).join(' ');
-
-  return (
-    <div>
-      <svg width="100%" viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`} className="mx-auto max-w-[300px]">
-        {[0.25, 0.5, 0.75, 0.95].map((r) => (
-          <polygon
-            key={r}
-            points={Array.from({ length: n }, (_, i) => {
-              const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-              const rad = r * RADIUS;
-              return `${CENTER + rad * Math.cos(angle)},${CENTER + rad * Math.sin(angle)}`;
-            }).join(' ')}
-            fill="none"
-            stroke="rgba(255,255,255,0.12)"
-            strokeWidth="0.5"
-          />
-        ))}
-        {RADAR_AXES.map((_, i) => {
-          const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-          const end = { x: CENTER + RADIUS * Math.cos(angle), y: CENTER + RADIUS * Math.sin(angle) };
-          return <line key={i} x1={CENTER} y1={CENTER} x2={end.x} y2={end.y} stroke="rgba(255,255,255,0.1)" strokeWidth="0.5" />;
-        })}
-        <motion.polygon
-          points={poly}
-          fill="rgba(201,169,110,0.15)"
-          stroke="#c9a96e"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          style={{ transformOrigin: `${CENTER}px ${CENTER}px` }}
-        />
-        {points.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r={4} fill="#c9a96e" opacity={0.8} />
-        ))}
-        {RADAR_AXES.map((key, i) => {
-          const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
-          const r = RADIUS + 28;
-          return (
-            <text
-              key={key}
-              x={CENTER + r * Math.cos(angle)}
-              y={CENTER + r * Math.sin(angle)}
-              textAnchor="middle"
-              dominantBaseline="central"
-              style={{ fontSize: '9px', fontFamily: 'var(--font-sans)', fill: 'rgba(255,255,255,0.7)' }}
-            >
-              {labels[key as keyof typeof labels]}
-            </text>
-          );
-        })}
-      </svg>
-    </div>
-  );
+  if (health >= 70) return '#4ECDC4'; // mint (excellent)
+  if (health >= 40) return '#E8A87C'; // muted coral (attention)
+  return '#CF6679'; // soft rose (critical)
 }
 
 // ── Circular progress ring ────────────────────────────────────────────────────
@@ -153,7 +110,7 @@ function ScoreRing({ score }: { score: number }) {
   const r = 40, cx = 52, cy = 52;
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (score / 100) * circumference;
-  const color = score >= 70 ? '#4ade80' : score >= 40 ? '#facc15' : '#f87171';
+  const color = score >= 80 ? '#4ECDC4' : score >= 65 ? '#7C9CBF' : score >= 45 ? '#E8A87C' : '#CF6679';
 
   return (
     <svg width="104" height="104" viewBox="0 0 104 104">
@@ -207,11 +164,22 @@ export default function AnalysisResults({
   );
 
   const handleNavigateToLab = () => {
-    navigate('/results?slide=2');
+    navigate('/lab');
   };
 
   const handleSave = () => {
     if (!isLoggedIn) {
+      // ── BUG 5 fix: persist pending analysis to sessionStorage before login ──
+      try {
+        sessionStorage.setItem('ssl_pending_analysis', JSON.stringify({
+          scores,
+          analysisId,
+          timestamp: Date.now(),
+        }));
+        console.log('[AnalysisResults] Pending analysis saved to sessionStorage');
+      } catch (e) {
+        console.warn('[AnalysisResults] Failed to save pending analysis:', e);
+      }
       navigate('/login');
     }
     // If logged in: already saved during analysis
@@ -283,21 +251,7 @@ export default function AnalysisResults({
           </div>
         </motion.div>
 
-        {/* ── SECTION 2: Radar Chart ────────────────────────────────────────── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="rounded-3xl p-4 mb-6"
-          style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
-        >
-          <p className="text-center mb-2" style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
-            {language === 'ko' ? '10축 피부 분석' : language === 'de' ? '10-Achsen-Hautanalyse' : '10-Axis Skin Analysis'}
-          </p>
-          <AIRadarChart scores={scores} lang={language} />
-        </motion.div>
-
-        {/* ── SECTION 3: Axis Cards ─────────────────────────────────────────── */}
+        {/* ── SECTION 2: Axis Cards (radar chart removed per Master Guide) ─────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -351,19 +305,8 @@ export default function AnalysisResults({
           </div>
         </motion.div>
 
-        {/* ── SECTION 4: Feedback ───────────────────────────────────────────── */}
-        {analysisId && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.4 }}
-            className="mb-6"
-          >
-            <FeedbackWidget analysisId={analysisId} />
-          </motion.div>
-        )}
 
-        {/* ── SECTION 5: Product Recommendations ───────────────────────────── */}
+        {/* ── SECTION 3: Product Recommendations ───────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -383,21 +326,14 @@ export default function AnalysisResults({
           ) : (
             <div
               className="rounded-2xl p-4 text-center"
-              style={{ background: 'rgba(74,222,128,0.06)', border: '1px solid rgba(74,222,128,0.2)' }}
+              style={{ background: 'rgba(78,205,196,0.06)', border: '1px solid rgba(78,205,196,0.2)' }}
             >
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: '#4ade80' }}>
-                {language === 'ko' ? '피부 상태가 양호합니다! 현재 루틴을 유지하세요.' : language === 'de' ? 'Ihr Hautzustand ist gut! Behalten Sie Ihre aktuelle Routine bei.' : 'Your skin looks great! Keep up your current routine.'}
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: '#4ECDC4' }}>
+                {getScoreSummary(overallScore, language)}
               </p>
               <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'rgba(255,255,255,0.35)', marginTop: '6px' }}>
-                {language === 'ko' ? '더 많은 맞춤 추천이 곧 추가됩니다' : language === 'de' ? 'Weitere personalisierte Empfehlungen folgen in Kürze' : 'More personalized recommendations coming soon'}
+                {language === 'ko' ? '더 정밀한 맞춤 추천이 곧 제공됩니다' : language === 'de' ? 'Weitere personalisierte Empfehlungen folgen in Kürze' : 'More personalized recommendations coming soon'}
               </p>
-              <button
-                onClick={handleNavigateToLab}
-                className="mt-2 text-sm"
-                style={{ fontFamily: 'var(--font-sans)', color: 'rgba(255,255,255,0.4)' }}
-              >
-                {language === 'ko' ? '전체 제품 둘러보기 →' : language === 'de' ? 'Alle Produkte ansehen →' : 'Browse all products →'}
-              </button>
             </div>
           )}
         </motion.div>
@@ -421,7 +357,7 @@ export default function AnalysisResults({
               fontWeight: 500,
             }}
           >
-            전체 맞춤 루틴 보기
+            {language === 'ko' ? '전체 맞춤 루틴 보기' : language === 'de' ? 'Meine Routine ansehen' : 'View My Routine'}
             <ChevronRight size={16} />
           </button>
 
@@ -438,7 +374,7 @@ export default function AnalysisResults({
               }}
             >
               <RotateCcw size={14} />
-              다시 분석
+              {language === 'ko' ? '다시 분석' : language === 'de' ? 'Erneut analysieren' : 'Retake'}
             </button>
             <button
               onClick={handleSave}
@@ -452,10 +388,25 @@ export default function AnalysisResults({
               }}
             >
               <Save size={14} />
-              {isLoggedIn ? '저장됨' : '로그인 후 저장'}
+              {isLoggedIn
+                ? (language === 'ko' ? '저장됨' : language === 'de' ? 'Gespeichert' : 'Saved')
+                : (language === 'ko' ? '로그인 후 저장' : language === 'de' ? 'Nach Login speichern' : 'Save after login')
+              }
             </button>
           </div>
         </motion.div>
+
+        {/* ── SECTION 5: Feedback (moved to bottom per Master Guide) ─────── */}
+        {analysisId && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9, duration: 0.4 }}
+            className="mb-6"
+          >
+            <FeedbackWidget analysisId={analysisId} />
+          </motion.div>
+        )}
 
       </div>
     </div>

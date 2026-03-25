@@ -850,6 +850,21 @@ export const phase1T = {
             newsletterSubmit:     "Jetzt anmelden",
             newsletterGdpr:       "Ich stimme den Datenschutzbestimmungen zu.",
         },
+        analysisHero: {
+            badge: "Präziser KI-Hautscan",
+            headingLine1: "Entdecken Sie die wahre Textur Ihrer Haut,",
+            headingLine2: "geleitet von Daten",
+            headingLine3: "<br />wie nie zuvor",
+            description: "Wir bieten eine exklusiv für Sie maßgeschneiderte Lösung durch 10-Achsen-Präzisionsmetriken und 7-Zonen-Mapping.",
+            btnPrimary: "Mit KI analysieren",
+            btnSecondary: "Fragebogen starten",
+            feature1: "⚡ 30-Sek. Analyse",
+            feature2: "🔬 Präzisionsdiagnose",
+            feature3: "🧴 Inhaltsstoff-Matching",
+            zoneTitle: "7-Zonen-Gesichtsanalyse",
+            zoneDesc: "Stirn · Wangen · Nase · Augen<br />Mund · Kinn · Kieferpartie",
+            scoreLabel: "Übereinstimmung"
+        },
     },
     en: {
         nav: {
@@ -897,6 +912,21 @@ export const phase1T = {
             newsletterPlaceholder:"Your email address",
             newsletterSubmit:     "Subscribe",
             newsletterGdpr:       "I agree to the privacy policy.",
+        },
+        analysisHero: {
+            badge: "Precision AI Skin Scan",
+            headingLine1: "Discover your skin's true texture,",
+            headingLine2: "guided by data",
+            headingLine3: "<br />like never before",
+            description: "Proposing a solution exclusively for you through 10-axis precision metrics and 7-zone dimensional mapping.",
+            btnPrimary: "Analyze with AI",
+            btnSecondary: "Start Questionnaire",
+            feature1: "⚡ 30-Sec Analysis",
+            feature2: "🔬 Precision Diagnosis",
+            feature3: "🧴 Ingredient Matching",
+            zoneTitle: "7-Zone Facial Analysis",
+            zoneDesc: "Forehead · Cheeks · Nose · Eyes<br />Mouth · Chin · Jawline",
+            scoreLabel: "Match Score"
         },
     },
     ko: {
@@ -975,6 +1005,21 @@ export const phase1T = {
             newsletterPlaceholder:"이메일 주소",
             newsletterSubmit:     "구독하기",
             newsletterGdpr:       "개인정보 처리방침에 동의합니다.",
+        },
+        analysisHero: {
+            badge: "정밀 AI 피부 스캔",
+            headingLine1: "피부가 머금은 고유의 결,",
+            headingLine2: "데이터",
+            headingLine3: "로<br />마주하는 첫 순간",
+            description: "10가지 정밀 지표와 7개 부위의 입체적 매핑으로<br />당신만을 위한 솔루션을 제안합니다",
+            btnPrimary: "AI로 분석받기",
+            btnSecondary: "질문으로 진단하기",
+            feature1: "⚡ 30초 분석",
+            feature2: "🔬 정밀 피부 진단",
+            feature3: "🧴 성분 기반 매칭",
+            zoneTitle: "7개의 얼굴 부위 분석",
+            zoneDesc: "이마 · 볼 · 코 · 눈가<br />입가 · 턱 · 턱선",
+            scoreLabel: "매칭 점수"
         },
     },
 } as const;

@@ -8,6 +8,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useI18nStore, phase1T } from '@/store/i18nStore';
 import styles from './AISkinAnalysisHero.module.css';
 import CameraIcon from './CameraIcon';
 
@@ -20,6 +21,9 @@ export default function AISkinAnalysisHero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
+  const { language } = useI18nStore();
+  const isKo = language === 'ko';
+  const t = phase1T[language].analysisHero;
 
   // ── IntersectionObserver: trigger animations + video autoplay ──
   useEffect(() => {
@@ -83,13 +87,13 @@ export default function AISkinAnalysisHero() {
               <span className={styles.pulseDot} />
               <span
                 style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: isKo ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
                   fontSize: 12,
                   fontWeight: 500,
                   color: '#a3b394',
                 }}
               >
-                정밀 AI 피부 스캔
+                {t.badge}
               </span>
             </div>
           </div>
@@ -98,7 +102,7 @@ export default function AISkinAnalysisHero() {
           <h2
             className={`${fadeClass(1)} ${styles.heroHeading}`}
             style={{
-              fontFamily: "'Hahmlet', serif",
+              fontFamily: isKo ? "'Hahmlet', serif" : "'Fraunces', serif",
               fontSize: 40,
               fontWeight: 400,
               color: '#f5f0e8',
@@ -106,21 +110,18 @@ export default function AISkinAnalysisHero() {
               marginBottom: 20,
             }}
           >
-            피부가 머금은 고유의 결,
+            {t.headingLine1}
             <br />
             <span style={{ color: '#d4b87a', fontWeight: 500 }}>
-              데이터
+              {t.headingLine2}
             </span>
-            로
-            <br />
-            마주하는 첫 순간
+            <span dangerouslySetInnerHTML={{ __html: t.headingLine3 }} />
           </h2>
 
-          {/* ── 3. Description ── */}
           <p
             className={fadeClass(2)}
             style={{
-              fontFamily: "'Hahmlet', serif",
+              fontFamily: isKo ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
               fontSize: 15,
               fontWeight: 300,
               color: 'rgba(245, 240, 232, 0.5)',
@@ -128,10 +129,8 @@ export default function AISkinAnalysisHero() {
               marginBottom: 32,
               maxWidth: 420,
             }}
-          >
-            10가지 정밀 지표와 7개 부위의 입체적 매핑으로,
-            당신만을 위한 솔루션을 제안합니다
-          </p>
+            dangerouslySetInnerHTML={{ __html: t.description }}
+          />
 
           {/* ── 4. CTA Buttons ── */}
           <div
@@ -149,14 +148,14 @@ export default function AISkinAnalysisHero() {
               type="button"
             >
               <CameraIcon size={18} />
-              AI로 분석받기
+              {t.btnPrimary}
             </button>
             <button
               className={styles.ctaSecondary}
               onClick={handleQuestionnaireAnalysis}
               type="button"
             >
-              질문으로 진단하기
+              {t.btnSecondary}
               <ChevronRight />
             </button>
           </div>
@@ -166,9 +165,9 @@ export default function AISkinAnalysisHero() {
             className={`${fadeClass(4)} ${styles.featurePillRow}`}
             style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}
           >
-            <span className={styles.featurePill}>⚡ 30초 분석</span>
-            <span className={styles.featurePill}>🔬 정밀 피부 진단</span>
-            <span className={styles.featurePill}>🧴 성분 기반 매칭</span>
+            <span className={styles.featurePill}>{t.feature1}</span>
+            <span className={styles.featurePill}>{t.feature2}</span>
+            <span className={styles.featurePill}>{t.feature3}</span>
           </div>
         </div>
 
@@ -200,28 +199,25 @@ export default function AISkinAnalysisHero() {
                 <GridIcon />
                 <span
                   style={{
-                    fontFamily: "'Hahmlet', serif",
+                    fontFamily: isKo ? "'Hahmlet', serif" : "'Fraunces', serif",
                     fontSize: 13,
                     fontWeight: 500,
                     color: '#f5f0e8',
                   }}
                 >
-                  7개의 얼굴 부위 분석
+                  {t.zoneTitle}
                 </span>
               </div>
               <p
                 style={{
-                  fontFamily: "'SUIT', sans-serif",
+                  fontFamily: isKo ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
                   fontSize: 11,
                   color: 'rgba(245, 240, 232, 0.4)',
                   lineHeight: 1.5,
                   margin: 0,
                 }}
-              >
-                이마 · 볼 · 코 · 눈가
-                <br />
-                입가 · 턱 · 턱선
-              </p>
+                dangerouslySetInnerHTML={{ __html: t.zoneDesc }}
+              />
             </div>
 
             {/* ── Floating score badge (top-right) ── */}
@@ -241,14 +237,14 @@ export default function AISkinAnalysisHero() {
               </span>
               <span
                 style={{
-                  fontFamily: "'SUIT', sans-serif",
+                  fontFamily: isKo ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
                   fontSize: 11,
                   fontWeight: 400,
                   color: 'rgba(245, 240, 232, 0.45)',
                   marginTop: 4,
                 }}
               >
-                매칭 점수
+                {t.scoreLabel}
               </span>
             </div>
           </div>

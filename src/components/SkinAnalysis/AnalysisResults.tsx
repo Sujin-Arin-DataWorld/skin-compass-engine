@@ -133,6 +133,7 @@ const TX = {
   retake:        { ko: '다시 분석', en: 'Retake', de: 'Wiederholen' },
   save:          { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
   saved:         { ko: '저장됨', en: 'Saved', de: 'Gespeichert' },
+  productSubtitle:{ ko: '분석 결과를 바탕으로 선별한 맞춤 솔루션입니다.', en: 'Curated solutions based on your analysis results.', de: 'Kuratierte Lösungen basierend auf Ihren Analyseergebnissen.' },
   noProducts:    { ko: '피부 상태가 양호합니다! 맞춤 루틴을 확인해보세요.', en: 'Your skin looks healthy! Check out our curated routines.', de: 'Ihre Haut sieht gesund aus! Entdecken Sie unsere kuratierten Routinen.' },
   precision:     { ko: '정밀 분석 완료', en: 'Precision Analysis', de: 'Präzisionsanalyse' },
   precisionDesc: { ko: 'AI 사진 + 생활습관 통합 분석', en: 'AI Photo + Lifestyle Integrated', de: 'KI-Foto + Lebensstil-Analyse' },
@@ -300,9 +301,9 @@ const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
   }),
-};
+} as const;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
@@ -323,7 +324,7 @@ export default function AnalysisResults({
   const { isLoggedIn } = useAuthStore();
   const resetAnalysis = useSkinAnalysisStore((s) => s.resetAnalysis);
   const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
-  const apiReasons = useSkinAnalysisStore((s) => (s as Record<string, unknown>).reasons as Record<string, string> | null | undefined);
+  const apiReasons = useSkinAnalysisStore((s) => s.reasons);
   const hasLifestyle = lifestyleAnswers !== null;
   const setResult = useDiagnosisStore((s) => s.setResult);
 
@@ -589,8 +590,11 @@ export default function AnalysisResults({
 
         {/* ── SECTION 4: Product Recommendations ───────────────────────────── */}
         <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="mt-8">
-          <p className="mb-4" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <p className="mb-1" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {TX.products[lang]}
+          </p>
+          <p className="mb-4" style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: 'rgba(134,134,139,0.7)', lineHeight: 1.5 }}>
+            {matchedProducts.length > 0 ? TX.productSubtitle[lang] : ''}
           </p>
           {matchedProducts.length > 0 ? (
             <div className="flex flex-col gap-3">

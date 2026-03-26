@@ -27,6 +27,7 @@ interface SkinAnalysisState {
 
   // Analysis results
   scores: SkinAxisScores | null;
+  reasons: Record<string, string> | null;
   scoreSource: ScoreSource | null;
   analysisId: string | null;
   errorMessage: string | null;
@@ -34,6 +35,7 @@ interface SkinAnalysisState {
     scores: SkinAxisScores,
     source: ScoreSource,
     analysisId?: string,
+    reasons?: Record<string, string> | null,
   ) => void;
   setError: (message: string) => void;
 
@@ -60,12 +62,14 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
       setLifestyleAnswers: (answers) => set({ lifestyleAnswers: answers }),
 
       scores: null,
+      reasons: null,
       scoreSource: null,
       analysisId: null,
       errorMessage: null,
-      setAnalysisResult: (scores, source, analysisId) =>
+      setAnalysisResult: (scores, source, analysisId, reasons) =>
         set((state) => ({
           scores,
+          reasons: reasons ?? null,
           scoreSource: source,
           analysisId: analysisId ?? null,
           currentStep: 'result',
@@ -89,6 +93,7 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
           capturedImageBase64: null,
           lifestyleAnswers: null,
           scores: null,
+          reasons: null,
           scoreSource: null,
           analysisId: null,
           errorMessage: null,

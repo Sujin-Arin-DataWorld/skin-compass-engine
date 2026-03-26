@@ -131,11 +131,13 @@ function AppInner() {
                 });
                 console.log('[App] Pending analysis saved successfully');
               }
-              sessionStorage.removeItem('ssl_pending_analysis');
+              // NOTE: Do NOT remove ssl_pending_analysis here.
+              // SkinAnalysisPage needs it to restore the results UI after redirect.
+              // SkinAnalysisPage will remove it after restoring the Zustand store.
             }
           } catch (e) {
             console.warn('[App] Pending analysis save failed:', e);
-            sessionStorage.removeItem('ssl_pending_analysis');
+            // Don't remove — SkinAnalysisPage may still need it for UI restoration
           }
         }
         if (event === "SIGNED_OUT") {

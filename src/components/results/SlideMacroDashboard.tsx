@@ -154,12 +154,14 @@ interface Props {
   onGoToLab?: () => void;
   onTierChange?: (steps: FilteredStep[]) => void;
   onAddToCart?: (item: CartItem) => void;
+  onRemoveFromCart?: (id: string) => void;
+  cartItemIds?: string[];
 }
 
 const DISCOUNT_PCT = 0.18;
 
 // ── Main Component ──────────────────────────────────────────────────────────
-export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, onAddToCart }: Props) {
+export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, onAddToCart, onRemoveFromCart, cartItemIds }: Props) {
   const { language } = useI18nStore();
   const lang = (language === 'de' || language === 'ko') ? language : 'en' as LangKey;
   const implicitFlags = useDiagnosisStore((s) => s.implicitFlags);
@@ -407,9 +409,14 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   lang={lang}
                   isDark={isDark}
                   tok={tok}
+                  cartItemIds={cartItemIds ?? []}
                   onAddToCart={onAddToCart ? (item) => {
                     onAddToCart(item);
                     setAddedIds((prev) => new Set([...prev, item.id]));
+                  } : undefined}
+                  onRemoveFromCart={onRemoveFromCart ? (id) => {
+                    onRemoveFromCart(id);
+                    setAddedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
                   } : undefined}
                 />
               ) : (

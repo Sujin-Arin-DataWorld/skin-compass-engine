@@ -189,6 +189,13 @@ const ResultsPage = () => {
     []
   );
 
+  const removeFromCart = useCallback(
+    (id: string) => {
+      setCartItems((prev) => prev.filter((c) => c.id !== id));
+    },
+    []
+  );
+
   // Cycle days from EXP_AGE
   const axisAnswers = useDiagnosisStore((s) => s.axisAnswers);
   const expAge = axisAnswers?.EXP_AGE as number | undefined;
@@ -271,7 +278,7 @@ const ResultsPage = () => {
   //
   const slides = [
     // Slide 0: Macro Dashboard
-    <SlideMacroDashboard key="slide-macro" result={result} onGoToLab={() => goTo(1)} onAddToCart={addToCart} />,
+    <SlideMacroDashboard key="slide-macro" result={result} onGoToLab={() => goTo(1)} onAddToCart={addToCart} onRemoveFromCart={removeFromCart} cartItemIds={cartItems.map(c => c.id)} />,
 
     // Slide 1: Lab & Special Care (lazy)
     <Suspense

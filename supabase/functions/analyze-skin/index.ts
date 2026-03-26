@@ -2,7 +2,7 @@
 // Supabase Edge Function: analyze-skin
 // Secure proxy to Groq API. Never exposes GROQ_API_KEY to the frontend.
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -119,8 +119,8 @@ Deno.serve(async (req: Request) => {
     const startMs = Date.now();
 
     // ── Run Groq API call and user identification IN PARALLEL ────────────────
-    const [groqRes, userInfo] = await Promise.all([
-      fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const groqFetch = async (): Promise<Response> => {
+      return fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${groqKey}`,
@@ -150,7 +150,36 @@ Deno.serve(async (req: Request) => {
             },
           ],
         }),
-      }),
+      });
+    };
+
+    // ── Detect user language from Accept-Language header ─────────────────────
+    const acceptLang = req.headers.get("accept-language") ?? "";
+    const lang = acceptLang.includes("ko") ? "ko" : acceptLang.includes("de") ? "de" : "en";
+    const ERROR_MESSAGES = {
+      rate_limit: {
+        ko: "분석 서버가 혼잡합니다. 잠시 후 다시 시도해주세요.",
+        en: "Analysis server is busy. Please try again shortly.",
+        de: "Der Analyseserver ist ausgelastet. Bitte versuchen Sie es gleich erneut.",
+      },
+      server_error: {
+        ko: "AI 분석 서버에 일시적 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+        en: "A temporary error occurred with the AI server. Please try again shortly.",
+        de: "Beim KI-Server ist ein vorübergehender Fehler aufgetreten. Bitte versuchen Sie es gleich erneut.",
+      },
+    };
+
+    const [groqRes, userInfo] = await Promise.all([
+      (async () => {
+        let res = await groqFetch();
+        // Retry once on 500/502/503 (Groq transient errors) after 2s delay
+        if (res.status >= 500 && res.status < 600) {
+          console.warn(`[analyze-skin] Groq returned ${res.status}, retrying in 2s...`);
+          await new Promise<void>((r) => setTimeout(r, 2_000));
+          res = await groqFetch();
+        }
+        return res;
+      })(),
       identifyUser(),
     ]);
 
@@ -160,11 +189,20 @@ Deno.serve(async (req: Request) => {
     if (!groqRes.ok) {
       if (groqRes.status === 429) {
         return new Response(
-          JSON.stringify({
-            error: "분석 서버가 혼잡합니다. 잠시 후 다시 시도해주세요.",
-          }),
+          JSON.stringify({ error: ERROR_MESSAGES.rate_limit[lang] }),
           {
             status: 429,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
+      }
+      if (groqRes.status >= 500) {
+        const errBody = await groqRes.text();
+        console.error(`[analyze-skin] Groq 500 after retry: ${errBody}`);
+        return new Response(
+          JSON.stringify({ error: ERROR_MESSAGES.server_error[lang] }),
+          {
+            status: 502,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           },
         );

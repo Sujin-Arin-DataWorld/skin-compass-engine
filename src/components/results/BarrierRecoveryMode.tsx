@@ -23,6 +23,7 @@ const COPY = {
   banner_sub:     { ko: '2주 회복 루틴 · 지금 단계에 집중해요',               en: '2-week recovery routine · Focus on the current phase',  de: '2-Wochen-Erholung · Fokus auf die aktuelle Phase' },
   done_badge:     { ko: '완료',          en: 'Done',          de: 'Erledigt'           },
   add_btn:        { ko: '추가',          en: 'Add',           de: 'Hinzufügen'         },
+  remove_btn:     { ko: '제거',          en: 'Remove',        de: 'Entfernen'          },
   prev_btn:       { ko: '← 이전',       en: '← Back',        de: '← Zurück'           },
   next_btn:       { ko: '다음 단계 →',  en: 'Next Step →',   de: 'Nächster Schritt →' },
   progress_label: { ko: '{N} / 3 단계 진행 중', en: 'Step {N} of 3', de: 'Schritt {N} / 3'  },
@@ -40,17 +41,26 @@ interface BarrierRecoveryModeProps {
   lang:         LangKey;
   isDark:       boolean;
   tok:          ReturnType<typeof tokens>;
+  cartItemIds:  string[];
   onAddToCart?: (item: CartItem) => void;
+  onRemoveFromCart?: (id: string) => void;
 }
 
-export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: BarrierRecoveryModeProps) {
+export default function BarrierRecoveryMode({ lang, isDark, tok, cartItemIds, onAddToCart, onRemoveFromCart }: BarrierRecoveryModeProps) {
   const [activePhase, setActivePhase] = useState<number>(0);
-  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
 
-  const handleAdd = useCallback((product: { id: string; price: number; role: string; emoji: string }) => {
-    setAddedIds((prev) => new Set([...prev, product.id]));
-    onAddToCart?.({ id: product.id, price: product.price, role: product.role, emoji: product.emoji });
-  }, [onAddToCart]);
+  // Derive added state from parent cart — single source of truth
+  const addedIds = new Set(cartItemIds);
+
+  const handleToggle = useCallback((product: { id: string; price: number; role: string; emoji: string }) => {
+    if (addedIds.has(product.id)) {
+      // Already in cart → remove
+      onRemoveFromCart?.(product.id);
+    } else {
+      // Not in cart → add
+      onAddToCart?.({ id: product.id, price: product.price, role: product.role, emoji: product.emoji });
+    }
+  }, [addedIds, onAddToCart, onRemoveFromCart]);
   const phase = BARRIER_RECOVERY_PHASES[activePhase];
 
   return (
@@ -243,7 +253,7 @@ export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: 
                   €{product.price}
                 </div>
                 <button
-                  onClick={() => handleAdd(product)}
+                  onClick={() => handleToggle(product)}
                   style={{
                     padding: '5px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
                     fontSize: '0.8125rem', fontWeight: 600,
@@ -255,7 +265,7 @@ export default function BarrierRecoveryMode({ lang, isDark, tok, onAddToCart }: 
                     minWidth: 44,
                   }}
                 >
-                  {addedIds.has(product.id) ? '✓' : t('add_btn', lang)}
+                  {addedIds.has(product.id) ? t('remove_btn', lang) : t('add_btn', lang)}
                 </button>
               </div>
             </div>

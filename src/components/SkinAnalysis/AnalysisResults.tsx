@@ -8,11 +8,13 @@ import { RotateCcw, Save, ChevronRight } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
+import { useDiagnosisStore } from '@/store/diagnosisStore';
 import FeedbackWidget from './FeedbackWidget';
 import ProductRecommendationCard from './ProductRecommendationCard';
 import { PRODUCT_RULES, AXIS_KO_SHORT } from '@/data/productRules';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO } from '@/engine/types';
+import type { AxisKey, AxisScores, AxisSeverity } from '@/engine/types';
 
 interface AnalysisResultsProps {
   scores: SkinAxisScores;
@@ -153,6 +155,7 @@ export default function AnalysisResults({
   const resetAnalysis = useSkinAnalysisStore((s) => s.resetAnalysis);
   const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
   const hasLifestyle = lifestyleAnswers !== null;
+  const setResult = useDiagnosisStore((s) => s.setResult);
 
   const overallScore = useMemo(() => getOverallScore(scores), [scores]);
   const summary = useMemo(() => getScoreSummary(overallScore, language), [overallScore, language]);
@@ -166,7 +169,32 @@ export default function AnalysisResults({
   );
 
   const handleNavigateToLab = () => {
-    navigate('/lab');
+    const axisKeys = Object.keys(scores) as AxisKey[];
+    const axisScores = { ...scores } as unknown as AxisScores;
+    const axisScoresNormalized = { ...scores } as unknown as AxisScores;
+    const axisSeverity = {} as AxisSeverity;
+    const primaryConcerns: AxisKey[] = [];
+
+    for (const key of axisKeys) {
+      const score = scores[key as keyof SkinAxisScores];
+      axisSeverity[key] = score > 60 ? 2 : score < 40 ? 1 : 0;
+      if (score > 60) primaryConcerns.push(key);
+    }
+
+    setResult({
+      engineVersion: 'v5-ai-camera',
+      axis_scores: axisScores,
+      axis_scores_normalized: axisScoresNormalized,
+      axis_severity: axisSeverity,
+      primary_concerns: primaryConcerns.slice(0, 5),
+      secondary_concerns: [],
+      detected_patterns: [],
+      urgency_level: 'MEDIUM',
+      active_flags: [],
+      radar_chart_data: [],
+      product_bundle: {},
+    });
+    navigate('/results');
   };
 
   const handleSave = () => {
@@ -196,10 +224,7 @@ export default function AnalysisResults({
   const stagger = { hidden: { opacity: 0, y: 20 }, visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.05 + 0.1, duration: 0.4 } }) };
 
   return (
-    <div
-      className="min-h-dvh w-full overflow-y-auto pb-24"
-      style={{ background: 'linear-gradient(160deg, #0d0d12 0%, #1a1520 100%)' }}
-    >
+    <div className="min-h-dvh w-full overflow-y-auto pb-32 bg-background text-foreground transition-colors duration-300">
       <div className="mx-auto max-w-md px-4 pt-8">
 
         {/* ── SECTION 0: Header ─────────────────────────────────────────────── */}
@@ -318,8 +343,7 @@ export default function AnalysisResults({
                   variants={stagger}
                   initial="hidden"
                   animate="visible"
-                  className="rounded-2xl p-3"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+                  className="rounded-2xl p-3 bg-card text-card-foreground border border-border"
                 >
                   <div className="flex items-center justify-between mb-1.5">
                     <span style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>

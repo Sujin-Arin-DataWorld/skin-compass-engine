@@ -75,6 +75,62 @@ export default function SkinAnalysisPage() {
   const { language } = useI18nStore();
   const t = translations[language];
 
+  // ── Language auto-detect on mount ─────────────────────────────────────────
+  useEffect(() => {
+    if (window.location.hostname.includes('.de')) {
+      useI18nStore.setState({ language: 'de' });
+    } else if (navigator.language.startsWith('ko')) {
+      useI18nStore.setState({ language: 'ko' });
+    }
+  }, []);
+
+  // ── Restore pending analysis after login redirect ─────────────────────────
+  useEffect(() => {
+    const raw = sessionStorage.getItem('ssl_pending_analysis');
+    if (!raw) return;
+    try {
+      const pending = JSON.parse(raw) as {
+        scores: SkinAxisScores;
+        analysisId: string | null;
+        hasLifestyle: boolean;
+        timestamp: number;
+      };
+      setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId);
+      sessionStorage.removeItem('ssl_pending_analysis');
+      // Non-blocking DB save
+      (async () => {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+          const profileScores: ProfileAxisScores = {
+            seb: pending.scores.seb,
+            hyd: pending.scores.hyd,
+            bar: pending.scores.bar,
+            sen: pending.scores.sen,
+            acne: pending.scores.acne,
+            pigment: pending.scores.pigment,
+            texture: pending.scores.texture,
+            aging: pending.scores.aging,
+            ox: pending.scores.ox,
+            makeup_stability: pending.scores.makeup_stability,
+          };
+          await useSkinProfileStore.getState().saveAnalysisResult({
+            userId: user.id,
+            scores: profileScores,
+            skinType: deriveSkinType(pending.scores),
+            primaryConcerns: derivePrimaryConcerns(pending.scores),
+            analysisMethod: 'camera',
+            confidenceScore: pending.hasLifestyle ? 0.92 : 0.75,
+          });
+        } catch (e) {
+          console.warn('[SkinAnalysis] Post-login save failed (non-fatal):', e);
+        }
+      })();
+    } catch (e) {
+      console.warn('[SkinAnalysis] Failed to restore pending analysis:', e);
+    }
+  }, [setAnalysisResult]);
+
   // ── Dynamic Meta Tags for Social Sharing ──────────────────────────────────
   useEffect(() => {
     const prevTitle = document.title;
@@ -177,10 +233,7 @@ export default function SkinAnalysisPage() {
   // ── Idle screen ───────────────────────────────────────────────────────────
   if (currentStep === 'idle') {
     return (
-      <div
-        className="min-h-dvh flex flex-col items-center justify-center px-6"
-        style={{ background: 'linear-gradient(160deg, #0d0d12 0%, #1a1520 100%)' }}
-      >
+      <div className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 bg-background text-foreground transition-colors duration-300">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -214,7 +267,6 @@ export default function SkinAnalysisPage() {
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: '28px',
-              color: '#fff',
               fontWeight: 400,
               marginBottom: '12px',
               lineHeight: 1.3,
@@ -287,10 +339,7 @@ export default function SkinAnalysisPage() {
   // ── Error screen ──────────────────────────────────────────────────────────
   if (currentStep === 'error') {
     return (
-      <div
-        className="min-h-dvh flex flex-col items-center justify-center px-6"
-        style={{ background: 'linear-gradient(160deg, #0d0d12 0%, #1a1520 100%)' }}
-      >
+      <div className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 bg-background text-foreground transition-colors duration-300">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -306,7 +355,6 @@ export default function SkinAnalysisPage() {
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: '22px',
-              color: '#fff',
               marginBottom: '8px',
             }}
           >

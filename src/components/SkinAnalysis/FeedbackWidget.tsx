@@ -2,6 +2,7 @@
 // Thumbs up/down to validate AI accuracy → Phase 2 training data
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { submitFeedback } from '@/services/skinAnalysisService';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
@@ -24,6 +25,7 @@ interface FeedbackWidgetProps {
 }
 
 export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
+  const navigate = useNavigate();
   const { language } = useI18nStore();
   const lang = language as Lang;
   const setFeedbackGiven = useSkinAnalysisStore((s) => s.setFeedbackGiven);
@@ -34,10 +36,22 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
   const [done, setDone] = useState(false);
 
   const handleVote = async (v: 'accurate' | 'inaccurate') => {
-    setVoted(v);
     if (v === 'inaccurate') {
+      const messages: Record<Lang, string> = {
+        ko: '분석 결과가 정확하지 않으신가요? 자세한 피부 진단 설문으로 이동하시겠어요?',
+        en: 'Is the analysis inaccurate? Would you like to take the detailed skin diagnosis questionnaire instead?',
+        de: 'Ist die Analyse ungenau? Möchten Sie stattdessen den detaillierten Hautdiagnose-Fragebogen ausfüllen?',
+      };
+      const confirmed = window.confirm(messages[lang] ?? messages.en);
+      if (confirmed) {
+        navigate('/diagnosis');
+        return;
+      }
+      // Cancelled — show comment fallback
+      setVoted(v);
       setShowComment(true);
     } else {
+      setVoted(v);
       await send(v);
     }
   };

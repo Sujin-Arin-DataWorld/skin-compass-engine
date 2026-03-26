@@ -415,6 +415,8 @@
     font-family: var(--font-sans);
     word-break: keep-all;
     overflow-wrap: break-word;
+    /* [PWA-FIX] Kill pull-to-refresh so users can't accidentally wipe diagnosis state */
+    overscroll-behavior-y: none;
     background-image:
       radial-gradient(ellipse 80% 50% at 20% 10%, hsl(100 22% 88% / 0.22) 0%, transparent 60%),
       radial-gradient(ellipse 60% 40% at 80% 80%, hsl(187 26% 90% / 0.25) 0%, transparent 55%),
@@ -441,6 +443,9 @@
   [role="button"] {
     min-height: 44px;
     min-width: 44px;
+    /* [PWA-FIX] Remove 300ms tap delay + grey highlight flash on mobile taps */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
   }
 
   p,

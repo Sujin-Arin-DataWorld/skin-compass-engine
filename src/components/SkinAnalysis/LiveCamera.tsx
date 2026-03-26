@@ -22,6 +22,9 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  // [PWA-FIX] WakeLock: prevents screen sleep while user poses for photo
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const wakeLockRef = useRef<any>(null);
 
   const [cameraState, setCameraState] = useState<CameraState>('starting');
   const [errorMsg, setErrorMsg] = useState('');
@@ -72,13 +75,30 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
 
   useEffect(() => {
     startCamera();
+
+    // [PWA-FIX] Request wake lock so the screen doesn't sleep mid-pose
+    const acquireWakeLock = async () => {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLockRef.current = await (navigator as Navigator & { wakeLock: { request(type: string): Promise<unknown> } }).wakeLock.request('screen');
+        }
+      } catch {
+        // Non-fatal — wake lock denied (iOS < 16.4, low-battery policy, etc.)
+      }
+    };
+    acquireWakeLock();
+
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      // [PWA-FIX] Release wake lock on unmount to restore normal screen timeout
+      if (wakeLockRef.current) {
+        (wakeLockRef.current as { release(): Promise<void> }).release().catch(() => {});
+      }
     };
   }, [startCamera]);
 
   // ── Capture (iOS-safe: pre-resize to avoid 4K canvas silent fail) ──────────
-  const capture = useCallback(() => {
+  const capture = useCallback(async () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas || cameraState !== 'live') return;
@@ -208,11 +228,10 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
 
     console.log('[Capture] 4. Image captured, size:', result.sizeBytes, 'bytes');
 
-    // Build a Blob for the onCapture signature (still needed by callers)
-    const binaryStr = atob(result.base64);
-    const bytes = new Uint8Array(binaryStr.length);
-    for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-    const blob = new Blob([bytes], { type: 'image/jpeg' });
+    // [PWA-FIX] Non-blocking Blob creation via fetch() — replaces synchronous atob/Uint8Array
+    // loop that blocked the main thread and froze the flash animation on mid-range Androids.
+    const res = await fetch(`data:image/jpeg;base64,${result.base64}`);
+    const blob = await res.blob();
 
     // Stop camera tracks only after successful capture — keeps camera live for retry on failure
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -377,22 +396,44 @@ export default function LiveCamera({ onCapture, onClose }: LiveCameraProps) {
         style={{ transform: 'scaleX(-1)' }}
       />
 
-      {/* Dark overlay with oval cutout (box-shadow trick) */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div
-          className="oval-guide absolute"
-          style={{
-            left: '50%',
-            top: '44%',
-            transform: 'translate(-50%, -50%)',
-            width: `${OVAL_WIDTH_PCT * 100}vw`,
-            height: `${OVAL_HEIGHT_PCT * 100}dvh`,
-            borderRadius: '50%',
-            border: '2px dashed rgba(255,255,255,0.85)',
-            boxShadow: '0 0 0 9999px rgba(0,0,0,0.65)',
-          }}
+      {/* [PWA-FIX] Hardware-accelerated SVG mask replaces boxShadow:9999px hack.
+           The old trick caused GPU overdraw → thermal throttling on mid-range Android. */}
+      <svg
+        className="oval-guide absolute inset-0 w-full h-full pointer-events-none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ willChange: 'opacity' }}
+      >
+        <defs>
+          <mask id="oval-cutout">
+            {/* White = show overlay; black = transparent (the cutout hole) */}
+            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+            <ellipse
+              cx="50%"
+              cy="44%"
+              rx={`${(OVAL_WIDTH_PCT * 100) / 2}%`}
+              ry={`${(OVAL_HEIGHT_PCT * 100) / 2}%`}
+              fill="black"
+            />
+          </mask>
+        </defs>
+        {/* Dark vignette with oval hole */}
+        <rect
+          x="0" y="0" width="100%" height="100%"
+          fill="rgba(0,0,0,0.65)"
+          mask="url(#oval-cutout)"
         />
-      </div>
+        {/* Dashed border around the oval guide */}
+        <ellipse
+          cx="50%"
+          cy="44%"
+          rx={`${(OVAL_WIDTH_PCT * 100) / 2}%`}
+          ry={`${(OVAL_HEIGHT_PCT * 100) / 2}%`}
+          fill="none"
+          stroke="rgba(255,255,255,0.85)"
+          strokeWidth="2"
+          strokeDasharray="8 6"
+        />
+      </svg>
 
       {/* Close button */}
       <button

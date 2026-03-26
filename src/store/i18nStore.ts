@@ -1,7 +1,32 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export type Language = "en" | "de" | "ko";
+
+// [PWA-FIX] Read the browser's preferred language instead of hardcoding "de"
+function detectInitialLanguage(): Language {
+    if (typeof window === 'undefined') return 'de';
+    const prefix = (navigator.language ?? 'de').split('-')[0].toLowerCase();
+    if (prefix === 'ko') return 'ko';
+    if (prefix === 'en') return 'en';
+    if (prefix === 'de') return 'de';
+    return 'de';
+}
+
+// [PWA-FIX] iOS Safari Private Mode throws QuotaExceededError on localStorage writes.
+// This wrapper silently falls back to an in-memory object to prevent White Screen of Death.
+const _memoryFallback: Record<string, string> = {};
+const safeLocalStorage = {
+    getItem: (key: string): string | null => {
+        try { return localStorage.getItem(key); } catch { return _memoryFallback[key] ?? null; }
+    },
+    setItem: (key: string, value: string): void => {
+        try { localStorage.setItem(key, value); } catch { _memoryFallback[key] = value; }
+    },
+    removeItem: (key: string): void => {
+        try { localStorage.removeItem(key); } catch { delete _memoryFallback[key]; }
+    },
+};
 
 interface I18nState {
     language: Language;
@@ -12,7 +37,7 @@ interface I18nState {
 export const useI18nStore = create<I18nState>()(
     persist(
         (set, get) => ({
-            language: "de",
+            language: detectInitialLanguage(), // [PWA-FIX] dynamic, not hardcoded "de"
             setLanguage: (lang) => set({ language: lang }),
             toggleLanguage: () =>
                 set((state) => {
@@ -21,7 +46,10 @@ export const useI18nStore = create<I18nState>()(
                     return { language: next };
                 }),
         }),
-        { name: "skin-strategy-language" }
+        {
+            name: "skin-strategy-language",
+            storage: createJSONStorage(() => safeLocalStorage), // [PWA-FIX] iOS private mode safe
+        }
     )
 );
 

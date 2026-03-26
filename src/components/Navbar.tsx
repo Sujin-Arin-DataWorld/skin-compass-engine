@@ -84,6 +84,12 @@ const Navbar = () => {
   // Close drawer on route change
   useEffect(() => { closeMobileMenu(); }, [location.pathname]);
 
+  // [PWA-FIX] Lock body scroll when drawer is open to prevent background scroll bleed
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
+
   const handleLogout = async () => {
     setUserMenuOpen(false);
     await logout();

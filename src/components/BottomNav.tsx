@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, Heart, LayoutGrid, User, ShoppingBag } from "lucide-react";
@@ -8,7 +8,9 @@ import { useI18nStore } from "@/store/i18nStore";
 
 export function BottomNav() {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  // [PWA-FIX] useRef instead of useState — ref updates never trigger re-renders
+  const lastScrollYRef = useRef(0);
+  const rafIdRef = useRef<number | null>(null);
   const location = useLocation();
   const cartCount = useCartStore((s) => s.totalItems());
   const { openMobileMenu } = useNavStore();
@@ -17,17 +19,29 @@ export function BottomNav() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      setLastScrollY(currentScrollY);
+      // [PWA-FIX] Debounce via rAF — fires at most once per frame, not every pixel
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        // [PWA-FIX] iOS rubber-band guard: overscroll produces negative scrollY → always show nav
+        if (currentScrollY <= 0) {
+          setIsVisible(true);
+          lastScrollYRef.current = 0;
+          return;
+        }
+        const shouldShow = !(currentScrollY > lastScrollYRef.current && currentScrollY > 50);
+        // [PWA-FIX] Only call setState when the boolean actually changes → no spurious re-renders
+        setIsVisible((prev) => (prev === shouldShow ? prev : shouldShow));
+        lastScrollYRef.current = currentScrollY;
+      });
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      // [PWA-FIX] Clean up any pending animation frame on unmount
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
+    };
+  }, []); // [PWA-FIX] Empty deps — refs never need to be listed as dependencies
 
   const labels: Record<string, Record<string, string>> = {
     home: { en: "Home", de: "Start", ko: "홈" },

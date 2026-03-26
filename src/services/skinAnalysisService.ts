@@ -18,6 +18,11 @@ export async function analyzeSkinImage(
   imageBase64: string,
   lifestyle?: Record<string, number | string>,
 ): Promise<AnalysisApiResponse> {
+  // [PWA-FIX] Fail-fast offline check — avoids confusing network errors on spotty mobile connections
+  if (typeof window !== 'undefined' && !navigator.onLine) {
+    throw new Error('오프라인 상태입니다. 인터넷 연결을 확인해주세요.');
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30_000);
 
@@ -38,7 +43,7 @@ export async function analyzeSkinImage(
       body.lifestyle = lifestyle;
     }
 
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, {
+    const requestInit: RequestInit = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,7 +51,22 @@ export async function analyzeSkinImage(
       },
       body: JSON.stringify(body),
       signal: controller.signal,
-    });
+    };
+
+    // [PWA-FIX] Single automatic retry on transient network drop (TypeError: Failed to fetch).
+    // Waits 1 000ms before the second attempt. AbortController timeout remains active across both.
+    let res: Response;
+    try {
+      res = await fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, requestInit);
+    } catch (fetchErr) {
+      if (fetchErr instanceof TypeError) {
+        // Network drop — wait 1s then retry once
+        await new Promise<void>((r) => setTimeout(r, 1_000));
+        res = await fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, requestInit);
+      } else {
+        throw fetchErr;
+      }
+    }
 
     clearTimeout(timeoutId);
 

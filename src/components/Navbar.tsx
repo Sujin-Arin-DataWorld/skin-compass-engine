@@ -176,8 +176,16 @@ const Navbar = () => {
 
             {/* Theme toggle (desktop only) */}
             <motion.button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="hidden md:flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+              onClick={() => {
+                const next = theme === "dark" ? "light" : "dark";
+                try {
+                  setTheme(next);
+                } catch (e) {
+                  if (next === "dark") document.documentElement.classList.add("dark");
+                  else document.documentElement.classList.remove("dark");
+                }
+              }}
+              className="hidden md:flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
               whileTap={{ scale: 0.9 }}
               aria-label="Toggle theme"
             >
@@ -430,8 +438,16 @@ const Navbar = () => {
                     ] as { val: string; label: string; Icon: React.ElementType }[]).map(({ val, label, Icon }) => (
                       <button
                         key={val}
-                        onClick={() => setTheme(val)}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border transition-all ${(val === "dark" ? theme === "dark" : theme !== "dark")
+                        onClick={() => {
+                          try {
+                            setTheme(val);
+                          } catch (e) {
+                            // Fallback for strict mode browsers (e.g. Firefox iOS) that block localStorage
+                            if (val === "dark") document.documentElement.classList.add("dark");
+                            else document.documentElement.classList.remove("dark");
+                          }
+                        }}
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border transition-all cursor-pointer select-none ${(val === "dark" ? theme === "dark" : theme !== "dark")
                           ? ""
                           : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500"
                           }`}

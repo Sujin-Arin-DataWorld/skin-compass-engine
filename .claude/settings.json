@@ -11,7 +11,9 @@
       "Read(//Users/sujinpark/Desktop/**)",
       "Bash(grep -l \"framer-motion\\\\|motion\" /Users/sujinpark/Desktop/skin-compass-engine/src/components/**/*.tsx)",
       "Bash(npm install vite-plugin-pwa --save-dev)",
-      "Read(//Users/sujinpark/**)"
+      "Read(//Users/sujinpark/**)",
+      "Bash(git -C /Users/sujinpark/Desktop/skin-compass-engine log --oneline -10)",
+      "Bash(git -C /Users/sujinpark/Desktop/skin-compass-engine log --oneline --all)"
     ],
     "additionalDirectories": [
       "/tmp",

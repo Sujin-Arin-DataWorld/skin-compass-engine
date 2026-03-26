@@ -181,6 +181,7 @@ export default function AISkinAnalysisHero() {
               ref={videoRef}
               src="/videos/AI_Screen.mp4"
               muted
+              autoPlay
               loop
               playsInline
               preload="metadata"

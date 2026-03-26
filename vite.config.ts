@@ -81,6 +81,16 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
+            // Video files — CacheFirst with range request support for mobile seeking
+            urlPattern: /\.mp4$/i,
+            handler: 'CacheFirst' as const,
+            options: {
+              cacheName: 'video-cache',
+              expiration: { maxEntries: 5, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              rangeRequests: true,
+            },
+          },
+          {
             // Static assets (fonts, icons, images) — aggressive cache
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico|woff2?)$/i,
             handler: 'CacheFirst' as const,

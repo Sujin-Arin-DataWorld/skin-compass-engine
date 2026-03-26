@@ -34,6 +34,7 @@ import SkinAnalysisPage from "./pages/SkinAnalysisPage";
 // import LabSelectionPage from "./pages/LabSelectionPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BottomNav } from "./components/BottomNav";
+import MobileDrawer from "./components/MobileDrawer";
 
 const queryClient = new QueryClient();
 
@@ -285,6 +286,7 @@ function AppInner() {
       </Routes>
 
       {!hideBottomNav && <BottomNav />}
+      <MobileDrawer />
 
       {/* GDPR consent modal — blocks UI until accepted or declined */}
       <AnimatePresence>

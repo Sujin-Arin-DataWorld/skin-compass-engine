@@ -4,11 +4,13 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from 'next-themes';
 import { RotateCcw, Save, ChevronRight } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { tokens, glassTokens } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
 import ProductRecommendationCard from './ProductRecommendationCard';
 import { PRODUCT_RULES, AXIS_KO_SHORT } from '@/data/productRules';
@@ -108,7 +110,7 @@ function getBarColor(key: string, score: number): string {
 }
 
 // ── Circular progress ring ────────────────────────────────────────────────────
-function ScoreRing({ score }: { score: number }) {
+function ScoreRing({ score, textColor, trackColor }: { score: number; textColor: string; trackColor: string }) {
   const r = 40, cx = 52, cy = 52;
   const circumference = 2 * Math.PI * r;
   const offset = circumference - (score / 100) * circumference;
@@ -116,7 +118,7 @@ function ScoreRing({ score }: { score: number }) {
 
   return (
     <svg width="104" height="104" viewBox="0 0 104 104">
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={trackColor} strokeWidth="6" />
       <motion.circle
         cx={cx} cy={cy} r={r}
         fill="none"
@@ -133,7 +135,7 @@ function ScoreRing({ score }: { score: number }) {
         x={cx} y={cy}
         textAnchor="middle"
         dominantBaseline="central"
-        style={{ fontSize: '22px', fontFamily: 'var(--font-numeric)', fontWeight: 700, fill: '#fff' }}
+        style={{ fontSize: '22px', fontFamily: 'var(--font-numeric)', fontWeight: 700, fill: textColor }}
       >
         {score}
       </text>
@@ -156,6 +158,12 @@ export default function AnalysisResults({
   const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
   const hasLifestyle = lifestyleAnswers !== null;
   const setResult = useDiagnosisStore((s) => s.setResult);
+
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tok = tokens(isDark);
+  const glassTok = glassTokens(isDark);
+  const ringTrackColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
 
   const overallScore = useMemo(() => getOverallScore(scores), [scores]);
   const summary = useMemo(() => getScoreSummary(overallScore, language), [overallScore, language]);
@@ -224,7 +232,7 @@ export default function AnalysisResults({
   const stagger = { hidden: { opacity: 0, y: 20 }, visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.05 + 0.1, duration: 0.4 } }) };
 
   return (
-    <div className="min-h-dvh w-full overflow-y-auto pb-32 bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-dvh w-full overflow-y-auto pb-32 transition-colors duration-300" style={{ background: tok.bg, color: tok.text }}>
       <div className="mx-auto max-w-md px-4 pt-8">
 
         {/* ── SECTION 0: Header ─────────────────────────────────────────────── */}
@@ -237,7 +245,7 @@ export default function AnalysisResults({
           <p style={{ fontFamily: 'var(--font-display)', fontSize: '11px', letterSpacing: '0.15em', color: '#c9a96e', textTransform: 'uppercase', marginBottom: '6px' }}>
             {language === 'ko' ? 'AI 피부 분석' : language === 'de' ? 'KI-Hautanalyse' : 'AI Skin Analysis'}
           </p>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '26px', color: '#fff', fontWeight: 400 }}>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '26px', color: tok.text, fontWeight: 400 }}>
             {language === 'ko' ? '분석 결과' : language === 'de' ? 'Analyseergebnis' : 'Analysis Result'}
           </h1>
         </motion.div>
@@ -270,7 +278,7 @@ export default function AnalysisResults({
             <p style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '11px',
-              color: 'rgba(255,255,255,0.45)',
+              color: tok.textTertiary,
               lineHeight: 1.5,
             }}>
               {language === 'ko'
@@ -306,12 +314,12 @@ export default function AnalysisResults({
           {/* Score ring + summary */}
           <div className="flex-1">
             <div className="flex items-center gap-4">
-              <ScoreRing score={overallScore} />
+              <ScoreRing score={overallScore} textColor={tok.text} trackColor={ringTrackColor} />
               <div>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginBottom: '4px' }}>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: tok.textSecondary, marginBottom: '4px' }}>
                   {language === 'ko' ? '종합 피부 점수' : language === 'de' ? 'Gesamt-Hautpunktzahl' : 'Overall Skin Score'}
                 </p>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: tok.text, lineHeight: 1.4 }}>
                   {summary}
                 </p>
               </div>
@@ -319,14 +327,14 @@ export default function AnalysisResults({
           </div>
         </motion.div>
 
-        {/* ── SECTION 2: Axis Cards (radar chart removed per Master Guide) ─────────────────────────────────────────── */}
+        {/* ── SECTION 2: Axis Cards ─────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.4 }}
           className="mb-6"
         >
-          <p className="mb-3" style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>
+          <p className="mb-3" style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: tok.textSecondary, letterSpacing: '0.05em' }}>
             {language === 'ko' ? '축별 상세 분석' : language === 'de' ? 'Detailanalyse je Achse' : 'Axis Breakdown'}
           </p>
           <div className="grid grid-cols-2 gap-3">
@@ -343,18 +351,19 @@ export default function AnalysisResults({
                   variants={stagger}
                   initial="hidden"
                   animate="visible"
-                  className="rounded-2xl p-3 bg-card text-card-foreground border border-border"
+                  className="rounded-2xl p-3"
+                  style={{ background: tok.bgCard, border: `1px solid ${tok.border}` }}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'rgba(255,255,255,0.6)' }}>
+                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: tok.textSecondary }}>
                       {label}
                     </span>
-                    <span style={{ fontFamily: 'var(--font-numeric)', fontSize: '15px', fontWeight: 700, color: '#fff' }}>
+                    <span style={{ fontFamily: 'var(--font-numeric)', fontSize: '15px', fontWeight: 700, color: tok.text }}>
                       {score}
                     </span>
                   </div>
                   {/* Progress bar */}
-                  <div className="rounded-full overflow-hidden mb-1.5" style={{ height: '3px', background: 'rgba(255,255,255,0.1)' }}>
+                  <div className="rounded-full overflow-hidden mb-1.5" style={{ height: '3px', background: tok.border }}>
                     <motion.div
                       className="h-full rounded-full"
                       style={{ background: barColor }}
@@ -363,7 +372,7 @@ export default function AnalysisResults({
                       transition={{ delay: i * 0.04 + 0.5, duration: 0.6 }}
                     />
                   </div>
-                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.3 }}>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', color: tok.textTertiary, lineHeight: 1.3 }}>
                     {insight}
                   </p>
                 </motion.div>
@@ -380,7 +389,7 @@ export default function AnalysisResults({
           transition={{ delay: 0.7, duration: 0.4 }}
           className="mb-6"
         >
-          <p className="mb-3" style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.05em' }}>
+          <p className="mb-3" style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: tok.textSecondary, letterSpacing: '0.05em' }}>
             {language === 'ko' ? '맞춤 추천 제품' : language === 'de' ? 'Empfohlene Produkte' : 'Recommended Products'}
           </p>
 
@@ -398,7 +407,7 @@ export default function AnalysisResults({
               <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: '#4ECDC4' }}>
                 {getScoreSummary(overallScore, language)}
               </p>
-              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: 'rgba(255,255,255,0.35)', marginTop: '6px' }}>
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: tok.textTertiary, marginTop: '6px' }}>
                 {language === 'ko' ? '더 정밀한 맞춤 추천이 곧 제공됩니다' : language === 'de' ? 'Weitere personalisierte Empfehlungen folgen in Kürze' : 'More personalized recommendations coming soon'}
               </p>
             </div>
@@ -433,9 +442,8 @@ export default function AnalysisResults({
               onClick={handleRetake}
               className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.7)',
+                ...glassTok.button,
+                color: tok.textSecondary,
                 fontFamily: 'var(--font-sans)',
                 fontSize: '14px',
               }}
@@ -447,9 +455,8 @@ export default function AnalysisResults({
               onClick={handleSave}
               className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: isLoggedIn ? 'rgba(255,255,255,0.7)' : '#c9a96e',
+                ...glassTok.button,
+                color: isLoggedIn ? tok.textSecondary : '#c9a96e',
                 fontFamily: 'var(--font-sans)',
                 fontSize: '14px',
               }}

@@ -4,7 +4,7 @@
 import { useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import { Camera, AlertCircle, RefreshCw } from 'lucide-react';
+import { Camera, AlertCircle, RefreshCw, Sun, CheckCircle2 } from 'lucide-react';
 import LiveCamera from '@/components/SkinAnalysis/LiveCamera';
 import LifestyleSurvey from '@/components/SkinAnalysis/LifestyleSurvey';
 import AnalysisLoading from '@/components/SkinAnalysis/AnalysisLoading';
@@ -19,6 +19,43 @@ import type { SkinAxisScores as ProfileAxisScores, SkinType, SkinConcern } from 
 import type { SkinAxisScores } from '@/types/skinAnalysis';
 
 // ── Multilingual meta for /skin-analysis ────────────────────────────────────
+// ── Camera soft prompt i18n ──────────────────────────────────────────────────
+const CAMERA_PROMPT = {
+  ko: {
+    title: '카메라 준비',
+    heading: '밝은 곳에서\n얼굴을 비춰주세요',
+    tips: [
+      '자연광이 있는 밝은 공간에서 촬영하세요',
+      '메이크업 없는 맨얼굴이 가장 정확합니다',
+      '정면을 바라보고 얼굴 전체가 보이게 해주세요',
+    ],
+    cta: '카메라 시작',
+    disclaimer: '촬영 후 사진은 분석 직후 삭제됩니다.',
+  },
+  en: {
+    title: 'Camera Ready',
+    heading: 'Find a bright spot\nand face the camera',
+    tips: [
+      'Use a well-lit area with natural light',
+      'Bare skin without makeup gives the best results',
+      'Look straight ahead with your full face visible',
+    ],
+    cta: 'Start Camera',
+    disclaimer: 'Your photo is deleted immediately after analysis.',
+  },
+  de: {
+    title: 'Kamera bereit',
+    heading: 'Suchen Sie einen\nhellen Ort',
+    tips: [
+      'Verwenden Sie einen gut beleuchteten Bereich mit natürlichem Licht',
+      'Ungeschminkte Haut liefert die besten Ergebnisse',
+      'Schauen Sie geradeaus, das gesamte Gesicht sichtbar',
+    ],
+    cta: 'Kamera starten',
+    disclaimer: 'Ihr Foto wird sofort nach der Analyse gelöscht.',
+  },
+} as const;
+
 const SKIN_ANALYSIS_META = {
   ko: {
     title: 'AI 피부 분석 | SkinStrategyLab',
@@ -407,10 +444,156 @@ export default function SkinAnalysisPage() {
           <LifestyleSurvey
             onComplete={(answers) => {
               setLifestyleAnswers(answers);
-              setStep('camera');
+              setStep('camera-prompt');
             }}
             onClose={handleClose}
           />
+        </motion.div>
+      )}
+
+      {/* Camera Soft Prompt */}
+      {currentStep === 'camera-prompt' && (
+        <motion.div
+          key="camera-prompt"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          {(() => {
+            const cp = CAMERA_PROMPT[language as keyof typeof CAMERA_PROMPT] ?? CAMERA_PROMPT.en;
+            return (
+              <div
+                className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 transition-colors duration-300"
+                style={{ background: tok.bg }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="text-center max-w-sm w-full"
+                >
+                  {/* Sun icon */}
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.15, duration: 0.4 }}
+                    className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center"
+                    style={{
+                      background: `linear-gradient(135deg, ${tok.accentBg}, rgba(255,200,50,0.08))`,
+                      border: `1px solid ${tok.accentBorder}`,
+                    }}
+                  >
+                    <Sun size={32} color="#E8A838" />
+                  </motion.div>
+
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '11px',
+                      letterSpacing: '0.15em',
+                      color: tok.accent,
+                      textTransform: 'uppercase',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    {cp.title}
+                  </p>
+                  <h1
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '26px',
+                      fontWeight: 400,
+                      color: tok.text,
+                      marginBottom: '28px',
+                      lineHeight: 1.4,
+                      whiteSpace: 'pre-line',
+                    }}
+                  >
+                    {cp.heading}
+                  </h1>
+
+                  {/* Tips */}
+                  <div className="text-left space-y-3 mb-10">
+                    {cp.tips.map((tip, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.25 + i * 0.1 }}
+                        className="flex items-start gap-3"
+                      >
+                        <CheckCircle2
+                          size={18}
+                          className="shrink-0 mt-0.5"
+                          style={{ color: tok.accent }}
+                          strokeWidth={2}
+                        />
+                        <span
+                          style={{
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '14px',
+                            color: tok.textSecondary,
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {tip}
+                        </span>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  {/* CTA — pre-requests camera permission while user sees friendly UI */}
+                  <motion.button
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.55 }}
+                    onClick={async () => {
+                      try {
+                        // Request camera permission now — browser popup appears
+                        // over this friendly prompt screen, NOT a black camera view
+                        const stream = await navigator.mediaDevices.getUserMedia({
+                          video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                        });
+                        // Permission granted — stop the preview stream immediately
+                        // (LiveCamera will create its own stream)
+                        stream.getTracks().forEach((t) => t.stop());
+                        // Advance to camera step — getUserMedia will succeed instantly
+                        // since permission is now cached by the browser
+                        setStep('camera');
+                      } catch {
+                        // Permission denied or no camera — go to error
+                        setError(t.camera.permissionNeeded);
+                      }
+                    }}
+                    className="w-full rounded-2xl py-4 text-center transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    style={{
+                      background: ctaTok.background,
+                      border: 'none',
+                      color: ctaTok.color,
+                      boxShadow: ctaTok.boxShadow,
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '16px',
+                      fontWeight: 500,
+                    }}
+                  >
+                    <Camera size={18} strokeWidth={2} />
+                    {cp.cta}
+                  </motion.button>
+
+                  <p
+                    className="mt-4"
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '11px',
+                      color: tok.textTertiary,
+                    }}
+                  >
+                    {cp.disclaimer}
+                  </p>
+                </motion.div>
+              </div>
+            );
+          })()}
         </motion.div>
       )}
 

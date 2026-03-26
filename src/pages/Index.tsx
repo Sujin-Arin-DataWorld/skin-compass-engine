@@ -20,7 +20,7 @@ import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
 import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
-import { tokens } from "@/lib/designTokens";
+import { tokens, brand, button } from "@/lib/designTokens";
 import AISkinAnalysisHero from "@/components/home/AISkinAnalysisHero";
 import AIScanOverlay from "@/components/hero/AIScanOverlay";
 
@@ -366,6 +366,11 @@ function ConcernSection({
   const [active, setActive] = useState<ConcernKey | null>(null);
   const { language } = useI18nStore();
 
+  // designTokens — theme-aware values
+  const theme = isDark ? brand.dark : brand.light;
+  const ghostBtn = isDark ? button.accentGhost.dark : button.accentGhost.light;
+  const idleBtn = isDark ? button.ghost.dark : button.ghost.light;
+
   const filteredProducts = active
     ? products.filter((p) => p.target_axes?.includes(CONCERN_META[active].axis))
     : [];
@@ -374,47 +379,67 @@ function ConcernSection({
     <section className="bg-stone-50 dark:bg-transparent py-20 px-5 md:px-10">
       <div className="mx-auto max-w-5xl">
         <div className="text-center mb-12">
-          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
+          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: theme.accent }}>
             Skin Strategy Lab
           </p>
           <h2
-            className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
-            style={{ fontFamily: "var(--font-display)" }}
+            className="text-2xl md:text-3xl font-light mb-4"
+            style={{ fontFamily: "var(--font-display)", color: theme.text }}
           >
             {title}
           </h2>
-          <p className="text-base md:text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto leading-relaxed">{sub}</p>
+          <p className="text-base md:text-lg max-w-xl mx-auto leading-relaxed" style={{ color: theme.textSecondary }}>{sub}</p>
         </div>
 
         <div className="grid grid-cols-3 lg:grid-cols-9 gap-3">
           {CONCERN_KEYS.map((key) => {
             const { icon: Icon } = CONCERN_META[key];
             const isActive = active === key;
+            // Focus-dimming: when something is selected, dim the rest
+            const isDimmed = active !== null && !isActive;
+
             return (
               <motion.button
                 key={key}
                 onClick={() => setActive(isActive ? null : key)}
-                whileTap={{ scale: 0.93 }}
-                className="flex flex-col items-center gap-2 p-3 rounded-2xl border transition-all duration-200"
+                whileTap={{ scale: 0.96 }}
+                className="relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
                 style={{
-                  borderColor: isActive ? accent : "transparent",
-                  background: isActive ? 'var(--ssl-accent-bg)' : 'transparent',
-                  backdropFilter: isActive ? "blur(8px)" : "none",
-                  WebkitBackdropFilter: isActive ? "blur(8px)" : "none",
-                  boxShadow: isActive
-                    ? (isDark ? "0 2px 12px rgba(45,107,74,0.08)" : "0 2px 12px rgba(94,139,104,0.08)")
-                    : "none",
+                  background: isActive ? ghostBtn.background : idleBtn.background,
+                  border: isActive ? ghostBtn.border : idleBtn.border,
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  boxShadow: isActive ? `0 4px 16px ${theme.accentBg}` : "none",
+                  opacity: isDimmed ? 0.4 : 1,
+                  filter: isDimmed ? "grayscale(40%)" : "none",
                 }}
               >
                 <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center"
-                  style={{ background: isActive ? (isDark ? "rgba(45,107,74,0.12)" : "rgba(94,139,104,0.12)") : "rgba(148,126,92,0.07)" }}
+                  className="w-11 h-11 rounded-full flex items-center justify-center transition-colors duration-300"
+                  style={{ background: isActive ? theme.accentBg : "rgba(148,126,92,0.07)" }}
                 >
-                  <Icon className="w-5 h-5" style={{ color: isActive ? accent : BRONZE }} strokeWidth={1.5} />
+                  <Icon
+                    className="w-5 h-5"
+                    style={{ color: isActive ? theme.accent : theme.textTertiary }}
+                    strokeWidth={isActive ? 2 : 1.5}
+                  />
                 </div>
-                <span className="text-xs font-medium text-center leading-tight" style={{ color: isActive ? accent : "#9a9a9a" }}>
+                <span
+                  className="text-xs font-medium text-center leading-tight transition-colors duration-300"
+                  style={{ color: isActive ? theme.accent : theme.textSecondary, fontFamily: "var(--font-sans)" }}
+                >
                   {concernLabels[key]}
                 </span>
+
+                {/* Selection dot indicator */}
+                {isActive && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="absolute top-2 right-2 w-2 h-2 rounded-full"
+                    style={{ background: theme.accent }}
+                  />
+                )}
               </motion.button>
             );
           })}
@@ -432,7 +457,7 @@ function ConcernSection({
             >
               <div className="mt-6 pb-1">
                 {filteredProducts.length === 0 ? (
-                  <p className="text-center text-sm md:text-base py-8" style={{ color: BRONZE }}>{noProducts}</p>
+                  <p className="text-center text-sm md:text-base py-8" style={{ color: theme.textTertiary }}>{noProducts}</p>
                 ) : (
                   <div
                     className="flex gap-4 overflow-x-auto pb-3"
@@ -445,22 +470,29 @@ function ConcernSection({
                       return (
                         <div
                           key={product.id}
-                          className="flex-shrink-0 w-44 md:w-52 rounded-2xl overflow-hidden border border-stone-200/60 dark:border-white/10 bg-white/80 dark:bg-white/[0.04] backdrop-blur-md transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg hover:shadow-[rgba(94,139,104,0.1)] dark:hover:shadow-black/30 dark:hover:border-[var(--ssl-accent)]/25 active:scale-[0.98]"
-                          style={{ scrollSnapAlign: "start" }}
+                          className="flex-shrink-0 w-44 md:w-52 rounded-2xl overflow-hidden transition-all duration-300 ease-out hover:scale-[1.02] active:scale-[0.98]"
+                          style={{
+                            scrollSnapAlign: "start",
+                            background: theme.bgCard,
+                            border: `1px solid ${theme.border}`,
+                            backdropFilter: "blur(16px)",
+                            WebkitBackdropFilter: "blur(16px)",
+                            boxShadow: isDark ? "0 2px 12px rgba(0,0,0,0.2)" : "0 2px 12px rgba(0,0,0,0.04)",
+                          }}
                         >
                           <Link to={`/formula/${product.id}`}>
-                            <div className="relative w-full aspect-square bg-stone-50 dark:bg-black/[0.12] flex items-center justify-center p-3 overflow-hidden">
-                              <div className="w-12 h-12 rounded-full" style={{ background: "rgba(45,107,74,0.08)" }} />
+                            <div className="relative w-full aspect-square flex items-center justify-center p-3 overflow-hidden" style={{ background: isDark ? "rgba(0,0,0,0.12)" : "#fafaf8" }}>
+                              <div className="w-12 h-12 rounded-full" style={{ background: theme.accentBg }} />
                               <img src={`/productsImage/${product.id}.jpg`} alt={name} className="absolute inset-0 w-full h-full object-contain p-3" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                             </div>
                           </Link>
                           <div className="p-3">
                             <Link to={`/formula/${product.id}`}>
-                              <p className="text-xs font-medium line-clamp-2 text-gray-800 dark:text-gray-200 mb-1 leading-snug hover:opacity-70 transition-opacity">
+                              <p className="text-xs font-medium line-clamp-2 mb-1 leading-snug hover:opacity-70 transition-opacity" style={{ color: theme.text }}>
                                 {name}
                               </p>
                             </Link>
-                            <p className="text-sm font-medium mb-2" style={{ color: accent }}>
+                            <p className="text-sm font-medium mb-2" style={{ color: theme.accent }}>
                               €{(product.price ?? product.price_eur).toFixed(2)}
                             </p>
                             <button
@@ -470,19 +502,19 @@ function ConcernSection({
                               style={{
                                 background: state === "added"
                                   ? "rgba(74,222,128,0.08)"
-                                  : isDark ? "rgba(45,107,74,0.04)" : "rgba(94,139,104,0.04)",
+                                  : idleBtn.background,
                                 backdropFilter: "blur(12px)",
                                 WebkitBackdropFilter: "blur(12px)",
                                 border: state === "added"
                                   ? "1px solid rgba(74,222,128,0.3)"
-                                  : isDark ? "1px solid rgba(45,107,74,0.12)" : "1px solid rgba(94,139,104,0.15)",
+                                  : idleBtn.border,
                                 boxShadow: isDark ? "0 1px 8px rgba(45,107,74,0.05)" : "0 1px 8px rgba(94,139,104,0.06)",
                               }}
                             >
-                              {state === "adding" && <Loader2 className="w-3 h-3 animate-spin text-gray-400" />}
+                              {state === "adding" && <Loader2 className="w-3 h-3 animate-spin" style={{ color: theme.textTertiary }} />}
                               {state === "added" && <Check className="w-3 h-3 text-green-500" strokeWidth={2} />}
-                              {state === "idle" && <ShoppingBag className="w-3 h-3 text-gray-400" strokeWidth={1.5} />}
-                              <span className={state === "added" ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}>
+                              {state === "idle" && <ShoppingBag className="w-3 h-3" style={{ color: theme.textTertiary }} strokeWidth={1.5} />}
+                              <span style={{ color: state === "added" ? (isDark ? "#4ade80" : "#16a34a") : theme.textSecondary }}>
                                 {state === "adding" ? "…" : state === "added" ? "✓" : addLabel}
                               </span>
                             </button>
@@ -708,7 +740,10 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
 }
 
 // ── Diagnosis Banner ──────────────────────────────────────────────────────────
-function DiagnosisBanner({ headline, sub, cta, accent, accentDeep, isDark }: { headline: string; sub: string; cta: string, accent: string, accentDeep: string, isDark: boolean }) {
+function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }: { headline: string; sub: string; accent: string; accentDeep: string; isDark: boolean; language: string }) {
+  const ctaPrimary   = HERO_CTA_PRIMARY[language as keyof typeof HERO_CTA_PRIMARY]   ?? HERO_CTA_PRIMARY.en;
+  const ctaSecondary = HERO_CTA_SECONDARY[language as keyof typeof HERO_CTA_SECONDARY] ?? HERO_CTA_SECONDARY.en;
+
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "420px" }}>
       <img
@@ -751,30 +786,47 @@ function DiagnosisBanner({ headline, sub, cta, accent, accentDeep, isDark }: { h
         >
           {sub}
         </motion.p>
+
+        {/* ── Dual CTA (same style as hero carousel) ── */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.22 }}
+          className="flex items-center gap-3 flex-wrap max-sm:justify-start"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            whileTap={{ scale: 0.97 }}
-          >
+          {/* PRIMARY — filled sage-green, Camera icon, left */}
+          <motion.div whileTap={{ scale: 0.97 }}>
             <Link
-              to="/diagnosis"
-              className="inline-flex items-center rounded-full px-8 py-3.5 text-sm md:text-base font-semibold tracking-wide hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97]"
+              to="/skin-analysis"
+              className="inline-flex items-center gap-2 rounded-full px-7 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold tracking-wide max-sm:w-full max-sm:justify-center hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97]"
               style={{
                 background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
                 color: isDark ? "#F5F5F7" : "#fff",
-                boxShadow: isDark ? "0 8px 32px rgba(45,107,74,0.45)" : "0 8px 32px rgba(45,79,57,0.35)",
+                boxShadow: isDark ? "0 6px 24px rgba(45,107,74,0.35)" : "0 6px 24px rgba(45,79,57,0.3)",
                 transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
+                fontFamily: "var(--font-sans)",
               }}
             >
-              {cta}
+              <Camera size={15} strokeWidth={2} />
+              {ctaPrimary}
+            </Link>
+          </motion.div>
+          {/* SECONDARY — ghost outline, ClipboardList icon, right */}
+          <motion.div whileTap={{ scale: 0.97 }}>
+            <Link
+              to="/diagnosis"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 md:px-6 md:py-3 text-sm font-medium tracking-wide transition-all duration-200 max-sm:w-full max-sm:justify-center"
+              style={{
+                border: "1px solid rgba(255,255,255,0.2)",
+                color: "rgba(255,255,255,0.55)",
+                fontFamily: "var(--font-sans)",
+                backdropFilter: "blur(4px)",
+                WebkitBackdropFilter: "blur(4px)",
+              }}
+            >
+              <ClipboardList size={14} strokeWidth={1.5} />
+              {ctaSecondary}
             </Link>
           </motion.div>
         </motion.div>
@@ -861,7 +913,7 @@ function Newsletter({
               <span className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
                 {gdprText}{" "}
                 <Link to="/datenschutz" className="underline hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-                  Datenschutz
+                  {language === 'ko' ? '개인정보 처리방침' : language === 'de' ? 'Datenschutz' : 'Privacy Policy'}
                 </Link>
               </span>
             </label>
@@ -936,10 +988,10 @@ export default function Index() {
         <DiagnosisBanner
           headline={p1.home.bannerHeadline}
           sub={p1.home.bannerSub}
-          cta={p1.home.bannerCta}
           accent={accent}
           accentDeep={accentDeep}
           isDark={isDark}
+          language={language}
         />
         <Newsletter
           headline={p1.home.newsletterHeadline}

@@ -13,7 +13,7 @@ export interface SkinAxisScores {
   makeup_stability: number;
 }
 
-export type AnalysisStep = 'idle' | 'survey' | 'camera' | 'analyzing' | 'result' | 'error';
+export type AnalysisStep = 'idle' | 'survey' | 'camera-prompt' | 'camera' | 'analyzing' | 'result' | 'error';
 export type ScoreSource = 'manual_questionnaire' | 'ai_photo_analysis';
 
 export interface AnalysisApiResponse {

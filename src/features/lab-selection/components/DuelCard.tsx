@@ -14,6 +14,8 @@ import { useProducts } from '../hooks/useProducts';
 import { calcComplianceScore } from '../utils/routineHelpers';
 import { calculateMatchScore } from '../data/axisIngredientMap';
 import type { FaceZone, SkinProfile, RequiredIngredient, PriceTier, Product } from '../types';
+import type { Product as EngineProduct } from '@/engine/types';
+import CompatibilityBadge from '@/components/product/CompatibilityBadge';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -90,6 +92,41 @@ const INGREDIENT_ALIASES: Record<string, string[]> = {
   'green tea extract':              ['green tea', 'camellia sinensis', 'egcg'],
 };
 
+// ── Lab Product → Engine Product adapter (for CompatibilityBadge) ─────────────
+
+const PROFILE_TO_AXES: Record<SkinProfile, string[]> = {
+  oily_acne:        ['seb', 'acne'],
+  dehydrated_oily:  ['hyd', 'seb'],
+  dry_barrier:      ['hyd', 'bar'],
+  sensitive:        ['sen'],
+  aging_elasticity: ['aging'],
+  post_menopause:   ['aging', 'hyd'],
+  pigmentation:     ['pigment'],
+  mens:             ['seb'],
+  combination:      [],
+};
+
+const PROFILE_TO_SKIN: Record<SkinProfile, string> = {
+  oily_acne:        'oily',
+  dehydrated_oily:  'combination',
+  dry_barrier:      'dry',
+  sensitive:        'sensitive',
+  aging_elasticity: 'normal',
+  post_menopause:   'dry',
+  pigmentation:     'combination',
+  mens:             'oily',
+  combination:      'combination',
+};
+
+function toEngineProduct(p: Product): EngineProduct {
+  return {
+    id: p.id,
+    key_ingredients: p.ingredients.map((i) => i.name_en),
+    target_axes: p.target_profiles.flatMap((prof) => PROFILE_TO_AXES[prof] ?? []),
+    for_skin: [...new Set(p.target_profiles.map((prof) => PROFILE_TO_SKIN[prof] ?? 'combination'))],
+  } as unknown as EngineProduct;
+}
+
 function filterProductsByIngredients(products: Product[], requiredIngredientIds: string[]): Product[] {
   // BUG FIX: was `return []` — now returns all products when no specific requirements
   if (requiredIngredientIds.length === 0) return products;
@@ -160,6 +197,7 @@ function ProductCard({
   isDark: boolean;
 }) {
   const { product, matchScore } = scored;
+  const engineProduct = useMemo(() => toEngineProduct(product), [product]);
   const GREEN = '#4A9E68';
   const GREEN_LIGHT = '#3D6B4A';
   const AMBER = '#BA7517';
@@ -264,6 +302,18 @@ function ProductCard({
         color: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.35)',
       }}>
         {tx('daily_price', lang, { price: dailyPrice })}
+      </div>
+
+      {/* Compatibility badge — compact mode */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <CompatibilityBadge product={engineProduct} variant="compact" />
+        <span style={{
+          fontSize: 'clamp(0.5625rem, 0.75vw, 0.625rem)',
+          color: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+        }}>
+          {lang === 'ko' ? '피부 적합도' : lang === 'de' ? 'Hautverträglichkeit' : 'Skin Fit'}
+        </span>
       </div>
 
       {/* CTA */}

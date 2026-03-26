@@ -10,7 +10,6 @@
 //   5. i18n: All error messages in ko/en/de
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// @ts-ignore: Deno URL imports are valid in Edge Functions but not recognized by Node.js TS config
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {

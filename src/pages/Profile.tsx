@@ -66,10 +66,11 @@ function SkinProgressTab() {
     const { language } = useI18nStore();
     const t = translations[language];
 
-    const latestResult = diagnosisResult ?? userProfile?.savedResults[0] ?? null;
-    const previousResult = userProfile?.savedResults[1] ?? null; // For historical trend tracking
+    const savedResults = userProfile?.savedResults ?? [];
+    const latestResult = diagnosisResult ?? savedResults[0] ?? null;
+    const previousResult = savedResults[1] ?? null;
 
-    const allProducts: Product[] = latestResult
+    const allProducts: Product[] = latestResult?.product_bundle
         ? Object.values(latestResult.product_bundle).flat()
         : [];
 
@@ -131,14 +132,14 @@ function SkinProgressTab() {
             </div>
 
             {/* History count */}
-            {userProfile && userProfile.savedResults.length > 1 && (
+            {userProfile && (userProfile.savedResults?.length ?? 0) > 1 && (
                 <p className="text-xs text-foreground/40 text-center">
-                    {userProfile.savedResults.length} {t.diagnosesSaved}
+                    {userProfile.savedResults?.length ?? 0} {t.diagnosesSaved}
                 </p>
             )}
 
             {/* ── Diagnosis Timeline ── */}
-            {userProfile && userProfile.savedResults.length > 0 && (
+            {userProfile && (userProfile.savedResults?.length ?? 0) > 0 && (
                 <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
                     <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-4">
                         {language === "ko" ? "진단 타임라인" : language === "de" ? "Diagnose-Timeline" : "Diagnosis Timeline"}
@@ -152,7 +153,7 @@ function SkinProgressTab() {
                         />
 
                         <div className="space-y-4">
-                            {userProfile.savedResults.slice(0, 5).map((saved, idx) => {
+                            {(userProfile.savedResults ?? []).slice(0, 5).map((saved, idx) => {
                                 const date = saved.engineVersion
                                     ? new Date().toLocaleDateString(
                                         language === "ko" ? "ko-KR" : language === "de" ? "de-DE" : "en-GB",
@@ -385,14 +386,14 @@ function OrderHistoryTab() {
                             {statusLabel[order.status]}
                         </span>
                     </div>
-                    {order.items.map((item, i) => (
+                    {(order.items ?? []).map((item, i) => (
                         <div key={i} className="flex items-center justify-between py-1 border-b border-border/20 last:border-0">
                             <span className="text-sm text-foreground">{item.product_name} × {item.quantity}</span>
-                            <span className="text-sm text-foreground/60">€{item.unit_price.toFixed(2)}</span>
+                            <span className="text-sm text-foreground/60">€{(item.unit_price ?? 0).toFixed(2)}</span>
                         </div>
                     ))}
                     <div className="flex justify-end mt-2">
-                        <span className="text-sm font-bold text-foreground">{t.profileTab.total} €{order.total.toFixed(2)}</span>
+                        <span className="text-sm font-bold text-foreground">{t.profileTab.total} €{(order.total ?? 0).toFixed(2)}</span>
                     </div>
                 </div>
             ))}
@@ -403,7 +404,7 @@ function OrderHistoryTab() {
 /* ── Main Profile Page ── */
 export default function Profile() {
     const { isLoggedIn, userProfile, logout } = useAuthStore();
-    const { updateProfile } = useProfile();
+    const { loading: profileLoading, updateProfile } = useProfile();
     const { language } = useI18nStore();
     const t = translations[language];
     const navigate = useNavigate();
@@ -411,8 +412,26 @@ export default function Profile() {
     const [activeTab, setActiveTab] = useState<Tab>("progress");
     const [editingName, setEditingName] = useState(false);
     const [saving, setSaving] = useState(false);
-    const [firstName, setFirstName] = useState(userProfile?.firstName ?? "");
+    const [firstName, setFirstName] = useState(userProfile?.firstName ?? userProfile?.email?.split('@')[0] ?? "");
     const [lastName, setLastName] = useState(userProfile?.lastName ?? "");
+
+    // ── Race Condition Guard: show skeleton while profile data is loading ────
+    if (profileLoading) {
+        return (
+            <div className="min-h-screen bg-background">
+                <SilkBackground />
+                <Navbar />
+                <main className="pt-28 pb-20 px-6 max-w-md mx-auto relative z-10">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                        <p className="text-sm text-foreground/40">
+                            {language === 'ko' ? '프로필 불러오는 중...' : language === 'de' ? 'Profil wird geladen...' : 'Loading profile...'}
+                        </p>
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
     if (!isLoggedIn || !userProfile) {
         return (
@@ -461,7 +480,7 @@ export default function Profile() {
                         {t.welcome}, {userProfile.firstName || "User"}
                     </h1>
                     <p className="text-xs text-foreground/50 mt-1">
-                        {userProfile.email} · {new Date(userProfile.createdAt).toLocaleDateString(language === "en" ? "en-US" : "de-DE", { month: "long", year: "numeric" })}
+                        {userProfile.email} · {userProfile.createdAt ? new Date(userProfile.createdAt).toLocaleDateString(language === "en" ? "en-US" : "de-DE", { month: "long", year: "numeric" }) : '—'}
                     </p>
                 </motion.div>
 

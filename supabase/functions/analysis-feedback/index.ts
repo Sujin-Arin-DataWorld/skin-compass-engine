@@ -2,7 +2,7 @@
 // Accepts thumbs-up / thumbs-down from the results screen.
 // Confirmed-accurate feedback becomes high-confidence Phase 2 training data.
 
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,7 +16,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { analysis_id, feedback, comment } = await req.json();
+    const { analysis_id, feedback, comment, tags } = await req.json();
 
     if (!analysis_id || !["accurate", "inaccurate"].includes(feedback)) {
       return new Response(
@@ -74,6 +74,7 @@ Deno.serve(async (req: Request) => {
       .update({
         user_feedback: feedback,
         feedback_comment: comment ?? null,
+        feedback_tags: Array.isArray(tags) ? tags : null,
         updated_at: new Date().toISOString(),
       })
       .eq("id", analysis_id);

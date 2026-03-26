@@ -12,6 +12,7 @@ import { useI18nStore } from "@/store/i18nStore";
 import { useSkinProfileStore } from "@/store/useSkinProfileStore";
 import { brand } from "@/lib/designTokens";
 import GdprConsentModal from "./components/GdprConsentModal";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Diagnosis from "./pages/Diagnosis";
 import Results from "./pages/Results";
@@ -258,9 +259,11 @@ function AppInner() {
         <Route
           path="/profile"
           element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            </ErrorBoundary>
           }
         />
         <Route

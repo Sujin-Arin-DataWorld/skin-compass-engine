@@ -134,7 +134,8 @@ const TX = {
   save:          { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
   saved:         { ko: '저장됨', en: 'Saved', de: 'Gespeichert' },
   productSubtitle:{ ko: '분석 결과를 바탕으로 선별한 맞춤 솔루션입니다.', en: 'Curated solutions based on your analysis results.', de: 'Kuratierte Lösungen basierend auf Ihren Analyseergebnissen.' },
-  noProducts:    { ko: '피부 상태가 양호합니다! 맞춤 루틴을 확인해보세요.', en: 'Your skin looks healthy! Check out our curated routines.', de: 'Ihre Haut sieht gesund aus! Entdecken Sie unsere kuratierten Routinen.' },
+  noProductsHealthy: { ko: '피부 상태가 양호합니다! 맞춤 루틴을 확인해보세요.', en: 'Your skin looks healthy! Check out our curated routines.', de: 'Ihre Haut sieht gesund aus! Entdecken Sie unsere kuratierten Routinen.' },
+  noProductsCurating: { ko: '고민에 맞는 전문 솔루션을 준비하고 있습니다.', en: 'We are curating specialized solutions for your specific concerns.', de: 'Wir kuratieren spezialisierte Lösungen für Ihre spezifischen Anliegen.' },
   precision:     { ko: '정밀 분석 완료', en: 'Precision Analysis', de: 'Präzisionsanalyse' },
   precisionDesc: { ko: 'AI 사진 + 생활습관 통합 분석', en: 'AI Photo + Lifestyle Integrated', de: 'KI-Foto + Lebensstil-Analyse' },
 };
@@ -399,10 +400,15 @@ export default function AnalysisResults({
     }
   }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate]);
 
+  const resetDiagnosisStore = useDiagnosisStore((s) => s.reset);
+
   const handleRetake = useCallback(() => {
     resetAnalysis();
+    // Also clear diagnosisStore to prevent UI flickering when
+    // navigating back to the camera view
+    resetDiagnosisStore();
     onRetake();
-  }, [resetAnalysis, onRetake]);
+  }, [resetAnalysis, resetDiagnosisStore, onRetake]);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -593,9 +599,11 @@ export default function AnalysisResults({
           <p className="mb-1" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {TX.products[lang]}
           </p>
-          <p className="mb-4" style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: 'rgba(134,134,139,0.7)', lineHeight: 1.5 }}>
-            {matchedProducts.length > 0 ? TX.productSubtitle[lang] : ''}
-          </p>
+          {matchedProducts.length > 0 && (
+            <p className="mb-4" style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: 'rgba(134,134,139,0.7)', lineHeight: 1.5 }}>
+              {TX.productSubtitle[lang]}
+            </p>
+          )}
           {matchedProducts.length > 0 ? (
             <div className="flex flex-col gap-3">
               {matchedProducts.map(rule => (
@@ -605,7 +613,7 @@ export default function AnalysisResults({
           ) : (
             <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(74,158,104,0.06)', border: '1px solid rgba(74,158,104,0.15)' }}>
               <p style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: '#4A9E68' }}>
-                {TX.noProducts[lang]}
+                {(tier === 'excellent' || tier === 'good') ? TX.noProductsHealthy[lang] : TX.noProductsCurating[lang]}
               </p>
             </div>
           )}

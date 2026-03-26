@@ -340,6 +340,23 @@ const ResultsPage = () => {
         </motion.div>
       </AnimatePresence>
 
+      {/* Legal disclaimer — 3-Layer: Layer 1 (always visible) */}
+      <div style={{
+        position: 'fixed',
+        bottom: cartItems.length > 0 ? 180 : 56,
+        left: 0, right: 0,
+        textAlign: 'center',
+        padding: '4px 16px',
+        fontSize: '0.625rem',
+        color: 'rgba(128,128,128,0.6)',
+        zIndex: 49,
+        transition: 'bottom 0.3s ease',
+      }}>
+        {language === 'ko' ? 'ⓘ AI 기반 화장품 추천 참고용 · 의학적 진단이 아닙니다'
+          : language === 'de' ? 'ⓘ KI-basierte Hautpflegeempfehlung · Keine medizinische Diagnose'
+          : 'ⓘ AI-powered skincare recommendation · Not a medical diagnosis'}
+      </div>
+
       {/* Sticky cart bar — shown only after user adds at least one product */}
       {cartItems.length > 0 && (
         <StickyCartBar

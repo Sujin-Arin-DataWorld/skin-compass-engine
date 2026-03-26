@@ -19,6 +19,7 @@ export type ScoreSource = 'manual_questionnaire' | 'ai_photo_analysis';
 export interface AnalysisApiResponse {
   analysis_id: string;
   scores: SkinAxisScores;
+  reasons?: Record<string, string> | null;  // AI-generated reasons per axis, null = use fallback
   model: string;
   version: string;
 }

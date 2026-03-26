@@ -17,6 +17,7 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 export async function analyzeSkinImage(
   imageBase64: string,
   lifestyle?: Record<string, number | string>,
+  language?: 'ko' | 'en' | 'de',
 ): Promise<AnalysisApiResponse> {
   // [PWA-FIX] Fail-fast offline check — avoids confusing network errors on spotty mobile connections
   if (typeof window !== 'undefined' && !navigator.onLine) {
@@ -24,7 +25,7 @@ export async function analyzeSkinImage(
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+  const timeoutId = setTimeout(() => controller.abort(), 45_000);  // Match Edge Function timeout
 
   // Forward user's auth token if logged in, otherwise use anon key
   let authToken = SUPABASE_ANON_KEY;
@@ -41,6 +42,9 @@ export async function analyzeSkinImage(
     const body: Record<string, unknown> = { image_base64: imageBase64 };
     if (lifestyle && Object.keys(lifestyle).length > 0) {
       body.lifestyle = lifestyle;
+    }
+    if (language) {
+      body.language = language;
     }
 
     const requestInit: RequestInit = {
@@ -72,11 +76,9 @@ export async function analyzeSkinImage(
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-      if (res.status === 429)
-        throw new Error('분석 서버가 혼잡합니다. 잠시 후 다시 시도해주세요.');
-      throw new Error(
-        (err as { error?: string }).error ?? `서버 오류 (${res.status})`,
-      );
+      const errorMsg = (err as { error?: string }).error ?? `서버 오류 (${res.status})`;
+      // Surface the server's localized error message directly
+      throw new Error(errorMsg);
     }
 
     return (await res.json()) as AnalysisApiResponse;
@@ -89,15 +91,17 @@ export async function analyzeSkinImage(
   }
 }
 
-// Prompt 3.5 — Feedback service
+// Prompt 3.5 — Feedback service (v2: structured tags)
 /**
  * Submits user accuracy feedback for a completed analysis.
+ * Tags provide structured, machine-readable reasons for inaccuracy.
  * This data becomes high-confidence training data for Phase 2 custom model.
  */
 export async function submitFeedback(
   analysisId: string,
   feedback: 'accurate' | 'inaccurate',
   comment?: string,
+  tags?: string[],
 ): Promise<void> {
   await fetch(`${SUPABASE_URL}/functions/v1/analysis-feedback`, {
     method: 'POST',
@@ -105,6 +109,6 @@ export async function submitFeedback(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     },
-    body: JSON.stringify({ analysis_id: analysisId, feedback, comment }),
+    body: JSON.stringify({ analysis_id: analysisId, feedback, comment, tags }),
   });
 }

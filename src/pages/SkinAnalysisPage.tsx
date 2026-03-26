@@ -210,7 +210,7 @@ export default function SkinAnalysisPage() {
       setStep('analyzing');
 
       try {
-        const response = await analyzeSkinImage(base64, lifestyleAnswers ?? undefined);
+        const response = await analyzeSkinImage(base64, lifestyleAnswers ?? undefined, language as 'ko' | 'en' | 'de');
         const hasLifestyle = lifestyleAnswers !== null;
         setAnalysisResult(
           response.scores,

@@ -43,41 +43,34 @@ const CONCERN_META: Record<ConcernKey, { axis: AxisKey; icon: LucideIcon }> = {
   neuro: { axis: "sen", icon: Leaf },
 };
 
-// ── Hero slide images ─────────────────────────────────────────────────────────
+// ── Hero slide images (2 slides: female model + male AI scan) ─────────────────
 const HERO_IMAGES = [
-  "/assets/hero-face.png",
-  "/assets/hero-model.png",
-  "/assets/kbeauty-lineup.png",
-  "/assets/hero-ai-scan.png",    // Slide 4: transparent PNG (man portrait)
+  "/assets/hero-face.png",       // Slide 1: female model close-up
+  "/assets/hero-ai-scan.png",    // Slide 2: male model + data overlay
 ];
 
-// TODO: Move HERO4_COPY to the global i18n JSON files for single source of truth
-const HERO4_COPY: Record<string, { id: string; headline: string; sub: string; cta: string }> = {
+// ── Slide 2 copy (male model + AI scan data overlay) ──────────────────────────
+const SLIDE2_COPY: Record<string, { id: string; headline: string; sub: string }> = {
   ko: {
     id: 'ai-scan',
     headline: "AI가 30초 만에\n피부를 읽습니다",
     sub: "사진 한 장으로 10축 정밀 분석\n당신만의 루틴을 설계합니다",
-    cta: "AI 스캔",
   },
   en: {
     id: 'ai-scan',
     headline: "Your skin,\nread in 30 seconds",
     sub: "10-axis precision analysis from one photo\nDesigning your personal routine",
-    cta: "AI scan",
   },
   de: {
     id: 'ai-scan',
     headline: "Ihre Haut,\nin 30 Sekunden gelesen",
     sub: "10-Achsen-Präzisionsanalyse mit einem Foto\nIhre persönliche Routine wird erstellt",
-    cta: "KI-Scan",
   },
 };
 
-// TODO: Move DUAL_CTA to the global i18n JSON files for single source of truth
-const DUAL_CTA = {
-  ai_scan:       { ko: "AI 스캔",      en: "AI scan",       de: "KI-Scan"    },
-  questionnaire: { ko: "설문 진단",     en: "Questionnaire", de: "Fragebogen"  },
-} as const;
+// ── Unified CTA for ALL hero slides (identical on every slide) ────────────────
+const HERO_CTA_PRIMARY  = { ko: '60초 AI 피부 진단',    en: '60s AI Skin Diagnosis', de: '60s KI-Hautdiagnose' } as const;
+const HERO_CTA_SECONDARY = { ko: '설문으로 진단하기',     en: 'Take the quiz instead',  de: 'Zum Fragebogen'       } as const;
 
 type CartBtnState = "idle" | "adding" | "added";
 
@@ -92,23 +85,23 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [current, setCurrent] = useState(0);
 
-  // Merge slide 4 into allSlides
-  const hero4 = HERO4_COPY[language] ?? HERO4_COPY.en;
-  const allSlides: { id?: string; headline: string; sub: string; cta: string }[] = [
-    ...slides.slice(0, 3),
-    hero4,
+  // Build 2-slide array: slide 1 (from i18n hero[0]) + slide 2 (SLIDE2_COPY)
+  const slide2 = SLIDE2_COPY[language] ?? SLIDE2_COPY.en;
+  const allSlides: { id?: string; headline: string; sub: string }[] = [
+    slides[0],   // female model
+    slide2,      // male model + AI scan overlay
   ];
 
-  const ctaAI = DUAL_CTA.ai_scan[language as keyof typeof DUAL_CTA.ai_scan] ?? DUAL_CTA.ai_scan.en;
-  const ctaQuiz = DUAL_CTA.questionnaire[language as keyof typeof DUAL_CTA.questionnaire] ?? DUAL_CTA.questionnaire.en;
+  // Unified CTA text — identical on every slide
+  const ctaPrimary   = HERO_CTA_PRIMARY[language as keyof typeof HERO_CTA_PRIMARY]   ?? HERO_CTA_PRIMARY.en;
+  const ctaSecondary = HERO_CTA_SECONDARY[language as keyof typeof HERO_CTA_SECONDARY] ?? HERO_CTA_SECONDARY.en;
 
+  // No autoplay — manual swipe only
   useEffect(() => {
     if (!emblaApi) return;
-    const id = setInterval(() => emblaApi.scrollNext(), 5000);
     const onSelect = () => setCurrent(emblaApi.selectedScrollSnap());
     emblaApi.on("select", onSelect);
     return () => {
-      clearInterval(id);
       emblaApi.off("select", onSelect);
     };
   }, [emblaApi]);
@@ -246,17 +239,17 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                     </span>
                   ))}
                 </motion.p>
-                {/* ── Dual CTA ── */}
+                {/* ── Unified Dual CTA (identical on every slide) ── */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 10 }}
                   transition={{ duration: 0.5, delay: 0.24 }}
-                  className={`flex items-center gap-3 flex-wrap ${isAIScanSlide ? 'max-sm:justify-center' : 'max-sm:justify-start'}`}
+                  className="flex items-center gap-3 flex-wrap max-sm:justify-start"
                 >
-                  {/* PRIMARY CTA (filled green pill) */}
+                  {/* PRIMARY CTA — always left, filled sage-green, Camera icon */}
                   <motion.div whileTap={{ scale: 0.97 }}>
                     <Link
-                      to={isAIScanSlide ? "/skin-analysis" : "/diagnosis"}
+                      to="/skin-analysis"
                       className="inline-flex items-center gap-2 rounded-full px-7 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold tracking-wide max-sm:w-full max-sm:justify-center hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97] active:shadow-[0_2px_12px_rgba(45,79,57,0.2)] dark:active:shadow-[0_2px_12px_rgba(45,107,74,0.15)]"
                       style={{
                         background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
@@ -266,23 +259,14 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                         fontFamily: "var(--font-sans)",
                       }}
                     >
-                      {isAIScanSlide ? (
-                        <>
-                          <Camera size={15} strokeWidth={2} />
-                          {ctaAI}
-                        </>
-                      ) : (
-                        <>
-                          <ClipboardList size={15} strokeWidth={1.8} />
-                          {allSlides[i]?.cta}
-                        </>
-                      )}
+                      <Camera size={15} strokeWidth={2} />
+                      {ctaPrimary}
                     </Link>
                   </motion.div>
-                  {/* SECONDARY CTA (ghost outline pill) */}
+                  {/* SECONDARY CTA — always right, ghost outline */}
                   <motion.div whileTap={{ scale: 0.97 }}>
                     <Link
-                      to={isAIScanSlide ? "/diagnosis" : "/skin-analysis"}
+                      to="/diagnosis"
                       className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 md:px-6 md:py-3 text-sm font-medium tracking-wide transition-all duration-200 max-sm:w-full max-sm:justify-center"
                       style={{
                         border: `1px solid ${ghostBorder}`,
@@ -292,17 +276,8 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                         WebkitBackdropFilter: "blur(4px)",
                       }}
                     >
-                      {isAIScanSlide ? (
-                        <>
-                          <ClipboardList size={14} strokeWidth={1.5} />
-                          {ctaQuiz}
-                        </>
-                      ) : (
-                        <>
-                          <Camera size={14} strokeWidth={1.5} />
-                          {ctaAI}
-                        </>
-                      )}
+                      <ClipboardList size={14} strokeWidth={1.5} />
+                      {ctaSecondary}
                     </Link>
                   </motion.div>
                 </motion.div>

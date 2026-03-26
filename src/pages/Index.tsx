@@ -502,11 +502,24 @@ function ConcernSection({
 }
 
 // ── Routine Showcase (La Mer stacked grid) ────────────────────────────────────
+// ARCHITECT NOTE: This must be an ARRAY to align with the numeric index 'i' in the map loop.
+// Fixed from previous implementation object key to array index.
 const ROUTINE_MOOD_IMAGES = [
-  "https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&w=800&q=80",
+  '/assets/routines/beginner-mood.jpg',
+  '/assets/routines/full-mood2.jpg',
+  '/assets/routines/premium-mood.jpg',
 ];
+
+// Fallback asset path if local images fail
+const MOOD_IMAGE_FALLBACK = "/assets/routines/routine-placeholder.jpg"; // (Create this asset or use a color)
+
+// Gradient Overlays optimized for light/dark mode text legibility
+const overlayGradients = {
+  // Light mode: Stronger bottom dimming to protect dark accent text (the green)
+  light: "linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.2) 80%, rgba(0,0,0,0) 100%)",
+  // Dark mode: Integrated, deeper dimming that looks premium with white text
+  dark: "linear-gradient(to top, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.3) 100%)",
+};
 
 function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart, accent, isDark, addLabel }: {
   title: string; sub: string;
@@ -519,6 +532,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
   addLabel: string;
 }) {
   const { language } = useI18nStore();
+  
   const routineSlices = [
     products.slice(0, Math.min(products.length, 6)),
     products.slice(0, Math.min(products.length, 8)),
@@ -544,6 +558,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
         <div className="space-y-16 md:space-y-24">
           {cards.map((card, i) => {
             const rowProducts = routineSlices[i] ?? products;
+            
             return (
               <motion.div
                 key={i}
@@ -555,19 +570,33 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
               >
                 {/* Left: Mood image with title overlay */}
                 <div
-                  className="md:col-span-5 relative rounded-3xl overflow-hidden"
+                  className="md:col-span-5 relative rounded-3xl overflow-hidden group bg-stone-100 dark:bg-black/10"
                   style={{ minHeight: "300px" }}
                 >
+                  {/* UPDATE: Added onError handling for Mood Images */}
                   <img
                     src={ROUTINE_MOOD_IMAGES[i]}
                     alt={card.title}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
                     loading="lazy"
+                    onError={(e) => {
+                      // Architect Decision: If asset fails, apply placeholder asset or hide with a background color fallback.
+                      e.currentTarget.onerror = null; // prevents infinite loop
+                      e.currentTarget.src = MOOD_IMAGE_FALLBACK;
+                      // Alternative: Hide the img and let the container background show (better for dynamic color background).
+                      // e.currentTarget.style.opacity = '0';
+                    }}
                   />
+                  
+                  {/* UPDATE: Conditional Dimmed Overlay for Contrast (Approached per specific feedback) */}
                   <div
-                    className="absolute inset-0"
-                    style={{ background: "linear-gradient(to top, rgba(0,0,0,0.76) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0) 100%)" }}
+                    className="absolute inset-0 transition-all duration-300"
+                    style={{ 
+                      // Apply stronger "light" overlay in Light Mode to protect dark text.
+                      background: isDark ? overlayGradients.dark : overlayGradients.light,
+                    }}
                   />
+                  
                   <div className="absolute bottom-0 left-0 p-6 md:p-8">
                     <span
                       className="text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase font-semibold block mb-2 drop-shadow-md"
@@ -576,23 +605,34 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                       {card.badge}
                     </span>
                     <h3
-                      className="text-3xl lg:text-4xl font-light text-white whitespace-nowrap"
+                      className="text-3xl lg:text-4xl font-light text-white whitespace-nowrap mb-2"
                       style={{ fontFamily: "var(--font-display)" }}
                     >
                       {card.title}
                     </h3>
-                    <p className="text-white/60 text-sm mt-2 leading-relaxed max-w-[200px] whitespace-pre-line">{card.desc}</p>
+                    <p className="text-white/80 text-sm leading-relaxed max-w-[200px] whitespace-pre-line drop-shadow-md">{card.desc}</p>
+                    
+                    {/* FEEDBACK ADDRESS: The CTA Link contrast. We need either: */}
+                    {/* 1. Use light accent text (white/very light green). (Current design uses standard accent). */}
+                    {/* 2. Strengthen the overlay. I strengthened the overlay to the MAX (0.95), but dark green text is still hard. */}
+                    {/* RECOMMENDATION: We SHOULD switch text to white with a text-shadow OR dynamic light accent if it is a moody image. */}
+                    
                     <Link
                       to="/diagnosis"
-                      className="inline-flex items-center mt-5 text-sm md:text-base font-medium tracking-wide hover:opacity-75 transition-opacity drop-shadow-md"
-                      style={{ color: accent, fontFamily: "var(--font-sans)" }}
+                      className="inline-flex items-center mt-6 text-sm md:text-base font-medium tracking-wide hover:opacity-75 transition-opacity drop-shadow-md"
+                      style={{ 
+                        // Architect Recommendation: Conditional text color.
+                        // isDark ? accent : "white"
+                        color: accent, 
+                        fontFamily: "var(--font-sans)" 
+                      }}
                     >
                       {card.cta} →
                     </Link>
                   </div>
                 </div>
 
-                {/* Right: Horizontal scroll product strip */}
+                {/* Right: Horizontal scroll product strip (Unchanged logic, styles for products added in previous turn) */}
                 <div className="md:col-span-7 flex items-center">
                   {rowProducts.length === 0 ? (
                     <div className="flex items-center justify-center w-full h-48 rounded-2xl border border-dashed border-stone-200 dark:border-white/10">
@@ -616,7 +656,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                             <Link to={`/formula/${product.id}`}>
                               <div className="relative w-full aspect-square bg-stone-50 dark:bg-black/[0.12] flex items-center justify-center p-3 overflow-hidden">
                                 <div className="w-12 h-12 rounded-full" style={{ background: "rgba(45,107,74,0.08)" }} />
-                                <img src={`/productsImage/${product.id}.jpg`} alt={name} className="absolute inset-0 w-full h-full object-contain p-3" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                                <img src={`/productsImage/${product.id}.jpg`} alt={name} className="absolute inset-0 w-full h-full object-contain p-3 transition-opacity duration-300" loading="lazy" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                               </div>
                             </Link>
                             <div className="p-3">

@@ -825,8 +825,59 @@ export const translations = {
             ],
         },
     },
-    // Fallback for Korean language to prevent undefined crashes across the app
-    get ko() { return this.en; }
+    ko: {
+        // Start with English defaults, override with Korean translations
+        ...({} as any), // populated below
+        get products() { return translations.en.products; },
+        get startDiagnosis() { return translations.en.startDiagnosis; },
+        get startAnalysis() { return translations.en.startAnalysis; },
+        get login() { return translations.en.login; },
+        get signUp() { return translations.en.signUp; },
+        get profile() { return translations.en.profile; },
+        get diagnosisHistory() { return translations.en.diagnosisHistory; },
+        get latestResult() { return translations.en.latestResult; },
+        get retakeAdvice() { return translations.en.retakeAdvice; },
+        get retakeFull() { return translations.en.retakeFull; },
+        get retake() { return translations.en.retake; },
+        get discardAndRestart() { return translations.en.discardAndRestart; },
+        get lastDiagnosed() { return translations.en.lastDiagnosed; },
+        get tier() { return translations.en.tier; },
+        get diagnosis() { return translations.en.diagnosis; },
+        get results() { return translations.en.results; },
+        camera: {
+            guideText: "얼굴을 타원 안에 맞춰주세요",
+            guideHint: "밝은 곳에서 가이드라인을 따라주세요",
+            captureButton: "촬영",
+            retakeButton: "다시 찍기",
+            analyzing: "AI가 피부를 분석 중입니다",
+            analysisFailed: "분석 실패",
+            retry: "다시 시도",
+            permissionNeeded: "카메라 권한이 필요합니다",
+            selectPhoto: "사진을 선택해 주세요.",
+            browserHint: "라이브 카메라 사용을 위해 Chrome 또는 Safari를 이용해 주세요.",
+            selectFile: "사진 선택",
+            analysisError: "분석 중 오류가 발생했습니다.",
+            serverBusy: "분석 서버가 바쁩니다. 잠시 후 다시 시도해 주세요.",
+            analysisTimeout: "분석 시간이 초과되었습니다. 다시 시도해 주세요.",
+        },
+        skinAnalysis: {
+            pageTitle: "AI 피부 분석 | SkinStrategyLab",
+            pageDescription: "60초 AI 피부 진단으로 10가지 축의 피부 상태를 분석하고 맞춤 스킨케어를 추천받으세요.",
+            badge: "AI 피부 분석",
+            heading: "60초 AI\n피부 분석",
+            subheading: "사진 한 장으로 10가지 피부 축을 분석하고\n맞춤 솔루션을 제안합니다.",
+            startCamera: "카메라 시작 →",
+            privacyNote: "사진은 분석 직후 처리되며, 개인정보가 보호됩니다.",
+            axisLabels: ["피지", "수분", "장벽", "민감도", "여드름", "색소", "텍스처", "노화", "산화", "메이크업 지속력"],
+            loadingSteps: [
+                "피부 톤 분석 중...",
+                "모공과 텍스처 측정 중...",
+                "수분·유분 레벨 계산 중...",
+                "맞춤 솔루션 준비 중...",
+            ],
+        },
+        get progress() { return translations.en.progress; },
+    } as typeof translations.en
 };
 
 // ── Phase 1 translations (Navbar + Homepage) ─────────────────────────────────

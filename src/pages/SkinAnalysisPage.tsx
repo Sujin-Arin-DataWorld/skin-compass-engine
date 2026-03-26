@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import { Camera, AlertCircle, RefreshCw } from 'lucide-react';
 import LiveCamera from '@/components/SkinAnalysis/LiveCamera';
 import LifestyleSurvey from '@/components/SkinAnalysis/LifestyleSurvey';
@@ -13,6 +14,7 @@ import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { analyzeSkinImage } from '@/services/skinAnalysisService';
 import { supabase } from '@/integrations/supabase/client';
 import { useI18nStore, translations } from '@/store/i18nStore';
+import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
 import type { SkinAxisScores as ProfileAxisScores, SkinType, SkinConcern } from '@/types/skinProfile';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
 
@@ -74,15 +76,15 @@ export default function SkinAnalysisPage() {
 
   const { language } = useI18nStore();
   const t = translations[language];
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tok = tokens(isDark);
+  const ctaTok = ctaTokens(isDark);
+  const glassTok = glassTokens(isDark);
 
-  // ── Language auto-detect on mount ─────────────────────────────────────────
-  useEffect(() => {
-    if (window.location.hostname.includes('.de')) {
-      useI18nStore.setState({ language: 'de' });
-    } else if (navigator.language.startsWith('ko')) {
-      useI18nStore.setState({ language: 'ko' });
-    }
-  }, []);
+  // ── Language auto-detect removed ──────────────────────────────────────────
+  // Language is managed by the global i18nStore.
+  // The previous hostname-based override was breaking user language preferences.
 
   // ── Restore pending analysis after login redirect ─────────────────────────
   useEffect(() => {
@@ -233,7 +235,10 @@ export default function SkinAnalysisPage() {
   // ── Idle screen ───────────────────────────────────────────────────────────
   if (currentStep === 'idle') {
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 bg-background text-foreground transition-colors duration-300">
+      <div
+        className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 transition-colors duration-300"
+        style={{ background: tok.bg, color: tok.text }}
+      >
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -244,11 +249,11 @@ export default function SkinAnalysisPage() {
           <div
             className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center"
             style={{
-              background: 'linear-gradient(135deg, rgba(201,169,110,0.15) 0%, rgba(183,110,121,0.15) 100%)',
-              border: '1px solid rgba(201,169,110,0.3)',
+              background: tok.accentBg,
+              border: `1px solid ${tok.accentBorder}`,
             }}
           >
-            <Camera size={32} color="#c9a96e" />
+            <Camera size={32} color={tok.accent} />
           </div>
 
           <p
@@ -256,7 +261,7 @@ export default function SkinAnalysisPage() {
               fontFamily: 'var(--font-display)',
               fontSize: '11px',
               letterSpacing: '0.15em',
-              color: '#c9a96e',
+              color: tok.accent,
               textTransform: 'uppercase',
               marginBottom: '8px',
             }}
@@ -268,6 +273,7 @@ export default function SkinAnalysisPage() {
               fontFamily: 'var(--font-display)',
               fontSize: '28px',
               fontWeight: 400,
+              color: tok.text,
               marginBottom: '12px',
               lineHeight: 1.3,
             }}
@@ -278,7 +284,7 @@ export default function SkinAnalysisPage() {
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '14px',
-              color: 'rgba(255,255,255,0.5)',
+              color: tok.textSecondary,
               marginBottom: '36px',
               lineHeight: 1.6,
               whiteSpace: 'pre-line',
@@ -294,11 +300,11 @@ export default function SkinAnalysisPage() {
                 key={label}
                 className="rounded-full px-3 py-1"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: tok.accentBg,
+                  border: `1px solid ${tok.border}`,
                   fontFamily: 'var(--font-sans)',
                   fontSize: '12px',
-                  color: 'rgba(255,255,255,0.55)',
+                  color: tok.textTertiary,
                 }}
               >
                 {label}
@@ -310,9 +316,10 @@ export default function SkinAnalysisPage() {
             onClick={() => setStep('survey')}
             className="w-full rounded-2xl py-4 text-center transition-all active:scale-[0.98]"
             style={{
-              background: 'linear-gradient(135deg, rgba(201,169,110,0.25) 0%, rgba(183,110,121,0.25) 100%)',
-              border: '1px solid rgba(201,169,110,0.5)',
-              color: '#c9a96e',
+              background: ctaTok.background,
+              border: 'none',
+              color: ctaTok.color,
+              boxShadow: ctaTok.boxShadow,
               fontFamily: 'var(--font-sans)',
               fontSize: '16px',
               fontWeight: 500,
@@ -326,7 +333,7 @@ export default function SkinAnalysisPage() {
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '11px',
-              color: 'rgba(255,255,255,0.25)',
+              color: tok.textTertiary,
             }}
           >
             {t.skinAnalysis.privacyNote}
@@ -339,7 +346,10 @@ export default function SkinAnalysisPage() {
   // ── Error screen ──────────────────────────────────────────────────────────
   if (currentStep === 'error') {
     return (
-      <div className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 bg-background text-foreground transition-colors duration-300">
+      <div
+        className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 transition-colors duration-300"
+        style={{ background: tok.bg, color: tok.text }}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -355,6 +365,7 @@ export default function SkinAnalysisPage() {
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: '22px',
+              color: tok.text,
               marginBottom: '8px',
             }}
           >
@@ -364,7 +375,7 @@ export default function SkinAnalysisPage() {
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '14px',
-              color: 'rgba(255,255,255,0.5)',
+              color: tok.textSecondary,
               marginBottom: '28px',
             }}
           >
@@ -374,9 +385,8 @@ export default function SkinAnalysisPage() {
             onClick={handleRetake}
             className="w-full rounded-2xl py-3 flex items-center justify-center gap-2"
             style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.12)',
-              color: 'rgba(255,255,255,0.7)',
+              ...glassTok.button,
+              color: tok.textSecondary,
               fontFamily: 'var(--font-sans)',
               fontSize: '15px',
             }}

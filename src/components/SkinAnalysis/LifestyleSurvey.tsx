@@ -5,9 +5,11 @@
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Microscope } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { FOUNDATION_QUESTIONS, fqText, fqHint, optLabel } from '@/data/foundationQuestions';
 import { CityClimateInput } from '@/components/diagnosis/CityClimateInput';
 import { useI18nStore } from '@/store/i18nStore';
+import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
 
 type Lang = 'en' | 'de' | 'ko';
 
@@ -45,6 +47,11 @@ function tx(obj: Record<string, string>, lang: Lang): string {
 export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurveyProps) {
   const { language } = useI18nStore();
   const lang = language as Lang;
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tok = tokens(isDark);
+  const ctaTok = ctaTokens(isDark);
+  const glassTok = glassTokens(isDark);
 
   const [showIntro, setShowIntro] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -93,16 +100,15 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
     return (
       <div
         className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6"
-        style={{ background: 'linear-gradient(160deg, #0d0d12 0%, #1a1520 100%)' }}
+        style={{ background: tok.bg }}
       >
         {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 left-4 rounded-full p-2.5 z-10"
           style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            color: '#fff',
+            ...glassTok.button,
+            color: tok.text,
           }}
         >
           <ArrowLeft size={18} />
@@ -118,11 +124,11 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
           <div
             className="w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center"
             style={{
-              background: 'linear-gradient(135deg, rgba(201,169,110,0.2) 0%, rgba(160,120,200,0.15) 100%)',
-              border: '1px solid rgba(201,169,110,0.4)',
+              background: tok.accentBg,
+              border: `1px solid ${tok.accentBorder}`,
             }}
           >
-            <Microscope size={32} color="#c9a96e" />
+            <Microscope size={32} color={tok.accent} />
           </div>
 
           {/* Badge */}
@@ -132,7 +138,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
               fontFamily: 'var(--font-display)',
               fontSize: '11px',
               letterSpacing: '0.18em',
-              color: '#c9a96e',
+              color: tok.accent,
               textTransform: 'uppercase',
             }}
           >
@@ -144,7 +150,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: '24px',
-              color: '#fff',
+              color: tok.text,
               fontWeight: 400,
               marginBottom: '12px',
               lineHeight: 1.35,
@@ -158,7 +164,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '14px',
-              color: 'rgba(255,255,255,0.5)',
+              color: tok.textSecondary,
               marginBottom: '28px',
               lineHeight: 1.7,
             }}
@@ -176,8 +182,8 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                 transition={{ delay: 0.3 + i * 0.08 }}
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
                 style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: tok.accentBg,
+                  border: `1px solid ${tok.border}`,
                 }}
               >
                 {icon}
@@ -190,9 +196,10 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
             onClick={() => setShowIntro(false)}
             className="w-full rounded-2xl py-4 text-center transition-all active:scale-[0.98]"
             style={{
-              background: 'linear-gradient(135deg, rgba(201,169,110,0.25) 0%, rgba(183,110,121,0.25) 100%)',
-              border: '1px solid rgba(201,169,110,0.5)',
-              color: '#c9a96e',
+              background: ctaTok.background,
+              border: 'none',
+              color: ctaTok.color,
+              boxShadow: ctaTok.boxShadow,
               fontFamily: 'var(--font-sans)',
               fontSize: '16px',
               fontWeight: 500,
@@ -209,7 +216,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: 'linear-gradient(160deg, #0d0d12 0%, #1a1520 100%)' }}
+      style={{ background: tok.bg }}
     >
       {/* Top bar */}
       <div className="px-5 pt-5 pb-3">
@@ -221,8 +228,8 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
               className="h-1 rounded-full flex-1 transition-all duration-300"
               style={{
                 background: i <= currentIndex
-                  ? 'linear-gradient(90deg, #c9a96e, #b76e79)'
-                  : 'rgba(255,255,255,0.08)',
+                  ? tok.accent
+                  : tok.border,
               }}
             />
           ))}
@@ -234,7 +241,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
             onClick={currentIndex === 0 ? () => setShowIntro(true) : handleBack}
             className="text-xs transition-colors"
             style={{
-              color: 'rgba(255,255,255,0.4)',
+              color: tok.textTertiary,
               fontFamily: 'var(--font-sans)',
               background: 'none',
               border: 'none',
@@ -248,7 +255,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
             style={{
               fontSize: '11px',
               letterSpacing: '0.12em',
-              color: 'rgba(255,255,255,0.25)',
+              color: tok.textTertiary,
               fontFamily: 'var(--font-sans)',
             }}
           >
@@ -276,7 +283,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                   style={{
                     fontFamily: 'var(--font-display)',
                     fontSize: '20px',
-                    color: '#fff',
+                    color: tok.text,
                     fontWeight: 400,
                     marginBottom: '16px',
                   }}
@@ -286,8 +293,8 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                 <div
                   className="rounded-2xl p-5"
                   style={{
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: tok.accentBg,
+                    border: `1px solid ${tok.border}`,
                   }}
                 >
                   <CityClimateInput
@@ -302,12 +309,13 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                   className="w-full mt-6 rounded-2xl py-4 text-center transition-all active:scale-[0.98]"
                   style={{
                     background: answers.climate
-                      ? 'linear-gradient(135deg, rgba(201,169,110,0.25) 0%, rgba(183,110,121,0.25) 100%)'
-                      : 'rgba(255,255,255,0.04)',
+                      ? ctaTok.background
+                      : tok.accentBg,
                     border: answers.climate
-                      ? '1px solid rgba(201,169,110,0.5)'
-                      : '1px solid rgba(255,255,255,0.08)',
-                    color: answers.climate ? '#c9a96e' : 'rgba(255,255,255,0.2)',
+                      ? 'none'
+                      : `1px solid ${tok.border}`,
+                    color: answers.climate ? ctaTok.color : tok.textTertiary,
+                    boxShadow: answers.climate ? ctaTok.boxShadow : 'none',
                     fontFamily: 'var(--font-sans)',
                     fontSize: '16px',
                     fontWeight: 500,
@@ -325,7 +333,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                   style={{
                     fontFamily: 'var(--font-display)',
                     fontSize: '20px',
-                    color: '#fff',
+                    color: tok.text,
                     fontWeight: 400,
                     marginBottom: '6px',
                     lineHeight: 1.4,
@@ -338,7 +346,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                     style={{
                       fontFamily: 'var(--font-sans)',
                       fontSize: '12px',
-                      color: 'rgba(255,255,255,0.35)',
+                      color: tok.textTertiary,
                       marginBottom: '20px',
                       lineHeight: 1.5,
                       fontStyle: 'italic',
@@ -360,14 +368,14 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                         className="text-left rounded-xl px-5 py-4 transition-all"
                         style={{
                           background: isSelected
-                            ? 'rgba(201,169,110,0.12)'
-                            : 'rgba(255,255,255,0.04)',
+                            ? tok.accentBg
+                            : 'transparent',
                           border: isSelected
-                            ? '1.5px solid rgba(201,169,110,0.6)'
-                            : '1px solid rgba(255,255,255,0.08)',
+                            ? `1.5px solid ${tok.accentBorder}`
+                            : `1px solid ${tok.border}`,
                           color: isSelected
-                            ? '#c9a96e'
-                            : 'rgba(255,255,255,0.7)',
+                            ? tok.accent
+                            : tok.textSecondary,
                           fontFamily: 'var(--font-sans)',
                           fontSize: '15px',
                           fontWeight: isSelected ? 500 : 400,

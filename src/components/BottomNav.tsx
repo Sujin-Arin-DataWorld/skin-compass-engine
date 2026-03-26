@@ -1,47 +1,34 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, Heart, LayoutGrid, User, ShoppingBag } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useNavStore } from "@/store/navStore";
 import { useI18nStore } from "@/store/i18nStore";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 export function BottomNav() {
   const [isVisible, setIsVisible] = useState(true);
-  // [PWA-FIX] useRef instead of useState — ref updates never trigger re-renders
-  const lastScrollYRef = useRef(0);
-  const rafIdRef = useRef<number | null>(null);
   const location = useLocation();
   const cartCount = useCartStore((s) => s.totalItems());
   const { openMobileMenu } = useNavStore();
   const { language } = useI18nStore();
   const navFont = { fontFamily: "var(--font-sans)" };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      // [PWA-FIX] Debounce via rAF — fires at most once per frame, not every pixel
-      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-        // [PWA-FIX] iOS rubber-band guard: overscroll produces negative scrollY → always show nav
-        if (currentScrollY <= 0) {
-          setIsVisible(true);
-          lastScrollYRef.current = 0;
-          return;
-        }
-        const shouldShow = !(currentScrollY > lastScrollYRef.current && currentScrollY > 50);
-        // [PWA-FIX] Only call setState when the boolean actually changes → no spurious re-renders
-        setIsVisible((prev) => (prev === shouldShow ? prev : shouldShow));
-        lastScrollYRef.current = currentScrollY;
-      });
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      // [PWA-FIX] Clean up any pending animation frame on unmount
-      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current);
-    };
-  }, []); // [PWA-FIX] Empty deps — refs never need to be listed as dependencies
+  // [PWA-FIX] GPU-perf-safe scroll handler via useScrollAnimation hook:
+  // - rAF-debounced (max 1 invocation per frame)
+  // - { passive: true } listener
+  // - iOS rubber-band guard (scrollY clamped to ≥ 0)
+  // - Cleanup on unmount (listener + cancelAnimationFrame)
+  useScrollAnimation((scrollY, prevScrollY) => {
+    if (scrollY <= 0) {
+      setIsVisible(true);
+      return;
+    }
+    const shouldShow = !(scrollY > prevScrollY && scrollY > 50);
+    // Only call setState when the boolean actually changes → no spurious re-renders
+    setIsVisible((prev) => (prev === shouldShow ? prev : shouldShow));
+  });
 
   const labels: Record<string, Record<string, string>> = {
     home: { en: "Home", de: "Start", ko: "홈" },
@@ -70,7 +57,7 @@ export function BottomNav() {
           className="fixed bottom-0 w-full z-50 md:hidden pb-[env(safe-area-inset-bottom)]"
         >
           {/* Glassmorphism background */}
-          <div className="absolute inset-0 bg-white/60 dark:bg-[#F5F5F7]/70 backdrop-blur-2xl border-t border-white/40 dark:border-white/[0.08] shadow-[0_-1px_0_0_rgba(0,0,0,0.04),0_-20px_60px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_-1px_0_0_rgba(255,255,255,0.04),0_-20px_60px_-10px_rgba(0,0,0,0.6)] pointer-events-none" />
+          <div className="absolute inset-0 bg-white/75 dark:bg-[#0A0A0A]/78 backdrop-blur-2xl border-t border-black/[0.06] dark:border-white/[0.04] shadow-[0_-1px_0_0_rgba(0,0,0,0.04),0_-20px_60px_-10px_rgba(0,0,0,0.08)] dark:shadow-[0_-1px_0_0_rgba(255,255,255,0.04),0_-20px_60px_-10px_rgba(0,0,0,0.6)] pointer-events-none" />
 
           <div className="relative grid grid-cols-5 items-center justify-items-center h-16 w-full" style={navFont}>
             {navItems.map((item) => {

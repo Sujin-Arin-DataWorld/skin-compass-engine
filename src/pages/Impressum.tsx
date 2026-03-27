@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 const Impressum = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
-    <div className="mx-auto max-w-[960px] px-6 pt-24 pb-16">
+    <div style={{ maxWidth: '960px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)', paddingTop: '96px', paddingBottom: '64px' }}>
       <h1 className="font-display text-3xl text-foreground">Impressum</h1>
       <div className="mt-8 space-y-8 text-sm leading-relaxed text-muted-foreground">
 

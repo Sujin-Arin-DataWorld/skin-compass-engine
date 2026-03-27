@@ -388,7 +388,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
             return (
               <button key={tab} onClick={() => setActiveTab(tab)} style={{
                 flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
-                background: 'transparent', minHeight: 44,
+                background: 'transparent', minHeight: 48,
                 fontSize: 'clamp(0.8125rem, 1.2vw, 0.9375rem)', fontWeight: 500,
                       color: active ? tok.accent : tok.textTertiary,
                 borderBottom: active ? `2px solid ${tok.accent}` : '2px solid transparent',
@@ -432,7 +432,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                       // Fix #5: notify parent of tier change for cart bar reactivity
                     }} style={{
                       flex: 1, padding: '10px 4px', textAlign: 'center', border: 'none', cursor: 'pointer',
-                      borderRadius: 10, minHeight: 44,
+                      borderRadius: 10, minHeight: 48,
                       background: isActive ? (isDark ? 'rgba(74,158,104,0.08)' : 'rgba(94,139,104,0.08)') : (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'),
                       outline: isActive ? `1px solid ${isDark ? 'rgba(74,158,104,0.15)' : 'rgba(94,139,104,0.15)'}` : 'none',
                     }}>

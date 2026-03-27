@@ -38,7 +38,7 @@ const Footer = () => {
         <p className="text-[11px] font-bold tracking-[0.15em] text-muted-foreground/70 uppercase">
           POWERED BY KOREAN BIOMETRIC DATA SCIENCE — GERMANY
         </p>
-        <p>© 2026 Skin Strategy Lab · skinstrategylab.de</p>
+        <p translate="no" className="notranslate">© 2026 Skin Strategy Lab · skinstrategylab.de</p>
       </div>
     </footer>
   );

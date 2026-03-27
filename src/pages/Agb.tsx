@@ -229,7 +229,7 @@ export default function Agb() {
   return (
     <div className="min-h-screen transition-colors duration-300" style={{ background: tok.bg }}>
       <Navbar />
-      <div className="mx-auto max-w-[760px] px-6 pt-24 pb-20">
+      <div style={{ maxWidth: '640px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)', paddingTop: '96px', paddingBottom: '80px' }}>
         {/* Header */}
         <p
           className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4"
@@ -246,14 +246,14 @@ export default function Agb() {
         {language !== "de" && (
           <p
             className="text-sm italic mb-4"
-            style={{ color: tok.textTertiary, fontFamily: "var(--font-sans)" }}
+            style={{ color: tok.textSecondary, fontFamily: "var(--font-sans)" }}
           >
             {copy.subtitle}
           </p>
         )}
         <p
           className="text-xs mb-12"
-          style={{ color: tok.textTertiary, fontFamily: "var(--font-sans)" }}
+          style={{ color: tok.textSecondary, fontFamily: "var(--font-sans)" }}
         >
           {copy.lastUpdated}
         </p>
@@ -286,7 +286,7 @@ export default function Agb() {
         {/* Divider + Operator info */}
         <div
           className="mt-16 pt-8 border-t text-xs space-y-1"
-          style={{ borderColor: tok.border, color: tok.textTertiary, fontFamily: "var(--font-sans)" }}
+          style={{ borderColor: tok.border, color: tok.textSecondary, fontFamily: "var(--font-sans)" }}
         >
           <p className="font-medium" style={{ color: tok.textSecondary }}>Skin Strategy Lab</p>
           <p>Sujin Park · Frankfurt am Main, Deutschland</p>

@@ -305,6 +305,7 @@ export const typography = {
 // Use with useMediaQuery hook or CSS media queries
  
 export const breakpoints = {
+  xs:  "440px",   // wide mobile (iPhone 16 Pro Max, Z Fold cover)
   sm:  "640px",   // landscape phones
   md:  "768px",   // tablets (this is the mobile/desktop split)
   lg:  "1024px",  // small laptops
@@ -317,19 +318,27 @@ export const breakpoints = {
 // Use these with isMobile flag or CSS clamp()
  
 export const spacing = {
-  // Section padding
-  sectionPx:    { mobile: "16px", desktop: "40px",  clamp: "clamp(16px, 4vw, 40px)" },
-  sectionPy:    { mobile: "48px", desktop: "80px",  clamp: "clamp(48px, 8vw, 80px)" },
+  // Section padding — fluid for luxury breathing on OLED screens
+  sectionPx:    { mobile: "20px", desktop: "40px",  clamp: "clamp(20px, 6vw, 40px)" },
+  sectionPy:    { mobile: "48px", desktop: "80px",  clamp: "clamp(48px, 8vh, 80px)" },
  
   // Card padding
-  cardPx:       { mobile: "16px", desktop: "24px",  clamp: "clamp(16px, 3vw, 24px)" },
+  cardPx:       { mobile: "16px", desktop: "24px",  clamp: "clamp(16px, 4vw, 24px)" },
   cardPy:       { mobile: "16px", desktop: "20px",  clamp: "clamp(16px, 2.5vw, 20px)" },
  
-  // Component gaps
-  gap:          { mobile: "12px", desktop: "20px",  clamp: "clamp(12px, 2vw, 20px)" },
+  // Component gaps — fluid
+  gap:          { mobile: "12px", desktop: "20px",  clamp: "clamp(12px, 3vw, 20px)" },
  
-  // Touch targets — minimum 44px on mobile (Apple HIG)
-  touchMin:     "44px",
+  // Touch targets — 48px for high-DPR flagships (iPhone 16, Galaxy S26)
+  touchMin:     "48px",
+ 
+  // Content max-width containment (Z Fold 6 inner display = 690px)
+  // Always pair with margin-inline: auto for centering
+  contentMaxWidth: {
+    narrow: "480px",   // questionnaire steppers, login forms, single-column
+    medium: "640px",   // product card grids (2-col on Z Fold), article content
+    wide:   "960px",   // full page containers, dashboard layouts
+  },
 } as const;
  
  

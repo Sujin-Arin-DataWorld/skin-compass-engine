@@ -489,7 +489,7 @@ export const translations = {
             ],
             expertSealTitle: "Biometrische Hautanalyse",
             expertSealSub: "ANGETRIEBEN DURCH KOREANISCHE BIOMETRISCHE DATENVERARBEITUNG — DEUTSCHLAND",
-            radarBrand: "Hautstrategie",
+            radarBrand: "Skin Strategy",
             scanInProgress: "SCAN LÄUFT",
             matchAccuracy: "Pflege-Fit: 98.4% Genauigkeit",
             progress: {

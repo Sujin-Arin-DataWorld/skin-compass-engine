@@ -42,8 +42,8 @@ function AccountSkeleton() {
             </aside>
 
             {/* Content area */}
-            <main className="flex-1 px-5 py-8 md:px-10 md:py-12">
-                <div className="max-w-2xl space-y-5">
+            <main className="flex-1" style={{ padding: 'clamp(20px, 6vw, 40px)' }}>
+                <div style={{ maxWidth: '640px' }} className="space-y-5">
                     {/* Greeting shimmer — mirrors AccountLayout greeting header */}
                     <div className="mb-8 md:mb-10 space-y-2">
                         <div className="h-1.5 w-24 rounded animate-pulse" style={goldShimmer} />

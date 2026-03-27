@@ -77,7 +77,7 @@ export default function FormulaDetail() {
             <SilkBackground />
             <Navbar />
 
-            <main className="pt-24 pb-20 px-6 md:px-10 max-w-3xl mx-auto relative z-10">
+            <main className="pt-24 pb-20 relative z-10" style={{ maxWidth: '960px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                 {/* Back Navigation */}
                 <Link
                     to="/results"

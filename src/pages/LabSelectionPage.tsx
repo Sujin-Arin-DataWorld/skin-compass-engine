@@ -273,8 +273,10 @@ export default function LabSelectionPage() {
         <div
           style={{
             maxWidth: 960,
-            margin: '0 auto',
-            padding: '32px 16px 24px',
+            marginInline: 'auto',
+            padding: 'clamp(20px, 6vw, 40px)',
+            paddingTop: 32,
+            paddingBottom: 24,
           }}
         >
           <motion.div
@@ -333,8 +335,9 @@ export default function LabSelectionPage() {
           <div
             style={{
               maxWidth: 960,
-              margin: '0 auto 28px',
-              padding: '0 16px',
+              marginInline: 'auto',
+              marginBottom: 28,
+              padding: '0 clamp(20px, 6vw, 40px)',
               display: 'flex',
               alignItems: 'center',
               gap: 8,
@@ -430,8 +433,9 @@ export default function LabSelectionPage() {
         <div
           style={{
             maxWidth: 960,
-            margin: '0 auto 24px',
-            padding: '0 16px',
+            marginInline: 'auto',
+            marginBottom: 24,
+            padding: '0 clamp(20px, 6vw, 40px)',
           }}
         >
           <GlobalGateCard />

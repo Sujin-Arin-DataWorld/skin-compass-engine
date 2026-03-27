@@ -13,7 +13,7 @@ import { useCartStore } from "@/store/cartStore";
 // ── Logo ──────────────────────────────────────────────────────────────────────
 function Logo() {
   return (
-    <Link to="/" className="flex flex-col items-start group" aria-label="Skin Strategy Lab">
+    <Link to="/" className="flex flex-col items-start group notranslate" aria-label="Skin Strategy Lab" translate="no">
       <span
         className="font-display text-[0.82rem] md:text-[1.00rem] font-light text-gray-900 dark:text-white transition-colors group-hover:text-[var(--ssl-accent-deep)] dark:group-hover:text-[var(--ssl-accent)] leading-none"
         style={{ fontFamily: "var(--font-display)", letterSpacing: "0.07em" }}

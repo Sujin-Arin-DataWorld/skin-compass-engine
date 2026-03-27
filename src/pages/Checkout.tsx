@@ -62,7 +62,7 @@ const Checkout = () => {
       <Navbar />
 
       <div className="flex min-h-screen flex-col items-center justify-start px-4 sm:px-6 pt-28 pb-16">
-        <div className="mx-auto w-full max-w-[520px]">
+        <div style={{ maxWidth: '480px', marginInline: 'auto', width: '100%' }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

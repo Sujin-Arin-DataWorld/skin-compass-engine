@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes';
 import { FOUNDATION_QUESTIONS, fqText, fqHint, optLabel } from '@/data/foundationQuestions';
 import { CityClimateInput } from '@/components/diagnosis/CityClimateInput';
 import { useI18nStore } from '@/store/i18nStore';
-import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
+import { tokens, ctaTokens, glassTokens, spacing } from '@/lib/designTokens';
 
 type Lang = 'en' | 'de' | 'ko';
 
@@ -246,7 +246,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              minHeight: 44,
+              minHeight: 48,
             }}
           >
             {tx(INTRO_COPY.back, lang)}
@@ -273,7 +273,14 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -30 }}
             transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-            className="max-w-md mx-auto w-full"
+            className="w-full rounded-2xl"
+            style={{
+              maxWidth: spacing.contentMaxWidth.narrow,
+              marginInline: 'auto',
+              background: tok.bgSurface,
+              border: `1px solid ${tok.border}`,
+              padding: '20px 16px',
+            }}
           >
             {isClimateStep ? (
               /* Climate step */
@@ -332,7 +339,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                 <h2
                   style={{
                     fontFamily: 'var(--font-display)',
-                    fontSize: '20px',
+                    fontSize: 'clamp(18px, 4vw, 22px)',
                     color: tok.text,
                     fontWeight: 400,
                     marginBottom: '6px',

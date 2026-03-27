@@ -478,7 +478,7 @@ const Datenschutz = () => {
     return (
         <div className="min-h-screen bg-background">
             <Navbar />
-            <div className="mx-auto max-w-[960px] px-6 pt-24 pb-16">
+            <div style={{ maxWidth: '960px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)', paddingTop: '96px', paddingBottom: '64px' }}>
                 <h1 className="font-display text-3xl text-foreground">{p.heading}</h1>
                 <p className="mt-2 text-xs text-muted-foreground">{p.effectiveDate}</p>
 

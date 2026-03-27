@@ -172,7 +172,7 @@ export default function About() {
 
       {/* ━━━ SECTION 2 — Logo + Pillars ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
       <section className="py-20 md:py-28 px-6" style={{ background: tok.bg }}>
-        <div className="mx-auto max-w-4xl">
+        <div style={{ maxWidth: '960px', marginInline: 'auto' }}>
           {/* Logo */}
           <motion.div {...fadeUp(0)} className="flex justify-center mb-16">
             <img
@@ -212,7 +212,7 @@ export default function About() {
                     </p>
                     <p
                       className="text-[11px] leading-relaxed whitespace-pre-line"
-                      style={{ color: tok.textTertiary, fontFamily: "var(--font-sans)" }}
+                      style={{ color: tok.textSecondary, fontFamily: "var(--font-sans)" }}
                     >
                       {pillar.label}
                     </p>
@@ -233,7 +233,7 @@ export default function About() {
             : "linear-gradient(180deg, rgba(94,139,104,0.04) 0%, transparent 100%)",
         }}
       >
-        <div className="mx-auto max-w-[680px]">
+        <div style={{ maxWidth: '640px', marginInline: 'auto' }}>
           <motion.p
             {...fadeUp(0)}
             className="text-[0.58rem] tracking-[0.35em] uppercase font-medium mb-6 text-center"

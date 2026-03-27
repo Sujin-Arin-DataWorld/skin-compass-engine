@@ -200,8 +200,9 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4"
+                  className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate"
                   style={{ color: accent, fontFamily: "var(--font-sans)" }}
+                  translate="no"
                 >
                   Skin Strategy Lab
                 </motion.p>
@@ -387,7 +388,7 @@ function ConcernSection({
     <section className="bg-stone-50 dark:bg-transparent py-20 px-5 md:px-10">
       <div className="mx-auto max-w-5xl">
         <div className="text-center mb-12">
-          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: theme.accent }}>
+          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate" style={{ color: theme.accent }} translate="no">
             Skin Strategy Lab
           </p>
           <h2
@@ -583,7 +584,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
     <section className="py-20 px-5 md:px-10 bg-white dark:bg-transparent">
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-16">
-          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
+          <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate" style={{ color: accent }} translate="no">
             Skin Strategy Lab
           </p>
           <h2
@@ -772,8 +773,9 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-5"
+          className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-5 notranslate"
           style={{ color: accent }}
+          translate="no"
         >
           Skin Strategy Lab
         </motion.p>
@@ -876,7 +878,7 @@ function Newsletter({
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="mx-auto max-w-lg text-center"
       >
-        <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4" style={{ color: accent }}>
+        <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate" style={{ color: accent }} translate="no">
           Skin Strategy Lab
         </p>
         <h2

@@ -309,7 +309,7 @@ const ZoneCard = memo(function ZoneCard({
               fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600,
               padding: '6px 12px', borderRadius: 8, border: '1px solid rgba(74,158,104,0.3)',
               background: 'rgba(74,158,104,0.08)', color: '#4A9E68', cursor: 'pointer',
-              minHeight: 44,
+              minHeight: 48,
             }}>
               {tx('collapse', lang)}
             </button>
@@ -323,7 +323,7 @@ const ZoneCard = memo(function ZoneCard({
               : (isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'),
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
             color: isExpanded ? tok.textTertiary : tok.textSecondary,
-            cursor: 'pointer', minHeight: 44,
+            cursor: 'pointer', minHeight: 48,
           }}>
             {isExpanded ? tx('collapse', lang) : tx('add_button', lang)}
           </button>

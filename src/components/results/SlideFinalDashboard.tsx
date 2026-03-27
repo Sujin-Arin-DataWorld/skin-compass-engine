@@ -654,7 +654,7 @@ function Section1MyCollection({
                     color: '#4A9E68',
                     background: 'none', border: 'none',
                     cursor: 'pointer', flexShrink: 0,
-                    padding: '10px 4px', minHeight: 44,
+                    padding: '10px 4px', minHeight: 48,
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -1329,7 +1329,7 @@ function Section2HowToStart({
           cursor: 'pointer',
           background: 'transparent',
           color: isDark ? '#48484A' : '#9CA3AF',
-          fontSize: 9, minHeight: 44,
+          fontSize: 9, minHeight: 48,
         }}>
           {tx('출시 알림 받기', 'Benachrichtigung bei Verfügbarkeit', 'Notify me when available', lang)}
         </button>
@@ -1426,7 +1426,7 @@ function Section3TrustFooter({ isBarrierEmergency, lang, isDark, onRestart }: Se
             color: isDark ? '#4A9E68' : '#3D6B4A',
             background: 'none', border: 'none',
             cursor: 'pointer',
-            minHeight: 44, padding: '10px 16px',
+            minHeight: 48, padding: '10px 16px',
             textDecoration: 'underline',
             textDecorationColor: 'transparent',
           }}

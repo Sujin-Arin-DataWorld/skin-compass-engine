@@ -331,7 +331,7 @@ function ProductCard({
               : (isDark ? '#2D6B4A' : 'linear-gradient(135deg, #6B9E76, #3D6B4A)'),
             color: '#F5F5F7',
             fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 600,
-            minHeight: 44,
+            minHeight: 48,
             transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         >
@@ -350,7 +350,7 @@ function ProductCard({
             border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
             color: isDark ? '#86868B' : '#6B7280',
             fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500,
-            minHeight: 44,
+            minHeight: 48,
             transition: 'all 0.15s',
           }}
         >

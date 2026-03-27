@@ -343,7 +343,7 @@ export default function SkinAnalysisPage() {
                   border: `1px solid ${tok.border}`,
                   fontFamily: 'var(--font-sans)',
                   fontSize: '12px',
-                  color: tok.textTertiary,
+                  color: tok.textSecondary,
                 }}
               >
                 {label}
@@ -372,7 +372,7 @@ export default function SkinAnalysisPage() {
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '11px',
-              color: tok.textTertiary,
+              color: tok.textSecondary,
             }}
           >
             {t.skinAnalysis.privacyNote}
@@ -587,7 +587,7 @@ export default function SkinAnalysisPage() {
                     style={{
                       fontFamily: 'var(--font-sans)',
                       fontSize: '11px',
-                      color: tok.textTertiary,
+                      color: tok.textSecondary,
                     }}
                   >
                     {cp.disclaimer}

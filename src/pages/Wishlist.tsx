@@ -25,7 +25,7 @@ export default function Wishlist() {
             <SilkBackground />
             <Navbar />
 
-            <main className="pt-24 pb-24 px-6 md:px-10 max-w-3xl mx-auto relative z-10">
+            <main className="pt-24 pb-24 relative z-10" style={{ maxWidth: '960px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                 <div className="flex items-center gap-3 mb-8">
                     <Heart className="w-6 h-6 text-primary" />
                     <h1 className="font-display text-2xl md:text-3xl font-light text-foreground">

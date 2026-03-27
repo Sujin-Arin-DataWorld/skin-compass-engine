@@ -18,7 +18,7 @@ import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
 import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
 import { savePendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
 import RetestReminderModal from "@/components/RetestReminderModal";
-import { tokens, ctaTokens, glassTokens, buttonTokens } from "@/lib/designTokens";
+import { tokens, ctaTokens, glassTokens, buttonTokens, spacing } from "@/lib/designTokens";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Phase = "foundation" | "scanning" | "facemap";
@@ -36,7 +36,7 @@ function pillStyle(selected: boolean, isDark: boolean): React.CSSProperties {
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
     borderRadius: 24, fontSize: 14, fontFamily: "var(--font-sans)",
-    cursor: "pointer", minHeight: 44, lineHeight: "1",
+    cursor: "pointer", minHeight: 48, lineHeight: "1",
     border: selected ? btnTok.accentGhost.border : btnTok.ghost.border,
     background: selected ? btnTok.accentGhost.background : "transparent",
     color: selected ? btnTok.accentGhost.color : tok.textSecondary,
@@ -113,7 +113,12 @@ function MobileFoundationStepper({
   };
 
   return (
-    <div style={{ padding: "0 4px", maxWidth: 440, margin: "0 auto" }}>
+    <div style={{
+      maxWidth: spacing.contentMaxWidth.narrow, marginInline: "auto",
+      background: tokens(isDark).bgSurface,
+      border: `1px solid ${tokens(isDark).border}`,
+      borderRadius: 20, padding: "20px 16px",
+    }}>
       {/* Progress bar */}
       <div style={{ display: "flex", gap: 4, marginBottom: 10 }}>
         {Array.from({ length: TOTAL_MOBILE_STEPS }).map((_, i) => (
@@ -496,8 +501,8 @@ const DiagnosisPage: React.FC = () => {
 
       {/* ── Page content ────────────────────────────────────────────────────── */}
       <div style={{
-        maxWidth: 960, margin: "0 auto",
-        padding: isMobile ? "58px 20px 120px" : "88px 24px 64px"
+        maxWidth: spacing.contentMaxWidth.wide, marginInline: "auto",
+        padding: isMobile ? `58px ${spacing.sectionPx.mobile} 120px` : `88px ${spacing.sectionPx.desktop} 64px`
       }}>
 
         {/* Progress bar */}
@@ -534,11 +539,11 @@ const DiagnosisPage: React.FC = () => {
             <motion.div key="foundation"
               initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}
               transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}>
-              <h1 style={{ fontSize: isMobile ? 20 : 32, fontWeight: 300, color: tok.accent, marginBottom: isMobile ? 2 : 6 }}>
+              <h1 style={{ fontSize: 'clamp(20px, 4vw, 32px)', fontWeight: 300, color: tok.accent, marginBottom: isMobile ? 2 : 6 }}>
                 {lang === "de" ? "Ihr Alltag & Ihre Haut" : lang === "ko" ? "일상 생활과 피부" : "Your Daily Life & Skin"}
               </h1>
               <p style={{
-                fontSize: isMobile ? 13 : 15, color: tok.textSecondary, marginBottom: isMobile ? 16 : 36,
+                fontSize: 'clamp(13px, 1.5vw, 15px)', color: tok.textSecondary, marginBottom: isMobile ? 16 : 36,
                 fontFamily: "var(--font-sans)", maxWidth: 480, lineHeight: 1.5
               }}>
                 {lang === "de" ? "Wir beginnen mit Ihrem Lebensstil — dem Fundament, das Ihre Haut täglich prägt."
@@ -574,18 +579,18 @@ const DiagnosisPage: React.FC = () => {
                       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                       style={{
-                        ...glassTok.button,
+                        ...glassTok.card,
                         borderRadius: 16, padding: "20px 16px",
                       }}>
                       <div style={{ fontSize: 24, marginBottom: 8 }}>{fq.icon}</div>
                       <div style={{
-                        fontSize: 15, color: tok.textSecondary, marginBottom: 6,
+                        fontSize: 'clamp(14px, 1.5vw, 16px)', color: tok.textSecondary, marginBottom: 6,
                         fontFamily: "var(--font-sans)", lineHeight: 1.5
                       }}>{fqText(fq, lang)}</div>
                       {fqHint(fq, lang) && (
                         <div style={{
-                          fontSize: 11, color: tok.textTertiary,
-                          fontFamily: "var(--font-sans)", lineHeight: 1.4, marginBottom: 10, fontStyle: "italic"
+                          fontSize: 'clamp(11px, 1vw, 13px)', color: tok.textSecondary,
+                          fontFamily: "var(--font-sans)", lineHeight: 1.4, marginBottom: 10, fontWeight: 500
                         }}>{fqHint(fq, lang)}</div>
                       )}
                       <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -607,7 +612,7 @@ const DiagnosisPage: React.FC = () => {
                     initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: FOUNDATION_QUESTIONS.length * 0.08, duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
                     style={{
-                      ...glassTok.button,
+                      ...glassTok.card,
                       borderRadius: 16, padding: "20px 16px",
                     }}>
                     <div style={{ fontSize: 24, marginBottom: 8 }}>🌍</div>

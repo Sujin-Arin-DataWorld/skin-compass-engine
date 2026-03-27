@@ -364,7 +364,7 @@ export default function Login() {
             <div className="min-h-screen bg-background">
                 <SilkBackground />
                 <Navbar />
-                <main className="pt-28 pb-20 px-6 max-w-md mx-auto relative z-10">
+                <main className="pt-28 pb-20 relative z-10" style={{ maxWidth: '480px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                     <motion.div
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -393,7 +393,7 @@ export default function Login() {
             <SilkBackground />
             <Navbar />
 
-            <main className="pt-28 pb-20 px-6 max-w-md mx-auto relative z-10">
+            <main className="pt-28 pb-20 relative z-10" style={{ maxWidth: '480px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                 <motion.div
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}

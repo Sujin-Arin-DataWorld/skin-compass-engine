@@ -194,7 +194,7 @@ const StickyCartBar = memo(function StickyCartBar({
             fontWeight: 600,
             letterSpacing: '0.02em',
             transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
-            minHeight: 44,
+            minHeight: 48,
           }}
         >
           {t('cart_cta', lang, { X: pricing.monthlyPrice })}

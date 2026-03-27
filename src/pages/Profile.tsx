@@ -422,7 +422,7 @@ export default function Profile() {
             <div className="min-h-screen bg-background">
                 <SilkBackground />
                 <Navbar />
-                <main className="pt-28 pb-20 px-6 max-w-md mx-auto relative z-10">
+                <main className="pt-28 pb-20 relative z-10" style={{ maxWidth: '480px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                     <div className="flex flex-col items-center gap-4">
                         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                         <p className="text-sm text-foreground/40">
@@ -439,7 +439,7 @@ export default function Profile() {
             <div className="min-h-screen bg-background">
                 <SilkBackground />
                 <Navbar />
-                <main className="pt-28 pb-20 px-6 max-w-md mx-auto relative z-10 text-center">
+                <main className="pt-28 pb-20 relative z-10 text-center" style={{ maxWidth: '480px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                     <p className="text-foreground text-lg font-semibold mb-4">{t.profileTab.pleaseLogin}</p>
                     <div className="flex gap-4 justify-center">
                         <Link to="/login" className="rounded-full border border-primary px-5 py-2 text-sm font-medium text-primary hover:bg-primary hover:text-primary-foreground transition-all">
@@ -473,7 +473,7 @@ export default function Profile() {
             <SilkBackground />
             <Navbar />
 
-            <main className="pt-28 pb-20 px-6 md:px-10 max-w-3xl mx-auto relative z-10">
+            <main className="pt-28 pb-20 relative z-10" style={{ maxWidth: '960px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                 {/* Header */}
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
                     <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-2">{t.profile}</p>

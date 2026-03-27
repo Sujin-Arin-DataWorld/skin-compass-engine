@@ -660,7 +660,7 @@ function InlineQuestionRenderer({
     display: "inline-flex", alignItems: "center",
     padding: "10px 18px", margin: "4px 5px 4px 0",
     borderRadius: 24, fontSize: 13, fontFamily: "var(--font-sans)",
-    cursor: "pointer", minHeight: 44, lineHeight: "1.2",
+    cursor: "pointer", minHeight: 48, lineHeight: "1.2",
     border: sel ? `1px solid ${GOLD}` : `1px solid ${isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)"}`,
     background: sel ? (isDark ? "rgba(45,107,74,0.15)" : "rgba(122,162,115,0.15)") : isDark ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.02)",
     color: sel ? GOLD : isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.7)",

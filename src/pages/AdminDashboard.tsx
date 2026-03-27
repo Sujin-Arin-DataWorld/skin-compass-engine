@@ -187,7 +187,7 @@ export default function AdminDashboard() {
             <SilkBackground />
             <Navbar />
 
-            <main className="pt-28 pb-20 px-6 md:px-10 max-w-5xl mx-auto relative z-10">
+            <main className="pt-28 pb-20 relative z-10" style={{ maxWidth: '960px', marginInline: 'auto', padding: 'clamp(20px, 6vw, 40px)' }}>
                 <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
                     <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-2">Admin Dashboard</p>
                     <h1 className="font-display text-foreground mb-8" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem)", fontWeight: 300 }}>

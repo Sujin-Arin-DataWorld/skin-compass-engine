@@ -32,7 +32,18 @@ export async function analyzeSkinImage(
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.access_token) {
-      authToken = session.access_token;
+      // Validate token hasn't expired (JWT exp is in seconds)
+      try {
+        const payload = JSON.parse(atob(session.access_token.split('.')[1]));
+        const nowSec = Math.floor(Date.now() / 1000);
+        if (payload.exp && payload.exp > nowSec + 30) {
+          // Token valid for at least 30 more seconds
+          authToken = session.access_token;
+        }
+        // else: token expired or about to expire — use anon key
+      } catch {
+        // Malformed token — use anon key
+      }
     }
   } catch {
     // Fall back to anon key — analysis still works for anonymous users
@@ -47,29 +58,36 @@ export async function analyzeSkinImage(
       body.language = language;
     }
 
-    const requestInit: RequestInit = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    };
+    const makeRequest = (token: string): Promise<Response> =>
+      fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
 
     // [PWA-FIX] Single automatic retry on transient network drop (TypeError: Failed to fetch).
     // Waits 1 000ms before the second attempt. AbortController timeout remains active across both.
     let res: Response;
     try {
-      res = await fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, requestInit);
+      res = await makeRequest(authToken);
     } catch (fetchErr) {
       if (fetchErr instanceof TypeError) {
         // Network drop — wait 1s then retry once
         await new Promise<void>((r) => setTimeout(r, 1_000));
-        res = await fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, requestInit);
+        res = await makeRequest(authToken);
       } else {
         throw fetchErr;
       }
+    }
+
+    // [AUTH-FIX] If 401 and we used a user token, retry with anon key
+    if (res.status === 401 && authToken !== SUPABASE_ANON_KEY) {
+      console.warn('[SkinAnalysis] Auth token rejected (401), retrying with anon key...');
+      res = await makeRequest(SUPABASE_ANON_KEY);
     }
 
     clearTimeout(timeoutId);

@@ -204,24 +204,19 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   style={{ color: accent, fontFamily: "var(--font-sans)" }}
                   translate="no"
                 >
-                  Skin Strategy Lab
+                  S<span>k</span>in S<span>t</span>rategy L<span>a</span>b
                 </motion.p>
                 <motion.h1
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
                   transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className={`text-white ${(i === 0 || i === 1) ? 'text-[34px]' : 'text-4xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-5' : 'mb-3 md:mb-5'} font-light break-keep`}
+                  className={`text-white ${(i === 0 || i === 1) ? 'text-[34px]' : 'text-4xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-5' : 'mb-3 md:mb-5'} font-light`}
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {allSlides[i]?.headline?.split('\n').map((line, idx, arr) => (
                     <span key={idx}>
                       {line}
-                      {idx < arr.length - 1 && (
-                        <>
-                          <br className="hidden md:block" />
-                          <span className="md:hidden"> </span>
-                        </>
-                      )}
+                      {idx < arr.length - 1 && <br />}
                     </span>
                   ))}
                 </motion.h1>
@@ -389,7 +384,7 @@ function ConcernSection({
       <div className="mx-auto max-w-5xl">
         <div className="text-center mb-12">
           <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate" style={{ color: theme.accent }} translate="no">
-            Skin Strategy Lab
+            S<span>k</span>in S<span>t</span>rategy L<span>a</span>b
           </p>
           <h2
             className="text-2xl md:text-3xl font-light mb-4"
@@ -585,7 +580,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
       <div className="mx-auto max-w-6xl">
         <div className="text-center mb-16">
           <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate" style={{ color: accent }} translate="no">
-            Skin Strategy Lab
+            S<span>k</span>in S<span>t</span>rategy L<span>a</span>b
           </p>
           <h2
             className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"
@@ -777,17 +772,22 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
           style={{ color: accent }}
           translate="no"
         >
-          Skin Strategy Lab
+          S<span>k</span>in S<span>t</span>rategy L<span>a</span>b
         </motion.p>
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          className="text-white text-4xl md:text-5xl font-light mb-5 leading-tight whitespace-nowrap break-keep"
+          className="text-white text-4xl md:text-5xl font-light mb-5 leading-tight"
           style={{ fontFamily: "var(--font-display)" }}
         >
-          {headline}
+          {headline.split('\n').map((line, idx, arr) => (
+            <span key={idx}>
+              {line}
+              {idx < arr.length - 1 && <br />}
+            </span>
+          ))}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 10 }}
@@ -879,7 +879,7 @@ function Newsletter({
         className="mx-auto max-w-lg text-center"
       >
         <p className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate" style={{ color: accent }} translate="no">
-          Skin Strategy Lab
+          S<span>k</span>in S<span>t</span>rategy L<span>a</span>b
         </p>
         <h2
           className="text-2xl md:text-3xl font-light text-gray-900 dark:text-gray-100 mb-4"

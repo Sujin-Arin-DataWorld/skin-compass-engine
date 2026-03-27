@@ -11,8 +11,8 @@ import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
 import { brand, glass } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
-import ProductRecommendationCard from './ProductRecommendationCard';
-import { PRODUCT_RULES, AXIS_KO_SHORT } from '@/data/productRules';
+import ProductImage from '@/components/product/ProductImage';
+import { getRecommendedProducts, AXIS_KO_SHORT } from '@/data/productRules';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO } from '@/engine/types';
 import type { AxisKey, AxisScores, AxisSeverity } from '@/engine/types';
@@ -53,67 +53,41 @@ function getScoreTier(score: number): ScoreTier {
 }
 
 const TIER_COLORS: Record<ScoreTier, string> = {
-  excellent: '#4A9E68',  // Forest green
-  good:      '#87B6BC',  // Teal
-  attention: '#C9A96E',  // Gold
-  critical:  '#CF6679',  // Soft rose
+  excellent: '#4ECDC4',  // Neon mint
+  good:      '#8a9a7b',  // Sage
+  attention: '#c4a265',  // Gold
+  critical:  '#E8A87C',  // Muted coral
 };
 
 const TIER_MESSAGES: Record<ScoreTier, Record<string, string>> = {
   excellent: {
-    ko: '피부 상태가 매우 건강합니다',
-    en: 'Your skin is in excellent condition',
-    de: 'Ihre Haut ist in hervorragendem Zustand',
+    ko: '피부 상태가 매우 좋습니다! 현재 루틴을 유지하세요.',
+    en: 'Your skin is in excellent condition! Keep your current routine.',
+    de: 'Ihre Haut ist in ausgezeichnetem Zustand! Behalten Sie Ihre Routine bei.',
   },
   good: {
-    ko: '전반적으로 양호한 피부입니다',
-    en: 'Your skin is in good shape overall',
-    de: 'Ihre Haut ist insgesamt in gutem Zustand',
+    ko: '전반적으로 양호합니다. 몇 가지 포인트 케어로 더 좋아질 수 있어요.',
+    en: 'Overall good condition. Targeted care can make it even better.',
+    de: 'Insgesamt guter Zustand. Gezielte Pflege kann ihn noch verbessern.',
   },
   attention: {
-    ko: '지금이 케어 골든타임이에요',
-    en: 'Now is the golden time for care',
-    de: 'Jetzt ist die goldene Zeit für Pflege',
+    ko: '지금이 케어 골든타임이에요 — 맞춤 솔루션을 준비했습니다.',
+    en: "Now is the golden time for care — we've prepared solutions for you.",
+    de: 'Jetzt ist die goldene Zeit für Pflege — wir haben Lösungen für Sie.',
   },
   critical: {
-    ko: '집중 케어가 필요한 시점입니다',
-    en: 'Your skin needs focused care',
-    de: 'Ihre Haut braucht intensive Pflege',
+    ko: '집중 케어가 필요합니다. 아래 맞춤 루틴을 확인해 주세요.',
+    en: 'Intensive care is needed. Please check your customized routine below.',
+    de: 'Intensive Pflege ist nötig. Bitte prüfen Sie Ihre Routine unten.',
   },
 };
 
-// ── Severity badge system ──────────────────────────────────────────────────
-type SeverityTier = 'excellent' | 'good' | 'normal' | 'attention' | 'critical';
-
-function getSeverityTier(sev: number): SeverityTier {
-  if (sev <= 20) return 'excellent';
-  if (sev <= 40) return 'good';
-  if (sev <= 55) return 'normal';
-  if (sev <= 75) return 'attention';
-  return 'critical';
-}
-
-const SEV_BADGE_COLORS: Record<SeverityTier, string> = {
-  excellent: '#4A9E68',
-  good:      '#4A9E68',
-  normal:    '#C9A96E',
-  attention: '#E8A87C',
-  critical:  '#CF6679',
-};
-
-const SEV_BADGE_LABELS: Record<SeverityTier, Record<string, string>> = {
-  excellent: { ko: '매우 좋음', en: 'Excellent', de: 'Hervorragend' },
-  good:      { ko: '양호', en: 'Good', de: 'Optimal' },
-  normal:    { ko: '보통', en: 'Normal', de: 'Normal' },
-  attention: { ko: '관리 필요', en: 'Needs care', de: 'Pflege nötig' },
-  critical:  { ko: '집중 케어', en: 'Critical', de: 'Intensive Pflege' },
-};
-
-// ── Gauge Bar labels ───────────────────────────────────────────────────────
-const GAUGE_LABELS = {
-  ko: ['좋음', '보통', '주의'],
-  en: ['Good', 'Fair', 'Concern'],
-  de: ['Optimal', 'Mäßig', 'Pflegebedarf'],
+// ── Tier labels (i18n) ────────────────────────────────────────────────────
+const TIER_LABELS: Record<ScoreTier, Record<string, string>> = {
+  excellent: { ko: '우수', en: 'Excellent', de: 'Ausgezeichnet' },
+  good:      { ko: '양호', en: 'Good', de: 'Gut' },
+  attention: { ko: '보통', en: 'Fair', de: 'Mäßig' },
+  critical:  { ko: '주의', en: 'Needs Care', de: 'Pflegebedarf' },
 };
 
 // ── Axis label helper ──────────────────────────────────────────────────────
@@ -185,48 +159,11 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
   );
 }
 
-// ── 3-Tier Gauge Bar ───────────────────────────────────────────────────────
-function GaugeBar({ severity, lang }: { severity: number; lang: string }) {
-  const labels = GAUGE_LABELS[lang as keyof typeof GAUGE_LABELS] ?? GAUGE_LABELS.en;
-
-  return (
-    <div className="mt-3">
-      {/* Gauge track with 3 segments */}
-      <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-        {/* Colored segments */}
-        <div className="absolute inset-0 flex">
-          <div style={{ flex: 1, background: 'rgba(74,158,104,0.35)' }} />
-          <div style={{ flex: 1, background: 'rgba(201,169,110,0.35)', borderLeft: '1px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.1)' }} />
-          <div style={{ flex: 1, background: 'rgba(232,168,124,0.35)' }} />
-        </div>
-        {/* Marker */}
-        <motion.div
-          className="absolute top-0 h-full w-1 rounded-full"
-          style={{
-            background: severity <= 35 ? '#4A9E68' : severity <= 65 ? '#C9A96E' : '#E8A87C',
-            boxShadow: `0 0 8px ${severity <= 35 ? 'rgba(74,158,104,0.6)' : severity <= 65 ? 'rgba(201,169,110,0.6)' : 'rgba(232,168,124,0.6)'}`,
-          }}
-          initial={{ left: '0%' }}
-          animate={{ left: `calc(${Math.min(Math.max(severity, 2), 98)}% - 2px)` }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-        />
-      </div>
-      {/* Segment labels */}
-      <div className="flex mt-1.5">
-        {labels.map((label, i) => (
-          <span key={i} className="flex-1 text-center notranslate" translate="no" style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-sans)' }}>
-            {label}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // ── Accordion Axis Row ─────────────────────────────────────────────────────
-function AxisAccordion({ axisKey, score, severity, label, badge, badgeColor, reason, lang }: {
-  axisKey: string; score: number; severity: number; label: string;
-  badge: string; badgeColor: string; reason: string; lang: string;
+function AxisAccordion({ healthScore, label, badge, badgeColor, reason }: {
+  healthScore: number; label: string;
+  badge: string; badgeColor: string; reason: string;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -244,15 +181,19 @@ function AxisAccordion({ axisKey, score, severity, label, badge, badgeColor, rea
           {label}
         </span>
 
-        {/* Mini gauge */}
-        <div className="w-16 h-1.5 rounded-full overflow-hidden flex" style={{ background: 'rgba(255,255,255,0.06)' }}>
-          <div style={{ flex: 1, background: 'rgba(74,158,104,0.3)' }} />
-          <div style={{ flex: 1, background: 'rgba(201,169,110,0.3)' }} />
-          <div style={{ flex: 1, background: 'rgba(232,168,124,0.3)' }} />
+        {/* Progress bar — proportional to healthScore */}
+        <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <motion.div
+            className="h-full rounded-full"
+            style={{ backgroundColor: badgeColor }}
+            initial={{ width: 0 }}
+            animate={{ width: `${Math.max(healthScore, 4)}%` }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          />
         </div>
 
         <span style={{ fontSize: '15px', fontFamily: 'var(--font-numeric)', fontWeight: 700, color: '#F5F5F7', width: '28px', textAlign: 'right' }}>
-          {score}
+          {healthScore}
         </span>
 
         {/* Badge */}
@@ -286,10 +227,11 @@ function AxisAccordion({ axisKey, score, severity, label, badge, badgeColor, rea
             className="overflow-hidden"
           >
             <div className="px-4 pb-4">
-              <GaugeBar severity={severity} lang={lang} />
-              <p className="mt-3" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', lineHeight: 1.6 }}>
-                {reason}
-              </p>
+              {reason && (
+                <p style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', lineHeight: 1.6 }}>
+                  {reason}
+                </p>
+              )}
             </div>
           </motion.div>
         )}
@@ -340,7 +282,8 @@ export default function AnalysisResults({
   const sortedAxes = useMemo(() => {
     const entries = (Object.keys(scores) as (keyof SkinAxisScores)[]).map(key => ({
       key,
-      score: scores[key],
+      rawScore: scores[key],
+      healthScore: toHealthScore(key, scores[key]),
       severity: getSeverity(key, scores[key]),
     }));
     return entries.sort((a, b) => b.severity - a.severity);
@@ -355,11 +298,9 @@ export default function AnalysisResults({
     [apiReasons, scores, lang],
   );
 
-  // ── Product rules ────────────────────────────────────────────────────────
+  // ── Product recommendations (from real DB) ────────────────────────────────
   const matchedProducts = useMemo(() =>
-    PRODUCT_RULES.filter(r => r.triggerCondition(scores))
-      .sort((a, b) => a.priority - b.priority)
-      .slice(0, 3),
+    getRecommendedProducts(scores, 5),
     [scores],
   );
 
@@ -390,7 +331,11 @@ export default function AnalysisResults({
     navigate('/results');
   }, [scores, setResult, navigate]);
 
-  const handleSave = useCallback(() => {
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+
+  const handleSave = useCallback(async () => {
+    if (saveStatus === 'saved') return; // already saved
+
     if (!isLoggedIn) {
       try {
         sessionStorage.setItem('ssl_pending_analysis', JSON.stringify({
@@ -398,8 +343,34 @@ export default function AnalysisResults({
         }));
       } catch (e) { console.warn('[AnalysisResults] Failed to save:', e); }
       navigate('/login?redirect=/skin-analysis');
+      return;
     }
-  }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate]);
+
+    // Logged in — save to Supabase
+    setSaveStatus('saving');
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user');
+
+      // Use rpc or direct fetch to avoid generated type constraints
+      const { error } = await (supabase as any)
+        .from('diagnosis_history')
+        .insert({
+          user_id: user.id,
+          analysis_id: analysisId,
+          scores: scores as unknown as Record<string, number>,
+          source: 'ai_photo_analysis',
+          created_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
+      setSaveStatus('saved');
+    } catch (err) {
+      console.error('[Save] Failed:', err);
+      setSaveStatus('idle');
+    }
+  }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate, saveStatus]);
 
   const resetDiagnosisStore = useDiagnosisStore((s) => s.reset);
 
@@ -415,7 +386,7 @@ export default function AnalysisResults({
   // RENDER
   // ═══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-dvh w-full overflow-y-auto pb-32" style={{ background: '#0A0A0A', color: '#F5F5F7' }}>
+    <div className="min-h-dvh w-full overflow-y-auto pb-32" style={{ background: '#0A0A0A', color: '#F5F5F7', overscrollBehavior: 'contain', touchAction: 'pan-y' }}>
 
       {/* ── SECTION 1: Photo Hero + Overall Score ──────────────────────────── */}
       <div className="relative w-full" style={{ minHeight: capturedImage ? '380px' : '200px' }}>
@@ -474,9 +445,9 @@ export default function AnalysisResults({
 
             {/* Top 3 concern pills */}
             <div className="flex flex-wrap gap-2 mt-4 justify-center">
-              {top3.map(({ key, severity }) => {
-                const sevTier = getSeverityTier(severity);
-                const color = SEV_BADGE_COLORS[sevTier];
+              {top3.map(({ key, healthScore }) => {
+                const pillTier = getScoreTier(healthScore);
+                const color = TIER_COLORS[pillTier];
                 return (
                   <span
                     key={key}
@@ -490,7 +461,7 @@ export default function AnalysisResults({
                       border: `1px solid ${color}30`,
                     }}
                   >
-                    {getAxisLabel(key, lang)} {Math.round(severity)}
+                    {getAxisLabel(key, lang)} {healthScore}
                   </span>
                 );
               })}
@@ -508,9 +479,9 @@ export default function AnalysisResults({
             {TX.topConcerns[lang]}
           </p>
           <div className="flex flex-col gap-3">
-            {top3.map(({ key, score, severity }, i) => {
-              const sevTier = getSeverityTier(severity);
-              const badgeColor = SEV_BADGE_COLORS[sevTier];
+            {top3.map(({ key, healthScore }, i) => {
+              const cardTier = getScoreTier(healthScore);
+              const badgeColor = TIER_COLORS[cardTier];
               const label = getAxisLabel(key, lang);
               const reason = reasons[key] ?? '';
 
@@ -537,7 +508,8 @@ export default function AnalysisResults({
                         {label}
                       </span>
                       <span
-                        className="rounded-full px-2.5 py-0.5"
+                        className="rounded-full px-2.5 py-0.5 notranslate"
+                        translate="no"
                         style={{
                           fontSize: '10px',
                           fontFamily: 'var(--font-sans)',
@@ -547,16 +519,24 @@ export default function AnalysisResults({
                           border: `1px solid ${badgeColor}30`,
                         }}
                       >
-                        {SEV_BADGE_LABELS[sevTier][lang]}
+                        {TIER_LABELS[cardTier][lang]}
                       </span>
                     </div>
                     <span style={{ fontSize: '22px', fontFamily: 'var(--font-numeric)', fontWeight: 700, color: badgeColor }}>
-                      {score}
+                      {healthScore}
                     </span>
                   </div>
 
-                  {/* Gauge bar */}
-                  <GaugeBar severity={severity} lang={lang} />
+                  {/* Progress bar — proportional to healthScore */}
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <motion.div
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: badgeColor }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${Math.max(healthScore, 4)}%` }}
+                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+                    />
+                  </div>
 
                   {/* AI Reason */}
                   {reason && (
@@ -576,19 +556,16 @@ export default function AnalysisResults({
             {TX.allAxes[lang]}
           </p>
           <div className="flex flex-col gap-2">
-            {rest.map(({ key, score, severity }) => {
-              const sevTier = getSeverityTier(severity);
+            {rest.map(({ key, healthScore }) => {
+              const accTier = getScoreTier(healthScore);
               return (
                 <AxisAccordion
                   key={key}
-                  axisKey={key}
-                  score={score}
-                  severity={severity}
+                  healthScore={healthScore}
                   label={getAxisLabel(key, lang)}
-                  badge={SEV_BADGE_LABELS[sevTier][lang]}
-                  badgeColor={SEV_BADGE_COLORS[sevTier]}
+                  badge={TIER_LABELS[accTier][lang]}
+                  badgeColor={TIER_COLORS[accTier]}
                   reason={reasons[key] ?? ''}
-                  lang={lang}
                 />
               );
             })}
@@ -607,9 +584,44 @@ export default function AnalysisResults({
           )}
           {matchedProducts.length > 0 ? (
             <div className="flex flex-col gap-3">
-              {matchedProducts.map(rule => (
-                <ProductRecommendationCard key={rule.productId} rule={rule} scores={scores} />
-              ))}
+              {matchedProducts.map((product, i) => {
+                const pName = lang === 'ko' ? product.name.ko : lang === 'de' ? product.name.de : product.name.en;
+                const pOneLiner = lang === 'ko' ? product.oneLiner.ko : lang === 'de' ? product.oneLiner.de : product.oneLiner.en;
+                return (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    className="flex gap-3 rounded-2xl p-4"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+                  >
+                    <ProductImage productId={product.id} name={pName} />
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <p style={{ fontSize: '14px', fontFamily: 'var(--font-sans)', fontWeight: 500, color: 'rgba(255,255,255,0.9)', lineHeight: 1.4 }}>
+                        {pName}
+                      </p>
+                      <p style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>
+                        {product.brand} · €{product.priceEur.toFixed(2)}
+                      </p>
+                      {pOneLiner && (
+                        <p className="mt-1" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: 'rgba(255,255,255,0.5)', lineHeight: 1.4 }}>
+                          {pOneLiner}
+                        </p>
+                      )}
+                      {/* Target axis badges */}
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {product.targetAxes.slice(0, 3).map(axis => (
+                          <span key={axis} className="rounded-full px-2 py-0.5" style={{ fontSize: '10px', fontFamily: 'var(--font-sans)', background: 'rgba(196,162,101,0.12)', border: '1px solid rgba(196,162,101,0.25)', color: '#c4a265' }}>
+                            {AXIS_KO_SHORT[axis] ?? axis}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           ) : (
             <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(74,158,104,0.06)', border: '1px solid rgba(74,158,104,0.15)' }}>
@@ -618,60 +630,44 @@ export default function AnalysisResults({
               </p>
             </div>
           )}
+
+          {/* Single CTA: View full routine */}
+          <button
+            onClick={handleNavigateToLab}
+            className="w-full mt-4 rounded-xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(138,154,123,0.12)', border: '1px solid rgba(138,154,123,0.25)', color: '#8a9a7b', fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500 }}
+          >
+            {TX.viewRoutine[lang]}
+            <ChevronRight size={14} />
+          </button>
         </motion.div>
 
         {/* ── SECTION 5: Action Buttons ─────────────────────────────────────── */}
-        <motion.div custom={8} variants={fadeUp} initial="hidden" animate="visible" className="mt-8 flex flex-col gap-3">
-          {/* Primary CTA */}
+        <motion.div custom={8} variants={fadeUp} initial="hidden" animate="visible" className="mt-6 flex gap-3">
           <button
-            onClick={handleNavigateToLab}
-            className="w-full rounded-2xl py-4 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            onClick={handleRetake}
+            className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', color: '#86868B', fontFamily: 'var(--font-sans)', fontSize: '14px' }}
+          >
+            <RotateCcw size={14} />
+            {TX.retake[lang]}
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saveStatus === 'saving'}
+            className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             style={{
-              background: '#2D6B4A',
-              color: '#F5F5F7',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '15px',
-              fontWeight: 600,
-              boxShadow: '0 4px 20px rgba(45,107,74,0.20)',
+              background: saveStatus === 'saved' ? 'rgba(138,154,123,0.1)' : 'rgba(255,255,255,0.03)',
+              border: saveStatus === 'saved' ? '1px solid rgba(138,154,123,0.3)' : '1px solid rgba(255,255,255,0.06)',
+              backdropFilter: 'blur(12px)',
+              color: saveStatus === 'saved' ? '#8a9a7b' : isLoggedIn ? '#86868B' : '#c4a265',
+              fontFamily: 'var(--font-sans)', fontSize: '14px',
+              opacity: saveStatus === 'saving' ? 0.6 : 1,
             }}
           >
-            {TX.viewRoutine[lang]}
-            <ChevronRight size={16} />
+            <Save size={14} />
+            {saveStatus === 'saved' ? TX.saved[lang] : TX.save[lang]}
           </button>
-
-          {/* Secondary actions */}
-          <div className="flex gap-3">
-            <button
-              onClick={handleRetake}
-              className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-              style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(12px)',
-                color: '#86868B',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '14px',
-              }}
-            >
-              <RotateCcw size={14} />
-              {TX.retake[lang]}
-            </button>
-            <button
-              onClick={handleSave}
-              className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-              style={{
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                backdropFilter: 'blur(12px)',
-                color: isLoggedIn ? '#86868B' : '#C9A96E',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '14px',
-              }}
-            >
-              <Save size={14} />
-              {isLoggedIn ? TX.saved[lang] : TX.save[lang]}
-            </button>
-          </div>
         </motion.div>
 
         {/* ── SECTION 6: Feedback (bottom) ──────────────────────────────────── */}

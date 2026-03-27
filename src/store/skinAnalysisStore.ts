@@ -133,9 +133,17 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
           localStorage.removeItem(name);
         },
       },
-      // Only persist the history array — all other state is ephemeral per-session
+      // Persist analysis results so they survive app switch / tab reload
+      // CRITICAL: capturedImageBase64 is NEVER persisted (too large for localStorage)
+      // CRITICAL: 'analyzing' state → 'idle' to prevent infinite loading on return
       partialize: (state) => ({
         analysisHistory: state.analysisHistory,
+        scores: state.scores,
+        reasons: state.reasons,
+        scoreSource: state.scoreSource,
+        analysisId: state.analysisId,
+        currentStep: state.currentStep === 'analyzing' ? 'idle' : state.currentStep,
+        feedbackGiven: state.feedbackGiven,
       }) as SkinAnalysisState,
     },
   ),

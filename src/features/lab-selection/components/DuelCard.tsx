@@ -16,6 +16,7 @@ import { calculateMatchScore } from '../data/axisIngredientMap';
 import type { FaceZone, SkinProfile, RequiredIngredient, PriceTier, Product } from '../types';
 import type { Product as EngineProduct } from '@/engine/types';
 import CompatibilityBadge from '@/components/product/CompatibilityBadge';
+import ProductImage from '@/components/product/ProductImage';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -240,24 +241,30 @@ function ProductCard({
         </div>
       )}
 
-      {/* Flag + brand */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: isBestMatch ? 4 : 0 }}>
-        <span style={{ fontSize: 16 }}>{product.country === 'KR' ? '🇰🇷' : '🇩🇪'}</span>
-        <span style={{
-          fontSize: 'clamp(0.5625rem, 0.7vw, 0.625rem)', fontWeight: 700,
-          letterSpacing: '0.1em', textTransform: 'uppercase',
-          color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
-        }}>
-          {product.brand}
-        </span>
-      </div>
+      {/* Product image + brand row */}
+      <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginTop: isBestMatch ? 4 : 0 }}>
+        <ProductImage productId={product.id} name={name} size="sm" />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Flag + brand */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 16 }}>{product.country === 'KR' ? '🇰🇷' : '🇩🇪'}</span>
+            <span style={{
+              fontSize: 'clamp(0.5625rem, 0.7vw, 0.625rem)', fontWeight: 700,
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              color: isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
+            }}>
+              {product.brand}
+            </span>
+          </div>
 
-      {/* Product name */}
-      <p style={{
-        fontSize: 'clamp(0.8125rem, 1.2vw, 0.9375rem)', fontWeight: 600,
-        color: isDark ? '#F5F5F7' : '#1B2838',
-        margin: 0, lineHeight: 1.3,
-      }}>{name}</p>
+          {/* Product name */}
+          <p style={{
+            fontSize: 'clamp(0.8125rem, 1.2vw, 0.9375rem)', fontWeight: 600,
+            color: isDark ? '#F5F5F7' : '#1B2838',
+            margin: '4px 0 0 0', lineHeight: 1.3,
+          }}>{name}</p>
+        </div>
+      </div>
 
       {/* Match score + progress bar */}
       <div>

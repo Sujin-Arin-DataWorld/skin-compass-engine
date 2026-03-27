@@ -12,6 +12,7 @@ import type { Address } from "@/store/authStore";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
+import ProductImage from "@/components/product/ProductImage";
 import { useTheme } from "next-themes";
 import { Moon, Sun, Globe } from "lucide-react";
 
@@ -94,10 +95,18 @@ function SkinProgressTab() {
                         )}
                     </div>
                 ) : (
-                    <p className="text-sm text-foreground/40 italic py-10">
-                        {t.noDiagnosis}{" "}
-                        <Link to="/diagnosis" className="text-primary hover:underline">{t.startNow}</Link>
-                    </p>
+                    <div className="flex flex-col items-center py-6 gap-3">
+                        <p className="text-sm text-foreground/40">
+                            {language === 'ko' ? '아직 피부 분석 기록이 없어요' : language === 'de' ? 'Noch keine Hautanalyse vorhanden' : 'No skin analysis yet'}
+                        </p>
+                        <Link
+                            to="/skin-analysis"
+                            className="rounded-xl px-5 py-2.5 text-sm font-medium transition-all"
+                            style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--primary))' }}
+                        >
+                            {language === 'ko' ? 'AI 피부 분석 시작 →' : language === 'de' ? 'KI-Hautanalyse starten →' : 'Start AI Analysis →'}
+                        </Link>
+                    </div>
                 )}
             </div>
 
@@ -114,8 +123,8 @@ function SkinProgressTab() {
                                 to={`/formula/${product.id}`}
                                 className="flex items-center gap-4 rounded-xl border border-border/50 p-3 hover:border-primary/30 transition-colors group"
                             >
-                                <div className="w-11 h-11 bg-gray-50 dark:bg-white/5 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <span className="text-lg opacity-40">🧴</span>
+                                <div className="w-11 h-11 flex-shrink-0">
+                                    <ProductImage productId={product.id} name={product.name?.en ?? product.brand ?? '?'} size="sm" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-[0.6rem] font-bold tracking-widest uppercase text-primary">{product.brand}</p>

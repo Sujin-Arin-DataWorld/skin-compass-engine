@@ -205,6 +205,45 @@ export default function SkinAnalysisPage() {
     };
   }, [language]);
 
+  // ── Sprint 3.2: Overscroll prevention + browser history for result step ────
+  useEffect(() => {
+    if (currentStep === 'result') {
+      // Prevent iOS bounce scroll from triggering back navigation
+      document.body.style.overscrollBehavior = 'none';
+      // Push a history entry so the back button returns to idle, not away
+      window.history.pushState({ step: 'result' }, '', '/skin-analysis');
+      return () => {
+        document.body.style.overscrollBehavior = 'auto';
+      };
+    }
+  }, [currentStep]);
+
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (currentStep === 'result') {
+        // User pressed back from results → reset to idle
+        resetAnalysis();
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentStep, resetAnalysis]);
+
+  // ── Sprint 3.3: Analyzing timeout (60s) — prevent infinite loading ─────────
+  useEffect(() => {
+    if (currentStep === 'analyzing') {
+      const timeout = setTimeout(() => {
+        console.error('[Analysis] Timeout — 60s exceeded');
+        setError(
+          language === 'ko' ? '분석 시간이 초과되었습니다. 다시 시도해 주세요.'
+          : language === 'de' ? 'Analyse-Zeitüberschreitung. Bitte versuchen Sie es erneut.'
+          : 'Analysis timed out. Please try again.'
+        );
+      }, 60_000);
+      return () => clearTimeout(timeout);
+    }
+  }, [currentStep, setError, language]);
+
   // ── Camera captured an image ──────────────────────────────────────────────
   const handleCapture = useCallback(
     async (base64: string) => {
@@ -268,6 +307,8 @@ export default function SkinAnalysisPage() {
 
   const handleRetake = useCallback(() => {
     resetAnalysis();
+    // Clear persisted analysis state to prevent stale 'analyzing' restoration
+    try { localStorage.removeItem('skin-analysis-store'); } catch { /* ignore */ }
     setStep('camera');
   }, [resetAnalysis, setStep]);
 

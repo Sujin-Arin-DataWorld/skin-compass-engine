@@ -1,9 +1,11 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // src/components/hero/AIScanOverlay.tsx
-// Metric chips + zone callouts only (face grid, scan line, brackets removed)
+// Metric chips + zone callouts + scan line + corner brackets
+// Uses AiScanBadge for premium count-up metric display
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { motion } from 'framer-motion';
+import { AiScanBadge } from './AiScanBadge';
 
 export default function AIScanOverlay() {
   return (
@@ -21,49 +23,19 @@ export default function AIScanOverlay() {
         }}
       />
 
-      {/* ── Metric Chips ── */}
-      {/* LEFT CHIPS (HYD, BAR, PIG) */}
+      {/* ── Metric Badges (AiScanBadge) ── */}
+      {/* LEFT BADGES (HYD, BAR, PIG) */}
       <div className="absolute top-[12%] md:top-[15%] left-[4%] md:left-[12%] flex flex-col gap-2 md:gap-2.5">
-        {([
-          { key: 'HYD', score: 72, color: '#4A9E68', border: 'rgba(74,158,104,0.3)' },
-          { key: 'BAR', score: 85, color: '#E24B4A', border: 'rgba(226,75,74,0.3)' },
-          { key: 'PIG', score: 51, color: '#BA7517', border: 'rgba(186,117,23,0.3)' },
-        ] as const).map((chip, i) => (
-          <motion.div
-            key={chip.key}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.8 + i * 0.15, duration: 0.5 }}
-            className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-md bg-black/65 backdrop-blur-md border"
-            style={{ borderColor: chip.border }}
-          >
-            <span className="text-[10px] md:text-[11px] font-mono text-white/85 tracking-wider">
-              {chip.key} <span style={{ color: chip.color }}>{chip.score}</span>
-            </span>
-          </motion.div>
-        ))}
+        <AiScanBadge axis="HYD" score={72} position="left" delay={0.8} />
+        <AiScanBadge axis="BAR" score={85} position="left" delay={0.95} />
+        <AiScanBadge axis="PIG" score={51} position="left" delay={1.1} />
       </div>
 
-      {/* RIGHT CHIPS (SEB, AGE, TEX) */}
+      {/* RIGHT BADGES (SEB, AGE, TEX) */}
       <div className="absolute top-[12%] md:top-[15%] right-[2%] md:right-[12%] flex flex-col gap-2 md:gap-2.5 items-end">
-        {([
-          { key: 'SEB', score: 38, color: '#BA7517', border: 'rgba(186,117,23,0.3)' },
-          { key: 'AGE', score: 24, color: '#4A9E68', border: 'rgba(74,158,104,0.3)' },
-          { key: 'TEX', score: 42, color: '#378ADD', border: 'rgba(55,138,221,0.3)' },
-        ] as const).map((chip, i) => (
-          <motion.div
-            key={chip.key}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.9 + i * 0.15, duration: 0.5 }}
-            className="flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 rounded-md bg-black/65 backdrop-blur-md border"
-            style={{ borderColor: chip.border }}
-          >
-            <span className="text-[10px] md:text-[11px] font-mono text-white/85 tracking-wider">
-              {chip.key} <span style={{ color: chip.color }}>{chip.score}</span>
-            </span>
-          </motion.div>
-        ))}
+        <AiScanBadge axis="SEB" score={38} position="right" delay={0.9} />
+        <AiScanBadge axis="AGE" score={24} position="right" delay={1.05} />
+        <AiScanBadge axis="TEX" score={42} position="right" delay={1.2} />
       </div>
 
       {/* ── Zone Callouts (desktop only) ── */}

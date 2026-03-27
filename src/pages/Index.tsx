@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTheme } from "next-themes";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import {
@@ -23,6 +23,8 @@ import type { LucideIcon } from "lucide-react";
 import { tokens, brand, button } from "@/lib/designTokens";
 import AISkinAnalysisHero from "@/components/home/AISkinAnalysisHero";
 import AIScanOverlay from "@/components/hero/AIScanOverlay";
+import { HeroCtaButtons } from "@/components/hero/HeroCtaButtons";
+import { SLIDE1_COPY, SLIDE2_COPY, HERO_CTA, type HeroLang } from "@/constants/hero-copy";
 
 // ── Intent-based prefetching — preload lazy chunks on hover/touch ─────────────
 const prefetchSkinAnalysis = () => { import("./SkinAnalysisPage"); };
@@ -53,34 +55,10 @@ const HERO_IMAGES = [
   "/assets/hero-ai-scan.png",    // Slide 2: male model + data overlay
 ];
 
-// ── Slide 2 copy (male model + AI scan data overlay) ──────────────────────────
-const SLIDE2_COPY: Record<string, { id: string; headline: string; sub: string }> = {
-  ko: {
-    id: 'ai-scan',
-    headline: "AI가 30초 만에\n피부를 읽습니다",
-    sub: "사진 한 장으로 10축 정밀 분석\n당신만의 루틴을 설계합니다",
-  },
-  en: {
-    id: 'ai-scan',
-    headline: "Your skin,\nread in 30 seconds",
-    sub: "10-axis precision analysis from one photo\nDesigning your personal routine",
-  },
-  de: {
-    id: 'ai-scan',
-    headline: "Ihre Haut,\nin 30 Sekunden gelesen",
-    sub: "10-Dimensionen-Präzisionsanalyse mit einem Foto\nIhre persönliche Pflege wird erstellt",
-  },
-};
-
-// ── Unified CTA for ALL hero slides (identical on every slide) ────────────────
-const HERO_CTA_PRIMARY  = { ko: '60초 AI 피부 진단',    en: '60s AI Skin Analysis', de: 'KI-Hautanalyse in 60 Sek.' } as const;
-const HERO_CTA_SECONDARY = { ko: '설문으로 진단하기',     en: 'Take the quiz instead',  de: 'Zum Fragebogen'       } as const;
-
 type CartBtnState = "idle" | "adding" | "added";
 
 // ── Hero Slider ───────────────────────────────────────────────────────────────
-function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
-  slides: { headline: string; sub: string; cta: string }[];
+function HeroSlider({ accent, accentDeep, isDark, language }: {
   accent: string;
   accentDeep: string;
   isDark: boolean;
@@ -88,17 +66,16 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
 }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
   const [current, setCurrent] = useState(0);
+  const navigate = useNavigate();
 
-  // Build 2-slide array: slide 1 (from i18n hero[0]) + slide 2 (SLIDE2_COPY)
-  const slide2 = SLIDE2_COPY[language] ?? SLIDE2_COPY.en;
+  // Build 2-slide array from dedicated constants
+  const lang = language as HeroLang;
+  const slide1 = SLIDE1_COPY[lang] ?? SLIDE1_COPY.en;
+  const slide2 = SLIDE2_COPY[lang] ?? SLIDE2_COPY.en;
   const allSlides: { id?: string; headline: string; sub: string }[] = [
-    slides[0],   // female model
+    slide1,      // female model
     slide2,      // male model + AI scan overlay
   ];
-
-  // Unified CTA text — identical on every slide
-  const ctaPrimary   = HERO_CTA_PRIMARY[language as keyof typeof HERO_CTA_PRIMARY]   ?? HERO_CTA_PRIMARY.en;
-  const ctaSecondary = HERO_CTA_SECONDARY[language as keyof typeof HERO_CTA_SECONDARY] ?? HERO_CTA_SECONDARY.en;
 
   // No autoplay — manual swipe only
   useEffect(() => {
@@ -111,7 +88,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
   }, [emblaApi]);
 
   return (
-    <section className="relative w-full overflow-hidden h-[82svh] md:h-[92svh] max-h-[720px] md:max-h-[850px]">
+    <section className="relative w-full overflow-hidden h-[78svh] md:h-[92svh] max-h-[680px] md:max-h-[850px]">
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
           {HERO_IMAGES.map((img, i) => {
@@ -134,14 +111,14 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                         : "linear-gradient(135deg, #0e1114 0%, #141a1e 50%, #0f1612 100%)",
                     }}
                   />
-                  {/* Group: portrait + overlay + data tags move together as ONE unit */}
+                  {/* Group: portrait + overlay + data tags — full size, no scale */}
                   <div
-                    className="absolute inset-0 z-[1] -translate-y-[8%] md:translate-y-0"
+                    className="absolute inset-0 z-[1] md:translate-y-0"
                   >
                     <img
                       src={img}
                       alt={allSlides[i]?.headline ?? ""}
-                      className="absolute inset-0 w-full h-[115%] object-cover md:translate-x-[13%] md:translate-y-0 md:h-full"
+                      className="absolute inset-0 w-full h-full object-cover object-top md:translate-x-[13%] md:object-center"
                       loading="lazy"
                     />
                     {/* Overlay wrapper: data tags + scan line anchored to image */}
@@ -165,13 +142,24 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
               )}
               {/* Dark gradient overlay — mobile: bottom-heavy, desktop: left-to-right */}
               {isAIScanSlide ? (
-                <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 35%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)",
-                    zIndex: 2,
-                  }}
-                />
+                <>
+                  {/* AI scan mobile gradient: starts at 50% for clean face/text zone split */}
+                  <div
+                    className="absolute inset-0 pointer-events-none md:hidden"
+                    style={{
+                      background: "linear-gradient(to top, rgba(0,0,0,0.93) 0%, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.05) 65%, transparent 100%)",
+                      zIndex: 2,
+                    }}
+                  />
+                  {/* AI scan desktop gradient */}
+                  <div
+                    className="absolute inset-0 pointer-events-none hidden md:block"
+                    style={{
+                      background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 35%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)",
+                      zIndex: 2,
+                    }}
+                  />
+                </>
               ) : (
                 <>
                   {/* Mobile gradient: bottom-heavy for face visibility */}
@@ -215,13 +203,13 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   zIndex: isAIScanSlide ? 4 : 3,
                 }}
               />
-              {/* Text + CTA */}
-              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-20 px-8 md:px-20 lg:px-28" style={{ zIndex: 10 }}>
+              {/* Text + CTA — sits in bottom zone */}
+              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-20 px-6 md:px-20 lg:px-28" style={{ zIndex: 10 }}>
                 <motion.p
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-4 notranslate"
+                  className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-3 md:mb-4 notranslate"
                   style={{ color: accent, fontFamily: "var(--font-sans)" }}
                   translate="no"
                 >
@@ -231,7 +219,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
                   transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className={`text-white ${(i === 0 || i === 1) ? 'text-[28px]' : 'text-3xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-4' : 'mb-2 md:mb-5'} font-light`}
+                  className={`text-white ${(i === 0 || i === 1) ? 'text-[26px]' : 'text-3xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-3' : 'mb-2 md:mb-5'} font-light`}
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {allSlides[i]?.headline?.split('\n').map((line, idx, arr) => (
@@ -251,61 +239,21 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   {allSlides[i]?.sub?.split('\n').map((line, idx, arr) => (
                     <span key={idx}>
                       {line}
-                      {idx < arr.length - 1 && (
-                        <>
-                          <br className="hidden md:block" />
-                          <span className="md:hidden"> </span>
-                        </>
-                      )}
+                      {idx < arr.length - 1 && <br />}
                     </span>
                   ))}
                 </motion.p>
-                {/* ── Unified Dual CTA (identical on every slide) ── */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 10 }}
-                  transition={{ duration: 0.5, delay: 0.24 }}
-                  className="flex items-center gap-3 flex-wrap max-sm:justify-start"
+                {/* ── Premium Dual CTA (gold shimmer + glass) ── */}
+                <div
+                  onMouseEnter={() => { prefetchSkinAnalysis(); prefetchDiagnosis(); }}
+                  onTouchStart={() => { prefetchSkinAnalysis(); prefetchDiagnosis(); }}
                 >
-                  {/* PRIMARY CTA — always left, filled sage-green, Camera icon */}
-                  <motion.div whileTap={{ scale: 0.97 }}>
-                    <Link
-                      to="/skin-analysis"
-                      onMouseEnter={prefetchSkinAnalysis}
-                      onTouchStart={prefetchSkinAnalysis}
-                      className="inline-flex items-center gap-2 rounded-full px-7 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold tracking-wide max-sm:w-full max-sm:justify-center hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97] active:shadow-[0_2px_12px_rgba(45,79,57,0.2)] dark:active:shadow-[0_2px_12px_rgba(45,107,74,0.15)]"
-                      style={{
-                        background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
-                        color: isDark ? "#F5F5F7" : "#fff",
-                        boxShadow: isDark ? "0 6px 24px rgba(45,107,74,0.35)" : "0 6px 24px rgba(45,79,57,0.3)",
-                        transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
-                        fontFamily: "var(--font-sans)",
-                      }}
-                    >
-                      <Camera size={15} strokeWidth={2} />
-                      {ctaPrimary}
-                    </Link>
-                  </motion.div>
-                  {/* SECONDARY CTA — always right, ghost outline */}
-                  <motion.div whileTap={{ scale: 0.97 }}>
-                    <Link
-                      to="/diagnosis"
-                      onMouseEnter={prefetchDiagnosis}
-                      onTouchStart={prefetchDiagnosis}
-                      className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 md:px-6 md:py-3 text-sm font-medium tracking-wide transition-all duration-200 max-sm:w-full max-sm:justify-center"
-                      style={{
-                        border: `1px solid ${ghostBorder}`,
-                        color: ghostColor,
-                        fontFamily: "var(--font-sans)",
-                        backdropFilter: "blur(4px)",
-                        WebkitBackdropFilter: "blur(4px)",
-                      }}
-                    >
-                      <ClipboardList size={14} strokeWidth={1.5} />
-                      {ctaSecondary}
-                    </Link>
-                  </motion.div>
-                </motion.div>
+                  <HeroCtaButtons
+                    lang={lang}
+                    onPrimary={() => navigate('/skin-analysis')}
+                    onSecondary={() => navigate('/diagnosis')}
+                  />
+                </div>
               </div>
             </div>
             );
@@ -330,7 +278,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
       </button>
 
       {/* Dots */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className="absolute bottom-3 md:bottom-6 left-1/2 -translate-x-1/2 flex gap-3" style={{ zIndex: 20 }}>
         {HERO_IMAGES.map((_, i) => (
           <button
             key={i}
@@ -768,8 +716,8 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
 
 // ── Diagnosis Banner ──────────────────────────────────────────────────────────
 function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }: { headline: string; sub: string; accent: string; accentDeep: string; isDark: boolean; language: string }) {
-  const ctaPrimary   = HERO_CTA_PRIMARY[language as keyof typeof HERO_CTA_PRIMARY]   ?? HERO_CTA_PRIMARY.en;
-  const ctaSecondary = HERO_CTA_SECONDARY[language as keyof typeof HERO_CTA_SECONDARY] ?? HERO_CTA_SECONDARY.en;
+  const navigate = useNavigate();
+  const lang = language as HeroLang;
 
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "420px" }}>
@@ -820,52 +768,18 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
           {sub}
         </motion.p>
 
-        {/* ── Dual CTA (same style as hero carousel) ── */}
+        {/* ── Premium Dual CTA (gold shimmer + glass) ── */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.22 }}
-          className="flex items-center gap-3 flex-wrap max-sm:justify-start"
         >
-          {/* PRIMARY — filled sage-green, Camera icon, left */}
-          <motion.div whileTap={{ scale: 0.97 }}>
-            <Link
-              to="/skin-analysis"
-              onMouseEnter={prefetchSkinAnalysis}
-              onTouchStart={prefetchSkinAnalysis}
-              className="inline-flex items-center gap-2 rounded-full px-7 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold tracking-wide max-sm:w-full max-sm:justify-center hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97]"
-              style={{
-                background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
-                color: isDark ? "#F5F5F7" : "#fff",
-                boxShadow: isDark ? "0 6px 24px rgba(45,107,74,0.35)" : "0 6px 24px rgba(45,79,57,0.3)",
-                transition: "all 0.3s cubic-bezier(0.22, 1, 0.36, 1)",
-                fontFamily: "var(--font-sans)",
-              }}
-            >
-              <Camera size={15} strokeWidth={2} />
-              {ctaPrimary}
-            </Link>
-          </motion.div>
-          {/* SECONDARY — ghost outline, ClipboardList icon, right */}
-          <motion.div whileTap={{ scale: 0.97 }}>
-            <Link
-              to="/diagnosis"
-              onMouseEnter={prefetchDiagnosis}
-              onTouchStart={prefetchDiagnosis}
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 md:px-6 md:py-3 text-sm font-medium tracking-wide transition-all duration-200 max-sm:w-full max-sm:justify-center"
-              style={{
-                border: "1px solid rgba(255,255,255,0.2)",
-                color: "rgba(255,255,255,0.55)",
-                fontFamily: "var(--font-sans)",
-                backdropFilter: "blur(4px)",
-                WebkitBackdropFilter: "blur(4px)",
-              }}
-            >
-              <ClipboardList size={14} strokeWidth={1.5} />
-              {ctaSecondary}
-            </Link>
-          </motion.div>
+          <HeroCtaButtons
+            lang={lang}
+            onPrimary={() => navigate('/skin-analysis')}
+            onSecondary={() => navigate('/diagnosis')}
+          />
         </motion.div>
       </div>
     </section>
@@ -994,7 +908,7 @@ export default function Index() {
       <RecheckBanner />
 
       <main>
-        <HeroSlider slides={p1.home.hero as unknown as { headline: string; sub: string; cta: string }[]} accent={accent} accentDeep={accentDeep} isDark={isDark} language={language} />
+        <HeroSlider accent={accent} accentDeep={accentDeep} isDark={isDark} language={language} />
         <UspStrip items={p1.home.usp as unknown as { label: string }[]} accent={accent} isDark={isDark} />
         <AISkinAnalysisHero />
         {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,29 +13,71 @@ import { useSkinProfileStore } from "@/store/useSkinProfileStore";
 import { brand } from "@/lib/designTokens";
 import GdprConsentModal from "./components/GdprConsentModal";
 import ErrorBoundary from "@/components/ErrorBoundary";
+
+// ── Critical-path (static imports) ──────────────────────────────────────────
 import Index from "./pages/Index";
-import Diagnosis from "./pages/Diagnosis";
-import Results from "./pages/Results";
-import About from "./pages/About";
-import Checkout from "./pages/Checkout";
-import Impressum from "./pages/Impressum";
-import Datenschutz from "./pages/Datenschutz";
-import FormulaDetail from "./pages/FormulaDetail";
-import Cart from "./pages/Cart";
-import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import Profile from "./pages/Profile";
-import Account from "./pages/Account";
-import Wishlist from "./pages/Wishlist";
-import AdminDashboard from "./pages/AdminDashboard";
-import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
-import SkinAnalysisPage from "./pages/SkinAnalysisPage";
-// LabSelectionPage deprecated — merged into unified funnel at /results?slide=2
-// import LabSelectionPage from "./pages/LabSelectionPage";
+import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { BottomNav } from "./components/BottomNav";
 import MobileDrawer from "./components/MobileDrawer";
+
+// ── Heavy routes (lazy-loaded) ──────────────────────────────────────────────
+const Diagnosis       = lazy(() => import("./pages/Diagnosis"));
+const Results         = lazy(() => import("./pages/Results"));
+const SkinAnalysisPage = lazy(() => import("./pages/SkinAnalysisPage"));
+const Profile         = lazy(() => import("./pages/Profile"));
+const Account         = lazy(() => import("./pages/Account"));
+const AdminDashboard  = lazy(() => import("./pages/AdminDashboard"));
+const Cart            = lazy(() => import("./pages/Cart"));
+const Checkout        = lazy(() => import("./pages/Checkout"));
+const Wishlist        = lazy(() => import("./pages/Wishlist"));
+const Signup          = lazy(() => import("./pages/Signup"));
+const About           = lazy(() => import("./pages/About"));
+const Impressum       = lazy(() => import("./pages/Impressum"));
+const Datenschutz     = lazy(() => import("./pages/Datenschutz"));
+const Agb             = lazy(() => import("./pages/Agb"));
+const FormulaDetail   = lazy(() => import("./pages/FormulaDetail"));
+
+// ── Route-level loading spinner ─────────────────────────────────────────────
+function RouteSpinner() {
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "var(--ssl-bg, #0d0d12)",
+      }}
+    >
+      <div style={{ position: "relative", width: 48, height: 48 }}>
+        <div
+          style={{
+            position: "absolute", inset: 0, borderRadius: "50%",
+            border: "1.5px solid rgba(201,169,110,0.12)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute", inset: 0, borderRadius: "50%",
+            border: "1.5px solid transparent", borderTopColor: "#c9a96e",
+            animation: "spin 0.8s linear infinite",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute", inset: 8, borderRadius: "50%",
+            border: "1px solid transparent", borderTopColor: "#b76e79",
+            animation: "spin 1.2s linear infinite reverse",
+          }}
+        />
+      </div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
 const queryClient = new QueryClient();
 
@@ -247,6 +289,7 @@ function AppInner() {
 
   return (
     <>
+      <Suspense fallback={<RouteSpinner />}>
       <Routes>
         <Route path="/" element={<Index />} />
         {/* ProtectedRoute temporarily removed for local dev */}
@@ -300,8 +343,10 @@ function AppInner() {
         <Route path="/about" element={<About />} />
         <Route path="/impressum" element={<Impressum />} />
         <Route path="/datenschutz" element={<Datenschutz />} />
+        <Route path="/agb" element={<Agb />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
 
       {!hideBottomNav && <BottomNav />}
       <MobileDrawer />

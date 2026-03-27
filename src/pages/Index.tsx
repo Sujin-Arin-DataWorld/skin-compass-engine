@@ -24,6 +24,10 @@ import { tokens, brand, button } from "@/lib/designTokens";
 import AISkinAnalysisHero from "@/components/home/AISkinAnalysisHero";
 import AIScanOverlay from "@/components/hero/AIScanOverlay";
 
+// ── Intent-based prefetching — preload lazy chunks on hover/touch ─────────────
+const prefetchSkinAnalysis = () => { import("./SkinAnalysisPage"); };
+const prefetchDiagnosis    = () => { import("./Diagnosis"); };
+
 // ── Design tokens (consumed from designTokens.ts via tokens() helper) ─────────
 const BRONZE = "var(--ssl-accent-deep)";  // kept for non-active icon fallback
 
@@ -250,6 +254,8 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   <motion.div whileTap={{ scale: 0.97 }}>
                     <Link
                       to="/skin-analysis"
+                      onMouseEnter={prefetchSkinAnalysis}
+                      onTouchStart={prefetchSkinAnalysis}
                       className="inline-flex items-center gap-2 rounded-full px-7 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold tracking-wide max-sm:w-full max-sm:justify-center hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97] active:shadow-[0_2px_12px_rgba(45,79,57,0.2)] dark:active:shadow-[0_2px_12px_rgba(45,107,74,0.15)]"
                       style={{
                         background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
@@ -267,6 +273,8 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   <motion.div whileTap={{ scale: 0.97 }}>
                     <Link
                       to="/diagnosis"
+                      onMouseEnter={prefetchDiagnosis}
+                      onTouchStart={prefetchDiagnosis}
                       className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 md:px-6 md:py-3 text-sm font-medium tracking-wide transition-all duration-200 max-sm:w-full max-sm:justify-center"
                       style={{
                         border: `1px solid ${ghostBorder}`,
@@ -651,6 +659,8 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                     
                     <Link
                       to="/diagnosis"
+                      onMouseEnter={prefetchDiagnosis}
+                      onTouchStart={prefetchDiagnosis}
                       className="inline-flex items-center mt-6 text-sm md:text-base font-medium tracking-wide hover:opacity-75 transition-opacity drop-shadow-md"
                       style={{ 
                         // Architect Recommendation: Conditional text color.
@@ -799,6 +809,8 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
           <motion.div whileTap={{ scale: 0.97 }}>
             <Link
               to="/skin-analysis"
+              onMouseEnter={prefetchSkinAnalysis}
+              onTouchStart={prefetchSkinAnalysis}
               className="inline-flex items-center gap-2 rounded-full px-7 py-3 md:px-8 md:py-3.5 text-sm md:text-base font-semibold tracking-wide max-sm:w-full max-sm:justify-center hover:shadow-[0_0_0_4px_rgba(94,139,104,0.12),0_8px_32px_rgba(45,79,57,0.3)] dark:hover:shadow-[0_0_0_4px_rgba(45,107,74,0.12),0_8px_32px_rgba(45,107,74,0.35)] active:scale-[0.97]"
               style={{
                 background: `linear-gradient(135deg, ${accent}, ${accentDeep})`,
@@ -816,6 +828,8 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
           <motion.div whileTap={{ scale: 0.97 }}>
             <Link
               to="/diagnosis"
+              onMouseEnter={prefetchDiagnosis}
+              onTouchStart={prefetchDiagnosis}
               className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 md:px-6 md:py-3 text-sm font-medium tracking-wide transition-all duration-200 max-sm:w-full max-sm:justify-center"
               style={{
                 border: "1px solid rgba(255,255,255,0.2)",

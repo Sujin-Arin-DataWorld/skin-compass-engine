@@ -586,7 +586,6 @@
 
 /* ── Mobile-first base rules ── */
 html {
-  -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
@@ -596,7 +595,6 @@ html {
 
 [lang="de"] {
   hyphens: auto;
-  -webkit-hyphens: auto;
 }
 
 [lang="en"] {

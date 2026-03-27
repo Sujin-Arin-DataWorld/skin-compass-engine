@@ -102,6 +102,10 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ].filter(Boolean),
+  css: {
+    // CSS 모듈이 아닌 일반 CSS의 소스맵을 dev에서만 활성화
+    devSourcemap: true,
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

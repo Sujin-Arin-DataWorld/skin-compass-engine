@@ -1,3 +1,21 @@
+// ═══════════════════════════════════════
+// 글로벌 에러 핸들러 (개발 환경 디버깅용)
+// ═══════════════════════════════════════
+
+if (import.meta.env.DEV) {
+  window.addEventListener('unhandledrejection', (event) => {
+    console.error('[SSL] Unhandled Promise Rejection:', event.reason);
+  });
+
+  window.addEventListener('error', (event) => {
+    // CSS 파싱 경고는 무시 (브라우저가 에러로 보고하는 경우 방지)
+    if (event.message?.includes('CSS') || event.message?.includes('Declaration')) {
+      return;
+    }
+    console.error('[SSL] Uncaught Error:', event.error || event.message);
+  });
+}
+
 import { createRoot } from "react-dom/client";
 import { Component, type ReactNode } from "react";
 import App from "./App.tsx";

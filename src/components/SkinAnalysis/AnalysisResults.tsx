@@ -8,6 +8,7 @@ import { RotateCcw, Save, ChevronRight, ChevronDown } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
+import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
 import { brand, glass } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
@@ -105,8 +106,10 @@ const TX = {
   products:      { ko: '맞춤 추천 제품', en: 'Recommended Products', de: 'Empfohlene Produkte' },
   viewRoutine:   { ko: '전체 맞춤 루틴 보기', en: 'View My Routine', de: 'Meine Routine ansehen' },
   retake:        { ko: '다시 분석', en: 'Retake', de: 'Wiederholen' },
-  save:          { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
-  saved:         { ko: '저장됨', en: 'Saved', de: 'Gespeichert' },
+  save:          { ko: '저장', en: 'Save', de: 'Speichern' },
+  saveLogin:     { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
+  saved:         { ko: '저장됨 ✓', en: 'Saved ✓', de: 'Gespeichert ✓' },
+  saveFail:      { ko: '저장 실패 — 재시도', en: 'Save failed — retry', de: 'Fehler — erneut versuchen' },
   productSubtitle:{ ko: '분석 결과를 바탕으로 선별한 맞춤 솔루션입니다.', en: 'Curated solutions based on your analysis results.', de: 'Kuratierte Lösungen basierend auf Ihren Analyseergebnissen.' },
   noProductsHealthy: { ko: '피부 상태가 양호합니다! 맞춤 루틴을 확인해보세요.', en: 'Your skin looks healthy! Check out our curated routines.', de: 'Ihre Haut sieht gesund aus! Entdecken Sie unsere kuratierten Routinen.' },
   noProductsCurating: { ko: '고민에 맞는 전문 솔루션을 준비하고 있습니다.', en: 'We are curating specialized solutions for your specific concerns.', de: 'Wir kuratieren spezialisierte Lösungen für Ihre spezifischen Anliegen.' },
@@ -331,46 +334,63 @@ export default function AnalysisResults({
     navigate('/results');
   }, [scores, setResult, navigate]);
 
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const saveAnalysisResult = useSkinProfileStore((s) => s.saveAnalysisResult);
 
   const handleSave = useCallback(async () => {
-    if (saveStatus === 'saved') return; // already saved
+    if (saveStatus === 'saved' || saveStatus === 'saving') return;
 
+    // Not logged in → redirect to login
     if (!isLoggedIn) {
       try {
         sessionStorage.setItem('ssl_pending_analysis', JSON.stringify({
           scores, analysisId, hasLifestyle, timestamp: Date.now(),
         }));
-      } catch (e) { console.warn('[AnalysisResults] Failed to save:', e); }
+      } catch (e) { console.warn('[AnalysisResults] sessionStorage failed:', e); }
       navigate('/login?redirect=/skin-analysis');
       return;
     }
 
-    // Logged in — save to Supabase
+    // Logged in → save via useSkinProfileStore to user_skin_profiles
     setSaveStatus('saving');
     try {
       const { supabase } = await import('@/integrations/supabase/client');
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user');
+      if (!user) throw new Error('Not authenticated');
 
-      // Use rpc or direct fetch to avoid generated type constraints
-      const { error } = await (supabase as any)
-        .from('diagnosis_history')
-        .insert({
-          user_id: user.id,
-          analysis_id: analysisId,
-          scores: scores as unknown as Record<string, number>,
-          source: 'ai_photo_analysis',
-          created_at: new Date().toISOString(),
-        });
+      // Derive skinType & primaryConcerns from scores
+      const sebHealth = 100 - scores.seb;
+      const hydHealth = scores.hyd;
+      const skinType =
+        sebHealth < 45 && hydHealth < 45 ? 'combination' :
+        sebHealth < 45 ? 'oily' :
+        hydHealth < 45 ? 'dry' : 'normal';
 
-      if (error) throw error;
+      const HIGH_IS_BAD_KEYS = ['seb', 'sen', 'acne', 'pigment', 'aging', 'ox'] as const;
+      const LOW_IS_BAD_KEYS  = ['hyd', 'bar', 'texture', 'makeup_stability'] as const;
+      const primaryConcerns: string[] = [
+        ...HIGH_IS_BAD_KEYS.filter(k => scores[k] > 60),
+        ...LOW_IS_BAD_KEYS.filter(k => scores[k as keyof typeof scores] < 40),
+      ].slice(0, 5);
+
+      const saved = await saveAnalysisResult({
+        userId: user.id,
+        scores,
+        skinType: skinType as 'oily' | 'dry' | 'combination' | 'normal',
+        primaryConcerns: primaryConcerns as any,
+        analysisMethod: 'camera',
+        confidenceScore: 85,
+      });
+
+      if (!saved) throw new Error('Save returned null');
       setSaveStatus('saved');
     } catch (err) {
       console.error('[Save] Failed:', err);
-      setSaveStatus('idle');
+      setSaveStatus('error');
+      // Auto-reset after 3s so user can retry
+      setTimeout(() => setSaveStatus('idle'), 3000);
     }
-  }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate, saveStatus]);
+  }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate, saveStatus, saveAnalysisResult]);
 
   const resetDiagnosisStore = useDiagnosisStore((s) => s.reset);
 
@@ -654,19 +674,32 @@ export default function AnalysisResults({
           </button>
           <button
             onClick={handleSave}
-            disabled={saveStatus === 'saving'}
+            disabled={saveStatus === 'saving' || saveStatus === 'saved'}
             className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             style={{
-              background: saveStatus === 'saved' ? 'rgba(138,154,123,0.1)' : 'rgba(255,255,255,0.03)',
-              border: saveStatus === 'saved' ? '1px solid rgba(138,154,123,0.3)' : '1px solid rgba(255,255,255,0.06)',
+              background:
+                saveStatus === 'saved'  ? 'rgba(138,154,123,0.15)' :
+                saveStatus === 'error'  ? 'rgba(232,168,124,0.10)' :
+                'rgba(255,255,255,0.03)',
+              border:
+                saveStatus === 'saved'  ? '1px solid rgba(138,154,123,0.4)' :
+                saveStatus === 'error'  ? '1px solid rgba(232,168,124,0.35)' :
+                '1px solid rgba(255,255,255,0.06)',
               backdropFilter: 'blur(12px)',
-              color: saveStatus === 'saved' ? '#8a9a7b' : isLoggedIn ? '#86868B' : '#c4a265',
+              color:
+                saveStatus === 'saved'  ? '#8a9a7b' :
+                saveStatus === 'error'  ? '#E8A87C' :
+                isLoggedIn ? '#F5F5F7' : '#c4a265',
               fontFamily: 'var(--font-sans)', fontSize: '14px',
               opacity: saveStatus === 'saving' ? 0.6 : 1,
+              fontWeight: saveStatus === 'idle' && isLoggedIn ? 600 : 400,
             }}
           >
             <Save size={14} />
-            {saveStatus === 'saved' ? TX.saved[lang] : TX.save[lang]}
+            {saveStatus === 'saved'  ? TX.saved[lang] :
+             saveStatus === 'error'  ? TX.saveFail[lang] :
+             saveStatus === 'saving' ? '...' :
+             isLoggedIn ? TX.save[lang] : TX.saveLogin[lang]}
           </button>
         </motion.div>
 

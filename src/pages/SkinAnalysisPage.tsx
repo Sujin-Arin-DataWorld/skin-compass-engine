@@ -14,6 +14,7 @@ import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { analyzeSkinImage } from '@/services/skinAnalysisService';
 import { supabase } from '@/integrations/supabase/client';
 import { useI18nStore, translations } from '@/store/i18nStore';
+import { safeSessionStorage } from '@/utils/safeStorage';
 import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
 import type { SkinAxisScores as ProfileAxisScores, SkinType, SkinConcern } from '@/types/skinProfile';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
@@ -112,7 +113,7 @@ export default function SkinAnalysisPage() {
   } = useSkinAnalysisStore();
 
   const { language } = useI18nStore();
-  const t = translations[language];
+  const t = translations[language as keyof typeof translations] || translations.en;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
@@ -125,7 +126,8 @@ export default function SkinAnalysisPage() {
 
   // ── Restore pending analysis after login redirect ─────────────────────────
   useEffect(() => {
-    const raw = sessionStorage.getItem('ssl_pending_analysis');
+    let raw: string | null = null;
+    try { raw = safeSessionStorage.getItem('ssl_pending_analysis'); } catch { return; }
     if (!raw) return;
     try {
       const pending = JSON.parse(raw) as {
@@ -135,7 +137,7 @@ export default function SkinAnalysisPage() {
         timestamp: number;
       };
       setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId);
-      sessionStorage.removeItem('ssl_pending_analysis');
+      safeSessionStorage.removeItem('ssl_pending_analysis');
       // Non-blocking DB save
       (async () => {
         try {

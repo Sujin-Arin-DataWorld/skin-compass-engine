@@ -431,7 +431,7 @@ export const translations = {
             heading: "60-Second AI Skin Analysis",
             subheading: "Take a photo and our AI will analyze 10 skin axes\nand suggest personalized solutions.",
             startCamera: "Start Camera →",
-            privacyNote: "Photos are processed immediately after analysis and your privacy is protected.",
+            privacyNote: "Photos are never stored on our servers. They are instantly and permanently deleted after AI analysis to ensure complete privacy.",
             axisLabels: ["Sebum", "Hydration", "Barrier", "Sensitivity", "Acne", "Pigment", "Texture", "Aging", "Oxidation", "Makeup Hold"],
             loadingSteps: [
                 "Analyzing skin tone...",
@@ -815,7 +815,7 @@ export const translations = {
             heading: "60-Sekunden KI-Hautanalyse",
             subheading: "Machen Sie ein Foto und unsere KI analysiert 10 Hautachsen\nund schlägt personalisierte Lösungen vor.",
             startCamera: "Kamera starten →",
-            privacyNote: "Fotos werden nach der Analyse sofort verarbeitet und Ihre Privatsphäre ist geschützt.",
+            privacyNote: "Fotos werden niemals auf unseren Servern gespeichert. Sie werden nach der KI-Analyse sofort dauerhaft gelöscht, um Ihre Privatsphäre zu schützen.",
             axisLabels: ["Hautöl", "Feuchtigkeit", "Barriere", "Empfindlichkeit", "Akne", "Pigment", "Textur", "Alterung", "Oxidation", "Make-up-Halt"],
             loadingSteps: [
                 "Hautton wird analysiert...",
@@ -828,12 +828,33 @@ export const translations = {
     ko: {
         // Start with English defaults, override with Korean translations
         ...({} as any), // populated below
+
+        // ── Scalar string fallbacks ─────────────────────────────────────────
         get products() { return translations.en.products; },
         get startDiagnosis() { return translations.en.startDiagnosis; },
         get startAnalysis() { return translations.en.startAnalysis; },
         get login() { return translations.en.login; },
         get signUp() { return translations.en.signUp; },
         get profile() { return translations.en.profile; },
+        get admin() { return translations.en.admin; },
+        get secureAccess() { return translations.en.secureAccess; },
+        get signInGoogle() { return translations.en.signInGoogle; },
+        get continueEmail() { return translations.en.continueEmail; },
+        get password() { return translations.en.password; },
+        get signIn() { return translations.en.signIn; },
+        get noAccount() { return translations.en.noAccount; },
+        get register() { return translations.en.register; },
+        get welcome() { return translations.en.welcome; },
+        get personalInfo() { return translations.en.personalInfo; },
+        get skinProgress() { return translations.en.skinProgress; },
+        get addressBook() { return translations.en.addressBook; },
+        get orders() { return translations.en.orders; },
+        get logout() { return translations.en.logout; },
+        get noDiagnosis() { return translations.en.noDiagnosis; },
+        get startNow() { return translations.en.startNow; },
+        get myVector() { return translations.en.myVector; },
+        get myRoutine() { return translations.en.myRoutine; },
+        get diagnosesSaved() { return translations.en.diagnosesSaved; },
         get diagnosisHistory() { return translations.en.diagnosisHistory; },
         get latestResult() { return translations.en.latestResult; },
         get retakeAdvice() { return translations.en.retakeAdvice; },
@@ -842,8 +863,23 @@ export const translations = {
         get discardAndRestart() { return translations.en.discardAndRestart; },
         get lastDiagnosed() { return translations.en.lastDiagnosed; },
         get tier() { return translations.en.tier; },
+        get heroTitle() { return translations.en.heroTitle; },
+        get heroSlogan() { return translations.en.heroSlogan; },
+        get targetPrecision() { return translations.en.targetPrecision; },
+
+        // ── Nested object fallbacks (CRITICAL — prevents WSOD) ──────────────
+        get steps() { return translations.en.steps; },
+        get index() { return translations.en.index; },
+        get navbar() { return translations.en.navbar; },
+        get profileTab() { return translations.en.profileTab; },
+        get cookie() { return translations.en.cookie; },
+        get loginPage() { return translations.en.loginPage; },
+        get markers() { return translations.en.markers; },
+        get axes() { return translations.en.axes; },
         get diagnosis() { return translations.en.diagnosis; },
         get results() { return translations.en.results; },
+
+        // ── Korean-specific overrides ───────────────────────────────────────
         camera: {
             guideText: "얼굴을 타원 안에 맞춰주세요",
             guideHint: "밝은 곳에서 가이드라인을 따라주세요",
@@ -867,7 +903,7 @@ export const translations = {
             heading: "60초 AI\n피부 분석",
             subheading: "사진 한 장으로 10가지 피부 축을 분석하고\n맞춤 솔루션을 제안합니다.",
             startCamera: "카메라 시작 →",
-            privacyNote: "사진은 분석 직후 처리되며, 개인정보가 보호됩니다.",
+            privacyNote: "사진은 서버에 절대 저장되지 않으며, AI 분석 즉시 영구 파기되어 개인정보가 철저히 보호됩니다.",
             axisLabels: ["피지", "수분", "장벽", "민감도", "여드름", "색소", "텍스처", "노화", "산화", "메이크업 지속력"],
             loadingSteps: [
                 "피부 톤 분석 중...",

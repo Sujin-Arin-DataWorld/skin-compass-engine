@@ -71,7 +71,10 @@ export default function AuthCallback() {
     //    registers its listener first on mount.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
-        go();
+        go().catch(err => {
+          console.error("[AuthCallback] go() failed:", err);
+          setError("Authentication error. Please try again.");
+        });
       } else if (event === "SIGNED_OUT" && !resolved) {
         navigate("/login?error=auth_cancelled", { replace: true });
       }
@@ -84,12 +87,17 @@ export default function AuthCallback() {
         setError(err.message);
         return;
       }
-      if (session) go();
+      if (session) {
+        go().catch(callbackErr => {
+          console.error("[AuthCallback] go() fallback failed:", callbackErr);
+          setError("Authentication error. Please try again.");
+        });
+      }
     });
 
     // 3. Timeout safety net — if nothing resolves in 15 s, surface an error.
     const timer = setTimeout(() => {
-      if (!resolved) setError("인증 시간이 초과되었습니다. 다시 시도해 주세요.");
+      if (!resolved) setError("Authentication timed out. Please try again.");
     }, 15_000);
 
     return () => {
@@ -116,7 +124,7 @@ export default function AuthCallback() {
             color: GOLD, borderRadius: 24, padding: "10px 24px",
             cursor: "pointer", fontSize: 13, letterSpacing: "0.08em",
           }}>
-          로그인으로 돌아가기
+          Back to Login
         </button>
       </div>
     );
@@ -158,14 +166,14 @@ export default function AuthCallback() {
           fontSize: 20, fontWeight: 300, color: GOLD,
           letterSpacing: "0.06em", marginBottom: 8,
         }}>
-          로그인 처리 중…
+          Signing in…
         </p>
         <p style={{
           fontFamily: "var(--font-sans)",
           fontSize: 12, color: "rgba(255,255,255,0.3)",
           letterSpacing: "0.1em",
         }}>
-          잠시만 기다려 주세요
+          Just a moment
         </p>
       </div>
     </div>

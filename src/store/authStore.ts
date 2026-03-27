@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { safeStorage } from "@/utils/safeStorage";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { DiagnosisResult } from "@/engine/types";
@@ -135,8 +136,12 @@ export const useAuthStore = create<AuthState>()(
                 await supabase.auth.signOut();
                 // 2. Wipe both Zustand persist slices from localStorage so the next
                 //    browser session (or a different user) starts completely clean.
-                localStorage.removeItem("skin-strategy-auth");
-                localStorage.removeItem("skin-diagnosis-store");
+                try {
+                    localStorage.removeItem("skin-strategy-auth");
+                    localStorage.removeItem("skin-diagnosis-store");
+                } catch {
+                    // Safari Private Mode — localStorage may be unavailable; no-op is safe.
+                }
                 // 3. Reset in-memory state as a safety net (in case navigation is delayed).
                 set({ isLoggedIn: false, userProfile: null });
                 // 4. Hard redirect — a full page reload guarantees all React state is gone.
@@ -173,6 +178,6 @@ export const useAuthStore = create<AuthState>()(
             },
 
         }),
-        { name: "skin-strategy-auth" }
+        { name: "skin-strategy-auth", storage: createJSONStorage(() => safeStorage) }
     )
 );

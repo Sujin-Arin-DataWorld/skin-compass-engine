@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { safeLocalStorage } from "@/utils/safeStorage";
 import type { Product } from "@/engine/types";
 
 export interface CartItem {
@@ -58,6 +59,6 @@ export const useCartStore = create<CartState>()(
           0
         ),
     }),
-    { name: "skin-compass-cart-v1" }
+    { name: "skin-compass-cart-v1", storage: createJSONStorage(() => safeLocalStorage) }
   )
 );

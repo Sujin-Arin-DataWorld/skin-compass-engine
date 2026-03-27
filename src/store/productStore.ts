@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
+import { safeLocalStorage } from "@/utils/safeStorage";
 import { Product } from "@/engine/types";
 import { CLINICAL_PRODUCTS } from "@/data/products";
 
@@ -23,6 +24,7 @@ export const useProductStore = create<ProductState>()(
         }),
         {
             name: "skin-compass-products-v2",
+            storage: createJSONStorage(() => safeLocalStorage),
         }
     )
 );

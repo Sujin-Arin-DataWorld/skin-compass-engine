@@ -173,60 +173,73 @@ function AppInner() {
   const handleGdprAccept = async () => {
     if (!gdprUserId) return;
     setGdprLoading(true);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any)
-      .from("profiles")
-      .update({
-        gdpr_consent: true,
-        gdpr_consent_at: new Date().toISOString(),
-      })
-      .eq("id", gdprUserId);
-    setGdprLoading(false);
-    setShowGdpr(false);
-    setGdprUserId(null);
-  };
-
-  const handleGdprDecline = async () => {
-    setGdprLoading(true);
-
-    if (gdprUserId) {
-      // 1. Mark the profile so the rejection is auditable even if step 2 fails
+    try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any)
         .from("profiles")
         .update({
-          gdpr_rejected: true,
-          gdpr_rejected_at: new Date().toISOString(),
+          gdpr_consent: true,
+          gdpr_consent_at: new Date().toISOString(),
         })
         .eq("id", gdprUserId);
-
-      // 2. Permanently delete the auth user via a SECURITY DEFINER RPC.
-      //    SQL to create it (run once in Supabase Dashboard → SQL Editor):
-      //
-      //    CREATE OR REPLACE FUNCTION public.delete_own_user()
-      //    RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
-      //    BEGIN
-      //      DELETE FROM auth.users WHERE id = auth.uid();
-      //    END;
-      //    $$;
-      //    GRANT EXECUTE ON FUNCTION public.delete_own_user() TO authenticated;
-      //
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: deleteError } = await (supabase as any).rpc("delete_own_user");
-
-      if (deleteError) {
-        // RPC not yet created or failed — user stays rejected in profiles.
-        // They are effectively locked out since gdpr_rejected = true.
-        // Clean up happens when an admin runs a deferred deletion job.
-        console.warn("delete_own_user RPC failed:", deleteError.message);
-      }
+      setShowGdpr(false);
+      setGdprUserId(null);
+    } catch (err) {
+      console.error("[App] GDPR accept save failed:", err);
+      // Non-fatal: close modal anyway so the user isn't stuck
+      setShowGdpr(false);
+      setGdprUserId(null);
+    } finally {
+      setGdprLoading(false);
     }
+  };
 
-    // Always sign out regardless of deletion outcome
-    await logout();
-    setGdprLoading(false);
-    setShowGdpr(false);
-    setGdprUserId(null);
+  const handleGdprDecline = async () => {
+    setGdprLoading(true);
+    try {
+      if (gdprUserId) {
+        // 1. Mark the profile so the rejection is auditable even if step 2 fails
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (supabase as any)
+          .from("profiles")
+          .update({
+            gdpr_rejected: true,
+            gdpr_rejected_at: new Date().toISOString(),
+          })
+          .eq("id", gdprUserId);
+
+        // 2. Permanently delete the auth user via a SECURITY DEFINER RPC.
+        //    SQL to create it (run once in Supabase Dashboard → SQL Editor):
+        //
+        //    CREATE OR REPLACE FUNCTION public.delete_own_user()
+        //    RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
+        //    BEGIN
+        //      DELETE FROM auth.users WHERE id = auth.uid();
+        //    END;
+        //    $$;
+        //    GRANT EXECUTE ON FUNCTION public.delete_own_user() TO authenticated;
+        //
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: deleteError } = await (supabase as any).rpc("delete_own_user");
+
+        if (deleteError) {
+          // RPC not yet created or failed — user stays rejected in profiles.
+          // They are effectively locked out since gdpr_rejected = true.
+          // Clean up happens when an admin runs a deferred deletion job.
+          console.warn("delete_own_user RPC failed:", deleteError.message);
+        }
+      }
+      // Always sign out regardless of deletion outcome
+      await logout();
+    } catch (err) {
+      console.error("[App] GDPR decline failed:", err);
+      // Force logout even if DB operations failed
+      try { await logout(); } catch { window.location.href = "/"; }
+    } finally {
+      setGdprLoading(false);
+      setShowGdpr(false);
+      setGdprUserId(null);
+    }
   };
 
   // /account has its own sidebar nav — hide the global BottomNav

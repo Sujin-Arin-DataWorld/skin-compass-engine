@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useI18nStore, translations } from "@/store/i18nStore";
+import { safeLocalStorage } from "@/utils/safeStorage";
 
 const CookieConsent = () => {
   const [show, setShow] = useState(false);
   const { language } = useI18nStore();
-  const t = translations[language];
+  const t = translations[language as keyof typeof translations] || translations.en;
 
   useEffect(() => {
-    const consent = localStorage.getItem("cookie_consent");
+    const consent = safeLocalStorage.getItem("cookie_consent");
     if (!consent) setShow(true);
   }, []);
 
   const accept = (analytics: boolean) => {
-    localStorage.setItem(
+    safeLocalStorage.setItem(
       "cookie_consent",
       JSON.stringify({ analytics, timestamp: new Date().toISOString() })
     );

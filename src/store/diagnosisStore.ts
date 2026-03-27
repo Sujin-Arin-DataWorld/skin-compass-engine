@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { safeStorage } from "@/utils/safeStorage";
 import { SkinType, ContextKey, Tier, DiagnosisResult, Product } from "@/engine/types";
 import type { FaceZone } from "@/features/lab-selection/types";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
@@ -524,7 +525,7 @@ export const useDiagnosisStore = create<DiagnosisState>()(
     }),
     {
       name: "skin-diagnosis-store",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => safeStorage),
       partialize: (state) => ({
         currentStep: state.currentStep,
         currentCategory: state.currentCategory,

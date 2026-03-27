@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
 import { useTheme } from "next-themes";
+import { safeLocalStorage } from "@/utils/safeStorage";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -62,19 +63,19 @@ const COPY = {
 
 function isDismissed(): boolean {
   try {
-    const raw = localStorage.getItem(DISMISS_KEY);
+    const raw = safeLocalStorage.getItem(DISMISS_KEY);
     if (!raw) return false;
-    return Date.now() < new Date(raw).getTime();
+    const expiry = new Date(raw).getTime();
+    if (isNaN(expiry)) return false; // corrupted value — treat as not dismissed
+    return Date.now() < expiry;
   } catch {
     return false;
   }
 }
 
 function persistDismiss(): void {
-  try {
-    const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    localStorage.setItem(DISMISS_KEY, expiry);
-  } catch { /* noop */ }
+  const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  safeLocalStorage.setItem(DISMISS_KEY, expiry);
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -112,7 +113,12 @@ export default function RecheckBanner() {
 
       if (cancelled || !data) return;
 
-      const daysSince = (Date.now() - new Date(data.diagnosed_at).getTime()) / 86_400_000;
+      // Safari: replace spaces with 'T' to avoid Invalid Date NaN
+      const safeDateStr = String(data.diagnosed_at).replace(' ', 'T');
+      const diagDate = new Date(safeDateStr);
+      if (isNaN(diagDate.getTime())) return; // corrupted date — bail
+
+      const daysSince = (Date.now() - diagDate.getTime()) / 86_400_000;
       const weeks = Math.floor(daysSince / 7);
       setWeeksSince(weeks);
 

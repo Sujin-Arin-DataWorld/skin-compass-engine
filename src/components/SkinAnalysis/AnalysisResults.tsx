@@ -24,8 +24,9 @@ const T = brand.dark;
 const G = glass.card.dark;
 
 // ── Axis direction mapping ─────────────────────────────────────────────────
-const HIGH_IS_BAD = new Set(['seb', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox']);
-const LOW_IS_BAD  = new Set(['hyd', 'bar', 'makeup_stability']);
+// V5 engine: hyd = dehydration severity, bar = barrier damage → high = bad
+const HIGH_IS_BAD = new Set(['seb', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox', 'hyd', 'bar']);
+const LOW_IS_BAD  = new Set(['makeup_stability']);
 
 function getSeverity(key: string, score: number): number {
   if (HIGH_IS_BAD.has(key)) return score;

@@ -40,7 +40,8 @@ function axisLabel(axis: AxisKey, lang: string, short = false) {
 }
 
 // ── Health Score conversion (UI only — raw scores stay intact for engine) ───
-const HIGH_IS_BAD_AXES = new Set<AxisKey>(['seb', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox']);
+// V5 engine: hyd = dehydration severity, bar = barrier damage → high = bad
+const HIGH_IS_BAD_AXES = new Set<AxisKey>(['seb', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox', 'hyd', 'bar']);
 function toHealthScore(axis: AxisKey, rawScore: number): number {
   return HIGH_IS_BAD_AXES.has(axis) ? 100 - rawScore : rawScore;
 }
@@ -184,7 +185,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
   const [activeTab, setActiveTab] = useState<TabKey>('routine');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedAxis, setExpandedAxis] = useState<AxisKey | null>(null);
-  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  // Cart state: rely on parent's cartItemIds prop (no local copy → no desync)
 
   const prefersReducedMotion = typeof window !== 'undefined'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
@@ -218,9 +219,10 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
   }, [currentSteps, onTierChange]);
 
   // ── Sorted axes (by health score — lowest health first = worst concerns) ──
+  // makeup_stability uses 3-8 scale (not 0-100) → exclude from comparison grid
   const activeAxes = useMemo(() =>
     AXIS_KEYS.map((k) => ({ axis: k, raw: result.axis_scores[k] ?? 0, score: toHealthScore(k, result.axis_scores[k] ?? 0) }))
-      .filter((a) => a.raw > 0).sort((a, b) => a.score - b.score),
+      .filter((a) => a.raw > 0 && a.axis !== 'makeup_stability').sort((a, b) => a.score - b.score),
     [result]);
   const topAxis = activeAxes[0];
 
@@ -417,14 +419,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   isDark={isDark}
                   tok={tok}
                   cartItemIds={cartItemIds ?? []}
-                  onAddToCart={onAddToCart ? (item) => {
-                    onAddToCart(item);
-                    setAddedIds((prev) => new Set([...prev, item.id]));
-                  } : undefined}
-                  onRemoveFromCart={onRemoveFromCart ? (id) => {
-                    onRemoveFromCart(id);
-                    setAddedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
-                  } : undefined}
+                  onAddToCart={onAddToCart}
+                  onRemoveFromCart={onRemoveFromCart}
                 />
               ) : (
               <>
@@ -550,11 +546,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                           }}>{step.product.keyIngredients.slice(0, 2).join(', ')}</p>
                           {isKeyStep && topAxis && (() => {
                             const hc = topAxis.score < 30 ? '#E24B4A' : topAxis.score < 70 ? '#BA7517' : '#4A9E68';
-                            const dispCurrent = toHealthScore(topAxis.axis, proj.currentScore);
-                            const dispTarget = toHealthScore(topAxis.axis, proj.targetScore4w);
+                            const dispCurrent = Math.round(toHealthScore(topAxis.axis, proj.currentScore));
+                            const dispTarget = Math.round(toHealthScore(topAxis.axis, proj.targetScore4w));
                             return (
                             <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: hc, margin: '2px 0 0', fontWeight: 500 }}>
-                              {tx('step_score_goal', lang, { a: axisLabel(topAxis.axis, lang), c: dispCurrent, g: dispTarget, w: 8 })}
+                              {tx('step_score_goal', lang, { a: axisLabel(topAxis.axis, lang), c: dispCurrent, g: dispTarget, w: 4 })}
                             </p>
                             );
                           })()}
@@ -563,25 +559,32 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                         <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                           {price > 0 && <div style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color: tok.text }}>€{price}</div>}
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            {onAddToCart && (
+                            {(onAddToCart || onRemoveFromCart) && (() => {
+                              const isAdded = cartItemIds?.includes(step.product.id);
+                              return (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const item = { id: step.product.id, price, role: step.role, emoji: ROLE_EMOJI[step.role] ?? '💊' };
-                                  onAddToCart(item);
-                                  setAddedIds((prev) => new Set([...prev, step.product.id]));
+                                  if (isAdded && onRemoveFromCart) {
+                                    onRemoveFromCart(step.product.id);
+                                  } else if (!isAdded && onAddToCart) {
+                                    const item = { id: step.product.id, price, role: step.role, emoji: ROLE_EMOJI[step.role] ?? '💊' };
+                                    onAddToCart(item);
+                                  }
                                 }}
                                 style={{
                                   padding: '3px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
                                   fontSize: '0.75rem', fontWeight: 600,
-                                  background: addedIds.has(step.product.id) ? 'rgba(74,158,104,0.12)' : 'rgba(74,158,104,0.85)',
-                                  color: addedIds.has(step.product.id) ? '#4A9E68' : '#FFFFFF',
+                                  background: isAdded ? 'rgba(74,158,104,0.12)' : 'rgba(74,158,104,0.85)',
+                                  color: isAdded ? '#4A9E68' : '#FFFFFF',
                                   transition: 'all 0.2s ease',
                                   minWidth: 40,
                                 }}
                               >
-                                {addedIds.has(step.product.id) ? '✓' : (lang === 'ko' ? '추가' : lang === 'de' ? 'Add' : 'Add')}
+                                {isAdded ? '✓' : (lang === 'ko' ? '추가' : lang === 'de' ? 'Add' : 'Add')}
                               </button>
+                              );
+                            })(
                             )}
                             <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
                               <ChevronDown size={14} style={{ color: tok.textTertiary }} />
@@ -870,7 +873,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                         {axisLabel(expandedAxis, lang)} ({Math.round(toHealthScore(expandedAxis, result.axis_scores[expandedAxis] ?? 0))}/100)
                       </p>
                       <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary, lineHeight: 1.5, margin: 0 }}>
-                        {AXIS_INTERPRETATIONS[expandedAxis]?.[lang]?.(toHealthScore(expandedAxis, result.axis_scores[expandedAxis] ?? 0)) ?? ''}
+                        {AXIS_INTERPRETATIONS[expandedAxis]?.[lang]?.(result.axis_scores[expandedAxis] ?? 0) ?? ''}
                       </p>
                     </div>
                   </motion.div>

@@ -68,12 +68,12 @@ const SLIDE2_COPY: Record<string, { id: string; headline: string; sub: string }>
   de: {
     id: 'ai-scan',
     headline: "Ihre Haut,\nin 30 Sekunden gelesen",
-    sub: "10-Achsen-Präzisionsanalyse mit einem Foto\nIhre persönliche Routine wird erstellt",
+    sub: "10-Dimensionen-Präzisionsanalyse mit einem Foto\nIhre persönliche Pflege wird erstellt",
   },
 };
 
 // ── Unified CTA for ALL hero slides (identical on every slide) ────────────────
-const HERO_CTA_PRIMARY  = { ko: '60초 AI 피부 진단',    en: '60s AI Skin Diagnosis', de: '60s KI-Hautdiagnose' } as const;
+const HERO_CTA_PRIMARY  = { ko: '60초 AI 피부 진단',    en: '60s AI Skin Analysis', de: 'KI-Hautanalyse in 60 Sek.' } as const;
 const HERO_CTA_SECONDARY = { ko: '설문으로 진단하기',     en: 'Take the quiz instead',  de: 'Zum Fragebogen'       } as const;
 
 type CartBtnState = "idle" | "adding" | "added";

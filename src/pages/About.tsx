@@ -77,7 +77,7 @@ const ABOUT_COPY = {
       "Verloren in der endlosen Flut von Beauty-Trends und neuen Produkten? Die richtige Pflege zu finden, sollte kein Rätselraten sein.",
       "Skin Strategy Lab ist Ihre hybride, personalisierte Lösung, die KI-Fotodiagnostik mit Lebensstil-Analysen und gezielten Zonen-Fragebögen vereint.",
       "Wir begleiten Ihre sich verändernde Hautstruktur und Ihren Hauttyp in jeder Lebensphase und empfehlen stets genau das, was Sie in diesem Moment benötigen.",
-      "Wir machen keine Kompromisse. Basierend auf klinisch-dermatologischen Studien und absolut transparenten Wirkstoffkonzentrationen kuratieren wir voller Überzeugung nur hochwirksame Produkte, die echte Ergebnisse liefern.",
+      "Wir machen keine Kompromisse. Basierend auf dermatologischen Studien und absolut transparenten Wirkstoffkonzentrationen kuratieren wir voller Überzeugung nur hochwirksame Produkte, die echte Ergebnisse liefern.",
       "Vertrauen Sie unserer Plattform und erleben Sie Hautpflege, die wirklich funktioniert.",
     ],
     manifestoTitle: "Ihr lebenslanger Hautpflege-Kompass",

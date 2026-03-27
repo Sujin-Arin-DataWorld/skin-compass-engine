@@ -593,7 +593,7 @@ export function buildRoutineV5(
   const advancedCaution: RoutineOutput["advancedCaution"] = deviceGated
     ? {
         en: `Device therapy is paused. Barrier score (${Math.round(scores.bar)}) must drop below 50 before EMS / LED activation. Follow the 5-step repair protocol for 4–6 weeks before re-assessing.`,
-        de: `Gerätetherapie ist pausiert. Der Barriere-Wert (${Math.round(scores.bar)}) muss unter 50 fallen, bevor EMS / LED aktiviert werden kann. Folgen Sie 4–6 Wochen dem 5-Schritt-Reparaturprotokoll.`,
+        de: `Geräteanwendung ist pausiert. Der Barriere-Wert (${Math.round(scores.bar)}) muss unter 50 fallen, bevor EMS / LED aktiviert werden kann. Folgen Sie 4–6 Wochen dem 5-Schritt-Reparaturprotokoll.`,
         ko: `기기 테라피가 일시 중단되었습니다. 배리어 점수(${Math.round(scores.bar)})가 50 이하로 내려가야 EMS / LED를 활성화할 수 있습니다. 4–6주간 5단계 회복 루틴을 따르세요.`,
       }
     : v4.advancedCaution;

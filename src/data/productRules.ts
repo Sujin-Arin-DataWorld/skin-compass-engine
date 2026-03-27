@@ -105,7 +105,7 @@ export const PRODUCT_RULES: ProductRule[] = [
     marketingCopy: {
       ko: '밤새 탄력을 되찾는 레티놀 집중 케어',
       en: 'Overnight firming with clinical-grade retinol',
-      de: 'Nächtliche Straffung mit klinischem Retinol',
+      de: 'Nächtliche Straffung mit professionellem Retinol',
     },
     targetAxes: ['aging'],
   },

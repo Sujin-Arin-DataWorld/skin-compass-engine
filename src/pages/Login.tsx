@@ -47,7 +47,7 @@ const LOGIN_I18N = {
     de: {
         title: "Sicherer Zugang",
         titleSignup: "Konto erstellen",
-        subtitle: "Ihre 10-Achsen-Hautstrategie ist ein klinischer Vermögenswert. Melden Sie sich an, um Ihre präzisen Daten zu sichern und Ihre personalisierte Formel freizuschalten. Ungespeicherte Daten gehen verloren.",
+        subtitle: "Ihre 10-Dimensionen-Hautstrategie ist ein wertvolles Pflegeprofil. Melden Sie sich an, um Ihre präzisen Daten zu sichern und Ihre personalisierte Formel freizuschalten. Ungespeicherte Daten gehen verloren.",
         subtitleSignup: "Erstellen Sie Ihr Skin Strategy Lab Konto.",
         tabLogin: "Anmelden",
         tabSignup: "Registrieren",

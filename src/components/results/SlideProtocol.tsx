@@ -302,7 +302,7 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
     noSteps: { en: "No steps for this timing.", de: "Keine Schritte für diesen Zeitpunkt.", ko: "해당 타이밍에 단계가 없습니다." },
     step: { en: "Step", de: "Schritt", ko: "단계" },
     advancedLabel: { en: "Advanced ✦", de: "Advanced ✦", ko: "어드밴스드 ✦" },
-    cautionTitle: { en: "Device therapy paused", de: "Gerätetherapie pausiert", ko: "기기 테라피 일시 중단" },
+    cautionTitle: { en: "Device therapy paused", de: "Geräteanwendung pausiert", ko: "기기 테라피 일시 중단" },
     upgradeAdvanced: {
       en: "→ Unlock Advanced: 5-step + Medicube Booster Pro Device",
       de: "→ Advanced freischalten: 5-Schritt + Medicube Booster Pro",
@@ -312,7 +312,7 @@ export default function SlideProtocol({ result, routineOutput, onGoToLab }: Prop
     sosEyebrow: { en: "🚨 SOS Rescue Protocol", de: "🚨 SOS Rettungsprotokoll", ko: "🚨 SOS 레스큐 프로토콜" },
     sosSub: { en: "K-Derma Clinic Exclusive", de: "K-Derma Klinik Exklusiv", ko: "피부과 전문 추천" },
     sosBadge: { en: "Minimalist 3-Step Protocol", de: "Minimalprotokoll — 3 Schritte", ko: "미니멀 3단계 프로토콜" },
-    sosBrandNote: { en: "Clinical dermatology brands only", de: "Nur klinische Dermatologie-Marken", ko: "임상 피부과 브랜드 전용" },
+    sosBrandNote: { en: "Clinical dermatology brands only", de: "Nur dermatologische Marken", ko: "임상 피부과 브랜드 전용" },
   };
   const t = (k: keyof typeof copy) => copy[k][lang] ?? copy[k]["en"];
 

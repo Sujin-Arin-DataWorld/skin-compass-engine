@@ -67,7 +67,7 @@ const CRITICAL_MESSAGES: Partial<Record<AxisKey, { en: string; de: string; ko: s
   acne: { en: "Inflammation control must come before any actives.", de: "Entzündungskontrolle muss vor anderen Wirkstoffen kommen.", ko: "모든 활성 성분 전에 염증 관리가 선행되어야 합니다." },
   seb: { en: "Oil regulation is the gateway to texture and pore improvement.", de: "Hautöl-Regulierung ist das Tor zur Verbesserung von Textur und Poren.", ko: "피지 조절이 피부결과 모공 개선의 시작점입니다." },
   hyd: { en: "Barrier hydration is Phase 1 before any targeted treatment.", de: "Barriere-Hydratation ist Phase 1 vor jeder gezielten Behandlung.", ko: "장벽 수분 공급이 모든 집중 케어 전 1단계입니다." },
-  sen: { en: "Barrier calming must precede all active ingredients.", de: "Barriere-Beruhigung muss vor der starken Wirkstofftherapie stehen.", ko: "모든 활성 성분 전에 장벽 진정이 선행되어야 합니다." },
+  sen: { en: "Barrier calming must precede all active ingredients.", de: "Barriere-Beruhigung muss vor der starken Wirkstoffanwendung stehen.", ko: "모든 활성 성분 전에 장벽 진정이 선행되어야 합니다." },
   pigment: { en: "SPF protocol activation is the highest leverage action.", de: "Aktivierung des SPF-Protokolls ist die wirkungsvollste Maßnahme.", ko: "SPF 프로토콜 실천이 가장 효과적인 조치입니다." },
   texture: { en: "Gentle exfoliation cadence is the critical variable.", de: "Regelmäßiges, schonendes Peeling ist die entscheidende Variable.", ko: "부드러운 각질 제거 주기가 핵심 변수입니다." },
   aging: { en: "Collagen-supporting actives unlock in Phase 4.", de: "Kollagenunterstützende Wirkstoffe entfalten Phase 4.", ko: "콜라겐 지지 활성 성분은 4단계에서 효과가 나타납니다." },
@@ -324,7 +324,7 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
 
         {/* Eyebrow */}
         <motion.p className="slide-eyebrow mb-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          {language === "de" ? "Klinische Analyse" : language === "ko" ? "임상 분석 결과" : "Clinical Analysis"}
+          {language === "de" ? "Wissenschaftliche Analyse" : language === "ko" ? "임상 분석 결과" : "Scientific Analysis"}
         </motion.p>
 
         {/* Headline */}
@@ -502,7 +502,7 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
             style={{ fontSize: "0.6875rem", color: "hsl(var(--foreground-hint))", marginTop: 8, textAlign: "right" }}
           >
             {language === "de"
-              ? "Tippen Sie auf eine Achse für die Bewertungsaufschlüsselung"
+              ? "Tippen Sie auf eine Dimension für die Bewertungsaufschlüsselung"
               : language === "ko"
                 ? "축을 탭하면 점수 분석을 볼 수 있습니다"
                 : "Tap any axis to see the score breakdown"}
@@ -526,7 +526,7 @@ const SlideAxisBreakdown = ({ result, goToProducts }: Props) => {
           <p className="slide-body" style={{ lineHeight: 1.5 }}>
             {CRITICAL_MESSAGES[topAxis]?.[language as "en" | "de" | "ko"] ?? (
               language === "de"
-                ? "Ihr Protokoll ist nach klinischer Priorität geordnet, beginnend mit Ihrer am höchsten bewerteten Achse."
+                ? "Ihr Protokoll ist nach wissenschaftlicher Priorität geordnet, beginnend mit Ihrer am höchsten bewerteten Dimension."
                 : language === "ko"
                   ? "프로토콜은 임상적 우선순위에 따라 정렬되며, 가장 높은 점수의 축부터 시작합니다."
                   : "Your protocol is ordered by clinical priority, starting with your highest-scoring axis."

@@ -214,7 +214,7 @@ const BALANCED_PATTERN: V5RiskPattern = {
   clinical_en:
     "No dominant clinical pattern detected. Skin axes are within moderate ranges. Maintenance protocol and daily UV protection are the primary recommendations.",
   clinical_de:
-    "Kein dominantes klinisches Muster erkannt. Hautachsen liegen in moderaten Bereichen. Pflegeprotokoll und täglicher UV-Schutz sind die primären Empfehlungen.",
+    "Kein dominantes Muster erkannt. Hautdimensionen liegen in moderaten Bereichen. Pflegeprotokoll und täglicher UV-Schutz sind die primären Empfehlungen.",
   clinical_ko:
     "지배적인 임상 패턴이 감지되지 않았습니다. 피부 축이 적절한 범위 내에 있습니다. 유지 관리 프로토콜과 매일 자외선 차단이 주요 권장 사항입니다.",
   flag: "NONE",

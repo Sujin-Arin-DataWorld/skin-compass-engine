@@ -34,7 +34,7 @@ function EmptyWishlist({ de }: { de: boolean }) {
             </p>
             <p className="text-sm text-center max-w-xs mb-6 text-gray-500 dark:text-[var(--ssl-accent-deep)]">
                 {de
-                    ? "Führen Sie eine Diagnose durch, um personalisierte Produktempfehlungen zu erhalten."
+                    ? "Führen Sie eine Analyse durch, um personalisierte Produktempfehlungen zu erhalten."
                     : "Complete a diagnosis to receive personalized product recommendations."}
             </p>
 
@@ -43,7 +43,7 @@ function EmptyWishlist({ de }: { de: boolean }) {
                 className="px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-80"
                 style={{ background: GOLD, color: "#F5F5F7" }}
             >
-                {de ? "Diagnose starten" : "Start Diagnosis"}
+                {de ? "Analyse starten" : "Start Analysis"}
             </Link>
         </div>
     );

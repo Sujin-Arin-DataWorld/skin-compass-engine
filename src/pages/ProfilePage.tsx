@@ -246,8 +246,8 @@ function DeleteModal({
 
                 <p style={{ fontSize: "0.8125rem", color: BRONZE, lineHeight: 1.65, marginBottom: "1.25rem" }}>
                     {de
-                        ? "Diese Aktion kann nicht rückgängig gemacht werden. Alle Diagnosen, Bestellungen und gespeicherten Produkte werden dauerhaft gelöscht."
-                        : "This action cannot be undone. All diagnoses, orders, and saved products will be permanently deleted."}
+                        ? "Diese Aktion kann nicht rückgängig gemacht werden. Alle Analysen, Bestellungen und gespeicherten Produkte werden dauerhaft gelöscht."
+                        : "This action cannot be undone. All analyses, orders, and saved products will be permanently deleted."}
                 </p>
 
                 <p style={{ fontSize: "0.75rem", color: "#e8e8e8", marginBottom: "0.5rem" }}>
@@ -621,8 +621,8 @@ export default function ProfilePage({ de }: { de: boolean }) {
                 </p>
                 <p style={{ fontSize: "0.8125rem", color: BRONZE, lineHeight: 1.65, marginBottom: "1.1rem" }}>
                     {de
-                        ? "Dein Konto wird dauerhaft gelöscht. Alle Diagnosen, Bestellungen und gespeicherten Produkte werden entfernt."
-                        : "Your account will be permanently deleted. All diagnoses, orders, and saved products will be removed."}
+                        ? "Dein Konto wird dauerhaft gelöscht. Alle Analysen, Bestellungen und gespeicherten Produkte werden entfernt."
+                        : "Your account will be permanently deleted. All analyses, orders, and saved products will be removed."}
                 </p>
                 <button
                     onClick={() => setDeleteOpen(true)}

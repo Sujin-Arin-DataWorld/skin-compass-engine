@@ -212,7 +212,7 @@ const COPY: Record<Lang, {
   },
   de: {
     title: "Wo bemerken Sie Hautprobleme?",
-    subtitle: "Tippen Sie auf eine klinische Zone, um Ihre Hautanliegen auszuwählen.",
+    subtitle: "Tippen Sie auf eine Zone, um Ihre Hautanliegen auszuwählen.",
     selected: (n) => `${n} Anliegen ausgewählt`,
     close: "Fertig", continue: "Weiter",
     hint: "Tippen Sie auf eine Zone, um zu beginnen",

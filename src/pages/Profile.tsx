@@ -142,7 +142,7 @@ function SkinProgressTab() {
             {userProfile && (userProfile.savedResults?.length ?? 0) > 0 && (
                 <div className="rounded-2xl border border-border bg-card p-5 md:p-6">
                     <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-4">
-                        {language === "ko" ? "진단 타임라인" : language === "de" ? "Diagnose-Timeline" : "Diagnosis Timeline"}
+                        {language === "ko" ? "진단 타임라인" : language === "de" ? "Analyse-Timeline" : "Analysis Timeline"}
                     </p>
 
                     <div className="relative">
@@ -209,7 +209,7 @@ function SkinProgressTab() {
                                                     <p className="text-[0.55rem] font-bold tracking-[0.12em] uppercase mb-1"
                                                         style={{ color: "hsl(var(--foreground-hint))" }}
                                                     >
-                                                        {language === "ko" ? "시스템 기본 루틴" : language === "de" ? "System-Basisroutine" : "System Base Routine"}
+                                                        {language === "ko" ? "시스템 기본 루틴" : language === "de" ? "System-Basispflege" : "System Base Routine"}
                                                     </p>
                                                     <div className="flex flex-wrap gap-1">
                                                         {routineProducts.slice(0, 5).map((p) => (

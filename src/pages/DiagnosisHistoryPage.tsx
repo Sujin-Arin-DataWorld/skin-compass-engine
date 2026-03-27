@@ -218,7 +218,7 @@ function EmptyState({ de }: { de: boolean }) {
                 margin: "0 auto 1.5rem",
             }}>
                 {de
-                    ? "Starten Sie Ihre wissenschaftliche Diagnose, um die Daten Ihrer Haut freizuschalten."
+                    ? "Starten Sie Ihre wissenschaftliche Analyse, um die Daten Ihrer Haut freizuschalten."
                     : "Start your scientific diagnosis to unlock your skin's data."
                 }
             </p>
@@ -228,7 +228,7 @@ function EmptyState({ de }: { de: boolean }) {
                 style={{ background: GOLD, color: "#F5F5F7" }}
             >
                 <FlaskConical className="w-4 h-4" strokeWidth={1.5} />
-                {de ? "Diagnose starten" : "Start Diagnosis"}
+                {de ? "Analyse starten" : "Start Analysis"}
             </Link>
         </motion.div>
     );
@@ -360,7 +360,7 @@ function DiagnosisCard({
 
                             {/* Axis score bars */}
                             <div>
-                                <SectionHead>{de ? "Achsen-Scores" : "Axis Scores"}</SectionHead>
+                                <SectionHead>{de ? "Dimensions-Scores" : "Axis Scores"}</SectionHead>
                                 <div className="space-y-2">
                                     {RADAR_AXES.map((key) => {
                                         const score = Math.round(record.radar_data[key] ?? 0);
@@ -571,7 +571,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
                         <div className="py-10 text-center">
                             <p style={{ fontSize: "0.8125rem", color: BRONZE, lineHeight: 1.6 }}>
                                 {de
-                                    ? "Führen Sie eine weitere Diagnose durch, um Ihren Fortschritt zu sehen."
+                                    ? "Führen Sie eine weitere Analyse durch, um Ihren Fortschritt zu sehen."
                                     : "Complete one more diagnosis to see your progress over time."}
                             </p>
                         </div>
@@ -744,7 +744,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
             {/* ── 3. Diagnosis Archive ─────────────────────────────────── */}
             <section>
                 <div className="flex items-center justify-between mb-3">
-                    <SectionHead>{de ? "Diagnose-Archiv" : "Diagnosis Archive"}</SectionHead>
+                    <SectionHead>{de ? "Analyse-Archiv" : "Analysis Archive"}</SectionHead>
                     {compareIds.length === 1 && (
                         <motion.p
                             initial={{ opacity: 0 }}

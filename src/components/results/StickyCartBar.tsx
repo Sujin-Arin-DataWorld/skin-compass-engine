@@ -16,11 +16,11 @@ import type { MockProduct, RoutineStep } from '@/engine/routineEngine';
 // ── i18n ──────────────────────────────────────────────────────────────────────
 
 const COPY = {
-  cart_protocol: { ko: '내 루틴', de: 'Meine Routine', en: 'My routine' },
+  cart_protocol: { ko: '내 루틴', de: 'Meine Pflege', en: 'My routine' },
   cart_products: { ko: '{N}개 제품', de: '{N} Produkte', en: '{N} products' },
   cart_daily_price: { ko: '하루 €{X}', de: '€{X} pro Tag', en: '€{X}/day' },
   cart_supply: { ko: '~{N}주분', de: '~{N} Wochen', en: '~{N} weeks' },
-  cart_cta: { ko: '내 루틴 시작 — 월 €{X}', de: 'Meine Routine starten — €{X}/Mo.', en: 'Start my routine — €{X}/mo' },
+  cart_cta: { ko: '내 루틴 시작 — 월 €{X}', de: 'Meine Pflege starten — €{X}/Mo.', en: 'Start my routine — €{X}/mo' },
   trust_dermatologist: { ko: '피부과 전문의 검증', de: 'Dermatologisch geprüft', en: 'Dermatologist reviewed' },
   trust_cancel: { ko: '언제든 해지 가능', de: 'Jederzeit kündbar', en: 'Cancel anytime' },
   trust_shipping: { ko: 'EU 3-5일 배송', de: 'EU 3-5 Werktage', en: 'EU 3-5 days' },

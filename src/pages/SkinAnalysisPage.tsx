@@ -68,7 +68,7 @@ const SKIN_ANALYSIS_META = {
   },
   de: {
     title: 'KI-Hautanalyse | SkinStrategyLab',
-    description: 'Analysieren Sie Ihre Haut in 10 Achsen mit einer 60-Sekunden-KI-Diagnose und erhalten Sie personalisierte Hautpflege-Empfehlungen.',
+    description: 'Analysieren Sie Ihre Haut in 10 Dimensionen mit einer 60-Sekunden-KI-Analyse und erhalten Sie personalisierte Hautpflege-Empfehlungen.',
   },
 } as const;
 

@@ -48,7 +48,7 @@ function generateAxisChangeMessage(
     message.ko = `${axisName.ko} 점수가 ${delta}점 개선됐어요 — 이대로 유지하세요!`;
   } else if (direction === "worsened") {
     message.en = `Your ${axisName.en.toLowerCase()} score increased by ${Math.abs(delta)} points — let's adjust your routine.`;
-    message.de = `Ihr ${axisName.de}-Wert stieg um ${Math.abs(delta)} Punkte — wir passen Ihre Routine an.`;
+    message.de = `Ihr ${axisName.de}-Wert stieg um ${Math.abs(delta)} Punkte — wir passen Ihre Pflege an.`;
     message.ko = `${axisName.ko} 점수가 ${Math.abs(delta)}점 올랐어요 — 루틴 조정이 필요합니다.`;
   } else {
     message.en = `Your ${axisName.en.toLowerCase()} is stable — your current care is maintaining results.`;
@@ -87,7 +87,7 @@ export function buildDiagnosisComparison(
     de: improvedCount > worsenedCount
       ? `Guter Fortschritt — ${improvedCount} Bereiche haben sich seit der letzten Diagnose verbessert.`
       : worsenedCount > improvedCount
-      ? `${worsenedCount} Bereiche brauchen Aufmerksamkeit — überprüfen wir Ihre Routine.`
+      ? `${worsenedCount} Bereiche brauchen Aufmerksamkeit — überprüfen wir Ihre Pflege.`
       : `Ihre Haut ist stabil — ${stableCount} Bereiche halten das Niveau.`,
     ko: improvedCount > worsenedCount
       ? `좋은 진전이에요 — 지난 진단 이후 ${improvedCount}개 항목이 개선됐습니다.`

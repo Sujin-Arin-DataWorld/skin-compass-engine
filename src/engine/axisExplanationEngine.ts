@@ -58,7 +58,7 @@ export function generateAxisExplanation(input: ExplainInput): AxisExplanation {
     explanationDe = `Ihre Haut verliert Feuchtigkeit schneller als sie nachliefern kann.${ageCtxDe}${winterCtxDe} Ihre Barriere braucht extra Unterstützung.`;
     explanationKo = `피부가 수분을 보충하는 속도보다 빠르게 잃고 있어요.${ageCtxKo}${winterCtxKo} 수분을 잡아두는 장벽 케어가 더 필요합니다.`;
     outcomeEn = "With a hydration-focused routine, you should notice less tightness within 1–2 weeks and visibly plumper skin by week 4.";
-    outcomeDe = "Mit einer feuchtigkeitsfokussierten Routine sollten Sie in 1–2 Wochen weniger Spannung und nach 4 Wochen sichtbar prallere Haut bemerken.";
+    outcomeDe = "Mit einer feuchtigkeitsfokussierten Pflege sollten Sie in 1–2 Wochen weniger Spannung und nach 4 Wochen sichtbar prallere Haut bemerken.";
     outcomeKo = "수분 집중 루틴을 따르면 1-2주 내에 당김이 줄고, 4주 후 눈에 띄게 촉촉한 피부를 느낄 수 있어요.";
 
   } else if (axis === "aging" && score >= 30) {
@@ -85,7 +85,7 @@ export function generateAxisExplanation(input: ExplainInput): AxisExplanation {
     explanationDe = `Ihre Öl-Drüsen produzieren übermäßig Hautöl.${maleCtxDe}${summerCtxDe} Das trägt zu Glanz, vergrößerten Poren und möglichen Unreinheiten bei.`;
     explanationKo = `피지선이 과도하게 피지를 분비하고 있어요.${maleCtxKo}${summerCtxKo} 번들거림, 넓은 모공, 트러블의 원인이 될 수 있어요.`;
     outcomeEn = "With the right oil-control routine, shine should reduce noticeably within 2–3 weeks.";
-    outcomeDe = "Mit der richtigen ölkontrollierenden Routine sollte der Glanz innerhalb von 2–3 Wochen merklich abnehmen.";
+    outcomeDe = "Mit der richtigen ölkontrollierenden Pflege sollte der Glanz innerhalb von 2–3 Wochen merklich abnehmen.";
     outcomeKo = "적절한 피지 조절 루틴으로 2-3주 내에 번들거림이 눈에 띄게 줄어들어요.";
 
   } else if (axis === "bar" && score >= 40) {
@@ -105,7 +105,7 @@ export function generateAxisExplanation(input: ExplainInput): AxisExplanation {
     explanationDe = "Ihre Haut reagiert stärker als normal auf Umweltreize, Produkte und Temperaturwechsel.";
     explanationKo = "환경 자극, 제품, 온도 변화에 평균보다 더 민감하게 반응하는 피부예요.";
     outcomeEn = "Simplifying your routine and focusing on barrier support typically reduces reactivity within 3–4 weeks.";
-    outcomeDe = "Eine vereinfachte Routine und Barriere-Unterstützung reduziert die Reaktivität meist innerhalb von 3–4 Wochen.";
+    outcomeDe = "Eine vereinfachte Pflege und Barriere-Unterstützung reduziert die Reaktivität meist innerhalb von 3–4 Wochen.";
     outcomeKo = "루틴을 단순화하고 장벽 케어에 집중하면 보통 3-4주 내에 민감도가 감소해요.";
 
   } else if (axis === "acne" && score >= 40) {
@@ -143,10 +143,10 @@ export function generateAxisExplanation(input: ExplainInput): AxisExplanation {
   } else {
     // Generic fallback
     explanationEn = `Your ${axis} score is ${score >= 50 ? "elevated" : "within a healthy range"} — we've accounted for this in your routine.`;
-    explanationDe = `Ihr ${axis}-Wert ist ${score >= 50 ? "erhöht" : "im gesunden Bereich"} — wir haben dies in Ihrer Routine berücksichtigt.`;
+    explanationDe = `Ihr ${axis}-Wert ist ${score >= 50 ? "erhöht" : "im gesunden Bereich"} — wir haben dies in Ihrer Pflege berücksichtigt.`;
     explanationKo = `${axis} 점수가 ${score >= 50 ? "높은 편이에요" : "건강한 범위 내에 있어요"} — 루틴에 반영했습니다.`;
     outcomeEn = "Following the recommended routine consistently will support overall skin health.";
-    outcomeDe = "Die konsequente Befolgung der empfohlenen Routine unterstützt die allgemeine Hautgesundheit.";
+    outcomeDe = "Die konsequente Befolgung der empfohlenen Pflege unterstützt die allgemeine Hautgesundheit.";
     outcomeKo = "추천 루틴을 꾸준히 따르면 전반적인 피부 건강이 향상돼요.";
   }
 

@@ -48,7 +48,7 @@ const COPY = {
         intro: "Um Skin Strategy Lab zu nutzen, benötigen wir Ihre Einwilligung zur Erhebung und Verarbeitung folgender personenbezogener Daten gemäß DSGVO (EU 2016/679):",
         bullets: [
             "Kontodaten: Name und E-Mail-Adresse (via Google)",
-            "Hautprofil: Diagnoseergebnisse, Achsen-Scores und Hauttyp",
+            "Hautprofil: Analyseergebnisse, Dimensions-Scores und Hauttyp",
             "Nutzungsdaten: Wunschliste, Bestellhistorie und gespeicherte Adressen",
             "Gesichtsbilder für KI-Hautanalyse (sofort nach Verarbeitung gelöscht, niemals gespeichert)",
         ],

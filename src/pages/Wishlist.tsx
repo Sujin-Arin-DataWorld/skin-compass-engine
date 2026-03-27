@@ -71,7 +71,7 @@ export default function Wishlist() {
                         <Heart className="w-10 h-10 text-foreground/20 mx-auto mb-4" />
                         <p className="text-foreground/60 text-sm mb-5">
                             {de
-                                ? "Ihre Wunschliste ist noch leer. Führen Sie eine Hautdiagnose durch und speichern Sie empfohlene Produkte."
+                                ? "Ihre Wunschliste ist noch leer. Führen Sie eine Hautanalyse durch und speichern Sie empfohlene Produkte."
                                 : "Your wishlist is empty. Run a skin diagnosis and save recommended products."}
                         </p>
                         <Link

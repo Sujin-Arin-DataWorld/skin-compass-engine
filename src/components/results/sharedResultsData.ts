@@ -101,7 +101,7 @@ export const CRITICAL_MESSAGES: Partial<Record<AxisKey, { en: string; de: string
   acne: { en: "Inflammation control must come before any actives.", de: "Entzündungskontrolle muss vor anderen Wirkstoffen kommen.", ko: "모든 활성 성분 전에 염증 관리가 선행되어야 합니다." },
   seb: { en: "Oil regulation is the gateway to texture and pore improvement.", de: "Hautöl-Regulierung ist das Tor zur Verbesserung von Textur und Poren.", ko: "피지 조절이 피부결과 모공 개선의 시작점입니다." },
   hyd: { en: "Barrier hydration is Phase 1 before any targeted treatment.", de: "Barriere-Hydratation ist Phase 1 vor jeder gezielten Behandlung.", ko: "장벽 수분 공급이 모든 집중 케어 전 1단계입니다." },
-  sen: { en: "Barrier calming must precede all active ingredients.", de: "Barriere-Beruhigung muss vor der starken Wirkstofftherapie stehen.", ko: "모든 활성 성분 전에 장벽 진정이 선행되어야 합니다." },
+  sen: { en: "Barrier calming must precede all active ingredients.", de: "Barriere-Beruhigung muss vor der starken Wirkstoffanwendung stehen.", ko: "모든 활성 성분 전에 장벽 진정이 선행되어야 합니다." },
   pigment: { en: "SPF protocol activation is the highest leverage action.", de: "Aktivierung des SPF-Protokolls ist die wirkungsvollste Maßnahme.", ko: "SPF 프로토콜 실천이 가장 효과적인 조치입니다." },
   texture: { en: "Gentle exfoliation cadence is the critical variable.", de: "Regelmäßiges, schonendes Peeling ist die entscheidende Variable.", ko: "부드러운 각질 제거 주기가 핵심 변수입니다." },
   aging: { en: "Collagen-supporting actives unlock in Phase 4.", de: "Kollagenunterstützende Wirkstoffe entfalten Phase 4.", ko: "콜라겐 지지 활성 성분은 4단계에서 효과가 나타납니다." },

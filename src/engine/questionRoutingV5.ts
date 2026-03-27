@@ -96,7 +96,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   // ── Axis 0: Global Habits ─────────────────────────────────────────────────
   {
     id: 0,
-    name: t("Global Habits & Base Routine", "Allgemeine Gewohnheiten & Basis-Routine", "기본 습관 및 루틴"),
+    name: t("Global Habits & Base Routine", "Allgemeine Gewohnheiten & Basis-Pflege", "기본 습관 및 루틴"),
     eyebrow: t("Your Daily Basics", "Ihre tägliche Basis", "데일리 기본 루틴"),
     triggerConcerns: [],
     alwaysShow: true,
@@ -227,7 +227,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         text: t("By 2 PM, what does your base makeup look like?", "Wie sieht Ihr Foundation-Make-up gegen 14 Uhr aus?", "오후 2시경, 베이스 메이크업 상태는 어떤가요?"),
         hint: t(
           "Makeup breakdown speed is a validated proxy for skin oil output in clinical dermatology.",
-          "Die Geschwindigkeit des Make-up-Abbaus ist ein klinisch validierter Indikator für die Hautöl-Produktion.",
+          "Die Geschwindigkeit des Make-up-Abbaus ist ein wissenschaftlich validierter Indikator für die Hautöl-Produktion.",
           "화장 무너짐 속도는 피부과 임상에서 검증된 피지량 추정 지표예요."
         ),
         required: false,

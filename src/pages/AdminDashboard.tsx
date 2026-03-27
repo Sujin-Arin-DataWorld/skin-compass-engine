@@ -220,7 +220,7 @@ export default function AdminDashboard() {
                             className="rounded-2xl border border-border bg-card p-6 md:p-8 mb-6"
                         >
                             <p className="text-xs font-bold tracking-[0.15em] uppercase text-foreground/50 mb-5">
-                                10-Achsen Durchschnitt (alle Nutzer)
+                                10-Dimensionen Durchschnitt (alle Nutzer)
                             </p>
                             {totalDiagnoses === 0 ? (
                                 <p className="text-sm text-foreground/40 italic py-4">Noch keine Diagnosen vorhanden.</p>

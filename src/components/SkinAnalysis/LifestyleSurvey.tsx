@@ -30,7 +30,7 @@ const INTRO_COPY = {
   },
   desc: {
     en: 'Answering these questions lets our AI analyze your skin photo with clinical-grade precision — not just what it sees, but why.',
-    de: 'Ihre Antworten ermöglichen unserer KI eine klinisch präzise Analyse — nicht nur, was sie sieht, sondern warum.',
+    de: 'Ihre Antworten ermöglichen unserer KI eine wissenschaftlich präzise Analyse — nicht nur, was sie sieht, sondern warum.',
     ko: 'AI가 피부 사진을 더 정확하게 분석할 수 있도록, 먼저 생활 습관을 파악합니다.',
   },
   start: { en: 'Start →', de: 'Start →', ko: '시작 →' },

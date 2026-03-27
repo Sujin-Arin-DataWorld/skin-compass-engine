@@ -50,7 +50,7 @@ const T = {
   caution_message: {
     ko: '현재 일부 부위의 민감도가 높아, 피부 장벽 보호를 위해 활성 성분 농도를 임상 안전 기준치 이하로 자동 조정했습니다.',
     en: 'Some zones show elevated sensitivity. Active ingredient concentrations have been automatically adjusted to clinically safe levels to protect your barrier.',
-    de: 'Einige Zonen zeigen erhöhte Empfindlichkeit. Die Konzentrationen aktiver Inhaltsstoffe wurden automatisch auf klinisch sichere Werte angepasst.',
+    de: 'Einige Zonen zeigen erhöhte Empfindlichkeit. Die Konzentrationen aktiver Inhaltsstoffe wurden automatisch auf sichere Werte angepasst.',
   },
   caution_details_toggle: {
     ko: '조정 내역 보기',

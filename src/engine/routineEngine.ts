@@ -145,7 +145,7 @@ export const DEVICE_MODE_MAP: Record<TargetTrouble, { en: string; de: string; ko
   },
   "barrier-repair": {
     en: "LED Therapy Mode — Low-level light, safe for compromised barrier",
-    de: "LED-Therapie-Modus — Niedrigenergie, sicher bei gestörter Barriere",
+    de: "LED-Anwendung — Niedrigenergie, sicher bei gestörter Barriere",
     ko: "저강도 LED 테라피 모드 — 손상된 장벽에 안전",
   },
 };
@@ -780,7 +780,7 @@ function buildSkinRescueProtocol(
     routine,
     disclaimer: {
       en: "Based on your responses, we recommend clinically-tested dermatological products. For chronic conditions, please also consult a dermatologist (Hautarzt).",
-      de: "Basierend auf Ihren Angaben empfehlen wir klinisch getestete dermatologische Produkte. Bei chronischen Erkrankungen empfehlen wir zusätzlich die Konsultation eines Hautarztes.",
+      de: "Basierend auf Ihren Angaben empfehlen wir dermatologisch getestete Produkte. Bei chronischen Erkrankungen empfehlen wir zusätzlich die Konsultation eines Hautarztes.",
       ko: "귀하의 응답을 바탕으로 임상 테스트된 피부과 전문 제품을 추천드립니다. 만성 질환의 경우 피부과 전문의(Hautarzt) 상담도 병행하시기 바랍니다.",
     },
   };
@@ -965,7 +965,7 @@ export function buildRoutine(
   const advancedCaution: RoutineOutput["advancedCaution"] = safetyBlocked
     ? {
       en: "Advanced device therapy is currently paused. Your barrier score indicates skin that is not yet ready for EMS / Microcurrent stimulation. Focus on the 5-step repair protocol for 4–6 weeks before re-assessing.",
-      de: "Die fortgeschrittene Gerätetherapie ist derzeit pausiert. Ihr Barriere-Score zeigt, dass Ihre Haut noch nicht für EMS / Mikrostrom-Stimulation bereit ist. Konzentrieren Sie sich 4–6 Wochen auf das 5-Schritt-Reparaturprotokoll.",
+      de: "Die fortgeschrittene Geräteanwendung ist derzeit pausiert. Ihr Barriere-Score zeigt, dass Ihre Haut noch nicht für EMS / Mikrostrom-Stimulation bereit ist. Konzentrieren Sie sich 4–6 Wochen auf das 5-Schritt-Reparaturprotokoll.",
       ko: "현재 고급 기기 테라피가 일시 중단되었습니다. 배리어 점수가 EMS / 마이크로커런트 자극을 받기에 아직 적합하지 않은 상태입니다. 4–6주 동안 5단계 회복 루틴에 집중한 후 재평가하세요.",
     }
     : null;

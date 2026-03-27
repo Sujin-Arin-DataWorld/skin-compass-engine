@@ -103,7 +103,7 @@ const AIX_CONTENT: Record<string, { en: string; de: string; ko: string }> = {
   treatment: { en: 'Targeted treatment for secondary concerns.', de: 'Gezielte Behandlung für sekundäre Anliegen.', ko: '2차 관심사를 위한 타겟 트리트먼트.' },
   moisturizer: { en: 'Barrier-sealing moisturiser matched to your base type.', de: 'Barriere-versiegelnde Feuchtigkeitscreme.', ko: '기초 타입에 맞춘 장벽 밀봉 보습제.' },
   spf: { en: 'Broad-spectrum UV protection.', de: 'Breitspektrum UV-Schutz.', ko: '광범위 자외선 차단.' },
-  device: { en: 'Clinical EMS/LED device. Amplifies serum penetration by up to 3×.', de: 'Klinisches EMS/LED-Gerät.', ko: '임상 등급 EMS/LED 기기.' },
+  device: { en: 'Clinical EMS/LED device. Amplifies serum penetration by up to 3×.', de: 'Professionelles EMS/LED-Gerät.', ko: '임상 등급 EMS/LED 기기.' },
 };
 
 // ── Circular Score Ring 점수링 디자인 ─────────────────────────────────────────────────────

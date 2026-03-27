@@ -307,7 +307,7 @@ export default function LabSelectionPage() {
               {language === 'ko'
                 ? '맞춤 루틴 설계'
                 : language === 'de'
-                  ? 'Ihre persönliche Routine'
+                  ? 'Ihre persönliche Pflege'
                   : 'Build Your Routine'}
             </h1>
             <p
@@ -322,8 +322,8 @@ export default function LabSelectionPage() {
               {language === 'ko'
                 ? '진단 결과를 기반으로 각 부위에 맞는 제품을 선택하고, 안전한 루틴을 완성하세요.'
                 : language === 'de'
-                  ? 'Wählen Sie Produkte basierend auf Ihren Diagnoseergebnissen und erstellen Sie Ihre sichere Routine.'
-                  : 'Select products matched to your diagnosis, zone by zone, and build a clinically safe routine.'}
+                  ? 'Wählen Sie Produkte basierend auf Ihren Analyseergebnissen und erstellen Sie Ihre sichere Pflege.'
+                  : 'Select products matched to your analysis, zone by zone, and build a safe skincare routine.'}
             </p>
           </motion.div>
         </div>
@@ -348,7 +348,7 @@ export default function LabSelectionPage() {
                   ko: '제품 선택', en: 'Select Products', de: 'Produkte wählen',
                 },
                 routine_builder: {
-                  ko: '루틴 빌더', en: 'Routine Builder', de: 'Routine Builder',
+                  ko: '루틴 빌더', en: 'Pflege Builder', de: 'Pflege-Ersteller',
                 },
               };
               const label = language === 'ko' ? labels[s].ko : language === 'de' ? labels[s].de : labels[s].en;

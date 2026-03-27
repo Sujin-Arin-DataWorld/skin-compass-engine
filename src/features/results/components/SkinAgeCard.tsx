@@ -72,7 +72,7 @@ function comparisonText(comparison: Comparison, delta: number, lang: Lang): stri
 const EXPLANATION: Record<Lang, string> = {
   ko: "피부 나이는 수분, 탄력, 자외선 손상 등 10개 축 점수를 기반으로 산출됩니다",
   en: "Skin age is calculated from 10 diagnostic axes including hydration, elasticity, and UV damage",
-  de: "Das Hautalter basiert auf 10 Diagnoseachsen wie Hydration, Elastizität und UV-Schäden",
+  de: "Das Hautalter basiert auf 10 Analysedimensionen wie Hydration, Elastizität und UV-Schäden",
 };
 
 const GAUGE_LABELS: Record<Lang, { bio: string; skin: string }> = {

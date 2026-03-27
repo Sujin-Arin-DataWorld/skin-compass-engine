@@ -389,7 +389,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
               style={{ lineHeight: 1.55, fontStyle: "italic", opacity: 0.75 }}
             >
               {language === "de"
-                ? "Diese Kombination von Zonen verrät uns ein spezifisches klinisches Muster:"
+                ? "Diese Kombination von Zonen verrät uns ein spezifisches Muster:"
                 : language === "ko"
                   ? "이 존들의 조합이 특정 임상 패턴을 보여줍니다:"
                   : "This combination of zones tells us a specific clinical pattern:"}
@@ -451,7 +451,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           style={{ lineHeight: 1.6 }}
         >
           {language === "de"
-            ? "Dieses Muster wurde aus der Überschneidung Ihrer am höchsten bewerteten Achsen identifiziert. Es beschreibt, wie Ihre Hautprobleme interagieren — nicht nur, was sie einzeln bedeuten."
+            ? "Dieses Muster wurde aus der Überschneidung Ihrer am höchsten bewerteten Dimensionen identifiziert. Es beschreibt, wie Ihre Hautprobleme interagieren — nicht nur, was sie einzeln bedeuten."
             : language === "ko"
               ? "이 패턴은 가장 높은 점수를 받은 축들의 교차점에서 확인되었습니다. 피부 문제들이 개별적으로 무엇을 의미하는지가 아닌, 어떻게 상호작용하는지를 설명합니다."
               : "This pattern was identified from the intersection of your highest-scoring axes. It describes how your skin's concerns interact — not just what they are individually."}
@@ -580,7 +580,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           {language === "ko"
             ? "진단은 전 세계 피부과 의사가 사용하는 임상 방법론을 기반으로 합니다 — SOS 피지 척도, TEWL 장벽 평가, APIA 프레임워크. 사진 없이도 정확한 분석이 가능합니다."
             : language === "de"
-              ? "Ihre Diagnose basiert auf Methoden der klinischen Dermatologie weltweit — darunter die SOS-Skala, TEWL-Barrierebewertung und das APIA-Framework. Keine Kamera nötig."
+              ? "Ihre Analyse basiert auf Methoden der wissenschaftlichen Dermatologie weltweit — darunter die SOS-Skala, TEWL-Barrierebewertung und das APIA-Framework. Keine Kamera nötig."
               : "Your diagnosis uses methods from clinical dermatology worldwide — including the SOS scale, TEWL barrier assessment, and the APIA framework. No camera needed."}
         </motion.div>
 
@@ -596,7 +596,7 @@ const SlideDiagnosisSummary = ({ result }: Props) => {
           }}
         >
           {language === "de"
-            ? "Ihre vollständige klinische Karte ansehen →"
+            ? "Ihre vollständige wissenschaftliche Karte ansehen →"
             : language === "ko"
               ? "전체 임상 분석 보기 →"
               : "See your full clinical map →"}

@@ -125,7 +125,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
             <div key={i} className="relative flex-[0_0_100%] h-full min-w-0">
               {isAIScanSlide ? (
                 <>
-                  {/* Slide 4: dark base background (fullscreen) */}
+                  {/* Slide 2: dark base background (fullscreen) */}
                   <div
                     className="absolute inset-0 z-0"
                     style={{
@@ -134,15 +134,17 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                         : "linear-gradient(135deg, #0e1114 0%, #141a1e 50%, #0f1612 100%)",
                     }}
                   />
-                  {/* Group: portrait + overlay move together */}
-                  <div className="absolute inset-0 z-[1]">
+                  {/* Group: portrait + overlay + data tags move together as ONE unit */}
+                  <div
+                    className="absolute inset-0 z-[1] -translate-y-[8%] md:translate-y-0"
+                  >
                     <img
                       src={img}
                       alt={allSlides[i]?.headline ?? ""}
-                      className="absolute inset-0 w-full h-full object-cover md:translate-x-[13%]"
+                      className="absolute inset-0 w-full h-[115%] object-cover md:translate-x-[13%] md:translate-y-0 md:h-full"
                       loading="lazy"
                     />
-                    {/* Overlay wrapper: right half for chip alignment /*스캔라인 & ㄱㄴ 브래킷 */}
+                    {/* Overlay wrapper: data tags + scan line anchored to image */}
                     {current === i && (
                       <div className="absolute inset-0 z-[5] pointer-events-none">
                         <div className="absolute top-0 left-0 w-full md:left-[37%] md:w-[50%] h-full">
@@ -156,21 +158,40 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                 <img
                   src={img}
                   alt={allSlides[i]?.headline ?? ""}
-                  className={`absolute inset-0 w-full h-full object-cover ${i === 0 ? 'object-top md:object-[92%_center]' : ''}`}
+                  className={`absolute inset-0 w-full h-full object-cover ${i === 0 ? 'object-[center_15%] md:object-[92%_center]' : ''}`}
                   style={{ zIndex: 0 }}
                   loading={i === 0 ? "eager" : "lazy"}
                 />
               )}
-              {/* Dark gradient overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: isAIScanSlide
-                    ? "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 35%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)"
-                    : "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)",
-                  zIndex: isAIScanSlide ? 2 : 1,
-                }}
-              />
+              {/* Dark gradient overlay — mobile: bottom-heavy, desktop: left-to-right */}
+              {isAIScanSlide ? (
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 35%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)",
+                    zIndex: 2,
+                  }}
+                />
+              ) : (
+                <>
+                  {/* Mobile gradient: bottom-heavy for face visibility */}
+                  <div
+                    className="absolute inset-0 pointer-events-none md:hidden"
+                    style={{
+                      background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.12) 60%, rgba(0,0,0,0.03) 100%)",
+                      zIndex: 1,
+                    }}
+                  />
+                  {/* Desktop gradient: left-to-right for landscape */}
+                  <div
+                    className="absolute inset-0 pointer-events-none hidden md:block"
+                    style={{
+                      background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)",
+                      zIndex: 1,
+                    }}
+                  />
+                </>
+              )}
               {/* Dreamy mist overlay */}
               <div
                 className="absolute inset-0 pointer-events-none"
@@ -210,7 +231,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
                   transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className={`text-white ${(i === 0 || i === 1) ? 'text-[34px]' : 'text-4xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-5' : 'mb-3 md:mb-5'} font-light`}
+                  className={`text-white ${(i === 0 || i === 1) ? 'text-[28px]' : 'text-3xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-4' : 'mb-2 md:mb-5'} font-light`}
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {allSlides[i]?.headline?.split('\n').map((line, idx, arr) => (
@@ -224,7 +245,7 @@ function HeroSlider({ slides, accent, accentDeep, isDark, language }: {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
                   transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                  className={`text-white/80 text-base md:text-lg leading-relaxed ${isAIScanSlide ? 'mb-8' : 'mb-4 md:mb-8'} max-w-lg break-keep`}
+                  className={`text-white/80 text-sm md:text-lg leading-relaxed ${isAIScanSlide ? 'mb-6' : 'mb-3 md:mb-8'} max-w-lg break-keep`}
                   style={{ fontFamily: "var(--font-sans)" }}
                 >
                   {allSlides[i]?.sub?.split('\n').map((line, idx, arr) => (

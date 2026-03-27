@@ -12,8 +12,8 @@ import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
 import { brand, glass } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
-import ProductImage from '@/components/product/ProductImage';
-import { getRecommendedProducts, AXIS_KO_SHORT } from '@/data/productRules';
+import { AXIS_KO_SHORT } from '@/data/productRules';
+import { buildProductBundleV5 } from '@/engine/routineEngineV5';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO } from '@/engine/types';
 import type { AxisKey, AxisScores, AxisSeverity } from '@/engine/types';
@@ -103,16 +103,12 @@ const TX = {
   overallLabel:  { ko: '종합 피부 점수', en: 'Overall Skin Score', de: 'Gesamt-Hautpunktzahl' },
   topConcerns:   { ko: '관리가 시급한 항목', en: 'Priority Concerns', de: 'Prioritäre Anliegen' },
   allAxes:       { ko: '전체 상세 분석', en: 'Full Analysis', de: 'Vollständige Analyse' },
-  products:      { ko: '맞춤 추천 제품', en: 'Recommended Products', de: 'Empfohlene Produkte' },
-  viewRoutine:   { ko: '전체 맞춤 루틴 보기', en: 'View My Routine', de: 'Meine Routine ansehen' },
+  masterplan:    { ko: '🧪 AI가 설계한 내 맞춤 스킨케어 마스터플랜 보기', en: '🧪 View AI Custom Skincare Masterplan', de: '🧪 KI-Hautpflege-Masterplan ansehen' },
   retake:        { ko: '다시 분석', en: 'Retake', de: 'Wiederholen' },
   save:          { ko: '저장', en: 'Save', de: 'Speichern' },
   saveLogin:     { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
   saved:         { ko: '저장됨 ✓', en: 'Saved ✓', de: 'Gespeichert ✓' },
   saveFail:      { ko: '저장 실패 — 재시도', en: 'Save failed — retry', de: 'Fehler — erneut versuchen' },
-  productSubtitle:{ ko: '분석 결과를 바탕으로 선별한 맞춤 솔루션입니다.', en: 'Curated solutions based on your analysis results.', de: 'Kuratierte Lösungen basierend auf Ihren Analyseergebnissen.' },
-  noProductsHealthy: { ko: '피부 상태가 양호합니다! 맞춤 루틴을 확인해보세요.', en: 'Your skin looks healthy! Check out our curated routines.', de: 'Ihre Haut sieht gesund aus! Entdecken Sie unsere kuratierten Routinen.' },
-  noProductsCurating: { ko: '고민에 맞는 전문 솔루션을 준비하고 있습니다.', en: 'We are curating specialized solutions for your specific concerns.', de: 'Wir kuratieren spezialisierte Lösungen für Ihre spezifischen Anliegen.' },
   precision:     { ko: '정밀 분석 완료', en: 'Precision Analysis', de: 'Präzisionsanalyse' },
   precisionDesc: { ko: 'AI 사진 + 생활습관 통합 분석', en: 'AI Photo + Lifestyle Integrated', de: 'KI-Foto + Lebensstil-Analyse' },
 };
@@ -301,11 +297,7 @@ export default function AnalysisResults({
     [apiReasons, scores, lang],
   );
 
-  // ── Product recommendations (from real DB) ────────────────────────────────
-  const matchedProducts = useMemo(() =>
-    getRecommendedProducts(scores, 5),
-    [scores],
-  );
+
 
   // ── Navigation handlers ──────────────────────────────────────────────────
   const handleNavigateToLab = useCallback(() => {
@@ -318,7 +310,9 @@ export default function AnalysisResults({
       axisSeverity[key] = score > 60 ? 2 : score < 40 ? 1 : 0;
       if (score > 60) primaryConcerns.push(key);
     }
-    setResult({
+
+    // Build temp result, then inject V5 product bundle
+    const tempResult = {
       engineVersion: 'v5-ai-camera',
       axis_scores: axisScores,
       axis_scores_normalized: { ...axisScores },
@@ -329,8 +323,15 @@ export default function AnalysisResults({
       urgency_level: 'MEDIUM',
       active_flags: [],
       radar_chart_data: [],
-      product_bundle: {},
-    });
+      product_bundle: {} as Record<string, unknown>,
+    } as any;
+
+    // V5 Engine: build Full tier product bundle
+    const implicitFlags = { atopyFlag: false, likelyHormonalCycleUser: false, likelyShaver: false };
+    const bundle = buildProductBundleV5(tempResult, implicitFlags, 'Full');
+    tempResult.product_bundle = bundle;
+
+    setResult(tempResult);
     navigate('/results');
   }, [scores, setResult, navigate]);
 
@@ -592,74 +593,41 @@ export default function AnalysisResults({
           </div>
         </motion.div>
 
-        {/* ── SECTION 4: Product Recommendations ───────────────────────────── */}
-        <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="mt-8">
-          <p className="mb-1" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            {TX.products[lang]}
-          </p>
-          {matchedProducts.length > 0 && (
-            <p className="mb-4" style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: 'rgba(134,134,139,0.7)', lineHeight: 1.5 }}>
-              {TX.productSubtitle[lang]}
-            </p>
-          )}
-          {matchedProducts.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              {matchedProducts.map((product, i) => {
-                const pName = lang === 'ko' ? product.name.ko : lang === 'de' ? product.name.de : product.name.en;
-                const pOneLiner = lang === 'ko' ? product.oneLiner.ko : lang === 'de' ? product.oneLiner.de : product.oneLiner.en;
-                return (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.08 }}
-                    className="flex gap-3 rounded-2xl p-4"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
-                  >
-                    <ProductImage productId={product.id} name={pName} />
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <p style={{ fontSize: '14px', fontFamily: 'var(--font-sans)', fontWeight: 500, color: 'rgba(255,255,255,0.9)', lineHeight: 1.4 }}>
-                        {pName}
-                      </p>
-                      <p style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', color: 'rgba(255,255,255,0.4)', marginTop: '2px' }}>
-                        {product.brand} · €{product.priceEur.toFixed(2)}
-                      </p>
-                      {pOneLiner && (
-                        <p className="mt-1" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: 'rgba(255,255,255,0.5)', lineHeight: 1.4 }}>
-                          {pOneLiner}
-                        </p>
-                      )}
-                      {/* Target axis badges */}
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {product.targetAxes.slice(0, 3).map(axis => (
-                          <span key={axis} className="rounded-full px-2 py-0.5" style={{ fontSize: '10px', fontFamily: 'var(--font-sans)', background: 'rgba(196,162,101,0.12)', border: '1px solid rgba(196,162,101,0.25)', color: '#c4a265' }}>
-                            {AXIS_KO_SHORT[axis] ?? axis}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="rounded-2xl p-5 text-center" style={{ background: 'rgba(74,158,104,0.06)', border: '1px solid rgba(74,158,104,0.15)' }}>
-              <p style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: '#4A9E68' }}>
-                {(tier === 'excellent' || tier === 'good') ? TX.noProductsHealthy[lang] : TX.noProductsCurating[lang]}
-              </p>
-            </div>
-          )}
-
-          {/* Single CTA: View full routine */}
-          <button
+        {/* ── SECTION 4: Masterplan CTA ─────────────────────────────────────── */}
+        <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="mt-10 mb-2">
+          <motion.button
             onClick={handleNavigateToLab}
-            className="w-full mt-4 rounded-xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-            style={{ background: 'rgba(138,154,123,0.12)', border: '1px solid rgba(138,154,123,0.25)', color: '#8a9a7b', fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full rounded-2xl py-5 flex flex-col items-center justify-center gap-2 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, rgba(138,154,123,0.15) 0%, rgba(74,158,104,0.12) 100%)',
+              border: '1px solid rgba(138,154,123,0.3)',
+              boxShadow: '0 0 40px rgba(138,154,123,0.08), inset 0 1px 0 rgba(255,255,255,0.04)',
+              backdropFilter: 'blur(12px)',
+            }}
           >
-            {TX.viewRoutine[lang]}
-            <ChevronRight size={14} />
-          </button>
+            <span style={{
+              fontSize: '15px',
+              fontFamily: 'var(--font-sans)',
+              fontWeight: 600,
+              color: '#8a9a7b',
+              lineHeight: 1.4,
+              textAlign: 'center',
+            }}>
+              {TX.masterplan[lang]}
+            </span>
+            <span style={{
+              fontSize: '12px',
+              fontFamily: 'var(--font-sans)',
+              color: 'rgba(138,154,123,0.6)',
+              letterSpacing: '0.05em',
+            }}>
+              {lang === 'ko' ? '3단계 / 5단계 / 기기 포함 프로토콜'
+               : lang === 'de' ? '3-Stufen / 5-Stufen / Geräte-Protokoll'
+               : '3-Step / 5-Step / Device Protocol'}
+            </span>
+          </motion.button>
         </motion.div>
 
         {/* ── SECTION 5: Action Buttons ─────────────────────────────────────── */}

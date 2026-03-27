@@ -39,6 +39,12 @@ function axisLabel(axis: AxisKey, lang: string, short = false) {
   return AXIS_LABELS[axis];
 }
 
+// ── Health Score conversion (UI only — raw scores stay intact for engine) ───
+const HIGH_IS_BAD_AXES = new Set<AxisKey>(['seb', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox']);
+function toHealthScore(axis: AxisKey, rawScore: number): number {
+  return HIGH_IS_BAD_AXES.has(axis) ? 100 - rawScore : rawScore;
+}
+
 // ── i18n Copy ─────────────────────────────────────────────────────────────────
 const C = {
   diagnosis_eyebrow: { ko: '피부 진단 결과', de: 'IHRE HAUTDIAGNOSE', en: 'YOUR SKIN DIAGNOSIS' },
@@ -113,7 +119,8 @@ const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56
   const r = (size - 7) / 2;
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - Math.min(100, Math.max(0, score)) / 100);
-  const color = scoreColor(score);
+  // Health Score color: low = red (bad), mid = amber, high = green (good)
+  const color = score < 30 ? '#E24B4A' : score < 70 ? '#BA7517' : '#4A9E68';
   const textColor = isDark ? '#F5F5F7' : '#1B2838'; // tok.text
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -210,10 +217,10 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
     onTierChange?.(currentSteps);
   }, [currentSteps, onTierChange]);
 
-  // ── Sorted axes ──────────────────────────────────────────────────────────
+  // ── Sorted axes (by health score — lowest health first = worst concerns) ──
   const activeAxes = useMemo(() =>
-    AXIS_KEYS.map((k) => ({ axis: k, score: result.axis_scores[k] ?? 0 }))
-      .filter((a) => a.score > 0).sort((a, b) => b.score - a.score),
+    AXIS_KEYS.map((k) => ({ axis: k, raw: result.axis_scores[k] ?? 0, score: toHealthScore(k, result.axis_scores[k] ?? 0) }))
+      .filter((a) => a.raw > 0).sort((a, b) => a.score - b.score),
     [result]);
   const topAxis = activeAxes[0];
 
@@ -240,7 +247,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
       if (!zone?.concerns?.length) return { zoneId, severity: 0 };
       const axes = zone.concerns.map(c => CONCERN_AXIS_MAP[c]).filter(Boolean) as AxisKey[];
       if (!axes.length) return { zoneId, severity: 50 };
-      return { zoneId, severity: Math.max(...axes.map(a => result.axis_scores[a] ?? 0)) };
+      return { zoneId, severity: Math.max(...axes.map(a => toHealthScore(a, result.axis_scores[a] ?? 0) < 50 ? 100 - toHealthScore(a, result.axis_scores[a] ?? 0) : 0)) };
     });
   }, [selectedZones, result]);
   const zoneCounts = useMemo(() => ({
@@ -312,8 +319,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
             <motion.div {...heroAnim(3)} style={{
               padding: 'clamp(12px, 2vw, 16px)', borderRadius: 12, textAlign: 'left',
               display: 'flex', gap: 12, alignItems: 'center',
-              border: `1px solid ${scoreBorderColor(topAxis.score, 0.12)}`,
-              background: scoreBgColor(topAxis.score, 0.04),
+              border: `1px solid ${scoreBorderColor(topAxis.raw, 0.12)}`,
+              background: scoreBgColor(topAxis.raw, 0.04),
               marginBottom: 10,
             }}>
               <CircularScore axis={topAxis.axis} score={topAxis.score} lang={lang} size={80} isDark={isDark} />
@@ -339,16 +346,16 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
           <motion.div {...heroAnim(4)} style={{
             display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 6,
           }}>
-            {activeAxes.slice(0, 3).map(({ axis, score }) => {
-              // Fix #3: severity-coded pill colors per light/dark mode
-              const pillColor = score >= 70
+            {activeAxes.slice(0, 3).map(({ axis, score, raw }) => {
+              // Pill colors: Health Score — low = red (bad), high = grey (good)
+              const pillColor = score < 30
                 ? (isDark ? '#E24B4A' : '#A32D2D')
-                : score >= 30
+                : score < 70
                   ? (isDark ? '#BA7517' : '#854F0B')
                   : (isDark ? '#86868B' : '#9CA3AF');
-              const pillBg = score >= 70
+              const pillBg = score < 30
                 ? (isDark ? 'rgba(226,75,74,0.10)' : 'rgba(226,75,74,0.08)')
-                : score >= 30
+                : score < 70
                   ? (isDark ? 'rgba(186,117,23,0.10)' : 'rgba(186,117,23,0.08)')
                   : (isDark ? 'rgba(134,134,139,0.10)' : 'rgba(134,134,139,0.08)');
               return (
@@ -489,7 +496,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   );
                   const isExpanded = expandedId === step.product.id;
                   const insight = AIX_CONTENT[step.role] ?? AIX_CONTENT['serum'];
-                  const topAxes = Object.entries(result.axis_scores).filter(([_, s]) => s > 30).sort((a, b) => b[1] - a[1]).slice(0, 3) as [AxisKey, number][];
+                  const topAxes = Object.entries(result.axis_scores).map(([k, s]) => [k, toHealthScore(k as AxisKey, s)] as [AxisKey, number]).filter(([_, s]) => s < 70).sort((a, b) => a[1] - b[1]).slice(0, 3);
                   const proj = routines.full.projected_improvement[topAxis?.axis ?? 'hyd'];
 
                   return (
@@ -541,11 +548,16 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                             fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: tok.textSecondary, margin: 0,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                           }}>{step.product.keyIngredients.slice(0, 2).join(', ')}</p>
-                          {isKeyStep && topAxis && (
-                            <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: scoreColor(topAxis.score), margin: '2px 0 0', fontWeight: 500 }}>
-                              {tx('step_score_goal', lang, { a: axisLabel(topAxis.axis, lang), c: proj.currentScore, g: proj.targetScore4w, w: 8 })}
+                          {isKeyStep && topAxis && (() => {
+                            const hc = topAxis.score < 30 ? '#E24B4A' : topAxis.score < 70 ? '#BA7517' : '#4A9E68';
+                            const dispCurrent = toHealthScore(topAxis.axis, proj.currentScore);
+                            const dispTarget = toHealthScore(topAxis.axis, proj.targetScore4w);
+                            return (
+                            <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: hc, margin: '2px 0 0', fontWeight: 500 }}>
+                              {tx('step_score_goal', lang, { a: axisLabel(topAxis.axis, lang), c: dispCurrent, g: dispTarget, w: 8 })}
                             </p>
-                          )}
+                            );
+                          })()}
                         </div>
                         {/* Price + add button + chevron */}
                         <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
@@ -618,12 +630,15 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                                   </span>
                                 </div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                                  {topAxes.map(([a, s]) => (
+                                  {topAxes.map(([a, s]) => {
+                                    const hc = s < 30 ? '#E24B4A' : s < 70 ? '#BA7517' : '#4A9E68';
+                                    return (
                                     <span key={a} style={{
                                       fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, padding: '3px 8px', borderRadius: 99,
-                                      background: `${scoreColor(s)}15`, border: `1px solid ${scoreColor(s)}33`, color: scoreColor(s),
+                                      background: `${hc}15`, border: `1px solid ${hc}33`, color: hc,
                                     }}>{axisLabel(a, lang)} {Math.round(s)}</span>
-                                  ))}
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>
@@ -852,10 +867,10 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                       background: tok.bgCard, border: `1px solid ${tok.border}`,
                     }}>
                       <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500, color: tok.text, margin: '0 0 4px' }}>
-                        {axisLabel(expandedAxis, lang)} ({Math.round(result.axis_scores[expandedAxis] ?? 0)}/100)
+                        {axisLabel(expandedAxis, lang)} ({Math.round(toHealthScore(expandedAxis, result.axis_scores[expandedAxis] ?? 0))}/100)
                       </p>
                       <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary, lineHeight: 1.5, margin: 0 }}>
-                        {AXIS_INTERPRETATIONS[expandedAxis]?.[lang]?.(result.axis_scores[expandedAxis] ?? 0) ?? ''}
+                        {AXIS_INTERPRETATIONS[expandedAxis]?.[lang]?.(toHealthScore(expandedAxis, result.axis_scores[expandedAxis] ?? 0)) ?? ''}
                       </p>
                     </div>
                   </motion.div>

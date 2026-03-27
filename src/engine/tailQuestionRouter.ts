@@ -111,7 +111,7 @@ const SEASONAL_CHANGE_Q: QuestionDef = {
   },
   hint: {
     en: "Many Europeans experience oilier skin in summer and tighter/drier skin in winter — your routine should adapt to the season",
-    de: "Viele Europäer haben im Sommer fettigere und im Winter trockenere Haut — Ihre Routine sollte sich anpassen",
+    de: "Viele Europäer haben im Sommer fettigere und im Winter trockenere Haut — Ihre Pflege sollte darauf abgestimmt sein.",
     ko: "유럽에서는 여름에 더 유분지고 겨울에 더 건조해지는 분이 많아요 — 루틴도 계절에 맞게 바뀌어야 합니다",
   },
   required: false,
@@ -119,15 +119,15 @@ const SEASONAL_CHANGE_Q: QuestionDef = {
   options: [
     {
       id: "season_oily_summer_dry_winter", score: 1,
-      label: { en: "Yes — oilier in summer, drier in winter", de: "Ja — im Sommer fettiger, im Winter trockener", ko: "네 — 여름엔 유분, 겨울엔 건조" },
+      label: { en: "Yes — oilier in summer, drier in winter", de: "Ja – im Sommer eher ölig, im Winter trockener", ko: "네 — 여름엔 유분, 겨울엔 건조" },
     },
     {
       id: "season_dry_always", score: 2,
-      label: { en: "Dry year-round, worse in winter", de: "Ganzjährig trocken, schlimmer im Winter", ko: "연중 건조하고 겨울에 더 심함" },
+      label: { en: "Dry year-round, worse in winter", de: "Ja – ganzjährig trocken, im Winter ausgeprägter", ko: "연중 건조하고 겨울에 더 심함" },
     },
     {
       id: "season_oily_always", score: 1,
-      label: { en: "Oily year-round, worse in summer", de: "Ganzjährig fettig, schlimmer im Sommer", ko: "연중 유분지고 여름에 더 심함" },
+      label: { en: "Oily year-round, worse in summer", de: "Ja – ganzjährig ölig, im Sommer ausgeprägter", ko: "연중 유분지고 여름에 더 심함" },
     },
     {
       id: "season_stable", score: 0,

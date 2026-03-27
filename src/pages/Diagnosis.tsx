@@ -166,14 +166,19 @@ function MobileFoundationStepper({
           </h3>
           {fqHint(q, lang) && (
             <p style={{
-              fontSize: 12, lineHeight: 1.4, marginBottom: 14,
-              color: tokens(isDark).textTertiary,
-              fontFamily: "var(--font-sans)", fontStyle: "italic",
+              fontSize: 14, lineHeight: 1.5, marginBottom: 16,
+              color: tokens(isDark).textSecondary,
+              fontFamily: "var(--font-sans)", fontWeight: 500,
             }}>
               {fqHint(q, lang)}
             </p>
           )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{
+            display: q.id === 'age_bracket' ? 'grid' : 'flex',
+            ...(q.id === 'age_bracket'
+              ? { gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }
+              : { flexDirection: 'column' as const, gap: 10 }),
+          }}>
             {q.options.map(opt => {
               const isSelected = selectedAnswers[q.id] === opt.value;
               return (
@@ -181,9 +186,13 @@ function MobileFoundationStepper({
                   key={opt.value}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleAnswer(q.id, opt.value)}
+                  translate="no"
+                  className="notranslate"
                   style={{
-                    padding: "14px 20px", borderRadius: 14,
-                    textAlign: "left", cursor: "pointer",
+                    padding: q.id === 'age_bracket' ? '14px 8px' : '14px 20px',
+                    borderRadius: 14,
+                    textAlign: q.id === 'age_bracket' ? 'center' : 'left',
+                    cursor: "pointer",
                     fontSize: 15, fontFamily: "var(--font-sans)",
                     transition: "all 0.2s ease", border: "none",
                     borderWidth: 1, borderStyle: "solid",
@@ -583,7 +592,9 @@ const DiagnosisPage: React.FC = () => {
                         {fq.options.map(opt => (
                           <div key={opt.value}
                             onClick={() => setFounds(p => ({ ...p, [fq.id]: opt.value }))}
-                            style={pillStyle(foundationAnswers[fq.id] === opt.value, isDark)}>
+                            style={pillStyle(foundationAnswers[fq.id] === opt.value, isDark)}
+                            translate="no"
+                            className="notranslate">
                             {optLabel(opt, lang)}
                           </div>
                         ))}

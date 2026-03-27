@@ -184,6 +184,7 @@ const Navbar = () => {
               className="hidden md:flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
               whileTap={{ scale: 0.9 }}
               aria-label="Toggle theme"
+              translate="no"
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </motion.button>

@@ -345,11 +345,11 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                   <p
                     style={{
                       fontFamily: 'var(--font-sans)',
-                      fontSize: '12px',
-                      color: tok.textTertiary,
-                      marginBottom: '20px',
+                      fontSize: '14px',
+                      color: tok.textSecondary,
+                      marginBottom: '16px',
                       lineHeight: 1.5,
-                      fontStyle: 'italic',
+                      fontWeight: 500,
                     }}
                   >
                     {fqHint(q, lang)}
@@ -357,7 +357,9 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                 )}
                 {!fqHint(q, lang) && <div className="mb-5" />}
 
-                <div className="flex flex-col gap-3">
+                <div className={q.id === 'age_bracket' ? '' : 'flex flex-col gap-3'}
+                  style={q.id === 'age_bracket' ? { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' } : undefined}
+                >
                   {q.options.map((opt) => {
                     const isSelected = answers[q.id] === opt.value;
                     return (
@@ -365,8 +367,11 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                         key={opt.value}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleAnswer(q.id, opt.value)}
-                        className="text-left rounded-xl px-5 py-4 transition-all"
+                        translate="no"
+                        className="notranslate rounded-xl transition-all"
                         style={{
+                          textAlign: q.id === 'age_bracket' ? 'center' : 'left',
+                          padding: q.id === 'age_bracket' ? '14px 8px' : '14px 20px',
                           background: isSelected
                             ? tok.accentBg
                             : 'transparent',

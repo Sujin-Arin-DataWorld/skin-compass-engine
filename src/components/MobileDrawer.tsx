@@ -211,6 +211,7 @@ export default function MobileDrawer() {
                         : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500"
                         }`}
                       style={(val === "dark" ? theme === "dark" : theme !== "dark") ? { borderColor: 'var(--ssl-accent)', background: 'var(--ssl-accent-bg)', color: 'var(--ssl-accent)' } : undefined}
+                      translate="no"
                     >
                       <Icon className="h-3 w-3" strokeWidth={1.8} />
                       {label}

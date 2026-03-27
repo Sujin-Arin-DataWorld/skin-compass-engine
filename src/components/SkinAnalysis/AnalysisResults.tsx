@@ -102,8 +102,8 @@ const SEV_BADGE_COLORS: Record<SeverityTier, string> = {
 };
 
 const SEV_BADGE_LABELS: Record<SeverityTier, Record<string, string>> = {
-  excellent: { ko: '매우 좋음', en: 'Excellent', de: 'Sehr gut' },
-  good:      { ko: '양호', en: 'Good', de: 'Gut' },
+  excellent: { ko: '매우 좋음', en: 'Excellent', de: 'Hervorragend' },
+  good:      { ko: '양호', en: 'Good', de: 'Optimal' },
   normal:    { ko: '보통', en: 'Normal', de: 'Normal' },
   attention: { ko: '관리 필요', en: 'Needs care', de: 'Pflege nötig' },
   critical:  { ko: '집중 케어', en: 'Critical', de: 'Intensive Pflege' },
@@ -113,7 +113,7 @@ const SEV_BADGE_LABELS: Record<SeverityTier, Record<string, string>> = {
 const GAUGE_LABELS = {
   ko: ['좋음', '보통', '주의'],
   en: ['Good', 'Fair', 'Concern'],
-  de: ['Gut', 'Mäßig', 'Achtung'],
+  de: ['Optimal', 'Mäßig', 'Pflegebedarf'],
 };
 
 // ── Axis label helper ──────────────────────────────────────────────────────
@@ -214,7 +214,7 @@ function GaugeBar({ severity, lang }: { severity: number; lang: string }) {
       {/* Segment labels */}
       <div className="flex mt-1.5">
         {labels.map((label, i) => (
-          <span key={i} className="flex-1 text-center" style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-sans)' }}>
+          <span key={i} className="flex-1 text-center notranslate" translate="no" style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-sans)' }}>
             {label}
           </span>
         ))}
@@ -257,7 +257,8 @@ function AxisAccordion({ axisKey, score, severity, label, badge, badgeColor, rea
 
         {/* Badge */}
         <span
-          className="rounded-full px-2 py-0.5 whitespace-nowrap"
+          className="rounded-full px-2 py-0.5 whitespace-nowrap notranslate"
+          translate="no"
           style={{
             fontSize: '10px',
             fontFamily: 'var(--font-sans)',

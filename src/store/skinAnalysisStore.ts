@@ -43,6 +43,10 @@ interface SkinAnalysisState {
   feedbackGiven: boolean;
   setFeedbackGiven: (given: boolean) => void;
 
+  // Phase 2: Training consent tracking (prevents re-showing modal in same session)
+  trainingConsentGiven: boolean;
+  setTrainingConsentGiven: (given: boolean) => void;
+
   // History persisted to localStorage (for future trend chart)
   analysisHistory: AnalysisHistoryEntry[];
 
@@ -85,6 +89,9 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
       feedbackGiven: false,
       setFeedbackGiven: (given) => set({ feedbackGiven: given }),
 
+      trainingConsentGiven: false,
+      setTrainingConsentGiven: (given) => set({ trainingConsentGiven: given }),
+
       analysisHistory: [],
 
       resetAnalysis: () =>
@@ -93,6 +100,7 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
           capturedImageBase64: null,
           lifestyleAnswers: null,
           scores: null,
+          trainingConsentGiven: false,
           reasons: null,
           scoreSource: null,
           analysisId: null,

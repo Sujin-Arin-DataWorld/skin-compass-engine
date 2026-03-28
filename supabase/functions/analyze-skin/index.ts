@@ -307,6 +307,7 @@ Deno.serve(async (req: Request) => {
             user_id: userId,
             is_anonymous: isAnonymous,
             scores_json: scores,
+            reasons_json: reasons,
             lifestyle_json: lifestyle ?? null,
             model_version: "groq-llama-4-scout-v2",
             inference_latency_ms: inferenceLatencyMs,

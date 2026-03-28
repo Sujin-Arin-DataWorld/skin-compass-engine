@@ -10,9 +10,11 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, ChevronRight, Check, ClipboardList } from 'lucide-react';
-import { submitFeedback } from '@/services/skinAnalysisService';
+import { submitFeedback, grantConsent, storeTrainingImage } from '@/services/skinAnalysisService';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { supabase } from '@/integrations/supabase/client';
+import AiTrainingConsentModal from './AiTrainingConsentModal';
 
 type Lang = 'ko' | 'en' | 'de';
 type Step = 'hook' | 'correction' | 'success' | 'hidden';
@@ -108,8 +110,13 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
   const { language } = useI18nStore();
   const lang = language as Lang;
   const setFeedbackGiven = useSkinAnalysisStore((s) => s.setFeedbackGiven);
+  const trainingConsentGiven = useSkinAnalysisStore((s) => s.trainingConsentGiven);
+  const setTrainingConsentGiven = useSkinAnalysisStore((s) => s.setTrainingConsentGiven);
+  const capturedImageBase64 = useSkinAnalysisStore((s) => s.capturedImageBase64);
 
   const [step, setStep] = useState<Step>('hook');
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedZones, setSelectedZones] = useState<Set<ZoneId>>(new Set());
   const [selectedConditions, setSelectedConditions] = useState<Set<ConditionId>>(new Set());
   const [comment, setComment] = useState('');
@@ -121,6 +128,13 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
     return () => {
       if (autoCloseTimer.current) clearTimeout(autoCloseTimer.current);
     };
+  }, []);
+
+  // Check auth status for consent modal eligibility
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setIsAuthenticated(!!user);
+    });
   }, []);
 
   // ── Toggle helpers ──────────────────────────────────────────────────────────
@@ -158,8 +172,43 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
     } finally {
       setSubmitting(false);
       showSuccessAndAutoClose();
+
+      // Phase 2: Show consent modal for authenticated users who haven't opted in
+      if (isAuthenticated && !trainingConsentGiven) {
+        // Small delay so success animation plays first
+        setTimeout(() => setShowConsentModal(true), 800);
+      }
     }
-  }, [analysisId, showSuccessAndAutoClose]);
+  }, [analysisId, showSuccessAndAutoClose, isAuthenticated, trainingConsentGiven]);
+
+  // Phase 2: Handle consent modal submission
+  const handleConsentSubmit = useCallback(async (
+    consents: { photoStorage: boolean; aiTraining: boolean },
+  ) => {
+    const promises: Promise<unknown>[] = [];
+
+    if (consents.photoStorage) {
+      promises.push(grantConsent('photo_storage'));
+    }
+    if (consents.aiTraining) {
+      promises.push(
+        grantConsent('ai_training').then(async () => {
+          // If we have the image in memory, upload it immediately
+          if (capturedImageBase64 && analysisId) {
+            const result = await storeTrainingImage(analysisId, capturedImageBase64);
+            if (result.success) {
+              console.log('[FeedbackWidget] Training image stored:', result.storagePath);
+            } else {
+              console.warn('[FeedbackWidget] Training image store failed:', result.error);
+            }
+          }
+        }),
+      );
+    }
+
+    await Promise.allSettled(promises);
+    setTrainingConsentGiven(true);
+  }, [capturedImageBase64, analysisId, setTrainingConsentGiven]);
 
   const handleInaccurate = useCallback(() => {
     setStep('correction');
@@ -196,9 +245,20 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
   }, [analysisId, selectedZones, selectedConditions, comment, showSuccessAndAutoClose]);
 
   // ── Render nothing if auto-closed ───────────────────────────────────────────
-  if (step === 'hidden') return null;
+  if (step === 'hidden') return (
+    <>
+      {/* Consent modal can outlive the widget */}
+      <AiTrainingConsentModal
+        isOpen={showConsentModal}
+        onClose={() => setShowConsentModal(false)}
+        onSubmit={handleConsentSubmit}
+        hasImage={!!capturedImageBase64}
+      />
+    </>
+  );
 
   return (
+    <>
     <AnimatePresence mode="wait">
       {/* ── Step 1: The Hook ────────────────────────────────────────────────── */}
       {step === 'hook' && (
@@ -435,5 +495,14 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
         </motion.div>
       )}
     </AnimatePresence>
+
+    {/* Phase 2: AI Training Consent Modal */}
+    <AiTrainingConsentModal
+      isOpen={showConsentModal}
+      onClose={() => setShowConsentModal(false)}
+      onSubmit={handleConsentSubmit}
+      hasImage={!!capturedImageBase64}
+    />
+    </>
   );
 }

@@ -1,5 +1,6 @@
 // Prompt 3 — Frontend service for AI skin analysis
 // Calls Supabase Edge Functions as a secure proxy to Groq API.
+// Phase 2: Added consent management and training image storage.
 
 import type { AnalysisApiResponse } from '@/types/skinAnalysis';
 import { supabase } from '@/integrations/supabase/client';
@@ -130,3 +131,132 @@ export async function submitFeedback(
     body: JSON.stringify({ analysis_id: analysisId, feedback, comment, tags }),
   });
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Phase 2: GDPR Two-Track Pipeline
+//
+// NOTE: user_consents, v_training_export, get_training_stats tables/views/functions
+// are not in the auto-generated Database type yet. They exist in the DB (from
+// migrations 002 + 003). To permanently fix these type errors:
+//   npx supabase gen types typescript --project-id <id> > src/integrations/supabase/types.ts
+// Until then, we use explicit 'any' casts on .from() / .rpc() calls.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Grants a specific GDPR consent (photo_storage or ai_training).
+ * Uses Supabase client directly (RLS enforces user_id = auth.uid()).
+ * Returns the consent row ID on success.
+ */
+export async function grantConsent(
+  consentType: 'photo_storage' | 'ai_training',
+): Promise<string | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    console.warn('[grantConsent] No authenticated user');
+    return null;
+  }
+
+  // Check if active consent already exists (idempotent)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: existing } = await (supabase as any)
+    .from('user_consents')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('consent_type', consentType)
+    .eq('is_active', true)
+    .limit(1)
+    .single();
+
+  if (existing?.id) return existing.id as string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('user_consents')
+    .insert({
+      user_id: user.id,
+      consent_type: consentType,
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error(`[grantConsent] Failed for ${consentType}:`, (error as Error).message);
+    return null;
+  }
+  return data?.id ?? null;
+}
+
+/**
+ * Stores a training image for an analysis via the store-training-image Edge Function.
+ * Requires authenticated user + active ai_training consent.
+ * Uses the capturedImageBase64 already in memory (zero-friction — no re-capture).
+ */
+export async function storeTrainingImage(
+  analysisId: string,
+  imageBase64: string,
+): Promise<{ success: boolean; storagePath?: string; error?: string }> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/store-training-image`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        analysis_id: analysisId,
+        image_base64: imageBase64,
+      }),
+    });
+
+    const body = await res.json();
+
+    if (!res.ok) {
+      return { success: false, error: body.error ?? `HTTP ${res.status}` };
+    }
+
+    return { success: true, storagePath: body.storage_path };
+  } catch (err) {
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : 'Network error',
+    };
+  }
+}
+
+/**
+ * Fetches training pipeline statistics from the get_training_stats() DB function.
+ * For admin dashboard use.
+ */
+export async function getTrainingStats(): Promise<Record<string, number> | null> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any).rpc('get_training_stats');
+  if (error) {
+    console.error('[getTrainingStats] RPC error:', (error as Error).message);
+    return null;
+  }
+  return data as Record<string, number>;
+}
+
+/**
+ * Fetches training-ready records from v_training_export view.
+ * Returns array of training data rows for JSONL export.
+ */
+export async function fetchTrainingExport(): Promise<Record<string, unknown>[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from('v_training_export')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('[fetchTrainingExport] Query error:', (error as Error).message);
+    return [];
+  }
+  return (data ?? []) as Record<string, unknown>[];
+}
+

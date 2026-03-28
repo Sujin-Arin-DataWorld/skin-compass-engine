@@ -235,18 +235,9 @@ const ResultsPage = () => {
     return () => window.removeEventListener("popstate", handler);
   }, [current]);
 
-  // Auto-save diagnosis result
-  const { isLoggedIn, saveDiagnosisResult } = useAuthStore();
-  useEffect(() => {
-    if (isLoggedIn && result) {
-      // Attach special care picks before saving
-      const resultWithPicks = {
-        ...result,
-        special_care_picks: Object.values(specialCarePicks),
-      };
-      saveDiagnosisResult(resultWithPicks);
-    }
-  }, [isLoggedIn, result, saveDiagnosisResult, specialCarePicks]);
+  // Diagnosis result is already persisted to Supabase by Diagnosis.tsx via useDiagnosis().saveDiagnosis().
+  // No additional local save needed here.
+  const { isLoggedIn } = useAuthStore();
 
   const goTo = useCallback(
     (idx: number) => {

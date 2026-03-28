@@ -72,9 +72,9 @@ Deno.serve(async (req: Request) => {
       return errorResponse(400, "image_base64 is required");
     }
 
-    // Basic size guard: reject images > 2MB base64 (~1.5MB decoded)
-    if (image_base64.length > 2_800_000) {
-      return errorResponse(413, "Image too large (max ~2MB)");
+    // Basic size guard: reject images > 20MB base64 (~15MB decoded)
+    if (image_base64.length > 20_000_000) {
+      return errorResponse(413, "Image too large (max ~15MB)");
     }
 
     // ── 3. Verify active ai_training consent ──────────────────────────────

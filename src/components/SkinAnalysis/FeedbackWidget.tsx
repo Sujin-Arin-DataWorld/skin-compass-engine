@@ -173,13 +173,15 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
       setSubmitting(false);
       showSuccessAndAutoClose();
 
-      // Phase 2: Show consent modal for authenticated users who haven't opted in
-      if (isAuthenticated && !trainingConsentGiven) {
+      // Phase 2: Show consent modal for ALL users who haven't opted in yet
+      // Authenticated → dual consent toggles (photo_storage + ai_training)
+      // Anonymous → "Sign up to save results" marketing hook (signup conversion)
+      if (!trainingConsentGiven) {
         // Small delay so success animation plays first
         setTimeout(() => setShowConsentModal(true), 800);
       }
     }
-  }, [analysisId, showSuccessAndAutoClose, isAuthenticated, trainingConsentGiven]);
+  }, [analysisId, showSuccessAndAutoClose, trainingConsentGiven]);
 
   // Phase 2: Handle consent modal submission
   const handleConsentSubmit = useCallback(async (
@@ -253,6 +255,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
         onClose={() => setShowConsentModal(false)}
         onSubmit={handleConsentSubmit}
         hasImage={!!capturedImageBase64}
+        isAuthenticated={isAuthenticated}
       />
     </>
   );
@@ -502,6 +505,7 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
       onClose={() => setShowConsentModal(false)}
       onSubmit={handleConsentSubmit}
       hasImage={!!capturedImageBase64}
+      isAuthenticated={isAuthenticated}
     />
     </>
   );

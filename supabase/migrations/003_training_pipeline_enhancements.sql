@@ -24,6 +24,17 @@ COMMENT ON COLUMN public.skin_analysis_logs.reasons_json IS
 
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- 1b. Add lifestyle_json to skin_analysis_logs
+--     The analyze-skin Edge Function has been sending this data, but the column
+--     was never created. This fixes that gap.
+-- ─────────────────────────────────────────────────────────────────────────────
+ALTER TABLE public.skin_analysis_logs
+  ADD COLUMN IF NOT EXISTS lifestyle_json JSONB DEFAULT NULL;
+
+COMMENT ON COLUMN public.skin_analysis_logs.lifestyle_json IS
+  'User lifestyle survey answers collected before analysis (age, sleep, stress, etc.). Conditioning signal for LoRA fine-tuning.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- 2. v_training_export — Comprehensive training data view
 --    Combines ALL signals needed for Llama Vision SFT:
 --      - Image (input)

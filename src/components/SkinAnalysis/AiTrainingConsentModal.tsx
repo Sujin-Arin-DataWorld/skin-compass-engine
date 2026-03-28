@@ -12,6 +12,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
@@ -22,8 +23,11 @@ import {
   Loader2,
   ChevronRight,
   Brain,
+  UserPlus,
+  BookmarkCheck,
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
+import { supabase } from '@/integrations/supabase/client';
 
 type Lang = 'ko' | 'en' | 'de';
 
@@ -86,6 +90,26 @@ const TX = {
     en: "You've helped make our AI smarter.",
     de: 'Sie haben unsere KI intelligenter gemacht.',
   },
+
+  // Anonymous signup hook
+  anonBadge: { ko: '결과 저장하기', en: 'Save Your Results', de: 'Ergebnisse speichern' },
+  anonTitle: {
+    ko: '분석 결과를\n영구 저장하세요',
+    en: 'Keep Your\nAnalysis Forever',
+    de: 'Bewahren Sie Ihre\nAnalyse dauerhaft auf',
+  },
+  anonSubtitle: {
+    ko: '무료 계정을 만들면 분석 결과를 저장하고, 피부 변화를 추적하며, AI 개선에 기여할 수 있습니다.',
+    en: 'Create a free account to save results, track skin changes, and contribute to AI improvement.',
+    de: 'Erstellen Sie ein kostenloses Konto, um Ergebnisse zu speichern, Hautveränderungen zu verfolgen und zur KI-Verbesserung beizutragen.',
+  },
+  anonBullets: {
+    ko: ['분석 결과 영구 보관', '시간 경과에 따른 피부 변화 추적', 'AI 정확도 개선에 기여'],
+    en: ['Permanent analysis history', 'Track skin changes over time', 'Help improve AI accuracy'],
+    de: ['Dauerhafte Analysehistorie', 'Hautveränderungen verfolgen', 'KI-Genauigkeit verbessern'],
+  },
+  anonCta: { ko: 'Google로 무료 가입', en: 'Sign up free with Google', de: 'Kostenlos mit Google registrieren' },
+  anonSkip: { ko: '가입 없이 계속', en: 'Continue without account', de: 'Ohne Konto fortfahren' },
 } as const;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -94,6 +118,7 @@ interface Props {
   onClose: () => void;
   onSubmit: (consents: { photoStorage: boolean; aiTraining: boolean }) => Promise<void>;
   hasImage: boolean; // whether capturedImageBase64 exists in store
+  isAuthenticated: boolean; // false → show signup CTA instead of consent toggles
 }
 
 // ── Toggle Switch ─────────────────────────────────────────────────────────────
@@ -197,7 +222,8 @@ function ConsentToggle({
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
-export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasImage }: Props) {
+export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasImage, isAuthenticated }: Props) {
+  const navigate = useNavigate();
   const { language } = useI18nStore();
   const lang = (language as Lang) || 'en';
 
@@ -222,6 +248,20 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
       setSubmitting(false);
     }
   }, [hasSelection, photoStorage, aiTraining, onSubmit, onClose]);
+
+  // Anonymous user: Google OAuth signup
+  const handleAnonSignup = useCallback(async () => {
+    setSubmitting(true);
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/skin-analysis` },
+      });
+    } catch (err) {
+      console.error('[AiTrainingConsent] OAuth error:', err);
+      setSubmitting(false);
+    }
+  }, []);
 
   if (!isOpen) return null;
 
@@ -301,8 +341,143 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
                     {TX.successDesc[lang]}
                   </p>
                 </motion.div>
+
+              ) : !isAuthenticated ? (
+                // ══════════════════════════════════════════════════════
+                // ANONYMOUS USER → Signup Marketing Hook
+                // ══════════════════════════════════════════════════════
+                <motion.div key="anon-signup" exit={{ opacity: 0 }}>
+                  {/* Close button */}
+                  <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10 transition-opacity hover:opacity-70"
+                    style={{
+                      background: 'var(--ssl-bg-surface)',
+                      border: '1px solid var(--ssl-border)',
+                      minHeight: '32px',
+                      minWidth: '32px',
+                    }}
+                  >
+                    <X size={14} style={{ color: 'var(--ssl-text-secondary)' }} />
+                  </button>
+
+                  {/* Header */}
+                  <div className="px-6 pt-7 pb-1">
+                    <div className="flex items-center gap-2 mb-3">
+                      <BookmarkCheck size={14} style={{ color: 'var(--ssl-accent)' }} />
+                      <p
+                        style={{
+                          fontFamily: 'var(--font-sans)',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          letterSpacing: '0.15em',
+                          textTransform: 'uppercase',
+                          color: 'var(--ssl-accent)',
+                        }}
+                      >
+                        {TX.anonBadge[lang]}
+                      </p>
+                    </div>
+                    <h2
+                      style={{
+                        fontFamily: 'var(--font-display)',
+                        fontSize: '22px',
+                        fontWeight: 700,
+                        lineHeight: 1.3,
+                        color: 'var(--ssl-text)',
+                        whiteSpace: 'pre-line',
+                      }}
+                    >
+                      {TX.anonTitle[lang]}
+                    </h2>
+                    <p
+                      className="mt-2.5"
+                      style={{
+                        fontFamily: 'var(--font-sans)',
+                        fontSize: '13px',
+                        lineHeight: 1.6,
+                        color: 'var(--ssl-text-secondary)',
+                      }}
+                    >
+                      {TX.anonSubtitle[lang]}
+                    </p>
+                  </div>
+
+                  {/* Value props */}
+                  <div className="px-6 py-4">
+                    <ul className="space-y-3">
+                      {TX.anonBullets[lang].map((bullet, i) => (
+                        <li key={i} className="flex items-center gap-3">
+                          <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{
+                              background: 'var(--ssl-accent-bg)',
+                              border: '1px solid var(--ssl-accent-border)',
+                            }}
+                          >
+                            {i === 0 ? <BookmarkCheck size={14} style={{ color: 'var(--ssl-accent)' }} /> :
+                             i === 1 ? <Camera size={14} style={{ color: 'var(--ssl-secondary)' }} /> :
+                                        <Brain size={14} style={{ color: 'var(--ssl-accent)' }} />}
+                          </div>
+                          <span
+                            style={{
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13.5px',
+                              fontWeight: 500,
+                              color: 'var(--ssl-text)',
+                            }}
+                          >
+                            {bullet}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div
+                    className="px-6 pb-8 pt-4 space-y-3"
+                    style={{ borderTop: '1px solid var(--ssl-border)' }}
+                  >
+                    {/* Google signup CTA */}
+                    <button
+                      onClick={handleAnonSignup}
+                      disabled={submitting}
+                      className="w-full py-3.5 rounded-2xl font-semibold text-sm transition-all duration-300 flex items-center justify-center gap-2.5 active:scale-[0.98]"
+                      style={{
+                        background: 'var(--ssl-accent)',
+                        color: '#FFFFFF',
+                        fontFamily: 'var(--font-sans)',
+                        opacity: submitting ? 0.6 : 1,
+                      }}
+                    >
+                      {submitting ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <UserPlus size={16} />
+                      )}
+                      {TX.anonCta[lang]}
+                    </button>
+
+                    {/* Skip */}
+                    <button
+                      onClick={onClose}
+                      className="w-full py-2.5 rounded-xl text-sm transition-opacity hover:opacity-70"
+                      style={{
+                        color: 'var(--ssl-text-tertiary)',
+                        fontFamily: 'var(--font-sans)',
+                        fontWeight: 400,
+                      }}
+                    >
+                      {TX.anonSkip[lang]}
+                    </button>
+                  </div>
+                </motion.div>
+
               ) : (
-                // ── Main Form ──────────────────────────────────────
+                // ══════════════════════════════════════════════════════
+                // AUTHENTICATED USER → Dual Consent Toggles
+                // ══════════════════════════════════════════════════════
                 <motion.div key="form" exit={{ opacity: 0 }}>
                   {/* Close button */}
                   <button
@@ -363,7 +538,6 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
 
                   {/* Toggle Cards */}
                   <div className="px-6 py-4 space-y-3">
-                    {/* Track 1: Photo Storage (Skin Journey) */}
                     <ConsentToggle
                       checked={photoStorage}
                       onChange={setPhotoStorage}
@@ -372,8 +546,6 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
                       description={TX.journeyDesc[lang]}
                       accentColor="var(--ssl-secondary)"
                     />
-
-                    {/* Track 2: AI Training */}
                     <ConsentToggle
                       checked={aiTraining}
                       onChange={setAiTraining}
@@ -421,7 +593,6 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
                     className="px-6 pb-8 pt-4 space-y-3"
                     style={{ borderTop: '1px solid var(--ssl-border)' }}
                   >
-                    {/* No image warning */}
                     {!hasImage && hasSelection && (
                       <p
                         className="text-center"
@@ -440,7 +611,6 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
                       </p>
                     )}
 
-                    {/* Submit */}
                     <button
                       onClick={handleSubmit}
                       disabled={!hasSelection || submitting}
@@ -467,7 +637,6 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
                       )}
                     </button>
 
-                    {/* Skip */}
                     <button
                       onClick={onClose}
                       disabled={submitting}

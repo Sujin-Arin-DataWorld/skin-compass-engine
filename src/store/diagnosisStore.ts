@@ -527,9 +527,6 @@ export const useDiagnosisStore = create<DiagnosisState>()(
       name: "skin-diagnosis-store",
       storage: createJSONStorage(() => safeStorage),
       partialize: (state) => {
-        // Base64 이미지는 용량 초과를 유발하므로 로컬 스토리지 저장에서 제외
-        const { acnePhoto, drynessPhoto, pigmentPhoto, ...safeInteractiveState } = state.interactiveState;
-
         return {
           currentStep: state.currentStep,
           currentCategory: state.currentCategory,
@@ -547,7 +544,13 @@ export const useDiagnosisStore = create<DiagnosisState>()(
           metaAnswers: state.metaAnswers,
           axisAnswers: state.axisAnswers,
           selectedTier: state.selectedTier,
-          interactiveState: safeInteractiveState as typeof state.interactiveState, // 이미지 필드 제외됨
+          // Base64 이미지는 용량 초과를 유발하므로 null로 대체하여 저장
+          interactiveState: {
+            ...state.interactiveState,
+            acnePhoto: null,
+            drynessPhoto: null,
+            pigmentPhoto: null,
+          },
           specialCarePicks: state.specialCarePicks,
           // uiSignals and result are NOT persisted (derived/large)
         };

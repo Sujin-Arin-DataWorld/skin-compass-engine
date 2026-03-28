@@ -6,9 +6,8 @@
  * Input:  SkinVector + ImplicitFlags + AxisResponses
  * Output: RoutineOutput — 3-step, 5-step, Advanced (Device), and SOS Rescue routines.
  *
- * ⚠️  MOCK CATALOG — final product DB is still being curated.
- * Fallback: missing steps inject the SkinStrategyLab hero product (serum role)
- * or are gracefully omitted without breaking the UI.
+ * Products sourced from product_db_merged.json via productBridge.ts.
+ * Zero hardcoded product catalogs — ONE source of truth.
  *
  * Clinical Safety Gate (Advanced tier):
  *   IF barrier > 85 OR atopyFlag → advanced = null.
@@ -22,6 +21,17 @@
 
 import type { SkinVector } from "@/engine/types";
 import type { AxisResponses, ImplicitFlags } from "@/store/diagnosisStore";
+import {
+  findProductsForSlot,
+  getProductById,
+  getWeakAxes,
+  SOS_IDS,
+  DEVICE_ID,
+  type RealProduct,
+} from "@/engine/productBridge";
+
+// Re-export so consumers can import from either module
+export type { RealProduct } from "@/engine/productBridge";
 
 // ─── Domain types ─────────────────────────────────────────────────────────────
 
@@ -56,26 +66,11 @@ export type Formulation =
   | "balm"
   | null;         // null = not applicable (devices)
 
-// ─── Mock Product Interface ───────────────────────────────────────────────────
-
-export interface MockProduct {
-  id: string;
-  name: { en: string; de: string; ko: string };
-  brand: string;
-  role: StepRole;
-  targetTrouble: TargetTrouble | "universal";
-  /** Empty array = compatible with all base types */
-  baseTypes: BaseType[];
-  formulation: Formulation;
-  keyIngredients: string[];
-  /** "am" = morning only, "pm" = evening only, both = all-day */
-  phaseTiming: Array<"am" | "pm">;
-  isHero?: boolean;
-}
+// ─── Routine interfaces ───────────────────────────────────────────────────────
 
 export interface RoutineStep {
   role: StepRole;
-  product: MockProduct | null; // null = gracefully omitted in UI
+  product: RealProduct | null; // null = gracefully omitted in UI
   timing: "am" | "pm";
   order: number;
 }
@@ -150,515 +145,16 @@ export const DEVICE_MODE_MAP: Record<TargetTrouble, { en: string; de: string; ko
   },
 };
 
-// ─── Hero fallback ────────────────────────────────────────────────────────────
+// ─── Trouble → weak-axis mapping ──────────────────────────────────────────────
+// Used to create weakAxes from TargetTrouble when full health scores aren't available.
 
-const HERO_PRODUCT: MockProduct = {
-  id: "ssl-hero-essence",
-  name: {
-    en: "SkinStrategyLab Signature Essence",
-    de: "SkinStrategyLab Signatur-Essenz",
-    ko: "스킨스트래티지랩 시그니처 에센스",
-  },
-  brand: "SkinStrategyLab",
-  role: "serum",
-  targetTrouble: "universal",
-  baseTypes: [],
-  formulation: "lightweight-fluid",
-  keyIngredients: ["Niacinamide 5%", "Panthenol", "Hyaluronic Acid"],
-  phaseTiming: ["am", "pm"],
-  isHero: true,
+const TROUBLE_TO_WEAK_AXES: Record<TargetTrouble, string[]> = {
+  "barrier-repair":        ["bar", "sen"],
+  "intense-hydration":     ["hyd", "bar"],
+  "blemish-sebum-control": ["acne", "texture", "seb"],
+  "brightening":           ["pigment", "ox"],
+  "well-aging":            ["aging", "pigment"],
 };
-
-// ─── Mock product catalog ─────────────────────────────────────────────────────
-
-const CATALOG: MockProduct[] = [
-
-  // ──────────────────────────────────────────────────────── CLEANSERS ─────────
-
-  {
-    id: "ssl-clean-gel",
-    name: { en: "Pore-Clear Gel Cleanser", de: "Porenklärendes Gel-Reinigungsmittel", ko: "포어클리어 젤 클렌저" },
-    brand: "SkinStrategyLab",
-    role: "cleanser", targetTrouble: "universal",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "gel",
-    keyIngredients: ["BHA 0.5%", "Green Tea Extract", "Niacinamide"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-clean-cream",
-    name: { en: "Comfort Cream Cleanser", de: "Komfort-Creme-Reiniger", ko: "컴포트 크림 클렌저" },
-    brand: "SkinStrategyLab",
-    role: "cleanser", targetTrouble: "universal",
-    baseTypes: ["dry"],
-    formulation: "cream",
-    keyIngredients: ["Ceramide NP", "Glycerin", "Oat Kernel Extract"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-clean-foam",
-    name: { en: "Balancing Foam Cleanser", de: "Ausgleichende Schaum-Reinigung", ko: "밸런싱 폼 클렌저" },
-    brand: "SkinStrategyLab",
-    role: "cleanser", targetTrouble: "universal",
-    baseTypes: ["normal"],
-    formulation: "gel",
-    keyIngredients: ["Green Tea Extract", "Niacinamide", "Aloe Vera"],
-    phaseTiming: ["am", "pm"],
-  },
-
-  // ──────────────────────────────────────────────────────────── TONERS ─────────
-
-  {
-    id: "ssl-toner-barrier",
-    name: { en: "Ceramide Barrier Essence Toner", de: "Ceramid-Barriere-Essenz-Toner", ko: "세라마이드 배리어 에센스 토너" },
-    brand: "SkinStrategyLab",
-    role: "toner", targetTrouble: "barrier-repair",
-    baseTypes: [],
-    formulation: "water",
-    keyIngredients: ["Ceramide AP", "Panthenol 3%", "Centella Asiatica"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-toner-hydra",
-    name: { en: "Hyaluronic Hydra Mist Toner", de: "Hyaluronischer Hydra-Nebel-Toner", ko: "히알루론산 하이드라 미스트 토너" },
-    brand: "SkinStrategyLab",
-    role: "toner", targetTrouble: "intense-hydration",
-    baseTypes: [],
-    formulation: "water",
-    keyIngredients: ["Hyaluronic Acid (3 molecular weights)", "Glycerin", "Tremella Mushroom"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-toner-bha",
-    name: { en: "BHA Pore Refining Toner", de: "BHA Porenverfeinerungs-Toner", ko: "BHA 모공 정제 토너" },
-    brand: "SkinStrategyLab",
-    role: "toner", targetTrouble: "blemish-sebum-control",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "water",
-    keyIngredients: ["Salicylic Acid 1%", "Niacinamide 5%", "Witch Hazel"],
-    phaseTiming: ["pm"],
-  },
-  {
-    id: "ssl-toner-niacin",
-    name: { en: "Niacinamide Clarifying Toner", de: "Niacinamid-Klärungs-Toner", ko: "나이아신아마이드 클래리파잉 토너" },
-    brand: "SkinStrategyLab",
-    role: "toner", targetTrouble: "blemish-sebum-control",
-    baseTypes: ["dry", "normal"],
-    formulation: "water",
-    keyIngredients: ["Niacinamide 5%", "Zinc PCA", "Azelaic Acid"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-toner-vc",
-    name: { en: "Vitamin C Brightening Toner", de: "Vitamin C Aufhellungs-Toner", ko: "비타민C 브라이트닝 토너" },
-    brand: "SkinStrategyLab",
-    role: "toner", targetTrouble: "brightening",
-    baseTypes: [],
-    formulation: "water",
-    keyIngredients: ["Ascorbyl Glucoside 2%", "Niacinamide 5%", "Tranexamic Acid"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-toner-peptide",
-    name: { en: "Peptide Firming Preparation Toner", de: "Peptid-Straffungs-Vorbereitungs-Toner", ko: "펩타이드 퍼밍 토너" },
-    brand: "SkinStrategyLab",
-    role: "toner", targetTrouble: "well-aging",
-    baseTypes: [],
-    formulation: "water",
-    keyIngredients: ["Copper Peptide GHK-Cu", "Adenosine", "EGF"],
-    phaseTiming: ["am", "pm"],
-  },
-
-  // ──────────────────────────────────────────────────────────── SERUMS ─────────
-
-  // Barrier Repair — AM+PM, formulation-matched by base type
-  {
-    id: "ssl-serum-barrier-oily",
-    name: { en: "Centella SOS Calming Gel", de: "Centella SOS Beruhigungs-Gel", ko: "병풀 SOS 진정 젤" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "barrier-repair",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "gel",
-    keyIngredients: ["Centella Asiatica 30%", "Ceramide NP", "Beta-Glucan"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-serum-barrier-dry",
-    name: { en: "Ceramide Barrier Recovery Fluid", de: "Ceramid Barriere-Regenerations-Fluid", ko: "세라마이드 배리어 회복 플루이드" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "barrier-repair",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Ceramide Complex", "Panthenol 5%", "Madecassoside"],
-    phaseTiming: ["am", "pm"],
-  },
-
-  // Intense Hydration — AM+PM
-  {
-    id: "ssl-serum-hydra-oily",
-    name: { en: "Aqua Plump Gel Serum", de: "Aqua Plump Gel-Serum", ko: "아쿠아 플럼프 젤 세럼" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "intense-hydration",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "gel",
-    keyIngredients: ["Hyaluronic Acid (5 molecular weights)", "Sodium PCA", "Tremella Mushroom"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-serum-hydra-dry",
-    name: { en: "Deep Moisture Infusion Serum", de: "Tiefenfeuchtigkeits-Infusionsserum", ko: "딥 모이스처 인퓨전 세럼" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "intense-hydration",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Hyaluronic Acid (5 molecular weights)", "Glycerin 10%", "Snow Mushroom"],
-    phaseTiming: ["am", "pm"],
-  },
-
-  // Blemish / Sebum Control — AM-safe (niacinamide, no BHA)
-  {
-    id: "ssl-serum-blemish-am-oily",
-    name: { en: "Niacinamide Pore Control Gel Serum", de: "Niacinamid Porenkontroll-Gel-Serum", ko: "나이아신아마이드 포어 컨트롤 젤 세럼" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "blemish-sebum-control",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "gel",
-    keyIngredients: ["Niacinamide 10%", "Zinc PCA", "Azelaic Acid 5%"],
-    phaseTiming: ["am"],
-  },
-  {
-    id: "ssl-serum-blemish-am-dry",
-    name: { en: "Clear Balance Daily Fluid", de: "Clear Balance Tages-Fluid", ko: "클리어 밸런스 데일리 플루이드" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "blemish-sebum-control",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Niacinamide 5%", "Zinc PCA", "Willow Bark Extract"],
-    phaseTiming: ["am"],
-  },
-  // Blemish — PM-only (BHA active clearance)
-  {
-    id: "ssl-serum-blemish-pm-oily",
-    name: { en: "BHA Clear Skin Gel Serum", de: "BHA Klarhaut Gel-Serum", ko: "BHA 클리어 스킨 젤 세럼" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "blemish-sebum-control",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "gel",
-    keyIngredients: ["Salicylic Acid 2%", "Niacinamide 10%", "Tea Tree Leaf Water"],
-    phaseTiming: ["pm"],
-  },
-  {
-    id: "ssl-serum-blemish-pm-dry",
-    name: { en: "Pore Control Balancing Fluid", de: "Porenkontrolle Balancier-Fluid", ko: "포어 컨트롤 밸런싱 플루이드" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "blemish-sebum-control",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Niacinamide 5%", "Zinc PCA", "Salicylic Acid 0.5%"],
-    phaseTiming: ["pm"],
-  },
-
-  // Brightening — AM+PM
-  {
-    id: "ssl-serum-bright-oily",
-    name: { en: "Vitamin C Glow Fluid", de: "Vitamin C Glow-Fluid", ko: "비타민C 글로우 플루이드" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "brightening",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Ascorbic Acid 10%", "Alpha-Arbutin 2%", "Niacinamide"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-serum-bright-dry",
-    name: { en: "Brightening Tone Perfector Serum", de: "Aufhellungs-Tonperfektions-Serum", ko: "브라이트닝 톤 퍼펙터 세럼" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "brightening",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Stabilized Vitamin C 15%", "Ferulic Acid", "Alpha-Arbutin"],
-    phaseTiming: ["am", "pm"],
-  },
-
-  // Well-Aging — AM (antioxidant protection)
-  {
-    id: "ssl-serum-aging-am-oily",
-    name: { en: "Youth Protect Antioxidant Fluid", de: "Youth Protect Antioxidans-Fluid", ko: "유스 프로텍트 항산화 플루이드" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "well-aging",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Vitamin C Derivative", "Resveratrol", "Matrixyl 3000"],
-    phaseTiming: ["am"],
-  },
-  {
-    id: "ssl-serum-aging-am-dry",
-    name: { en: "Glow & Firm Morning Fluid", de: "Glow & Firm Morgen-Fluid", ko: "글로우 & 펌 모닝 플루이드" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "well-aging",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Stable Vitamin C 15%", "Adenosine", "Collagen Amino Acids"],
-    phaseTiming: ["am"],
-  },
-  // Well-Aging — PM (retinol / peptide repair)
-  {
-    id: "ssl-serum-aging-pm-oily",
-    name: { en: "Peptide Youth Activating Fluid", de: "Peptid-Jugend-Aktivierungs-Fluid", ko: "펩타이드 유스 액티베이팅 플루이드" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "well-aging",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Matrixyl 3000", "Retinyl Propionate 0.1%", "Coenzyme Q10"],
-    phaseTiming: ["pm"],
-  },
-  {
-    id: "ssl-serum-aging-pm-dry",
-    name: { en: "Collagen Boost Firming Serum", de: "Kollagen-Boost-Straffungsserum", ko: "콜라겐 부스트 퍼밍 세럼" },
-    brand: "SkinStrategyLab",
-    role: "serum", targetTrouble: "well-aging",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Copper Peptide GHK-Cu", "Retinol 0.1%", "Adenosine"],
-    phaseTiming: ["pm"],
-  },
-
-  // ─────────────────────────────────────────────── TREATMENTS (5-step slot 4) ──
-
-  {
-    id: "ssl-treat-barrier",
-    name: { en: "Barrier Rescue Concentrate", de: "Barriere-Rettungs-Konzentrat", ko: "배리어 레스큐 컨센트레이트" },
-    brand: "SkinStrategyLab",
-    role: "treatment", targetTrouble: "barrier-repair",
-    baseTypes: [],
-    formulation: "cream",
-    keyIngredients: ["Ceramide Complex", "Shea Butter", "Colloidal Oatmeal"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-treat-hydra",
-    name: { en: "Water Reserve Eye & Lip Treatment", de: "Wasserreserve Augen- & Lippenpflege", ko: "워터 리저브 아이 & 립 트리트먼트" },
-    brand: "SkinStrategyLab",
-    role: "treatment", targetTrouble: "intense-hydration",
-    baseTypes: [],
-    formulation: "gel",
-    keyIngredients: ["Hyaluronic Acid", "Caffeine", "Peptide"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-treat-blemish",
-    name: { en: "Spot & Pore Refining Treatment", de: "Spot & Poren-Verfeinerungs-Treatment", ko: "스팟 & 포어 리파이닝 트리트먼트" },
-    brand: "SkinStrategyLab",
-    role: "treatment", targetTrouble: "blemish-sebum-control",
-    baseTypes: [],
-    formulation: "gel",
-    keyIngredients: ["BHA 2%", "Zinc Oxide", "Tea Tree"],
-    phaseTiming: ["pm"],
-  },
-  {
-    id: "ssl-treat-bright",
-    name: { en: "Dark Circle & Brightening Eye Serum", de: "Augenringe & Aufhellungs-Augenserum", ko: "다크서클 & 브라이트닝 아이 세럼" },
-    brand: "SkinStrategyLab",
-    role: "treatment", targetTrouble: "brightening",
-    baseTypes: [],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Vitamin K2", "Caffeine", "Alpha-Arbutin"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-treat-aging",
-    name: { en: "Retinol Eye & Expression Line Cream", de: "Retinol Augen- & Ausdrucksliniencreme", ko: "레티놀 아이 & 익스프레션 크림" },
-    brand: "SkinStrategyLab",
-    role: "treatment", targetTrouble: "well-aging",
-    baseTypes: [],
-    formulation: "cream",
-    keyIngredients: ["Retinol 0.05%", "Caffeine", "Peptide Complex"],
-    phaseTiming: ["pm"],
-  },
-
-  // ──────────────────────────────────────────────────── MOISTURIZERS ───────────
-
-  {
-    id: "ssl-moist-gel",
-    name: { en: "Oil-Free Aqua Gel", de: "Ölfreies Aqua-Gel", ko: "오일프리 아쿠아 젤" },
-    brand: "SkinStrategyLab",
-    role: "moisturizer", targetTrouble: "universal",
-    baseTypes: ["oily"],
-    formulation: "gel",
-    keyIngredients: ["Sodium Hyaluronate", "Niacinamide", "Aloe Vera"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-moist-emulsion",
-    name: { en: "Hydra-Balance Emulsion", de: "Hydra-Balance Emulsion", ko: "하이드라밸런스 에멀젼" },
-    brand: "SkinStrategyLab",
-    role: "moisturizer", targetTrouble: "universal",
-    baseTypes: ["combination-dehydrated-oily"],
-    formulation: "lotion",
-    keyIngredients: ["Ceramide", "Glycerin", "Squalane"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-moist-cream",
-    name: { en: "Rich Barrier Cream", de: "Reichhaltige Barriere-Creme", ko: "리치 배리어 크림" },
-    brand: "SkinStrategyLab",
-    role: "moisturizer", targetTrouble: "universal",
-    baseTypes: ["dry"],
-    formulation: "cream",
-    keyIngredients: ["Ceramide Complex", "Shea Butter", "Marula Oil"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "ssl-moist-lotion",
-    name: { en: "Daily Comfort Lotion", de: "Tägliche Komfort-Lotion", ko: "데일리 컴포트 로션" },
-    brand: "SkinStrategyLab",
-    role: "moisturizer", targetTrouble: "universal",
-    baseTypes: ["normal"],
-    formulation: "lotion",
-    keyIngredients: ["Hyaluronic Acid", "Niacinamide", "Green Tea Extract"],
-    phaseTiming: ["am", "pm"],
-  },
-
-  // ─────────────────────────────────────────────────────────────── SPF ─────────
-
-  {
-    id: "ssl-spf-fluid",
-    name: { en: "Invisible Shield SPF 50+ PA++++", de: "Unsichtbarer Schutz LSF 50+ PA++++", ko: "인비저블 쉴드 SPF 50+ PA++++" },
-    brand: "SkinStrategyLab",
-    role: "spf", targetTrouble: "universal",
-    baseTypes: ["oily", "combination-dehydrated-oily", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Zinc Oxide", "Tinosorb S", "Niacinamide"],
-    phaseTiming: ["am"],
-  },
-  {
-    id: "ssl-spf-cream",
-    name: { en: "Nourishing Sun Defense SPF 50+ PA++++", de: "Nährende Sonnenschutz LSF 50+ PA++++", ko: "너리싱 선 디펜스 SPF 50+ PA++++" },
-    brand: "SkinStrategyLab",
-    role: "spf", targetTrouble: "universal",
-    baseTypes: ["dry"],
-    formulation: "cream",
-    keyIngredients: ["Zinc Oxide", "Ceramide", "Squalane"],
-    phaseTiming: ["am"],
-  },
-
-  // ─────────────────────────────────────────────────────────── DEVICE ──────────
-
-  {
-    id: "medicube-booster-pro",
-    name: {
-      en: "Medicube Age-R Booster Pro",
-      de: "Medicube Age-R Booster Pro",
-      ko: "메디큐브 에이지알 부스터 프로",
-    },
-    brand: "Medicube",
-    role: "device",
-    targetTrouble: "universal",
-    baseTypes: [],
-    formulation: null,
-    keyIngredients: ["Electroporation", "EMS", "Microcurrent", "Air Shot", "LED Therapy"],
-    phaseTiming: ["pm"],
-  },
-];
-
-// ─── SOS Rescue Catalog (K-Derma clinical brands only) ───────────────────────
-// Products here are NEVER mixed with the general catalog.
-// Two parallel brand lines cover all base types:
-//   Oily / Combination-Dehydrated → Dongkook Pharm — Madeca MD (Centella)
-//   Dry / Normal                  → Aestura — Atobarrier 365 (Ceramide)
-
-const SOS_CATALOG: MockProduct[] = [
-
-  // ──────────────────────────────────────── Dongkook Pharm — Madeca MD ────────
-
-  {
-    id: "madeca-cleanser",
-    name: {
-      en: "Madeca MD Calming Gel Cleanser",
-      de: "Madeca MD Beruhigendes Gel-Reinigungsmittel",
-      ko: "마데카MD 진정 젤 클렌저",
-    },
-    brand: "Dongkook Pharm",
-    role: "cleanser", targetTrouble: "barrier-repair",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "gel",
-    keyIngredients: ["Centella Asiatica 60%", "Madecassoside", "Panthenol 5%"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "madeca-serum",
-    name: {
-      en: "Madeca MD Centella SOS Ampoule",
-      de: "Madeca MD Centella SOS Ampulle",
-      ko: "마데카MD 센텔라 SOS 앰플",
-    },
-    brand: "Dongkook Pharm",
-    role: "serum", targetTrouble: "barrier-repair",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Centella Asiatica Extract", "Asiaticoside", "Ceramide NP"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "madeca-cream",
-    name: {
-      en: "Madeca MD Recovery Barrier Cream",
-      de: "Madeca MD Regenerierende Barriere-Creme",
-      ko: "마데카MD 리커버리 배리어 크림",
-    },
-    brand: "Dongkook Pharm",
-    role: "moisturizer", targetTrouble: "barrier-repair",
-    baseTypes: ["oily", "combination-dehydrated-oily"],
-    formulation: "cream",
-    keyIngredients: ["Centella Asiatica 20%", "Ceramide Complex", "Beta-Glucan"],
-    phaseTiming: ["am", "pm"],
-  },
-
-  // ─────────────────────────────────────────── Aestura — Atobarrier 365 ───────
-
-  {
-    id: "aestura-cleanser",
-    name: {
-      en: "Atobarrier 365 Gentle Cream Cleanser",
-      de: "Atobarrier 365 Sanfter Creme-Reiniger",
-      ko: "에스트라 아토베리어 365 순한 크림 클렌저",
-    },
-    brand: "Aestura",
-    role: "cleanser", targetTrouble: "barrier-repair",
-    baseTypes: ["dry", "normal"],
-    formulation: "cream",
-    keyIngredients: ["Ceramide NP", "Betaine", "Allantoin"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "aestura-serum",
-    name: {
-      en: "Atobarrier 365 Ceramide Repair Ampoule",
-      de: "Atobarrier 365 Ceramid-Reparatur-Ampulle",
-      ko: "에스트라 아토베리어 365 세라마이드 리페어 앰플",
-    },
-    brand: "Aestura",
-    role: "serum", targetTrouble: "barrier-repair",
-    baseTypes: ["dry", "normal"],
-    formulation: "lightweight-fluid",
-    keyIngredients: ["Ceramide Complex 5%", "Panthenol 3%", "Glycerin"],
-    phaseTiming: ["am", "pm"],
-  },
-  {
-    id: "aestura-cream",
-    name: {
-      en: "Atobarrier 365 Intensive Barrier Cream",
-      de: "Atobarrier 365 Intensive Barriere-Creme",
-      ko: "에스트라 아토베리어 365 인텐시브 크림",
-    },
-    brand: "Aestura",
-    role: "moisturizer", targetTrouble: "barrier-repair",
-    baseTypes: ["dry", "normal"],
-    formulation: "cream",
-    keyIngredients: ["Ceramide 3", "Ceramide 6-II", "Ceramide 1", "Niacinamide"],
-    phaseTiming: ["am", "pm"],
-  },
-];
 
 // ─── Derivation logic ─────────────────────────────────────────────────────────
 
@@ -680,21 +176,15 @@ export function deriveBaseType(sebum: number, hydration: number): BaseType {
  */
 export function deriveTargetTrouble(v: SkinVector): TargetTrouble {
   // ── Priority 1: SOS Rescue (Barrier & Sensitivity) ──────────────────────────
-  // Severely compromised barrier or reactive skin CANNOT safely handle any
-  // active ingredients — ceramide + soothing repair is the only safe protocol.
   if (v.barrier > 75 || v.sensitivity > 75) return "barrier-repair";
 
   // ── Priority 2: Critical Dehydration ────────────────────────────────────────
-  // Hydration axis is INVERTED: score < 25 = severely dehydrated.
-  // Skin cannot absorb or benefit from actives without adequate hydration.
   if (v.hydration < 25) return "intense-hydration";
 
   // ── Priority 3: Active Clearance (Acne & Pores) ─────────────────────────────
-  // BHA / Niacinamide clearance protocol. Only safe if barrier is intact (< 75).
   if (v.texture > 60 || v.pores > 70) return "blemish-sebum-control";
 
   // ── Priority 4: Correction ───────────────────────────────────────────────────
-  // Both Brightening and Well-Aging are safe here. Pigment > Aging → brightening.
   if (v.pigment > v.aging) return "brightening";
   return "well-aging";
 }
@@ -703,14 +193,6 @@ export function deriveTargetTrouble(v: SkinVector): TargetTrouble {
 
 /**
  * Determines whether the Skin Rescue Hard Override (B-3) should activate.
- *
- * Three independent trigger conditions — any ONE is sufficient:
- *   1. `atopyFlag`   — compound multi-signal flag derived from store
- *   2. `diagnosis`   — confirmed dx_atopic or dx_psoriasis answer
- *   3. `itch+barrier`— frequent/constant chronic itch AND barrier score > 75
- *                      (cross-validation prevents false positives from winter dryness)
- *
- * Exported so the frontend can optionally read the trigger for diagnostic display.
  */
 export function isSkinRescueRequired(
   axisResponses: AxisResponses,
@@ -738,25 +220,29 @@ export function isSkinRescueRequired(
 }
 
 /**
- * Builds the forced 3-Step SOS Rescue RoutineLevel from SOS_CATALOG.
- * Uses the same base-type matching logic as pickProduct but exclusively
- * against the K-Derma clinical catalog.
+ * Builds the forced 3-Step SOS Rescue RoutineLevel from real DB products.
+ * Uses the SOS product IDs defined in productBridge.ts.
+ *
+ * Two parallel brand lines cover all base types:
+ *   Oily / Combination-Dehydrated → Dongkook Pharm — Madeca MD (Centella)
+ *   Dry / Normal                  → Aestura — Atobarrier 365 (Ceramide)
  */
 function buildSkinRescueProtocol(
   base: BaseType,
   trigger: SkinRescueProtocol["trigger"]
 ): SkinRescueProtocol {
+  const isOily = base === "oily" || base === "combination-dehydrated-oily";
+
   const pickSos = (role: StepRole, timing: "am" | "pm", order: number): RoutineStep => {
-    const product =
-      SOS_CATALOG.find(
-        (p) =>
-          p.role === role &&
-          p.phaseTiming.includes(timing) &&
-          (p.baseTypes.length === 0 || p.baseTypes.includes(base))
-      ) ??
-      // Broadest fallback: any SOS product for this role + timing
-      SOS_CATALOG.find((p) => p.role === role && p.phaseTiming.includes(timing)) ??
-      null;
+    let productId: string | undefined;
+    if (role === "cleanser") {
+      productId = isOily ? SOS_IDS.madeca_cleanser : SOS_IDS.aestura_cleanser;
+    } else if (role === "serum") {
+      productId = isOily ? SOS_IDS.madeca_serum : SOS_IDS.aestura_serum;
+    } else if (role === "moisturizer") {
+      productId = isOily ? SOS_IDS.madeca_cream : SOS_IDS.aestura_cream;
+    }
+    const product = productId ? getProductById(productId) ?? null : null;
     return { role, product, timing, order };
   };
 
@@ -789,57 +275,9 @@ function buildSkinRescueProtocol(
 // ─── Product selection ────────────────────────────────────────────────────────
 
 /**
- * Picks the best-matching product from the catalog for a given
- * role, target trouble, base type, and timing slot.
- *
- * Selection priority:
- *   1. Exact targetTrouble + compatible baseType + timing
- *   2. Universal targetTrouble + compatible baseType + timing
- *   3. Exact targetTrouble (ignoring baseType) + timing
- *   4. Hero product (serum role only)
- *   5. null (UI gracefully omits the step)
+ * Picks the best-matching product from real DB for a given role,
+ * target trouble, base type, and timing slot.
  */
-function pickProduct(
-  role: StepRole,
-  trouble: TargetTrouble,
-  base: BaseType,
-  timing: "am" | "pm"
-): MockProduct | null {
-  const pool = CATALOG.filter(
-    (p) =>
-      p.role === role &&
-      p.phaseTiming.includes(timing)
-  );
-
-  // 1. Exact match with base-type filter
-  const exact = pool.find(
-    (p) =>
-      p.targetTrouble === trouble &&
-      (p.baseTypes.length === 0 || p.baseTypes.includes(base))
-  );
-  if (exact) return exact;
-
-  // 2. Universal with base-type filter
-  const universal = pool.find(
-    (p) =>
-      p.targetTrouble === "universal" &&
-      (p.baseTypes.length === 0 || p.baseTypes.includes(base))
-  );
-  if (universal) return universal;
-
-  // 3. Exact match ignoring base-type (broadest acceptable fallback)
-  const anyBase = pool.find((p) => p.targetTrouble === trouble);
-  if (anyBase) return anyBase;
-
-  // 4. Hero product for serum only
-  if (role === "serum") return HERO_PRODUCT;
-
-  // 5. Gracefully omit
-  return null;
-}
-
-// ─── Routine builder ──────────────────────────────────────────────────────────
-
 function makeStep(
   role: StepRole,
   trouble: TargetTrouble,
@@ -847,8 +285,12 @@ function makeStep(
   timing: "am" | "pm",
   order: number
 ): RoutineStep {
-  return { role, product: pickProduct(role, trouble, base, timing), timing, order };
+  const weakAxes = TROUBLE_TO_WEAK_AXES[trouble] || [];
+  const matches = findProductsForSlot(role, weakAxes, base);
+  return { role, product: matches[0] || null, timing, order };
 }
+
+// ─── Routine builder ──────────────────────────────────────────────────────────
 
 function buildRoutineLevel(
   label: "3-step" | "5-step",
@@ -906,7 +348,7 @@ function buildRoutineLevel(
  */
 function buildAdvancedLevel(base: BaseType, trouble: TargetTrouble): RoutineLevel {
   const committed = buildRoutineLevel("5-step", base, trouble);
-  const deviceProduct = CATALOG.find((p) => p.id === "medicube-booster-pro") ?? null;
+  const deviceProduct = getProductById(DEVICE_ID) ?? null;
 
   const deviceStep: RoutineStep = {
     role: "device",
@@ -940,7 +382,7 @@ function buildAdvancedLevel(base: BaseType, trouble: TargetTrouble): RoutineLeve
  *   2. Clinical Safety Gate — barrier > 85 OR atopyFlag → advanced = null.
  *   3. Normal 3-tier routine assembly.
  *
- * All product slots use graceful fallback (hero product or null).
+ * All product slots use graceful fallback (null = omitted in UI).
  * The frontend (Module C) should treat null steps as omitted.
  */
 export function buildRoutine(
@@ -958,8 +400,6 @@ export function buildRoutine(
     : null;
 
   // ── Clinical Safety Gate (Advanced tier) ──────────────────────────────────
-  // EMS / Microcurrent / Electroporation are contraindicated when barrier is
-  // severely compromised (score > 85) or atopyFlag is active.
   const safetyBlocked = vector.barrier > 85 || implicitFlags.atopyFlag;
 
   const advancedCaution: RoutineOutput["advancedCaution"] = safetyBlocked

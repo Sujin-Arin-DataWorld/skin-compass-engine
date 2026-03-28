@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, MapPin, Trash2, Pencil, X, Star, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAddresses, type ShippingAddress, type AddressInput } from "@/hooks/useAddresses";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const GOLD = "var(--ssl-accent)";
@@ -11,18 +12,6 @@ const BRONZE = "var(--ssl-accent-deep)";
 const EMPTY_FORM: AddressInput = {
     label: "", name: "", street: "", city: "", zip: "", country: "DE", phone: "",
 };
-
-// ── Mobile detection ─────────────────────────────────────────────────────────
-function useIsMobile() {
-    const [isMobile, setIsMobile] = useState(false);
-    useEffect(() => {
-        const check = () => setIsMobile(window.innerWidth < 768);
-        check();
-        window.addEventListener("resize", check);
-        return () => window.removeEventListener("resize", check);
-    }, []);
-    return isMobile;
-}
 
 // ── Floating label input ──────────────────────────────────────────────────────
 function FloatingField({

@@ -15,29 +15,43 @@ export function scoreColor(score: number): string {
   return '#86868B';
 }
 
-export function scoreBorderColor(score: number, opacity = 0.12): string {
-  if (score >= 70) return `rgba(226,75,74,${opacity})`;
-  if (score >= 30) return `rgba(186,117,23,${opacity})`;
-  return `rgba(134,134,139,${opacity})`;
+/**
+ * Score-based border color — opacity elevated in dark mode to stay visible
+ * against #0A0A0A / #1C1C1E surfaces.
+ */
+export function scoreBorderColor(score: number, opacity = 0.12, isDark = false): string {
+  const o = isDark ? Math.min(opacity * 1.8, 0.35) : opacity;
+  if (score >= 70) return `rgba(226,75,74,${o})`;
+  if (score >= 30) return `rgba(186,117,23,${o})`;
+  return `rgba(134,134,139,${o})`;
 }
 
-export function scoreBgColor(score: number, opacity = 0.04): string {
-  if (score >= 70) return `rgba(226,75,74,${opacity})`;
-  if (score >= 30) return `rgba(186,117,23,${opacity})`;
-  return `rgba(134,134,139,${opacity})`;
+/**
+ * Score-based background tint — dark mode needs 2.5× opacity to register
+ * against slate surfaces. Light mode stays ultra-subtle on white.
+ */
+export function scoreBgColor(score: number, opacity = 0.04, isDark = false): string {
+  const o = isDark ? Math.min(opacity * 2.5, 0.20) : opacity;
+  if (score >= 70) return `rgba(226,75,74,${o})`;
+  if (score >= 30) return `rgba(186,117,23,${o})`;
+  return `rgba(134,134,139,${o})`;
 }
 
-/** Category-tinted backgrounds for product image containers */
-export function categoryTint(role: string): string {
+/**
+ * Category-tinted backgrounds for product image containers.
+ * Light: 6% opacity (subtle on white). Dark: 14% (punch on black).
+ */
+export function categoryTint(role: string, isDark = false): string {
+  const o = isDark ? 0.14 : 0.06;
   switch (role) {
-    case 'cleanser':    return 'rgba(74,158,104,0.06)';
-    case 'toner':       return 'rgba(55,138,221,0.06)';
-    case 'serum':       return 'rgba(186,117,23,0.06)';
-    case 'treatment':   return 'rgba(186,117,23,0.06)';
-    case 'moisturizer': return 'rgba(226,75,74,0.06)';
-    case 'spf':         return 'rgba(186,117,23,0.06)';
-    case 'device':      return 'rgba(134,134,139,0.06)';
-    default:            return 'rgba(134,134,139,0.06)';
+    case 'cleanser':    return `rgba(74,158,104,${o})`;
+    case 'toner':       return `rgba(55,138,221,${o})`;
+    case 'serum':       return `rgba(186,117,23,${o})`;
+    case 'treatment':   return `rgba(186,117,23,${o})`;
+    case 'moisturizer': return `rgba(226,75,74,${o})`;
+    case 'spf':         return `rgba(186,117,23,${o})`;
+    case 'device':      return `rgba(134,134,139,${o})`;
+    default:            return `rgba(134,134,139,${o})`;
   }
 }
 
@@ -143,45 +157,11 @@ export const FLAG_MESSAGES: Record<string, {
   },
 };
 
-// ── Mock product prices (SSL catalog) ───────────────────────────────────
-// The mock catalog IDs (ssl-*) are separate from product_db_merged.json.
-// These realistic EUR prices allow the UI to display meaningful numbers.
+// ── Real product prices (from product_db_merged.json via productBridge) ──
 
-export const MOCK_PRODUCT_PRICES: Record<string, number> = {
-  // Cleansers
-  'ssl-clean-gel': 18, 'ssl-clean-cream': 22, 'ssl-clean-foam': 16,
-  // Toners
-  'ssl-toner-barrier': 24, 'ssl-toner-hydra': 22, 'ssl-toner-bha': 20,
-  'ssl-toner-niacin': 20, 'ssl-toner-vc': 26, 'ssl-toner-peptide': 28,
-  // Serums
-  'ssl-serum-barrier-oily': 32, 'ssl-serum-barrier-dry': 34,
-  'ssl-serum-hydra-oily': 28, 'ssl-serum-hydra-dry': 30,
-  'ssl-serum-blemish-am-oily': 30, 'ssl-serum-blemish-am-dry': 28,
-  'ssl-serum-blemish-pm-oily': 32, 'ssl-serum-blemish-pm-dry': 30,
-  'ssl-serum-bright-oily': 36, 'ssl-serum-bright-dry': 38,
-  'ssl-serum-aging-am-oily': 34, 'ssl-serum-aging-am-dry': 36,
-  'ssl-serum-aging-pm-oily': 38, 'ssl-serum-aging-pm-dry': 40,
-  // Treatments
-  'ssl-treat-barrier': 28, 'ssl-treat-hydra': 26, 'ssl-treat-blemish': 24,
-  'ssl-treat-bright': 30, 'ssl-treat-aging': 36,
-  // Moisturizers
-  'ssl-moist-gel': 24, 'ssl-moist-emulsion': 26, 'ssl-moist-cream': 28, 'ssl-moist-lotion': 22,
-  // SPF
-  'ssl-spf-fluid': 22, 'ssl-spf-cream': 24,
-  // Device
-  'medicube-booster-pro': 189,
-  // Hero
-  'ssl-hero-essence': 32,
-  // SOS
-  'madeca-cleanser': 14, 'madeca-serum': 22, 'madeca-cream': 18,
-  'aestura-cleanser': 16, 'aestura-serum': 24, 'aestura-cream': 20,
-  // Barrier recovery overrides (routineEngineV5 BARRIER_EMERGENCY)
-  'barrier-serum-recovery': 28, 'barrier-moist-recovery': 26, 'barrier-spf-mineral': 22,
-};
+import { getRealProductPrice } from '@/engine/productBridge';
 
-export function getProductPrice(productId: string): number {
-  return MOCK_PRODUCT_PRICES[productId] ?? 0;
-}
+export const getProductPrice = getRealProductPrice;
 
 // ── Skin cell turnover cycle mapping ──────────────────────────────────────
 

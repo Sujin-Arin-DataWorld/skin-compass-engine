@@ -6,13 +6,15 @@
  * Trust badges moved to SlideMacroDashboard bottom.
  */
 
-import { useMemo, memo } from 'react';
+import { useMemo, memo, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 import { useI18nStore } from '@/store/i18nStore';
+import { useCartStore } from '@/store/cartStore';
 import { ctaTokens } from '@/lib/designTokens';
 import { useTheme } from 'next-themes';
-import { getProductPrice, ROLE_EMOJI } from './sharedResultsData';
-import type { MockProduct, RoutineStep } from '@/engine/routineEngine';
+import { getProductPrice } from './sharedResultsData';
+import type { RealProduct, RoutineStep } from '@/engine/routineEngine';
 
 // ── i18n ──────────────────────────────────────────────────────────────────────
 
@@ -44,7 +46,7 @@ interface BarrierProduct {
 }
 
 interface StickyCartBarProps {
-  steps: Array<RoutineStep & { product: MockProduct }>;
+  steps: Array<RoutineStep & { product: RealProduct }>;
   cycleDays: number;
   slideNavHeight?: number;
   barrierProducts?: BarrierProduct[];
@@ -67,6 +69,20 @@ const StickyCartBar = memo(function StickyCartBar({
   const isDark = resolvedTheme === 'dark';
 
   const ctaTok = ctaTokens(isDark);
+
+  // ── Zombie cart prevention: validate on mount ─────────────────────────────
+  useEffect(() => {
+    useCartStore.getState().validateCart().then(({ removedCount, priceUpdated }) => {
+      if (removedCount > 0 || priceUpdated) {
+        const msg = lang === 'ko'
+          ? '장바구니가 최신 가격 및 재고로 업데이트되었습니다.'
+          : lang === 'de'
+            ? 'Ihr Warenkorb wurde mit aktuellen Preisen und Verfügbarkeiten aktualisiert.'
+            : 'Your cart has been updated with the latest prices and availability.';
+        toast.info(msg);
+      }
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isBarrierMode = (barrierProducts?.length ?? 0) > 0;
 

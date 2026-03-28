@@ -5,8 +5,6 @@
 import type { AnalysisApiResponse } from '@/types/skinAnalysis';
 import { supabase } from '@/integrations/supabase/client';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 /**
  * Sends a base64 face image to the Supabase Edge Function which calls Groq
@@ -26,87 +24,49 @@ export async function analyzeSkinImage(
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 45_000);  // Match Edge Function timeout
+  const timeoutId = setTimeout(() => controller.abort(), 45_000); // Match Edge Function timeout
 
-  // Forward user's auth token if logged in, otherwise use anon key
-  let authToken = SUPABASE_ANON_KEY;
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.access_token) {
-      // Validate token hasn't expired (JWT exp is in seconds)
-      try {
-        const payload = JSON.parse(atob(session.access_token.split('.')[1]));
-        const nowSec = Math.floor(Date.now() / 1000);
-        if (payload.exp && payload.exp > nowSec + 30) {
-          // Token valid for at least 30 more seconds
-          authToken = session.access_token;
-        }
-        // else: token expired or about to expire — use anon key
-      } catch {
-        // Malformed token — use anon key
-      }
-    }
-  } catch {
-    // Fall back to anon key — analysis still works for anonymous users
-  }
+  const body: Record<string, unknown> = { image_base64: imageBase64 };
+  if (lifestyle && Object.keys(lifestyle).length > 0) body.lifestyle = lifestyle;
+  if (language) body.language = language;
+
+  // supabase.functions.invoke handles auth automatically (session token or anon key fallback)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const doInvoke = () => (supabase.functions as any).invoke('analyze-skin', {
+    body,
+    signal: controller.signal,
+  }) as Promise<{ data: AnalysisApiResponse | null; error: (Error & { name: string; context?: Response }) | null }>;
 
   try {
-    const body: Record<string, unknown> = { image_base64: imageBase64 };
-    if (lifestyle && Object.keys(lifestyle).length > 0) {
-      body.lifestyle = lifestyle;
-    }
-    if (language) {
-      body.language = language;
-    }
+    let result = await doInvoke();
 
-    const makeRequest = (token: string): Promise<Response> =>
-      fetch(`${SUPABASE_URL}/functions/v1/analyze-skin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(body),
-        signal: controller.signal,
-      });
-
-    // [PWA-FIX] Single automatic retry on transient network drop (TypeError: Failed to fetch).
+    // [PWA-FIX] Single retry on transient network drop (FunctionsFetchError, not a timeout abort).
     // Waits 1 000ms before the second attempt. AbortController timeout remains active across both.
-    let res: Response;
-    try {
-      res = await makeRequest(authToken);
-    } catch (fetchErr) {
-      if (fetchErr instanceof TypeError) {
-        // Network drop — wait 1s then retry once
-        await new Promise<void>((r) => setTimeout(r, 1_000));
-        res = await makeRequest(authToken);
-      } else {
-        throw fetchErr;
+    if (result.error?.name === 'FunctionsFetchError') {
+      const isAbort = (result.error.context as unknown as Error | undefined)?.name === 'AbortError';
+      if (isAbort) {
+        throw new Error('분석 시간이 초과되었습니다. 다시 시도해주세요.');
       }
+      await new Promise<void>((r) => setTimeout(r, 1_000));
+      result = await doInvoke();
     }
 
-    // [AUTH-FIX] If 401 and we used a user token, retry with anon key
-    if (res.status === 401 && authToken !== SUPABASE_ANON_KEY) {
-      console.warn('[SkinAnalysis] Auth token rejected (401), retrying with anon key...');
-      res = await makeRequest(SUPABASE_ANON_KEY);
+    if (result.error) {
+      if (result.error.name === 'FunctionsHttpError') {
+        // Extract the server's localized error message (e.g. face-not-detected)
+        let errMsg = '서버 오류';
+        try {
+          const errBody = await result.error.context!.json() as { error?: string };
+          errMsg = errBody.error ?? errMsg;
+        } catch { /* ignore body parse failure */ }
+        throw new Error(errMsg);
+      }
+      throw new Error(result.error.message ?? '서버 오류');
     }
 
+    return result.data as AnalysisApiResponse;
+  } finally {
     clearTimeout(timeoutId);
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: 'Unknown error' }));
-      const errorMsg = (err as { error?: string }).error ?? `서버 오류 (${res.status})`;
-      // Surface the server's localized error message directly
-      throw new Error(errorMsg);
-    }
-
-    return (await res.json()) as AnalysisApiResponse;
-  } catch (e) {
-    clearTimeout(timeoutId);
-    if (e instanceof Error && e.name === 'AbortError') {
-      throw new Error('분석 시간이 초과되었습니다. 다시 시도해주세요.');
-    }
-    throw e;
   }
 }
 
@@ -122,13 +82,9 @@ export async function submitFeedback(
   comment?: string,
   tags?: string[],
 ): Promise<void> {
-  await fetch(`${SUPABASE_URL}/functions/v1/analysis-feedback`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    },
-    body: JSON.stringify({ analysis_id: analysisId, feedback, comment, tags }),
+  // fire-and-forget — no error handling intentional
+  await supabase.functions.invoke('analysis-feedback', {
+    body: { analysis_id: analysisId, feedback, comment, tags },
   });
 }
 
@@ -195,31 +151,21 @@ export async function storeTrainingImage(
   analysisId: string,
   imageBase64: string,
 ): Promise<{ success: boolean; storagePath?: string; error?: string }> {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.access_token) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
     return { success: false, error: 'Not authenticated' };
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/store-training-image`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({
-        analysis_id: analysisId,
-        image_base64: imageBase64,
-      }),
+    const { data, error } = await supabase.functions.invoke('store-training-image', {
+      body: { analysis_id: analysisId, image_base64: imageBase64 },
     });
 
-    const body = await res.json();
-
-    if (!res.ok) {
-      return { success: false, error: body.error ?? `HTTP ${res.status}` };
+    if (error) {
+      return { success: false, error: error.message };
     }
 
-    return { success: true, storagePath: body.storage_path };
+    return { success: true, storagePath: (data as { storage_path?: string })?.storage_path };
   } catch (err) {
     return {
       success: false,

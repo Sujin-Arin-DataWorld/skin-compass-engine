@@ -1,7 +1,8 @@
 // Prompt 3 — PART C: SkinAnalysisPage
 // State machine: idle → camera → analyzing → result → error
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { Camera, AlertCircle, RefreshCw, Sun, CheckCircle2 } from 'lucide-react';
@@ -115,6 +116,10 @@ export default function SkinAnalysisPage() {
   const { language } = useI18nStore();
   const t = translations[language as keyof typeof translations] || translations.en;
   const { resolvedTheme } = useTheme();
+
+  // ── Deduplication guard: prevent double-save on React remount ────────────
+  const hasSavedRef = useRef(false);
+  useEffect(() => { hasSavedRef.current = false; }, [analysisId]);
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
   const ctaTok = ctaTokens(isDark);
@@ -261,6 +266,8 @@ export default function SkinAnalysisPage() {
 
         // ── Persist to user_skin_profiles if logged in (non-blocking) ──────
         (async () => {
+          if (hasSavedRef.current) return; // Guard against React remount double-save
+          hasSavedRef.current = true;
           try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return; // Guest mode — skip DB save
@@ -285,10 +292,17 @@ export default function SkinAnalysisPage() {
               primaryConcerns: derivePrimaryConcerns(response.scores),
               analysisMethod: 'camera',
               confidenceScore: hasLifestyle ? 0.92 : 0.75,
+              analysisId: response.analysis_id ?? undefined,
             });
 
             if (saved) {
               console.log('[SkinAnalysis] Profile persisted:', saved.id);
+              const saveMsg = language === 'ko'
+                ? '분석 결과가 프로필에 안전하게 저장되었습니다.'
+                : language === 'de'
+                  ? 'Analyseergebnisse wurden sicher in Ihrem Profil gespeichert.'
+                  : 'Analysis results securely saved to your profile.';
+              toast.success(saveMsg);
             }
           } catch (e) {
             console.warn('[SkinAnalysis] Profile save failed (non-fatal):', e);
@@ -298,7 +312,7 @@ export default function SkinAnalysisPage() {
         setError(err instanceof Error ? err.message : t.camera.analysisError);
       }
     },
-    [setCapturedImage, setStep, setAnalysisResult, setError, t, lifestyleAnswers],
+    [setCapturedImage, setStep, setAnalysisResult, setError, t, lifestyleAnswers, language],
   );
 
   const handleClose = useCallback(() => {

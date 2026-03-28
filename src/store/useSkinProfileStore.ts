@@ -37,6 +37,7 @@ interface SaveAnalysisParams {
   primaryConcerns: SkinConcern[];
   analysisMethod: AnalysisMethod;
   confidenceScore?: number;
+  analysisId?: string;
 }
 
 // ── Store implementation ──
@@ -93,7 +94,7 @@ export const useSkinProfileStore = create<SkinProfileState>((set) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const insertData = {
+      const upsertData = {
         user_id: params.userId,
         ...mapScoresToDbColumns(params.scores),
         zone_scores: params.zoneScores ?? {},
@@ -102,12 +103,13 @@ export const useSkinProfileStore = create<SkinProfileState>((set) => ({
         analysis_method: params.analysisMethod,
         confidence_score: params.confidenceScore ?? null,
         is_active: true,
+        ...(params.analysisId ? { analysis_id: params.analysisId } : {}),
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data, error } = await (supabase as any)
         .from('user_skin_profiles')
-        .insert(insertData)
+        .upsert(upsertData, { onConflict: 'analysis_id', ignoreDuplicates: false })
         .select()
         .single();
 

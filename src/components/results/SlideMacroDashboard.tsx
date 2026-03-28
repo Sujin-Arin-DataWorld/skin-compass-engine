@@ -11,13 +11,14 @@ import { useDiagnosisStore } from '@/store/diagnosisStore';
 import { buildRoutineV5 } from '@/engine/routineEngineV5';
 import type { DiagnosisResult, AxisKey } from '@/engine/types';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS } from '@/engine/types';
-import type { RoutineStep, MockProduct } from '@/engine/routineEngine';
+import type { RoutineStep, RealProduct } from '@/engine/routineEngine';
 import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
 import { useTheme } from 'next-themes';
+import ProductImage from '@/components/product/ProductImage';
 import {
   scoreColor, scoreBorderColor, scoreBgColor, categoryTint,
   AXIS_INTERPRETATIONS, CRITICAL_MESSAGES, FLAG_MESSAGES,
-  getProductPrice, AGE_CYCLE_MAP, ROLE_EMOJI,
+  getProductPrice, AGE_CYCLE_MAP,
 } from './sharedResultsData';
 import BarrierRecoveryMode from './BarrierRecoveryMode';
 
@@ -154,7 +155,7 @@ const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56
 // ── Types ────────────────────────────────────────────────────────────────────
 type TierKey = '3-step' | '5-step' | 'advanced';
 type TabKey = 'routine' | 'insights';
-type FilteredStep = RoutineStep & { product: MockProduct };
+type FilteredStep = RoutineStep & { product: RealProduct };
 
 type CartItem = { id: string; price: number; role: string; emoji: string };
 interface Props {
@@ -321,8 +322,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 8,
                 padding: '6px 12px', borderRadius: 10,
-                border: `1px solid ${scoreBorderColor(topAxis.raw, 0.10)}`,
-                background: scoreBgColor(topAxis.raw, 0.03),
+                border: `1px solid ${scoreBorderColor(topAxis.raw, 0.10, isDark)}`,
+                background: scoreBgColor(topAxis.raw, 0.03, isDark),
                 flexShrink: 0,
               }}>
                 <CircularScore axis={topAxis.axis} score={topAxis.score} lang={lang} size={40} isDark={isDark} />
@@ -466,7 +467,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vw, 8px)' }}>
                 {currentSteps.map((step, i) => {
                   const price = getProductPrice(step.product.id);
-                  const isKeyStep = topAxis && step.product.keyIngredients.some((ing) =>
+                  const isKeyStep = topAxis && step.product.key_ingredients.some((ing) =>
                     (topAxis.axis === 'ox' && /vitamin\s*c|ascorb|antioxid/i.test(ing)) ||
                     (topAxis.axis === 'bar' && /ceramide|panthe|centella/i.test(ing)) ||
                     (topAxis.axis === 'hyd' && /hyaluron|glycerin/i.test(ing)) ||
@@ -502,15 +503,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                           background: isKeyStep ? 'rgba(226,75,74,0.12)' : 'rgba(74,158,104,0.12)',
                           color: isKeyStep ? '#E24B4A' : (tok.accent),
                         }}>{i + 1}</span>
-                        {/* Product icon */}
-                        <div style={{
-                          width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                          background: categoryTint(step.role),
-                          position: 'relative', overflow: 'hidden',
-                        }}>
-                          <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>{ROLE_EMOJI[step.role] ?? '💊'}</span>
-                          <img src={`/productsImage/${step.product.id}.jpg`} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { e.currentTarget.style.display = 'none'; }} />
-                        </div>
+                        {/* Product image */}
+                        <ProductImage productId={step.product.id} name={step.product.name[lang] ?? step.product.name.en} size="sm" />
                         {/* Product info */}
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -530,7 +524,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                           <p style={{
                             fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: tok.textSecondary, margin: 0,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          }}>{step.product.keyIngredients.slice(0, 2).join(', ')}</p>
+                          }}>{step.product.key_ingredients.slice(0, 2).join(', ')}</p>
                           {isKeyStep && topAxis && (() => {
                             const hc = topAxis.score < 30 ? '#E24B4A' : topAxis.score < 70 ? '#BA7517' : '#4A9E68';
                             const dispCurrent = Math.round(toHealthScore(topAxis.axis, proj.currentScore));
@@ -555,7 +549,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                                   if (isAdded && onRemoveFromCart) {
                                     onRemoveFromCart(step.product.id);
                                   } else if (!isAdded && onAddToCart) {
-                                    const item = { id: step.product.id, price, role: step.role, emoji: ROLE_EMOJI[step.role] ?? '💊' };
+                                    const item = { id: step.product.id, price, role: step.role, emoji: '' };
                                     onAddToCart(item);
                                   }
                                 }}
@@ -604,7 +598,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                                   </span>
                                 </div>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginBottom: 8 }}>
-                                  {[{ l: tx('role_label', lang), v: step.role }, { l: tx('form_label', lang), v: step.product.formulation ?? '—' }].map(({ l, v }) => (
+                                  {[{ l: tx('role_label', lang), v: step.role }, { l: tx('form_label', lang), v: step.product.texture_type ?? '—' }].map(({ l, v }) => (
                                     <div key={l} style={{ borderRadius: 6, padding: '4px 6px', background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
                                       <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textSecondary }}>{l} </span>
                                       <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600, color: tok.text }}>{v}</span>

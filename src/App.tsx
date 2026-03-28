@@ -4,7 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, MotionConfig } from "framer-motion";
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 import { ThemeProvider, useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
@@ -88,6 +89,13 @@ function AppInner() {
   const location = useLocation();
   const { language } = useI18nStore();
   const { resolvedTheme } = useTheme();
+
+  // Performance mode — injects .low-performance body class for CSS-level GPU drain suppression
+  // Uses "user" on MotionConfig (not "always") to avoid breaking onAnimationComplete callbacks
+  const { reducedMotion } = usePerformanceMode();
+  useEffect(() => {
+    document.body.classList.toggle('low-performance', reducedMotion);
+  }, [reducedMotion]);
 
   // Sync HTML lang attribute for i18n CSS rules ([lang="ko"], etc.)
   useEffect(() => {
@@ -288,7 +296,7 @@ function AppInner() {
   const hideBottomNav = location.pathname.startsWith("/account");
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <Suspense fallback={<RouteSpinner />}>
       <Routes>
         <Route path="/" element={<Index />} />
@@ -361,7 +369,7 @@ function AppInner() {
           />
         )}
       </AnimatePresence>
-    </>
+    </MotionConfig>
   );
 }
 

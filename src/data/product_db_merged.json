@@ -10137,7 +10137,453 @@
         "allergens_to_declare_2026": [],
         "note": "2026년 7월 의무화되는 신규 INCI 용어집 변경 여부 확인 필요."
       }
+    },
+    {
+      "id": "KR_madeca_md_cleanser",
+      "name_kr": "마데카MD 진정 젤 클렌저",
+      "name_en": "Madeca MD Calming Gel Cleanser",
+      "name_de": "Madeca MD Beruhigendes Gel-Reinigungsmittel",
+      "brand": "Dongkook Pharm",
+      "brand_kr": "동국제약",
+      "country": "KR",
+      "market_tier": "derma",
+      "price_tier": "mid",
+      "price_eur": 14.0,
+      "price_krw": 19800,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.09,
+      "routine_slot": "cleanser",
+      "texture_type": "gel",
+      "texture_description_kr": "진정 젤",
+      "ingredients": [
+        {
+          "name_en": "Centella Asiatica Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": 60.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        },
+        {
+          "name_en": "Madecassoside",
+          "name_kr": "마데카소사이드",
+          "name_inci": "Madecassoside",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "barrier_damage",
+        "redness",
+        "sensitivity",
+        "irritation"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "물에 적신 얼굴에 부드럽게 거품 내어 30초 마사지 후 헹굼",
+      "application_instruction_en": "Gently lather on wet face, massage for 30 seconds, and rinse off.",
+      "application_instruction_de": "Sanft auf dem feuchten Gesicht aufschäumen, 30 Sekunden massieren und abspülen.",
+      "one_liner_kr": "병풀 60% + 판테놀 5% SOS 진정 클렌저",
+      "one_liner_en": "Centella 60% + Panthenol 5% SOS calming cleanser",
+      "one_liner_de": "Centella 60% + Panthenol 5% SOS beruhigender Reiniger",
+      "full_inci_list": null,
+      "cpnp_2026_compliance": null
+    },
+    {
+      "id": "KR_madeca_md_serum",
+      "name_kr": "마데카MD 센텔라 SOS 앰플",
+      "name_en": "Madeca MD Centella SOS Ampoule",
+      "name_de": "Madeca MD Centella SOS Ampulle",
+      "brand": "Dongkook Pharm",
+      "brand_kr": "동국제약",
+      "country": "KR",
+      "market_tier": "derma",
+      "price_tier": "mid",
+      "price_eur": 22.0,
+      "price_krw": 32000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.44,
+      "routine_slot": "serum_am_pm",
+      "texture_type": "ampoule",
+      "texture_description_kr": "앰플",
+      "ingredients": [
+        {
+          "name_en": "Centella Asiatica Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        },
+        {
+          "name_en": "Asiaticoside",
+          "name_kr": "아시아티코사이드",
+          "name_inci": "Asiaticoside",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Ceramide NP",
+          "name_kr": "세라마이드NP",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "barrier_damage",
+        "redness",
+        "sensitivity",
+        "irritation"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "apply",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "세안 후 적당량을 얼굴 전체에 부드럽게 펴 발라줍니다",
+      "application_instruction_en": "After cleansing, gently apply an appropriate amount to the entire face.",
+      "application_instruction_de": "Nach der Reinigung eine angemessene Menge sanft auf das gesamte Gesicht auftragen.",
+      "one_liner_kr": "센텔라 + 아시아티코사이드 SOS 진정 앰플",
+      "one_liner_en": "Centella + Asiaticoside SOS calming ampoule",
+      "one_liner_de": "Centella + Asiaticoside SOS-Beruhigungsampulle",
+      "full_inci_list": null,
+      "cpnp_2026_compliance": null
+    },
+    {
+      "id": "KR_madeca_md_cream",
+      "name_kr": "마데카MD 리커버리 배리어 크림",
+      "name_en": "Madeca MD Recovery Barrier Cream",
+      "name_de": "Madeca MD Regenerierende Barriere-Creme",
+      "brand": "Dongkook Pharm",
+      "brand_kr": "동국제약",
+      "country": "KR",
+      "market_tier": "derma",
+      "price_tier": "mid",
+      "price_eur": 18.0,
+      "price_krw": 25000,
+      "volume_ml": 50,
+      "price_per_ml_eur": 0.36,
+      "routine_slot": "moisturizer_rich",
+      "texture_type": "cream",
+      "texture_description_kr": "크림",
+      "ingredients": [
+        {
+          "name_en": "Centella Asiatica Extract",
+          "name_kr": "병풀추출물",
+          "name_inci": "Centella Asiatica Extract",
+          "concentration_pct": 20.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        },
+        {
+          "name_en": "Ceramide Complex",
+          "name_kr": "세라마이드 복합체",
+          "name_inci": "Ceramide Complex",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Beta-Glucan",
+          "name_kr": "베타글루칸",
+          "name_inci": "Beta-Glucan",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "sensitive",
+        "dry_barrier",
+        "dehydrated_oily"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "barrier_damage",
+        "redness",
+        "sensitivity",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "apply",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "세안 후 마지막 단계에 크림을 얼굴 전체에 펴 발라줍니다",
+      "application_instruction_en": "As the last step after cleansing, apply cream to the entire face.",
+      "application_instruction_de": "Als letzten Schritt nach der Reinigung die Creme auf das gesamte Gesicht auftragen.",
+      "one_liner_kr": "병풀 20% + 세라마이드 배리어 리커버리 크림",
+      "one_liner_en": "Centella 20% + Ceramide barrier recovery cream",
+      "one_liner_de": "Centella 20% + Ceramid Barriere-Erholungscreme",
+      "full_inci_list": null,
+      "cpnp_2026_compliance": null
+    },
+    {
+      "id": "KR_aestura_atobarrier_cleanser",
+      "name_kr": "에스트라 아토베리어 365 순한 크림 클렌저",
+      "name_en": "Atobarrier 365 Gentle Cream Cleanser",
+      "name_de": "Atobarrier 365 Sanfter Creme-Reiniger",
+      "brand": "Aestura",
+      "brand_kr": "에스트라",
+      "country": "KR",
+      "market_tier": "derma",
+      "price_tier": "mid",
+      "price_eur": 16.0,
+      "price_krw": 22000,
+      "volume_ml": 150,
+      "price_per_ml_eur": 0.11,
+      "routine_slot": "cleanser",
+      "texture_type": "cream",
+      "texture_description_kr": "크림",
+      "ingredients": [
+        {
+          "name_en": "Ceramide NP",
+          "name_kr": "세라마이드NP",
+          "name_inci": "Ceramide NP",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Betaine",
+          "name_kr": "베타인",
+          "name_inci": "Betaine",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "humectant"
+        },
+        {
+          "name_en": "Allantoin",
+          "name_kr": "알란토인",
+          "name_inci": "Allantoin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "soothing"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier",
+        "dry_sensitive",
+        "sensitive"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "barrier_damage",
+        "redness",
+        "sensitivity",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "wash_off",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "물에 적신 얼굴에 부드럽게 거품 내어 30초 마사지 후 헹굼",
+      "application_instruction_en": "Gently lather on wet face, massage for 30 seconds, and rinse off.",
+      "application_instruction_de": "Sanft auf dem feuchten Gesicht aufschäumen, 30 Sekunden massieren und abspülen.",
+      "one_liner_kr": "세라마이드 + 알란토인 초순한 클렌저",
+      "one_liner_en": "Ceramide + Allantoin ultra-gentle cleanser",
+      "one_liner_de": "Ceramid + Allantoin ultra-sanfter Reiniger",
+      "full_inci_list": null,
+      "cpnp_2026_compliance": null
+    },
+    {
+      "id": "KR_aestura_atobarrier_serum",
+      "name_kr": "에스트라 아토베리어 365 세라마이드 리페어 앰플",
+      "name_en": "Atobarrier 365 Ceramide Repair Ampoule",
+      "name_de": "Atobarrier 365 Ceramid-Reparatur-Ampulle",
+      "brand": "Aestura",
+      "brand_kr": "에스트라",
+      "country": "KR",
+      "market_tier": "derma",
+      "price_tier": "mid",
+      "price_eur": 24.0,
+      "price_krw": 35000,
+      "volume_ml": 40,
+      "price_per_ml_eur": 0.6,
+      "routine_slot": "serum_am_pm",
+      "texture_type": "ampoule",
+      "texture_description_kr": "앰플",
+      "ingredients": [
+        {
+          "name_en": "Ceramide Complex",
+          "name_kr": "세라마이드 복합체",
+          "name_inci": "Ceramide Complex",
+          "concentration_pct": 5.0,
+          "concentration_unit": "%",
+          "role": "barrier_repair"
+        },
+        {
+          "name_en": "Panthenol",
+          "name_kr": "판테놀",
+          "name_inci": "Panthenol",
+          "concentration_pct": 3.0,
+          "concentration_unit": "%",
+          "role": "soothing"
+        },
+        {
+          "name_en": "Glycerin",
+          "name_kr": "글리세린",
+          "name_inci": "Glycerin",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "humectant"
+        }
+      ],
+      "target_profiles": [
+        "dry_barrier",
+        "dry_sensitive",
+        "sensitive"
+      ],
+      "target_age_range": "all",
+      "skin_concerns": [
+        "barrier_damage",
+        "redness",
+        "sensitivity",
+        "dehydration"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "apply",
+      "application_frequency": "daily_am_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "세안 후 적당량을 얼굴 전체에 부드럽게 펴 발라줍니다",
+      "application_instruction_en": "After cleansing, gently apply an appropriate amount to the entire face.",
+      "application_instruction_de": "Nach der Reinigung eine angemessene Menge sanft auf das gesamte Gesicht auftragen.",
+      "one_liner_kr": "세라마이드 5% + 판테놀 3% 피부장벽 회복 앰플",
+      "one_liner_en": "Ceramide 5% + Panthenol 3% barrier repair ampoule",
+      "one_liner_de": "Ceramid 5% + Panthenol 3% Barriere-Reparatur-Ampulle",
+      "full_inci_list": null,
+      "cpnp_2026_compliance": null
+    },
+    {
+      "id": "KR_medicube_booster_pro",
+      "name_kr": "메디큐브 에이지알 부스터 프로",
+      "name_en": "Medicube Age-R Booster Pro",
+      "name_de": "Medicube Age-R Booster Pro",
+      "brand": "Medicube",
+      "brand_kr": "메디큐브",
+      "country": "KR",
+      "market_tier": "premium",
+      "price_tier": "premium",
+      "price_eur": 189.0,
+      "price_krw": 289000,
+      "volume_ml": null,
+      "price_per_ml_eur": null,
+      "routine_slot": "device",
+      "texture_type": null,
+      "texture_description_kr": null,
+      "ingredients": [
+        {
+          "name_en": "Electroporation",
+          "name_kr": "전기영동",
+          "name_inci": "N/A",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "device_technology"
+        },
+        {
+          "name_en": "EMS",
+          "name_kr": "EMS",
+          "name_inci": "N/A",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "device_technology"
+        },
+        {
+          "name_en": "Microcurrent",
+          "name_kr": "마이크로커런트",
+          "name_inci": "N/A",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "device_technology"
+        },
+        {
+          "name_en": "Air Shot",
+          "name_kr": "에어샷",
+          "name_inci": "N/A",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "device_technology"
+        },
+        {
+          "name_en": "LED Therapy",
+          "name_kr": "LED 테라피",
+          "name_inci": "N/A",
+          "concentration_pct": null,
+          "concentration_unit": null,
+          "role": "device_technology"
+        }
+      ],
+      "target_profiles": [
+        "aging_elasticity",
+        "dullness",
+        "pigmentation"
+      ],
+      "target_age_range": "30+",
+      "skin_concerns": [
+        "fine_lines",
+        "wrinkles",
+        "loss_of_elasticity",
+        "dullness",
+        "uneven_tone"
+      ],
+      "application_zones": [
+        "whole_face"
+      ],
+      "application_method": "device",
+      "application_frequency": "3x_weekly_pm",
+      "vs_comparison": null,
+      "duel_verdict": null,
+      "application_instruction_kr": "저녁 세럼 도포 후 3분간 사용. 주 3회 권장",
+      "application_instruction_en": "Use for 3 minutes after applying evening serum. Recommended 3x per week.",
+      "application_instruction_de": "3 Minuten nach dem Abendserum verwenden. 3x pro Woche empfohlen.",
+      "one_liner_kr": "6-in-1 전기영동 + EMS + LED 홈 에스테틱 디바이스",
+      "one_liner_en": "6-in-1 Electroporation + EMS + LED home aesthetic device",
+      "one_liner_de": "6-in-1 Elektroporation + EMS + LED Heim-Ästhetik-Gerät",
+      "full_inci_list": null,
+      "cpnp_2026_compliance": null
     }
   ],
-  "_engine_last_updated": "2026-03-19T17:48:25Z"
+  "_engine_last_updated": "2026-03-19T17:48:25Z",
+  "metadata": {
+    "schema_version": "2.1",
+    "last_updated": "2026-03-28",
+    "total_products": 145
+  }
 }

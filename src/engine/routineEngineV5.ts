@@ -30,9 +30,13 @@ import {
   type TargetTrouble,
   type RoutineLevel,
   type RoutineStep,
-  type MockProduct,
+  type RealProduct,
   type RoutineOutput,
 } from "@/engine/routineEngine";
+import {
+  findProductsForSlot,
+  getProductById,
+} from "@/engine/productBridge";
 import type { ImplicitFlags, AxisResponses } from "@/store/diagnosisStore";
 import type { AxisKey, DiagnosisResult, Product, Tier, SkinVector } from "@/engine/types";
 import { AXIS_KEYS } from "@/engine/types";
@@ -51,88 +55,32 @@ import { AXIS_KEYS } from "@/engine/types";
 //                Chemical UV filters (Tinosorb, Oxybenzone, Octinoxate …) excluded.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── Barrier-safe cleanser overrides (mirrored from SOS_CATALOG in routineEngine.ts)
-
-const BARRIER_CLEANSER_OILY: MockProduct = {
-  id: "madeca-cleanser",
-  name: {
-    en: "Madeca MD Calming Gel Cleanser",
-    de: "Madeca MD Beruhigendes Gel-Reinigungsmittel",
-    ko: "마데카MD 진정 젤 클렌저",
-  },
-  brand: "Dongkook Pharm",
-  role: "cleanser", targetTrouble: "barrier-repair",
-  baseTypes: ["oily", "combination-dehydrated-oily"],
-  formulation: "gel",
-  keyIngredients: ["Centella Asiatica 60%", "Madecassoside", "Panthenol 5%"],
-  phaseTiming: ["am", "pm"],
+// Barrier-safe product IDs in the real DB
+const BARRIER_OVERRIDE_IDS = {
+  cleanser_oily:  'KR_madeca_md_cleanser',
+  cleanser_dry:   'KR_aestura_atobarrier_cleanser',
+  serum:          'KR_aestura_atobarrier_serum',     // Ceramide 5% + Panthenol 3%
+  moisturizer:    'KR_aestura_atobarrier_cream',     // Triple ceramide
 };
 
-const BARRIER_CLEANSER_DRY: MockProduct = {
-  id: "aestura-cleanser",
-  name: {
-    en: "Atobarrier 365 Gentle Cream Cleanser",
-    de: "Atobarrier 365 Sanfter Creme-Reiniger",
-    ko: "에스트라 아토베리어 365 순한 크림 클렌저",
-  },
-  brand: "Aestura",
-  role: "cleanser", targetTrouble: "barrier-repair",
-  baseTypes: ["dry", "normal"],
-  formulation: "cream",
-  keyIngredients: ["Ceramide NP", "Betaine", "Allantoin"],
-  phaseTiming: ["am", "pm"],
-};
+function getBarrierOverride(key: keyof typeof BARRIER_OVERRIDE_IDS): RealProduct | null {
+  return getProductById(BARRIER_OVERRIDE_IDS[key]) ?? null;
+}
 
-// ── Barrier-safe serum placeholder (when catalog serum contains actives)
-
-const BARRIER_SERUM_PLACEHOLDER: MockProduct = {
-  id: "barrier-serum-recovery",
-  name: {
-    en: "Barrier Recovery Ampoule (Separate Selection)",
-    de: "Barriere-Regenerations-Ampulle (separate Auswahl)",
-    ko: "베리어 진정 앰플 (별도 선택)",
-  },
-  brand: "SkinStrategyLab",
-  role: "serum", targetTrouble: "barrier-repair",
-  baseTypes: [],
-  formulation: "lightweight-fluid",
-  keyIngredients: ["Panthenol", "Allantoin", "Centella Asiatica"],
-  phaseTiming: ["am", "pm"],
-};
-
-// ── Triple-lipid barrier moisturizer (when catalog pick lacks ceramide)
-
-const BARRIER_MOISTURIZER: MockProduct = {
-  id: "barrier-moist-recovery",
-  name: {
-    en: "Barrier Lock Ceramide Cream",
-    de: "Barriere-Schutz Ceramid-Creme",
-    ko: "배리어 락 세라마이드 크림",
-  },
-  brand: "SkinStrategyLab",
-  role: "moisturizer", targetTrouble: "barrier-repair",
-  baseTypes: [],
-  formulation: "cream",
-  keyIngredients: ["Ceramide Complex", "Cholesterol", "Linoleic Acid", "Panthenol"],
-  phaseTiming: ["am", "pm"],
-};
-
-// ── Mineral-only SPF override (when catalog SPF contains chemical UV filters)
-
-const BARRIER_SPF_MINERAL: MockProduct = {
-  id: "barrier-spf-mineral",
-  name: {
-    en: "Mineral Shield SPF 50+ (Zinc Oxide)",
-    de: "Mineral-Schutz LSF 50+ (Zinkoxid)",
-    ko: "미네랄 선스크린 SPF 50+ (산화아연)",
-  },
-  brand: "SkinStrategyLab",
-  role: "spf", targetTrouble: "universal",
-  baseTypes: [],
-  formulation: "lightweight-fluid",
-  keyIngredients: ["Zinc Oxide 20%", "Titanium Dioxide", "Ceramide NP"],
-  phaseTiming: ["am"],
-};
+/**
+ * Finds the best mineral-only SPF from the real DB.
+ * Falls back to any SPF if no mineral-only option exists.
+ */
+function findMineralSpf(): RealProduct | null {
+  const weakAxes = ['bar', 'sen'];
+  const spfProducts = findProductsForSlot('spf', weakAxes);
+  // Prefer products with mineral ingredients
+  const mineral = spfProducts.find((p) =>
+    p.key_ingredients.some((i) => /zinc oxide|titanium dioxide/i.test(i)) &&
+    !p.key_ingredients.some((i) => /tinosorb|oxybenzone|octinoxate|homosalate/i.test(i))
+  );
+  return mineral ?? spfProducts[0] ?? null;
+}
 
 // ── Per-step barrier safety gate
 
@@ -141,7 +89,7 @@ function applyBarrierRecoveryToStep(
   baseType: BaseType,
 ): RoutineStep {
   if (!step.product) return step;
-  const ing = step.product.keyIngredients;
+  const ing = step.product.key_ingredients;
 
   switch (step.role) {
     case "cleanser": {
@@ -150,7 +98,7 @@ function applyBarrierRecoveryToStep(
       );
       if (isUnsafe) {
         const isOily = baseType === "oily" || baseType === "combination-dehydrated-oily";
-        return { ...step, product: isOily ? BARRIER_CLEANSER_OILY : BARRIER_CLEANSER_DRY };
+        return { ...step, product: getBarrierOverride(isOily ? 'cleanser_oily' : 'cleanser_dry') };
       }
       return step;
     }
@@ -158,21 +106,21 @@ function applyBarrierRecoveryToStep(
       const isUnsafe = ing.some((i) =>
         /retinol|retinal|tretinoin|ascorbic acid|vitamin c [0-9]|salicylic acid|glycolic|lactic|mandelic|niacinamide 10%/i.test(i)
       );
-      if (isUnsafe) return { ...step, product: BARRIER_SERUM_PLACEHOLDER };
+      if (isUnsafe) return { ...step, product: getBarrierOverride('serum') };
       return step;
     }
     case "moisturizer": {
       const hasBarrierLipid = ing.some((i) =>
         /ceramide|cholesterol|linoleic|caprylic|capric|fatty acid/i.test(i)
       );
-      if (!hasBarrierLipid) return { ...step, product: BARRIER_MOISTURIZER };
+      if (!hasBarrierLipid) return { ...step, product: getBarrierOverride('moisturizer') };
       return step;
     }
     case "spf": {
       const hasChemFilter = ing.some((i) =>
         /tinosorb|oxybenzone|octinoxate|homosalate|ethylhexyl methoxycinnamate|butyl methoxydibenzoylmethane/i.test(i)
       );
-      if (hasChemFilter) return { ...step, product: BARRIER_SPF_MINERAL };
+      if (hasChemFilter) return { ...step, product: findMineralSpf() };
       return step;
     }
     default:
@@ -514,23 +462,23 @@ function toV4ImplicitFlags(
 const EMPTY_AXIS_RESPONSES: AxisResponses = {};
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MockProduct → DiagnosisResult.product_bundle Product conversion
+// RealProduct → DiagnosisResult.product_bundle Product conversion
 // ─────────────────────────────────────────────────────────────────────────────
 
-function mockToProduct(mp: MockProduct, phase: string): Product {
+function realToProduct(rp: RealProduct, phase: string): Product {
   return {
-    id:              mp.id,
-    name:            { en: mp.name.en, de: mp.name.de },
-    brand:           mp.brand,
+    id:              rp.id,
+    name:            { en: rp.name.en, de: rp.name.de },
+    brand:           rp.brand,
     phase,
-    type:            mp.role,
-    price_eur:       0,
-    tier:            mp.isHero ? ["Entry", "Full", "Premium"] : ["Full", "Premium"],
-    shopify_handle:  mp.id,
-    key_ingredients: mp.keyIngredients,
+    type:            rp.routine_slot,
+    price_eur:       rp.price_eur,
+    tier:            ["Full", "Premium"],
+    shopify_handle:  rp.id,
+    key_ingredients: rp.key_ingredients,
     target_axes:     [],
-    for_skin:        mp.baseTypes,
-    texture_feel:    mp.formulation ?? undefined,
+    for_skin:        rp.for_skin,
+    texture_feel:    rp.texture_type ?? undefined,
   };
 }
 
@@ -542,12 +490,12 @@ function routineLevelToPhaseMap(
 
   for (const step of am) {
     if (!step.product) continue;
-    bundle.AM.push(mockToProduct(step.product, "AM"));
+    bundle.AM.push(realToProduct(step.product, "AM"));
   }
   for (const step of pm) {
     if (!step.product) continue;
     const phase = step.role === "device" ? "Device" : "PM";
-    bundle[phase].push(mockToProduct(step.product, phase));
+    bundle[phase].push(realToProduct(step.product, phase));
   }
 
   if (bundle.Device.length === 0) delete bundle.Device;
@@ -641,13 +589,6 @@ export function buildRoutineV5(
  * subsequent products from the SAME brand receive a 1.15× scoring boost.
  * This prevents "Frankenstein" routines that mix too many brands,
  * providing a more cohesive user experience and better ingredient synergy.
- *
- * The multiplier is applied during the post-selection reranking pass:
- *   - Extract Phase 1 brand from the routine
- *   - For each subsequent phase, if multiple candidates exist, prefer
- *     the same-brand candidate by boosting its implicit priority
- *
- * Future maintenance: adjust this constant to tune brand cohesion vs diversity.
  */
 const BRAND_AFFINITY_MULTIPLIER = 1.15;
 
@@ -657,12 +598,6 @@ const BRAND_AFFINITY_MULTIPLIER = 1.15;
  * Post-selection reranking: given a flat product list from the V4 routine,
  * if Phase 1 product establishes a dominant brand, subsequent same-brand
  * products are moved toward the front of their respective phase slots.
- *
- * This is a "soft preference" — it doesn't replace any products, it only
- * reorders when alternatives from the same pool exist. In practice, since
- * the V4 engine's catalog is brand-homogeneous (SkinStrategyLab), this
- * primarily affects routines using the merged product DB with multi-brand
- * candidates per slot.
  */
 function applyBrandAffinity(products: Product[]): Product[] {
   if (products.length < 2) return products;
@@ -685,9 +620,6 @@ function applyBrandAffinity(products: Product[]): Product[] {
  *
  * Strict product counts per tier. After the V4 engine builds the full
  * routine, we slice to exactly this many products per AM/PM phase.
- *   Entry:   3 products (cleanser, serum, moisturizer)
- *   Full:    5 products (cleanser, toner, serum, treatment, moisturizer)
- *   Premium: 5 products + device (same as Full, device handled separately)
  */
 const TIER_STEP_LIMITS: Record<Tier, number> = {
   Entry: 3,
@@ -699,16 +631,6 @@ const TIER_STEP_LIMITS: Record<Tier, number> = {
  * buildProductBundleV5
  *
  * Returns the product_bundle Record<string, Product[]> for DiagnosisResult.
- *
- * Selection priority:
- *   1. SOS Rescue active → 3-step K-Derma SOS protocol
- *   2. Premium + device cleared → advanced (5-step + device)
- *   3. Full or Premium (gated) → committed (5-step)
- *   4. Entry → minimalist (3-step)
- *
- * After selection, applies:
- *   - Brand affinity reranking (1.15× same-brand boost)
- *   - Strict array slice to match tier step count
  */
 export function buildProductBundleV5(
   result:        DiagnosisResult,
@@ -748,17 +670,15 @@ export function buildProductBundleV5(
   }
 
   // ── Brand affinity reranking ──────────────────────────────────────────────
-  // Apply 1.15× boost for same-brand products within each phase
   for (const phase of Object.keys(bundle)) {
-    if (phase === "Device") continue; // Don't rerank devices
+    if (phase === "Device") continue;
     bundle[phase] = applyBrandAffinity(bundle[phase]);
   }
 
   // ── Strict tier step count slice ──────────────────────────────────────────
-  // Ensure we return exactly the right number of products for the tier
   const limit = TIER_STEP_LIMITS[tier];
   for (const phase of Object.keys(bundle)) {
-    if (phase === "Device") continue; // Device is a separate slot
+    if (phase === "Device") continue;
     if (bundle[phase].length > limit) {
       bundle[phase] = bundle[phase].slice(0, limit);
     }
@@ -766,4 +686,3 @@ export function buildProductBundleV5(
 
   return bundle;
 }
-

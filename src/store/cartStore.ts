@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { safeLocalStorage } from "@/utils/safeStorage";
+import { getProductById, getRealProductPrice } from "@/engine/productBridge";
 import type { Product } from "@/engine/types";
 
 export interface CartItem {
@@ -16,6 +17,7 @@ interface CartState {
   clear: () => void;
   totalItems: () => number;
   totalPrice: () => number;
+  validateCart: () => Promise<{ removedCount: number; priceUpdated: boolean }>;
 }
 
 export const useCartStore = create<CartState>()(
@@ -58,6 +60,29 @@ export const useCartStore = create<CartState>()(
           (sum, i) => sum + (i.product.price ?? i.product.price_eur) * i.quantity,
           0
         ),
+
+      validateCart: async () => {
+        const { items } = get();
+        if (items.length === 0) return { removedCount: 0, priceUpdated: false };
+        let removedCount = 0;
+        let priceUpdated = false;
+        const validated = items
+          .filter((item) => {
+            const real = getProductById(item.product.id);
+            if (!real) { removedCount++; return false; }
+            return true;
+          })
+          .map((item) => {
+            const freshPrice = getRealProductPrice(item.product.id);
+            if (freshPrice !== item.product.price_eur) {
+              priceUpdated = true;
+              return { ...item, product: { ...item.product, price_eur: freshPrice } };
+            }
+            return item;
+          });
+        if (removedCount > 0 || priceUpdated) set({ items: validated });
+        return { removedCount, priceUpdated };
+      },
     }),
     { name: "skin-compass-cart-v1", storage: createJSONStorage(() => safeLocalStorage) }
   )

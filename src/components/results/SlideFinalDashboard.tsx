@@ -16,11 +16,12 @@ import { useI18nStore } from '@/store/i18nStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
 import { buildRoutineV5 } from '@/engine/routineEngineV5';
 import type { DiagnosisResult } from '@/engine/types';
-import type { RoutineStep, MockProduct } from '@/engine/routineEngine';
+import type { RoutineStep, RealProduct } from '@/engine/routineEngine';
 import { tokens, ctaTokens } from '@/lib/designTokens';
 import {
-  ROLE_EMOJI, getProductPrice, AGE_CYCLE_MAP,
+  getProductPrice, AGE_CYCLE_MAP, ROLE_EMOJI,
 } from './sharedResultsData';
+import ProductImage from '@/components/product/ProductImage';
 import {
   BARRIER_RECOVERY_PHASES,
 } from './BarrierRecoveryProducts';
@@ -28,7 +29,7 @@ import {
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 type LangKey = 'en' | 'de' | 'ko';
-type FilteredStep = RoutineStep & { product: MockProduct };
+type FilteredStep = RoutineStep & { product: RealProduct };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -265,42 +266,9 @@ export default function SlideFinalDashboard({ result, cartItemIds }: Props) {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function ProductThumbnail({
-  id, role, emoji,
-}: { id: string; role: string; emoji: string }) {
-  const gradMap: Record<string, [string, string]> = {
-    cleanser:      ['rgba(74,158,104,0.12)', 'rgba(74,158,104,0.04)'],
-    toner:         ['rgba(55,138,221,0.10)', 'rgba(55,138,221,0.04)'],
-    toner_essence: ['rgba(55,138,221,0.10)', 'rgba(55,138,221,0.04)'],
-    serum:         ['rgba(186,117,23,0.10)', 'rgba(186,117,23,0.04)'],
-    treatment:     ['rgba(186,117,23,0.10)', 'rgba(186,117,23,0.04)'],
-    moisturizer:   ['rgba(226,75,74,0.08)',  'rgba(226,75,74,0.03)'],
-    spf:           ['rgba(186,117,23,0.08)', 'rgba(186,117,23,0.03)'],
-    sunscreen:     ['rgba(186,117,23,0.08)', 'rgba(186,117,23,0.03)'],
-    eye:           ['rgba(134,134,139,0.08)', 'rgba(134,134,139,0.03)'],
-  };
-  const [bgTop, bgBot] = gradMap[role] ?? ['rgba(134,134,139,0.08)', 'rgba(134,134,139,0.03)'];
-
-  return (
-    <div style={{
-      width: 40, height: 48, borderRadius: 8, flexShrink: 0,
-      background: `linear-gradient(180deg, ${bgTop} 0%, ${bgBot} 100%)`,
-      border: `1px solid ${bgTop.replace(/[\d.]+\)$/, '0.15)')}`,
-      position: 'relative', overflow: 'hidden',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      <span style={{ fontSize: 18, lineHeight: 1, zIndex: 1 }}>{emoji}</span>
-      <img
-        src={`/productsImage/${id}.jpg`}
-        alt=""
-        style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: 'cover', zIndex: 2,
-        }}
-        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-      />
-    </div>
-  );
+  id, name,
+}: { id: string; name: string }) {
+  return <ProductImage productId={id} name={name} size="sm" />;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -442,16 +410,14 @@ function Section1MyCollection({
             <ProductThumbnail
               key={product.id}
               id={product.id}
-              role={product.role}
-              emoji={product.emoji}
+              name={(product.name as Record<string, string>)[lang] ?? (product.name as Record<string, string>).en ?? product.id}
             />
           ))
           : allRoutineProducts.map(step => (
             <ProductThumbnail
               key={step.product.id}
               id={step.product.id}
-              role={step.role}
-              emoji={ROLE_EMOJI[step.role] ?? '💊'}
+              name={step.product.name[lang as keyof typeof step.product.name] ?? step.product.name.en}
             />
           ))
         }
@@ -461,8 +427,7 @@ function Section1MyCollection({
             <ProductThumbnail
               key={zone}
               id={p.id ?? zone}
-              role={p.role ?? 'serum'}
-              emoji={p.emoji ?? '🔬'}
+              name={(p as { name?: Record<string, string> }).name?.[lang] ?? p.id ?? zone}
             />
           );
         })}

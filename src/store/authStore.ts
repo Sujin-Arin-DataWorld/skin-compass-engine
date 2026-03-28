@@ -127,6 +127,7 @@ export const useAuthStore = create<AuthState>()(
                     localStorage.removeItem("skin-analysis-store");
                     localStorage.removeItem("skin-compass-cart-v1");
                     localStorage.removeItem("skin-compass-products-v2");
+                    localStorage.removeItem("ssl_diagnosis_progress"); // legacy key — hook deleted in Sprint C
                 } catch {
                     // Safari Private Mode safe
                 }
@@ -142,6 +143,24 @@ export const useAuthStore = create<AuthState>()(
                 set({ userProfile: { ...profile, ...updates } });
             },
         }),
-        { name: "skin-strategy-auth", storage: createJSONStorage(() => safeStorage) }
+        {
+            name: "skin-strategy-auth",
+            storage: createJSONStorage(() => safeStorage),
+            version: 2,
+            migrate: (persistedState: unknown, version: number) => {
+                try {
+                    const state = (persistedState ?? {}) as Record<string, unknown>;
+                    if (version < 2) {
+                        // Remove dead fields from old authStore versions (addresses, savedResults)
+                        delete state.addresses;
+                        delete state.savedResults;
+                    }
+                    return state;
+                } catch {
+                    // Corrupted localStorage → return clean initial state to prevent WSOD
+                    return { isLoggedIn: false, userProfile: null };
+                }
+            },
+        }
     )
 );

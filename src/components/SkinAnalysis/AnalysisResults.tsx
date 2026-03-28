@@ -346,10 +346,13 @@ export default function AnalysisResults({
     // Not logged in → redirect to login
     if (!isLoggedIn) {
       try {
-        sessionStorage.setItem('ssl_pending_analysis', JSON.stringify({
+        // Use localStorage (NOT sessionStorage) because Firefox Multi-Account
+        // Containers and popup blockers may open OAuth in a new tab.
+        // sessionStorage is NOT shared between tabs → data would be lost.
+        localStorage.setItem('ssl_pending_analysis', JSON.stringify({
           scores, analysisId, hasLifestyle, timestamp: Date.now(),
         }));
-      } catch (e) { console.warn('[AnalysisResults] sessionStorage failed:', e); }
+      } catch (e) { console.warn('[AnalysisResults] localStorage failed:', e); }
       navigate('/login?redirect=/skin-analysis');
       return;
     }

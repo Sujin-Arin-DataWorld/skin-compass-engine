@@ -130,9 +130,11 @@ export default function SkinAnalysisPage() {
   // The previous hostname-based override was breaking user language preferences.
 
   // ── Restore pending analysis after login redirect ─────────────────────────
+  // Data is stored in localStorage (not sessionStorage) so it survives
+  // cross-tab OAuth flows (Firefox Multi-Account Containers, popup blockers).
   useEffect(() => {
     let raw: string | null = null;
-    try { raw = safeSessionStorage.getItem('ssl_pending_analysis'); } catch { return; }
+    try { raw = localStorage.getItem('ssl_pending_analysis'); } catch { return; }
     if (!raw) return;
     try {
       const pending = JSON.parse(raw) as {
@@ -141,8 +143,13 @@ export default function SkinAnalysisPage() {
         hasLifestyle: boolean;
         timestamp: number;
       };
+      // TTL guard: only restore if saved within the last 30 minutes
+      if (Date.now() - (pending.timestamp || 0) > 30 * 60 * 1000) {
+        localStorage.removeItem('ssl_pending_analysis');
+        return;
+      }
       setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId);
-      safeSessionStorage.removeItem('ssl_pending_analysis');
+      localStorage.removeItem('ssl_pending_analysis');
       // Non-blocking DB save
       (async () => {
         try {

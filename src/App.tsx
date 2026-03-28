@@ -154,8 +154,9 @@ function AppInner() {
           skinProfileStore.fetchActiveProfile(session.user.id);
 
           // ── BUG 5 fix: persist pending analysis saved before login ──
+          // Uses localStorage (not sessionStorage) to survive cross-tab OAuth
           try {
-            const pendingRaw = sessionStorage.getItem('ssl_pending_analysis');
+            const pendingRaw = localStorage.getItem('ssl_pending_analysis');
             if (pendingRaw) {
               const pending = JSON.parse(pendingRaw);
               // Only process if saved within last 30 minutes

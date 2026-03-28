@@ -357,7 +357,21 @@ export default function Login() {
 
     const handleGoogleClick = async () => {
         setIsRedirecting(true);
-        await loginWithGoogle(redirectTo);
+
+        // 🛡️ Architectural Defense: Timeout fallback
+        // If the browser intercepts the redirect (e.g., Firefox Containers,
+        // Popup Blockers), remove the white overlay after 4 seconds so the
+        // UI isn't permanently frozen.
+        const fallbackTimer = setTimeout(() => {
+            setIsRedirecting(false);
+        }, 4000);
+
+        try {
+            await loginWithGoogle(redirectTo);
+        } catch (error) {
+            clearTimeout(fallbackTimer);
+            setIsRedirecting(false);
+        }
     };
 
     if (emailSent) {

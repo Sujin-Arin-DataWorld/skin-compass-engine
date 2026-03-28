@@ -57,7 +57,7 @@ export const useI18nStore = create<I18nState>()(
 export const translations = {
     en: {
         products: "Products",
-        startDiagnosis: "Start Diagnosis",
+        startDiagnosis: "Start Analysis",
         startAnalysis: "Start Analysis",
         login: "Login",
         signUp: "Sign Up",
@@ -76,19 +76,19 @@ export const translations = {
         addressBook: "Address Book",
         orders: "Orders",
         logout: "Log out",
-        noDiagnosis: "No diagnosis yet.",
+        noDiagnosis: "No analysis yet.",
         startNow: "Start now →",
         myVector: "My Skin Vector (10 Axes)",
         myRoutine: "My Routine (5 Formulas)",
-        diagnosesSaved: "diagnoses saved",
+        diagnosesSaved: "analyses saved",
 
         // Hero Data
         heroTitle: "Precision Skincare.",
-        heroSlogan: "Advanced diagnostic intelligence. 10-Axis clinical profiling.",
+        heroSlogan: "Advanced skin intelligence. 10-Axis clinical profiling.",
         targetPrecision: "Targeted Precision Scan",
         steps: {
             step1: "Algorithm Engine",
-            step1Desc: "120-point diagnostic mapping",
+            step1Desc: "120-point precision mapping",
             step2: "Visual Analysis",
             step2Desc: "Vectorial elasticity scan",
             step3: "Custom Formula",
@@ -97,7 +97,7 @@ export const translations = {
         index: {
             journey: [
                 { title: "Context Setup", subtitle: "Age, environment & lifestyle baseline", desc: "We begin by establishing your environmental and lifestyle parameters. Every algorithmic decision accounts for your local climate and daily routine.", accent: "30 sec" },
-                { title: "Biometric Symptom Check", subtitle: "120 clinical markers assessed", desc: "Our diagnostic engine evaluates your skin across multiple dimensions based on IGA, TEWL, and MASI—the exact clinical scales used in dermatological research.", accent: "3-5 min" },
+                { title: "Biometric Symptom Check", subtitle: "120 clinical markers assessed", desc: "Our analysis engine evaluates your skin across multiple dimensions based on IGA, TEWL, and MASI—the exact clinical scales used in dermatological research.", accent: "3-5 min" },
                 { title: "Data-Driven Analysis", subtitle: "10-axis scoring computed", desc: "Your responses generate a unique biometric skin vector. We don't sort you into a generic \"skin type.\" Your clinical metrics drive the entire recommendation engine.", accent: "< 3 sec" },
                 { title: "Your Targeted Protocol", subtitle: "5-phase K-beauty routine", desc: "Every product recommendation passes a dual filter: dermatological efficacy for your specific data vector, and EU-compliant safety standards. No guesswork.", accent: "Personalized" }
             ],
@@ -116,14 +116,14 @@ export const translations = {
             targetedFormulas: "Targeted Formulas",
             collectionSub: "All products are biometrically matched.",
             authority: {
-                confidence: "Diagnostic Confidence",
+                confidence: "Analysis Confidence",
                 axes: "Clinical Axes",
                 markers: "Validated Markers",
                 phase: "Phase Protocol",
                 realResults: "Real Results. Visible Progress.",
                 realResultsSub: "See how a clinically matched K-Beauty protocol transforms your skin over time."
             },
-            diagnosisMeets: "Diagnosis Meets Beauty.",
+            diagnosisMeets: "Analysis Meets Beauty.",
             diagnosisMeetsSub: "End the cycle of skincare speculation. We curate exactly what your unique skin vector demands.",
             kitTitle: "The Complete<br/>Strategy Lab Kit.",
             kitSub: "5 formulas perfectly curated to shift your exact clinical vector toward harmony. Delivered monthly.",
@@ -141,7 +141,7 @@ export const translations = {
             tenAxisAnalysis: "10-Axis Skin Vector Analysis",
             clinicallyMatched: "Clinically Matched Formulas",
             flow: {
-                diagnosis: "Diagnosis",
+                diagnosis: "Analysis",
                 protocol: "Your protocol",
                 routine: "K-beauty routine"
             },
@@ -159,7 +159,7 @@ export const translations = {
         },
         profileTab: {
             progressDetected: "Progress Detected:",
-            vectorOptimized: "Vector optimized compared to previous diagnosis",
+            vectorOptimized: "Vector optimized compared to previous analysis",
             noProducts: "No products assigned yet.",
             noAddresses: "No addresses saved.",
             remove: "Remove",
@@ -370,7 +370,7 @@ export const translations = {
                 enc2: "Analysis in progress. You're doing great—stay focused!",
                 enc3: "Almost there! We're mapping your unique skin vector now.",
                 enc4: "Finalizing your results. Get ready for your report.",
-                encFinal: "Diagnosis complete! High-precision report incoming...",
+                encFinal: "Analysis complete! High-precision report incoming...",
                 processing: "PROCESSING DATA",
                 context: "CONTEXT",
                 category: "CATEGORY",
@@ -394,7 +394,7 @@ export const translations = {
             premiumTimingDesc: "The Clinical EMS / LED Device is a lease-to-own reward, not a first-month gift. It ships only after your barrier stability is confirmed — typically Month 2. This protects reactive skin from premature device stimulation and ensures results are measurable before dispatch.",
             formulasMatched: "formulas matched to your vector",
             personalizedSelection: "Personalized Selection",
-            selectionReason: "Each product was selected because of specific signals in your diagnosis — not because of your skin type alone.",
+            selectionReason: "Each product was selected because of specific signals in your analysis — not because of your skin type alone.",
             oneTimeVsAdaptive: "One-time vs. Adaptive",
             adaptiveReason: "These products are matched to your skin today. Next month, your barrier may shift, or a new active may unlock. The subscription keeps the match current.",
             whyThisWorks: "Why this works for you",
@@ -426,7 +426,7 @@ export const translations = {
         },
         skinAnalysis: {
             pageTitle: "AI Skin Analysis | SkinStrategyLab",
-            pageDescription: "Analyze your skin across 10 axes with a 60-second AI diagnosis and get personalized skincare recommendations.",
+            pageDescription: "Analyze your skin across 10 axes with a 60-second AI analysis and get personalized skincare recommendations.",
             badge: "AI Skin Analysis",
             heading: "60-Second AI Skin Analysis",
             subheading: "Take a photo and our AI will analyze 10 skin axes\nand suggest personalized solutions.",
@@ -898,7 +898,7 @@ export const translations = {
         },
         skinAnalysis: {
             pageTitle: "AI 피부 분석 | SkinStrategyLab",
-            pageDescription: "60초 AI 피부 진단으로 10가지 축의 피부 상태를 분석하고 맞춤 스킨케어를 추천받으세요.",
+            pageDescription: "60초 AI 피부 분석으로 10가지 축의 피부 상태를 분석하고 맞춤 스킨케어를 추천받으세요.",
             badge: "AI 피부 분석",
             heading: "60초 AI\n피부 분석",
             subheading: "사진 한 장으로 10가지 피부 축을 분석하고\n맞춤 솔루션을 제안합니다.",
@@ -999,7 +999,7 @@ export const phase1T = {
         },
         home: {
             hero: [
-                { headline: "Your perfect routine,\nfind it now.", sub: "Discover your bespoke skincare protocol\nwith a 60-second AI analysis.", cta: "Start My Diagnosis" },
+                { headline: "Your perfect routine,\nfind it now.", sub: "Discover your bespoke skincare protocol\nwith a 60-second AI analysis.", cta: "Start My Analysis" },
                 { headline: "Skincare that understands you.", sub: "We analyze your skin state and concerns\nto build your perfect routine.", cta: "Begin Analysis" },
                 { headline: "Curated for your skin.", sub: "Start instantly with selected skincare\nand clinical home devices.", cta: "Find My Routine" },
             ],
@@ -1021,7 +1021,7 @@ export const phase1T = {
             ],
             bannerHeadline: "Determine Your\nSkin Type",
             bannerSub: "Every skin is unique.\nOur algorithm finds your personal protocol.",
-            bannerCta: "Free Skin Diagnosis",
+            bannerCta: "Free Skin Analysis",
             newsletterHeadline: "Exclusive Newsletter",
             newsletterSub: "10% off your first order + clinical skincare tips\ndelivered to your inbox.",
             newsletterPlaceholder: "Your email address",
@@ -1037,7 +1037,7 @@ export const phase1T = {
             btnPrimary: "Analyze with AI",
             btnSecondary: "Start Questionnaire",
             feature1: "⚡ 30-Sec Analysis",
-            feature2: "🔬 Precision Diagnosis",
+            feature2: "🔬 Precision Analysis",
             feature3: "🧴 Ingredient Matching",
             zoneTitle: "7-Zone Facial Analysis",
             zoneDesc: "Forehead · Cheeks · Nose · Eyes<br />Mouth · Chin · Jawline",
@@ -1092,7 +1092,7 @@ export const phase1T = {
         },
         home: {
             hero: [
-                { headline: "내 피부에 맞는 루틴,\n이제 찾으세요", sub: "60초 AI 피부 분석으로\n당신만의 스킨케어 루틴을 확인하세요.", cta: "내 피부 진단하기" },
+                { headline: "내 피부에 맞는 루틴,\n이제 찾으세요", sub: "60초 AI 피부 분석으로\n당신만의 스킨케어 루틴을 확인하세요.", cta: "내 피부 분석하기" },
                 { headline: "피부를 이해하는 스킨케어", sub: "피부 상태와 고민을 분석해\n당신에게 맞는 루틴을 설계합니다.", cta: "피부 분석 시작하기" },
                 { headline: "당신의 피부에 맞는 루틴", sub: "선별된 제품과\n홈 디바이스까지 한 번에 시작하세요.", cta: "나만의 루틴 찾기" },
             ],
@@ -1114,7 +1114,7 @@ export const phase1T = {
             ],
             bannerHeadline: "나의 피부 타입 알아보기",
             bannerSub: "모든 피부는 고유합니다.\n알고리즘이 당신만의 프로토콜을 찾아드립니다.",
-            bannerCta: "무료 피부 진단",
+            bannerCta: "무료 피부 분석",
             newsletterHeadline: "독점 뉴스레터",
             newsletterSub: "첫 주문 10% 할인 + 임상 스킨케어 팁을 받아보세요.",
             newsletterPlaceholder: "이메일 주소",
@@ -1128,9 +1128,9 @@ export const phase1T = {
             headingLine3: "로<br />마주하는 첫 순간",
             description: "10가지 정밀 지표와 7개 부위의 입체적 매핑으로<br />당신만을 위한 솔루션을 제안합니다",
             btnPrimary: "AI로 분석받기",
-            btnSecondary: "질문으로 진단하기",
+            btnSecondary: "질문으로 분석하기",
             feature1: "⚡ 30초 분석",
-            feature2: "🔬 정밀 피부 진단",
+            feature2: "🔬 정밀 피부 분석",
             feature3: "🧴 성분 기반 매칭",
             zoneTitle: "7개의 얼굴 부위 분석",
             zoneDesc: "이마 · 볼 · 코 · 눈가<br />입가 · 턱 · 턱선",

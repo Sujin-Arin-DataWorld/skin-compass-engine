@@ -299,7 +299,7 @@ const ResultsPage = () => {
     </Suspense>,
 
     // Slide 2: Final Selection (Glassmorphism)
-    <SlideFinalDashboard key="slide-final" result={result} />,
+    <SlideFinalDashboard key="slide-final" result={result} cartItemIds={cartItems.map(c => c.id)} />,
   ];
 
   return (
@@ -333,28 +333,36 @@ const ResultsPage = () => {
             if (info.offset.x < -60) goTo(current + 1);
             if (info.offset.x > 60) goTo(current - 1);
           }}
-          className="absolute inset-0 flex flex-col pt-[96px] pb-[220px]"
+          className="absolute inset-0 flex flex-col pt-[82px] pb-[90px]"
           style={{ willChange: "transform" }}
         >
           {slides[current]}
         </motion.div>
       </AnimatePresence>
 
-      {/* Legal disclaimer — 3-Layer: Layer 1 (always visible) */}
+      {/* Legal disclaimer — AI transparency */}
       <div style={{
         position: 'fixed',
-        bottom: cartItems.length > 0 ? 180 : 56,
-        left: 0, right: 0,
+        bottom: cartItems.length > 0 ? 80 : 40,
+        left: '50%',
+        transform: 'translateX(-50%)',
         textAlign: 'center',
-        padding: '4px 16px',
-        fontSize: '0.625rem',
-        color: 'rgba(128,128,128,0.6)',
+        padding: '6px 16px',
+        fontSize: '0.6875rem',
+        fontWeight: 500,
+        color: 'rgba(128,128,128,0.85)',
         zIndex: 49,
         transition: 'bottom 0.3s ease',
+        pointerEvents: 'none',
+        borderRadius: 99,
+        background: 'rgba(128,128,128,0.06)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        whiteSpace: 'nowrap',
       }}>
-        {language === 'ko' ? 'ⓘ AI 기반 화장품 추천 참고용 · 의학적 진단이 아닙니다'
-          : language === 'de' ? 'ⓘ KI-basierte Hautpflegeempfehlung · Keine medizinische Diagnose'
-          : 'ⓘ AI-powered skincare recommendation · Not a medical diagnosis'}
+        {language === 'ko' ? 'ⓘ AI 기반 피부 분석 · 의료 행위가 아닙니다'
+          : language === 'de' ? 'ⓘ KI-basierte Hautanalyse · Keine medizinische Beratung'
+          : 'ⓘ AI-powered skin analysis · Not medical advice'}
       </div>
 
       {/* Sticky cart bar — shown only after user adds at least one product */}
@@ -362,7 +370,6 @@ const ResultsPage = () => {
         <StickyCartBar
           steps={[]}
           cycleDays={cycleDays}
-          slideNavHeight={0}
           barrierProducts={cartItems}
           onCta={() => current < TOTAL_SLIDES - 1 ? goTo(TOTAL_SLIDES - 1) : navigate('/checkout')}
         />

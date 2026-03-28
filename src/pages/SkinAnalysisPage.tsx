@@ -60,7 +60,7 @@ const CAMERA_PROMPT = {
 const SKIN_ANALYSIS_META = {
   ko: {
     title: 'AI 피부 분석 | SkinStrategyLab',
-    description: '60초 AI 피부 진단으로 10가지 축의 피부 상태를 분석하고 맞춤 스킨케어를 추천받으세요.',
+    description: '60초 AI 피부 분석으로 10가지 축의 피부 상태를 분석하고 맞춤 스킨케어를 추천받으세요.',
   },
   en: {
     title: 'AI Skin Analysis | SkinStrategyLab',
@@ -236,8 +236,8 @@ export default function SkinAnalysisPage() {
         console.error('[Analysis] Timeout — 60s exceeded');
         setError(
           language === 'ko' ? '분석 시간이 초과되었습니다. 다시 시도해 주세요.'
-          : language === 'de' ? 'Analyse-Zeitüberschreitung. Bitte versuchen Sie es erneut.'
-          : 'Analysis timed out. Please try again.'
+            : language === 'de' ? 'Analyse-Zeitüberschreitung. Bitte versuchen Sie es erneut.'
+              : 'Analysis timed out. Please try again.'
         );
       }, 60_000);
       return () => clearTimeout(timeout);

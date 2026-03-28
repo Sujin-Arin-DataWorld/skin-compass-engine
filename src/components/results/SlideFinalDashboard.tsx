@@ -65,13 +65,14 @@ const collectionVariants = {
 
 interface Props {
   result: DiagnosisResult;
+  cartItemIds?: string[];
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export default function SlideFinalDashboard({ result }: Props) {
+export default function SlideFinalDashboard({ result, cartItemIds }: Props) {
   const { language } = useI18nStore();
   const lang = (language === 'de' || language === 'ko') ? language : 'en' as LangKey;
   const { resolvedTheme } = useTheme();
@@ -97,17 +98,24 @@ export default function SlideFinalDashboard({ result }: Props) {
   );
 
   const allRoutineProducts = useMemo<FilteredStep[]>(() => {
-    const routine = routineOutput.routines.committed;
+    // Route to correct tier level instead of hardcoding committed
+    let routineLevel;
+    if (selectedTier === 'Entry') routineLevel = routineOutput.routines.minimalist;
+    else if (selectedTier === 'Premium') routineLevel = routineOutput.routines.advanced ?? routineOutput.routines.committed;
+    else routineLevel = routineOutput.routines.committed;
+
     const seen = new Set<string>();
     const combined: FilteredStep[] = [];
-    for (const step of [...routine.am, ...routine.pm]) {
+    for (const step of [...routineLevel.am, ...routineLevel.pm]) {
       if (!step.product) continue;
       if (seen.has(step.product.id)) continue;
+      // Cart filter: if user removed a product in Slide 0, exclude it here
+      if (cartItemIds && cartItemIds.length > 0 && !cartItemIds.includes(step.product.id)) continue;
       seen.add(step.product.id);
       combined.push(step as FilteredStep);
     }
     return combined;
-  }, [routineOutput]);
+  }, [routineOutput, selectedTier, cartItemIds]);
 
   const zoneProducts = useMemo(
     () => Object.entries(specialCarePicks),
@@ -133,17 +141,20 @@ export default function SlideFinalDashboard({ result }: Props) {
     return routineTotal + zoneTotal;
   }, [allRoutineProducts, zoneProducts]);
 
-  const barrierAllProducts = useMemo(
-    () => BARRIER_RECOVERY_PHASES.flatMap(p => p.products),
-    [],
-  );
+  const barrierAllProducts = useMemo(() => {
+    const all = BARRIER_RECOVERY_PHASES.flatMap(p => p.products);
+    if (cartItemIds && cartItemIds.length > 0) {
+      return all.filter(p => cartItemIds.includes(p.id));
+    }
+    return all;
+  }, [cartItemIds]);
   const barrierOriginal = useMemo(
     () => barrierAllProducts.reduce((s, p) => s + p.price, 0),
     [barrierAllProducts],
   );
 
   const effectiveOriginal = isBarrierEmergency ? barrierOriginal : normalOriginal;
-  const effectiveDiscounted = Math.round(effectiveOriginal * (1 - discountPct / 100) * 100) / 100;
+  const effectiveDiscounted = Math.round(effectiveOriginal * (1 - discountPct / 100));
   const effectiveCount = isBarrierEmergency
     ? barrierAllProducts.length
     : allRoutineProducts.length + zoneProducts.length;
@@ -151,7 +162,7 @@ export default function SlideFinalDashboard({ result }: Props) {
     ? (effectiveDiscounted / supplyDays).toFixed(2) : '0.00';
   const effectiveMonthlyPrice = supplyDays > 0
     ? (effectiveDiscounted / supplyDays * 30).toFixed(2) : '0.00';
-  const refillPrice = Math.round(effectiveDiscounted * (1 - refillDiscountPct / 100) * 100) / 100;
+  const refillPrice = Math.round(effectiveDiscounted * (1 - refillDiscountPct / 100));
 
   // ── Timeline milestones ─────────────────────────────────────────────────────
   const firstCheckin = Math.round(cycleDays / 7);
@@ -177,7 +188,7 @@ export default function SlideFinalDashboard({ result }: Props) {
       flex: 1,
       overflowY: 'auto',
       overflowX: 'hidden',
-      paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 34px))',
+      paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 34px))',
       paddingTop: 'env(safe-area-inset-top, 0px)',
     }}>
       <div style={{
@@ -401,9 +412,9 @@ function Section1MyCollection({
               lang,
             )
             : tx(
-              '진단 기반 · 피부과 검증 · 맞춤 구성',
-              'Diagnosebasiert · Dermatologisch geprüft · Personalisiert',
-              'Diagnosis-based · Dermatologist verified · Personalized',
+              'AI 맞춤 구성',
+              'KI-personalisiert',
+              'AI-personalized',
               lang,
             )
           }
@@ -812,7 +823,7 @@ function Section1MyCollection({
               color: isDark ? '#48484A' : '#9CA3AF',
               textDecoration: 'line-through',
             }}>
-              €{effectiveOriginal.toFixed(2)}
+              €{Math.round(effectiveOriginal)}
             </span>
           )}
           <span style={{
@@ -820,7 +831,7 @@ function Section1MyCollection({
             fontWeight: 500,
             color: isDark ? '#F5F5F7' : '#1B2838',
           }}>
-            €{effectiveDiscounted.toFixed(2)}
+            €{effectiveDiscounted}
           </span>
         </div>
 
@@ -1074,7 +1085,7 @@ function Section2HowToStart({
             fontWeight: 500,
             color: isDark ? '#F5F5F7' : '#1B2838',
           }}>
-            €{effectiveDiscounted.toFixed(2)}
+            €{effectiveDiscounted}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <span style={{
@@ -1143,13 +1154,13 @@ function Section2HowToStart({
               '장벽 회복 시작 — €{X}',
               'Barriere-Erholung starten — €{X}',
               'Start barrier recovery — €{X}',
-              lang, { X: effectiveDiscounted.toFixed(2) },
+              lang, { X: effectiveDiscounted },
             )
             : tx(
               '지금 주문하기 — €{X}',
               'Jetzt bestellen — €{X}',
               'Order now — €{X}',
-              lang, { X: effectiveDiscounted.toFixed(2) },
+              lang, { X: effectiveDiscounted },
             )
           }
         </motion.button>
@@ -1184,7 +1195,7 @@ function Section2HowToStart({
             fontWeight: 500,
             color: isDark ? '#F5F5F7' : '#1B2838',
           }}>
-            €{refillPrice.toFixed(2)}
+            €{refillPrice}
           </div>
           <div style={{
             fontSize: 'clamp(0.5rem, 0.7vw, 0.5625rem)',
@@ -1271,7 +1282,7 @@ function Section2HowToStart({
             '스마트 리필 시작 — €{X}/{W}주',
             'Smart-Nachfüllung starten — €{X}/{W} Wo.',
             'Start Smart Refill — €{X}/{W}wk',
-            lang, { X: refillPrice.toFixed(2), W: supplyWeeks },
+            lang, { X: refillPrice, W: supplyWeeks },
           )}
         </motion.button>
       </motion.div>
@@ -1389,7 +1400,7 @@ function Section3TrustFooter({ isBarrierEmergency, lang, isDark, onRestart }: Se
             overflowWrap: 'break-word',
           }}>
             {tx(
-              '지금은 장벽 회복에 집중하세요. 1 사이클 후 체크인에서 장벽이 회복되면, 당신의 진단에 맞는 풀 5단계 루틴 + 부위별 맞춤 제품이 해금됩니다.',
+              '지금은 장벽 회복에 집중하세요. 1 사이클 후 체크인에서 장벽이 회복되면, 당신의 분석에 맞는 풀 5단계 루틴 + 부위별 맞춤 제품이 해금됩니다.',
               'Konzentrieren Sie sich jetzt auf die Erholung. Nach dem 1-Zyklus-Check-in wird Ihr volles 5-Schritte-Protokoll freigeschaltet.',
               'Focus on recovery now. After your 1-cycle check-in confirms healing, your full 5-step protocol + zone care will unlock.',
               lang,
@@ -1398,24 +1409,7 @@ function Section3TrustFooter({ isBarrierEmergency, lang, isDark, onRestart }: Se
         </div>
       )}
 
-      {/* Trust badges */}
-      <div style={{
-        display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 8,
-      }}>
-        {[
-          { icon: '🔬', text: tx('피부과 전문의 검증', 'Dermatologisch geprüft', 'Dermatologist reviewed', lang) },
-          { icon: '🔄', text: tx('언제든 해지 가능', 'Jederzeit kündbar', 'Cancel anytime', lang) },
-          { icon: '📦', text: tx('EU 3-5일 배송', 'EU 3-5 Werktage', 'EU 3-5 days', lang) },
-        ].map((b, i) => (
-          <span key={i} style={{
-            fontSize: 'clamp(0.5625rem, 0.8vw, 0.6875rem)',
-            color: isDark ? '#48484A' : '#9CA3AF',
-            whiteSpace: 'nowrap',
-          }}>
-            {b.icon} {b.text}
-          </span>
-        ))}
-      </div>
+
 
       {/* Restart assessment link */}
       <div style={{ textAlign: 'center' }}>
@@ -1437,7 +1431,7 @@ function Section3TrustFooter({ isBarrierEmergency, lang, isDark, onRestart }: Se
             (e.currentTarget as HTMLButtonElement).style.textDecorationColor = 'transparent';
           }}
         >
-          {tx('← 진단 다시 시작하기', '← Diagnose neu starten', '← Restart assessment', lang)}
+          {tx('← 분석 다시 시작하기', '← Analyse neu starten', '← Restart assessment', lang)}
         </button>
       </div>
     </motion.div>

@@ -35,7 +35,7 @@ const SlideNav = ({ current, total, labels, onPrev, onNext, onGoTo }: SlideNavPr
         display: 'flex',
         justifyContent: 'center',
         gap: 'clamp(16px, 4vw, 32px)',
-        padding: '8px 0',
+        padding: '4px 0',
         borderBottom: `1px solid ${tok.border}`,
         background: isDark ? 'rgba(10,10,10,0.78)' : 'rgba(250,250,248,0.78)',
         backdropFilter: 'blur(16px)',

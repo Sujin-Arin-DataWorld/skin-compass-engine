@@ -4,7 +4,7 @@ import type { SkinAxisScores, AnalysisStep, ScoreSource } from '@/types/skinAnal
 
 // Prompt 4.5 — Zustand Store Bridge (AI scores → existing system)
 // This store manages the AI camera analysis flow.
-// scoreSource field lets the UI show "AI 분석 결과 기반" vs "자가진단 결과 기반" badges.
+// scoreSource field lets the UI show "AI 분석 결과 기반" vs "자가분석 결과 기반" badges.
 
 interface AnalysisHistoryEntry {
   date: string;

@@ -41,7 +41,7 @@ export const SLIDE2_COPY = {
 // ── Unified CTA — ALL slides identical ───────────────────────────────────────
 export const HERO_CTA = {
   primary: {
-    ko: '60초 AI 피부 진단',
+    ko: '60초 AI 피부 분석',
     en: '60s AI Skin Analysis',
     de: 'KI-Hautanalyse in 60 Sek.',
   },

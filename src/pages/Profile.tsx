@@ -59,24 +59,24 @@ const TIER_COLORS = {
 
 const TIER_LABELS: Record<string, Record<Lang, string>> = {
   excellent: { ko: '우수', en: 'Excellent', de: 'Ausgezeichnet' },
-  good:      { ko: '양호', en: 'Good', de: 'Gut' },
+  good: { ko: '양호', en: 'Good', de: 'Gut' },
   attention: { ko: '보통', en: 'Fair', de: 'Mäßig' },
-  critical:  { ko: '주의', en: 'Needs Care', de: 'Pflegebedarf' },
+  critical: { ko: '주의', en: 'Needs Care', de: 'Pflegebedarf' },
 };
 
 const AXES: SkinAxis[] = ['seb', 'hyd', 'bar', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox', 'makeup_stability'];
 
 const AXIS_LABELS: Record<SkinAxis, Record<Lang, string>> = {
-  seb:              { ko: '유분 밸런스',   en: 'Oil Balance',          de: 'Öl-Balance' },
-  hyd:              { ko: '수분도',        en: 'Hydration',            de: 'Feuchtigkeit' },
-  bar:              { ko: '피부 장벽',     en: 'Skin Barrier',         de: 'Hautbarriere' },
-  sen:              { ko: '민감도 방어',   en: 'Sensitivity Defense',  de: 'Empfindlichkeitsschutz' },
-  acne:             { ko: '트러블 관리',   en: 'Breakout Control',     de: 'Unreinheiten-Kontrolle' },
-  pigment:          { ko: '톤 균일도',     en: 'Tone Evenness',        de: 'Ton-Gleichmäßigkeit' },
-  texture:          { ko: '피부결',        en: 'Skin Texture',         de: 'Hauttextur' },
-  aging:            { ko: '탄력 방어',     en: 'Firmness Defense',     de: 'Straffheitsschutz' },
-  ox:               { ko: '환경 방어',     en: 'Environmental Shield', de: 'Umweltschutz' },
-  makeup_stability: { ko: '화장 지속력',   en: 'Makeup Wear',          de: 'Make-up-Haltbarkeit' },
+  seb: { ko: '유분 밸런스', en: 'Oil Balance', de: 'Öl-Balance' },
+  hyd: { ko: '수분도', en: 'Hydration', de: 'Feuchtigkeit' },
+  bar: { ko: '피부 장벽', en: 'Skin Barrier', de: 'Hautbarriere' },
+  sen: { ko: '민감도 방어', en: 'Sensitivity Defense', de: 'Empfindlichkeitsschutz' },
+  acne: { ko: '트러블 관리', en: 'Breakout Control', de: 'Unreinheiten-Kontrolle' },
+  pigment: { ko: '톤 균일도', en: 'Tone Evenness', de: 'Ton-Gleichmäßigkeit' },
+  texture: { ko: '피부결', en: 'Skin Texture', de: 'Hauttextur' },
+  aging: { ko: '탄력 방어', en: 'Firmness Defense', de: 'Straffheitsschutz' },
+  ox: { ko: '환경 방어', en: 'Environmental Shield', de: 'Umweltschutz' },
+  makeup_stability: { ko: '화장 지속력', en: 'Makeup Wear', de: 'Make-up-Haltbarkeit' },
 };
 
 function calculateOverallHealth(profile: UserSkinProfile): number {
@@ -115,13 +115,13 @@ function NoAnalysisCTA({ lang }: { lang: Lang }) {
     >
       <p className="text-sm mb-1" style={{ color: '#1a1a18', fontWeight: 500 }}>
         {lang === 'ko' ? '아직 피부 분석을 하지 않았어요'
-         : lang === 'de' ? 'Sie haben noch keine Hautanalyse durchgeführt'
-         : "You haven't done a skin analysis yet"}
+          : lang === 'de' ? 'Sie haben noch keine Hautanalyse durchgeführt'
+            : "You haven't done a skin analysis yet"}
       </p>
       <p className="text-xs mb-4" style={{ color: '#9a9590' }}>
         {lang === 'ko' ? 'AI가 30초 안에 피부 상태를 분석해드려요'
-         : lang === 'de' ? 'KI analysiert Ihren Hautzustand in 30 Sekunden'
-         : 'AI analyzes your skin condition in 30 seconds'}
+          : lang === 'de' ? 'KI analysiert Ihren Hautzustand in 30 Sekunden'
+            : 'AI analyzes your skin condition in 30 seconds'}
       </p>
       <Link
         to="/skin-analysis"
@@ -129,8 +129,8 @@ function NoAnalysisCTA({ lang }: { lang: Lang }) {
         style={{ backgroundColor: '#8a9a7b', color: '#fff' }}
       >
         {lang === 'ko' ? 'AI 피부 분석 시작 →'
-         : lang === 'de' ? 'KI-Hautanalyse starten →'
-         : 'Start AI Skin Analysis →'}
+          : lang === 'de' ? 'KI-Hautanalyse starten →'
+            : 'Start AI Skin Analysis →'}
       </Link>
     </div>
   );
@@ -248,8 +248,8 @@ function ProfileHeader({ userName, activeProfile, lang }: {
                 {lang === 'ko'
                   ? `마지막 분석: ${formatDateShort(activeProfile.createdAt, lang)}`
                   : lang === 'de'
-                  ? `Letzte Analyse: ${formatDateShort(activeProfile.createdAt, lang)}`
-                  : `Last analysis: ${formatDateShort(activeProfile.createdAt, lang)}`}
+                    ? `Letzte Analyse: ${formatDateShort(activeProfile.createdAt, lang)}`
+                    : `Last analysis: ${formatDateShort(activeProfile.createdAt, lang)}`}
               </p>
             )}
           </div>
@@ -334,8 +334,8 @@ function SkinProfileGrid({ activeProfile, lang }: { activeProfile: UserSkinProfi
         style={{ backgroundColor: 'rgba(138, 154, 123, 0.08)', color: '#8a9a7b' }}
       >
         {lang === 'ko' ? '맞춤 제품 추천 보러가기'
-         : lang === 'de' ? 'Personalisierte Empfehlungen ansehen'
-         : 'View Personalized Recommendations'}
+          : lang === 'de' ? 'Personalisierte Empfehlungen ansehen'
+            : 'View Personalized Recommendations'}
         <span>→</span>
       </Link>
     </section>
@@ -405,9 +405,9 @@ function TopConcerns({ activeProfile, lang }: { activeProfile: UserSkinProfile; 
       axis,
       health: toHealthScore(axis, activeProfile.scores[axis]),
     }))
-    .sort((a, b) => a.health - b.health)
-    .slice(0, 3),
-  [activeProfile]);
+      .sort((a, b) => a.health - b.health)
+      .slice(0, 3),
+    [activeProfile]);
 
   return (
     <section className="px-5 py-6">
@@ -539,8 +539,8 @@ function ChangeIndicator({ current, previous, lang }: {
         {lang === 'ko'
           ? `지난 분석 대비 ${Math.abs(diff)}점 ${isUp ? '개선' : '하락'}`
           : lang === 'de'
-          ? `${Math.abs(diff)} Punkte ${isUp ? 'verbessert' : 'verschlechtert'} seit letzter Analyse`
-          : `${Math.abs(diff)} points ${isUp ? 'improved' : 'decreased'} since last`}
+            ? `${Math.abs(diff)} Punkte ${isUp ? 'verbessert' : 'verschlechtert'} seit letzter Analyse`
+            : `${Math.abs(diff)} points ${isUp ? 'improved' : 'decreased'} since last`}
       </span>
     </div>
   );
@@ -616,7 +616,7 @@ function AnalysisHistory({ userId, lang }: { userId: string; lang: Lang }) {
                   <span className="text-xs font-medium" style={{ color: '#1a1a18' }}>
                     {record.analysis_method === 'camera'
                       ? (lang === 'ko' ? 'AI 분석' : lang === 'de' ? 'KI-Analyse' : 'AI Analysis')
-                      : (lang === 'ko' ? '자가진단' : lang === 'de' ? 'Selbstdiagnose' : 'Self-diagnosis')}
+                      : (lang === 'ko' ? '자가분석' : lang === 'de' ? 'Selbstanalyse' : 'Self-analysis')}
                   </span>
                   {record.is_active && (
                     <span className="text-[9px] px-1.5 py-0.5 rounded-full"
@@ -668,18 +668,18 @@ function MyRoutineSection({ lang }: { lang: Lang }) {
       >
         <p className="text-sm mb-1" style={{ color: '#1a1a18', fontWeight: 500 }}>
           {lang === 'ko' ? '맞춤 루틴을 구성해보세요'
-           : lang === 'de' ? 'Stellen Sie Ihre Routine zusammen'
-           : 'Build your custom routine'}
+            : lang === 'de' ? 'Stellen Sie Ihre Routine zusammen'
+              : 'Build your custom routine'}
         </p>
         <p className="text-xs" style={{ color: '#9a9590' }}>
           {lang === 'ko' ? '피부 분석 결과 기반으로 제품을 추천해드려요'
-           : lang === 'de' ? 'Wir empfehlen Produkte basierend auf Ihrer Analyse'
-           : 'Product recommendations based on your analysis'}
+            : lang === 'de' ? 'Wir empfehlen Produkte basierend auf Ihrer Analyse'
+              : 'Product recommendations based on your analysis'}
         </p>
         <span className="inline-block mt-3 text-sm font-medium" style={{ color: '#8a9a7b' }}>
           {lang === 'ko' ? 'Lab에서 루틴 만들기 →'
-           : lang === 'de' ? 'Routine im Lab erstellen →'
-           : 'Build routine in Lab →'}
+            : lang === 'de' ? 'Routine im Lab erstellen →'
+              : 'Build routine in Lab →'}
         </span>
       </Link>
     </section>
@@ -771,13 +771,13 @@ function GuestView({ lang }: { lang: Lang }) {
       </div>
       <p className="text-base font-medium mb-2" style={{ color: '#1a1a18' }}>
         {lang === 'ko' ? '로그인 후 피부 분석 결과를 저장하세요'
-         : lang === 'de' ? 'Melden Sie sich an, um Ihre Analyse zu speichern'
-         : 'Sign in to save your skin analysis'}
+          : lang === 'de' ? 'Melden Sie sich an, um Ihre Analyse zu speichern'
+            : 'Sign in to save your skin analysis'}
       </p>
       <p className="text-xs mb-6" style={{ color: '#9a9590' }}>
         {lang === 'ko' ? '분석 기록, 루틴, 변화 추이를 한눈에 확인할 수 있어요'
-         : lang === 'de' ? 'Verlauf, Routine und Veränderungen auf einen Blick'
-         : 'View history, routine, and progress at a glance'}
+          : lang === 'de' ? 'Verlauf, Routine und Veränderungen auf einen Blick'
+            : 'View history, routine, and progress at a glance'}
       </p>
       <div className="flex gap-3">
         <Link

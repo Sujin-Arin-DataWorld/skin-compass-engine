@@ -211,10 +211,11 @@ interface ZoneData {
 // ── Circular score ring ────────────────────────────────────────────────────────
 
 function CircularScore({ score, size = 52 }: { score: number; size?: number }) {
+  const healthScore = 100 - score; // score is raw severity from engine
   const r = (size - 7) / 2;
   const circ = 2 * Math.PI * r;
-  const offset = circ * (1 - Math.min(100, Math.max(0, score)) / 100);
-  const color = severityColor(score);
+  const offset = circ * (1 - Math.min(100, Math.max(0, healthScore)) / 100);
+  const color = severityColor(score); // color follows severity (red = urgent)
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', flexShrink: 0, overflow: 'visible' }}>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} opacity={0.15} />
@@ -227,7 +228,7 @@ function CircularScore({ score, size = 52 }: { score: number; size?: number }) {
       <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central"
         fontSize={size * 0.28} fontWeight={700} fill={color}
         transform={`rotate(90, ${size / 2}, ${size / 2})`}>
-        {Math.round(score)}
+        {Math.round(healthScore)}
       </text>
     </svg>
   );
@@ -774,7 +775,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
                   background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                 }}>
-                  <span style={{ fontSize: 10, color: '#86868B' }}>{Math.round(zd.severity)}</span>
+                  <span style={{ fontSize: 10, color: '#86868B' }}>{Math.round(100 - zd.severity)}</span>
                   <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary }}>
                     {ZONE_LABELS[zd.faceZone]?.[lang] ?? zd.faceZone}
                   </span>

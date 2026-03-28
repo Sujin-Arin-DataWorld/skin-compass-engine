@@ -48,8 +48,8 @@ function toHealthScore(axis: AxisKey, rawScore: number): number {
 
 // ── i18n Copy ─────────────────────────────────────────────────────────────────
 const C = {
-  diagnosis_eyebrow: { ko: '피부 진단 결과', de: 'IHRE HAUTDIAGNOSE', en: 'YOUR SKIN DIAGNOSIS' },
-  confidence_badge: { ko: '{N}% 진단 신뢰도 · {M}개 신호 분석', de: '{N}% Diagnose-Vertrauen · {M} Signale analysiert', en: '{N}% Diagnosis confidence · {M} signals analyzed' },
+  diagnosis_eyebrow: { ko: '피부 분석 결과', de: 'IHRE HAUTANALYSE', en: 'YOUR SKIN ANALYSIS' },
+  confidence_badge: { ko: '{N}% 분석 신뢰도 · {M}개 신호 분석', de: '{N}% Analyse-Vertrauen · {M} Signale analysiert', en: '{N}% Analysis confidence · {M} signals analyzed' },
   top_concern_suffix: { ko: '이(가) 가장 높아요', de: ' ist am höchsten', en: ' is your top concern' },
   top_concern_neglect: { ko: '방치하면 악화가 가속돼요.', de: 'Unbehandelt beschleunigt sich die Verschlechterung.', en: 'Left untreated, this will accelerate.' },
   remaining_more: { ko: '+{N}개 더', de: '+{N} weitere', en: '+{N} more' },
@@ -69,7 +69,7 @@ const C = {
   per_bottle: { ko: '1병당', de: 'pro Flasche', en: 'per bottle' },
   why_ingredient: { ko: '이 성분이 좋은 이유', de: 'Warum dieser Wirkstoff', en: 'Why This Ingredient' },
   matching_logic: { ko: '제품 매칭 로직', de: 'Matching-Logik', en: 'Matching Logic' },
-  aix_matching: { ko: 'AIX 진단 매칭', de: 'AIX Diagnose', en: 'AIX Diagnosis Match' },
+  aix_matching: { ko: 'AIX 분석 매칭', de: 'AIX Analyse', en: 'AIX Analysis Match' },
   zone_teaser_badge: { ko: '{N}곳 추가 관리 필요', de: '{N} Zonen brauchen Pflege', en: '{N} zones need care' },
   zone_teaser_no_extra: { ko: '모든 부위가 기본 루틴으로 관리됩니다', de: 'Alle Zonen werden durch die Basisroutine abgedeckt', en: 'All zones are covered by the basic routine' },
   zone_teaser_desc: { ko: '기본 루틴에 포함되지 않는 부위별 특수 성분이 필요해요', de: 'Spezielle Wirkstoffe, die nicht in der Basisroutine enthalten sind', en: 'Specialized ingredients not included in your basic routine' },
@@ -175,6 +175,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
   const implicitFlags = useDiagnosisStore((s) => s.implicitFlags);
   const axisAnswers = useDiagnosisStore((s) => s.axisAnswers);
   const selectedZones = useDiagnosisStore((s) => s.selectedZones);
+  const setTier = useDiagnosisStore((s) => s.setTier);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
@@ -284,128 +285,112 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
   return (
     <div className="results-slide flex flex-1 flex-col overflow-y-auto" style={{
       paddingInline: 'clamp(16px, 4vw, 40px)',
-      paddingTop: 'clamp(20px, 4vw, 32px)',
-      paddingBottom: 200,
+      paddingTop: 'clamp(12px, 2vw, 20px)',
+      paddingBottom: 120,
       wordBreak: 'keep-all',
     }}>
       <div style={{ maxWidth: 900, margin: '0 auto', width: '100%' }}>
 
-        {/* ════════ HERO ════════ */}
-        <div style={{ textAlign: 'center', marginBottom: 'clamp(16px, 3vw, 24px)' }}>
+        {/* ════════ HERO (compact) ════════ */}
+        <div style={{ marginBottom: 'clamp(8px, 1.5vw, 12px)' }}>
 
-          {/* 1a. Eyebrow */}
-          <motion.p {...heroAnim(0)} style={{
-            fontSize: 'clamp(0.625rem, 1vw, 0.75rem)', fontWeight: 600,
-            letterSpacing: '0.18em', textTransform: 'uppercase',
-            color: tok.textTertiary, marginBottom: 6,
-          }}>{tx('diagnosis_eyebrow', lang)}</motion.p>
-
-          {/* 1b. Pattern title */}
-          <motion.h1 {...heroAnim(1)} style={{
-            fontSize: 'clamp(1.25rem, 2vw + 0.5rem, 1.75rem)', fontWeight: 300,
-            lineHeight: 1.2, color: tok.text, margin: '0 0 8px',
-          }}>{patternName}</motion.h1>
-
-          {/* 1c. Confidence badge */}
-          <motion.div {...heroAnim(2)} style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+          {/* Row 1: Pattern title + confidence inline */}
+          <motion.div {...heroAnim(0)} style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, marginBottom: 'clamp(6px, 1vw, 10px)', flexWrap: 'wrap',
+          }}>
+            <h1 style={{
+              fontSize: 'clamp(1.0625rem, 1.8vw + 0.25rem, 1.375rem)', fontWeight: 300,
+              lineHeight: 1.25, color: tok.text, margin: 0, textAlign: 'center',
+            }}>{patternName}</h1>
             <span style={{
-              fontSize: 'clamp(0.625rem, 0.9vw, 0.75rem)', fontWeight: 500,
-              padding: '4px 12px', borderRadius: 99,
+              fontSize: 'clamp(0.5625rem, 0.75vw, 0.6875rem)', fontWeight: 500,
+              padding: '2px 8px', borderRadius: 99,
               background: isDark ? 'rgba(45,107,74,0.08)' : 'rgba(94,139,104,0.08)',
-              color: tok.accent,
-            }}>{tx('confidence_badge', lang, { N: confidence, M: signalCount })}</span>
+              color: tok.accent, whiteSpace: 'nowrap', flexShrink: 0,
+            }}>{confidence}% · {signalCount} Sig.</span>
           </motion.div>
 
-          {/* 1d. Top concern card (desktop only ≥768px) */}
-          {topAxis && typeof window !== 'undefined' && window.innerWidth >= 768 && (
-            <motion.div {...heroAnim(3)} style={{
-              padding: 'clamp(12px, 2vw, 16px)', borderRadius: 12, textAlign: 'left',
-              display: 'flex', gap: 12, alignItems: 'center',
-              border: `1px solid ${scoreBorderColor(topAxis.raw, 0.12)}`,
-              background: scoreBgColor(topAxis.raw, 0.04),
-              marginBottom: 10,
-            }}>
-              <CircularScore axis={topAxis.axis} score={topAxis.score} lang={lang} size={80} isDark={isDark} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{
-                  fontSize: 'clamp(1rem, 1.5vw, 1.1875rem)', fontWeight: 600,
-                  color: tok.text, marginBottom: 4, lineHeight: 1.3,
-                }}>
-                  {axisLabel(topAxis.axis, lang)}{tx('top_concern_suffix', lang)}
-                </p>
-                <p style={{
-                  fontSize: 'clamp(0.8125rem, 1.2vw, 0.9375rem)', color: tok.textSecondary,
-                  lineHeight: 1.55,
-                }}>
-                  {CRITICAL_MESSAGES[topAxis.axis]?.[lang] ?? ''}
-                  {' '}{tx('top_concern_neglect', lang)}
-                </p>
-              </div>
-            </motion.div>
-          )}
-
-          {/* 1e. Remaining axes as pills */}
-          <motion.div {...heroAnim(4)} style={{
-            display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 6,
+          {/* Row 2: Top concern mini-card + scrollable pills — horizontal layout */}
+          <motion.div {...heroAnim(1)} style={{
+            display: 'flex', alignItems: 'center', gap: 'clamp(8px, 1.5vw, 12px)',
+            marginBottom: 0,
           }}>
-            {activeAxes.slice(0, 3).map(({ axis, score, raw }) => {
-              // Pill colors: Health Score — low = red (bad), high = grey (good)
-              const pillColor = score < 30
-                ? (isDark ? '#E24B4A' : '#A32D2D')
-                : score < 70
-                  ? (isDark ? '#BA7517' : '#854F0B')
-                  : (isDark ? '#86868B' : '#9CA3AF');
-              const pillBg = score < 30
-                ? (isDark ? 'rgba(226,75,74,0.10)' : 'rgba(226,75,74,0.08)')
-                : score < 70
-                  ? (isDark ? 'rgba(186,117,23,0.10)' : 'rgba(186,117,23,0.08)')
-                  : (isDark ? 'rgba(134,134,139,0.10)' : 'rgba(134,134,139,0.08)');
-              return (
-                <span key={axis} style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 'clamp(0.6875rem, 1vw, 0.75rem)', padding: '4px 12px', borderRadius: 99,
-                  background: pillBg, color: pillColor, fontWeight: 500,
-                  lineHeight: 1, whiteSpace: 'nowrap', textAlign: 'center',
-                  verticalAlign: 'middle',
-                }}>{axisLabel(axis, lang)} {Math.round(score)}</span>
-              );
-            })}
-            {activeAxes.length > 3 && (
-              <button onClick={() => setActiveTab('insights')} style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 'clamp(0.6875rem, 1vw, 0.75rem)', padding: '4px 12px', borderRadius: 99,
-                background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                color: tok.textTertiary, fontWeight: 500, border: 'none', cursor: 'pointer',
-                lineHeight: 1, whiteSpace: 'nowrap',
-                transition: 'all 0.15s cubic-bezier(0.22, 1, 0.36, 1)',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'; }}
-              >{tx('remaining_more', lang, { N: activeAxes.length - 3 })}</button>
+            {/* Left: Top concern compact card */}
+            {topAxis && (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8,
+                padding: '6px 12px', borderRadius: 10,
+                border: `1px solid ${scoreBorderColor(topAxis.raw, 0.10)}`,
+                background: scoreBgColor(topAxis.raw, 0.03),
+                flexShrink: 0,
+              }}>
+                <CircularScore axis={topAxis.axis} score={topAxis.score} lang={lang} size={40} isDark={isDark} />
+                <span style={{
+                  fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', fontWeight: 600,
+                  color: tok.text, whiteSpace: 'nowrap',
+                }}>{axisLabel(topAxis.axis, lang)}</span>
+              </div>
             )}
+
+            {/* Right: Scrollable pills (no wrap, horizontal swipe) */}
+            <div style={{
+              display: 'flex', gap: 5, alignItems: 'center',
+              overflowX: 'auto', WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none', flexGrow: 1, minWidth: 0,
+              maskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
+            }}>
+              {activeAxes.slice(1).map(({ axis, score }) => {
+                const pillColor = score < 30
+                  ? (isDark ? '#E24B4A' : '#A32D2D')
+                  : score < 70
+                    ? (isDark ? '#BA7517' : '#854F0B')
+                    : (isDark ? '#86868B' : '#9CA3AF');
+                const pillBg = score < 30
+                  ? (isDark ? 'rgba(226,75,74,0.10)' : 'rgba(226,75,74,0.08)')
+                  : score < 70
+                    ? (isDark ? 'rgba(186,117,23,0.10)' : 'rgba(186,117,23,0.08)')
+                    : (isDark ? 'rgba(134,134,139,0.10)' : 'rgba(134,134,139,0.08)');
+                return (
+                  <span key={axis} style={{
+                    display: 'inline-flex', alignItems: 'center',
+                    fontSize: 'clamp(0.625rem, 0.85vw, 0.6875rem)', padding: '3px 9px', borderRadius: 99,
+                    background: pillBg, color: pillColor, fontWeight: 500,
+                    lineHeight: 1, whiteSpace: 'nowrap', flexShrink: 0,
+                  }}>{axisLabel(axis, lang)} {Math.round(score)}</span>
+                );
+              })}
+            </div>
           </motion.div>
         </div>
 
-        {/* ════════ TAB BAR ════════ */}
-        <motion.div {...heroAnim(5)} style={{
+        {/* ════════ TAB BAR (sticky) ════════ */}
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 40,
           display: 'flex', borderBottom: `1px solid ${tok.border}`,
-          marginBottom: 'clamp(12px, 2vw, 16px)',
+          marginBottom: 'clamp(8px, 1.5vw, 12px)',
+          marginInline: 'calc(-1 * clamp(16px, 4vw, 40px))',
+          paddingInline: 'clamp(16px, 4vw, 40px)',
+          background: isDark ? 'rgba(10,10,10,0.88)' : 'rgba(250,250,248,0.88)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
         }}>
           {(['routine', 'insights'] as TabKey[]).map((tab) => {
             const active = activeTab === tab;
             const label = tab === 'routine' ? tx('tab_routine', lang) : tx('tab_insights', lang);
             return (
               <button key={tab} onClick={() => setActiveTab(tab)} style={{
-                flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
-                background: 'transparent', minHeight: 48,
-                fontSize: 'clamp(0.8125rem, 1.2vw, 0.9375rem)', fontWeight: 500,
-                      color: active ? tok.accent : tok.textTertiary,
+                flex: 1, padding: '8px 0', border: 'none', cursor: 'pointer',
+                background: 'transparent', minHeight: 40,
+                fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)', fontWeight: 500,
+                color: active ? tok.accent : tok.textTertiary,
                 borderBottom: active ? `2px solid ${tok.accent}` : '2px solid transparent',
                 transition: 'all 0.2s ease',
               }}>{label}</button>
             );
           })}
-        </motion.div>
+        </div>
 
         {/* ════════ TAB CONTENT ════════ */}
         <AnimatePresence mode="wait">
@@ -432,7 +417,9 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                     <button key={tab.key} onClick={() => {
                       setActiveTier(tab.key);
                       setExpandedId(null);
-                      // Fix #5: notify parent of tier change for cart bar reactivity
+                      // Sync to global store so Slide 2 reads the correct tier
+                      const tierMap: Record<TierKey, 'Entry'|'Full'|'Premium'> = { '3-step': 'Entry', '5-step': 'Full', 'advanced': 'Premium' };
+                      setTier(tierMap[tab.key]);
                     }} style={{
                       flex: 1, padding: '10px 4px', textAlign: 'center', border: 'none', cursor: 'pointer',
                       borderRadius: 10, minHeight: 48,
@@ -712,6 +699,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
               )}
               </>
               )}
+
+
             </motion.div>
           ) : (
             /* ════════ INSIGHTS TAB ════════ */

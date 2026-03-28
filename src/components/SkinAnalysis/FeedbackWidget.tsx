@@ -20,20 +20,20 @@ type Step = 'hook' | 'correction' | 'success' | 'hidden';
 // ── Zone chips (Question A: "Which area did we miss?") ──────────────────────
 const ZONE_CHIPS = [
   { id: 'forehead', ko: '이마', en: 'Forehead', de: 'Stirn' },
-  { id: 'cheeks',   ko: '볼',  en: 'Cheeks',   de: 'Wangen' },
-  { id: 'nose',     ko: '코',  en: 'Nose',     de: 'Nase' },
-  { id: 'chin',     ko: '턱',  en: 'Chin',     de: 'Kinn' },
-  { id: 'overall',  ko: '전체', en: 'Overall',  de: 'Gesamt' },
+  { id: 'cheeks', ko: '볼', en: 'Cheeks', de: 'Wangen' },
+  { id: 'nose', ko: '코', en: 'Nose', de: 'Nase' },
+  { id: 'chin', ko: '턱', en: 'Chin', de: 'Kinn' },
+  { id: 'overall', ko: '전체', en: 'Overall', de: 'Gesamt' },
 ] as const;
 
 // ── Condition chips (Question B: "What is the actual condition?") ────────────
 const CONDITION_CHIPS = [
-  { id: 'more_oily',      metric: 'seb', direction: 'increase' as const, ko: '더 기름짐',    en: 'More Oily',      de: 'Öliger' },
-  { id: 'more_dry',       metric: 'hyd', direction: 'decrease' as const, ko: '더 건조함',    en: 'More Dry',       de: 'Trockener' },
-  { id: 'more_sensitive',  metric: 'sen', direction: 'increase' as const, ko: '더 민감함',    en: 'More Sensitive', de: 'Empfindlicher' },
-  { id: 'breakouts',       metric: 'acne', direction: 'increase' as const, ko: '트러블 있음', en: 'Breakouts',      de: 'Unreinheiten' },
-  { id: 'pigmentation',    metric: 'pigment', direction: 'increase' as const, ko: '색소침착',  en: 'Pigmentation',   de: 'Pigmentierung' },
-  { id: 'texture_rough',   metric: 'texture', direction: 'increase' as const, ko: '피부결 거침', en: 'Rough Texture', de: 'Raue Textur' },
+  { id: 'more_oily', metric: 'seb', direction: 'increase' as const, ko: '더 기름짐', en: 'More Oily', de: 'Öliger' },
+  { id: 'more_dry', metric: 'hyd', direction: 'decrease' as const, ko: '더 건조함', en: 'More Dry', de: 'Trockener' },
+  { id: 'more_sensitive', metric: 'sen', direction: 'increase' as const, ko: '더 민감함', en: 'More Sensitive', de: 'Empfindlicher' },
+  { id: 'breakouts', metric: 'acne', direction: 'increase' as const, ko: '트러블 있음', en: 'Breakouts', de: 'Unreinheiten' },
+  { id: 'pigmentation', metric: 'pigment', direction: 'increase' as const, ko: '색소침착', en: 'Pigmentation', de: 'Pigmentierung' },
+  { id: 'texture_rough', metric: 'texture', direction: 'increase' as const, ko: '피부결 거침', en: 'Rough Texture', de: 'Raue Textur' },
 ] as const;
 
 type ZoneId = typeof ZONE_CHIPS[number]['id'];
@@ -41,19 +41,19 @@ type ConditionId = typeof CONDITION_CHIPS[number]['id'];
 
 // ── i18n Texts ──────────────────────────────────────────────────────────────
 const TX = {
-  question:     { ko: '분석 결과가 정확한가요?', en: 'How accurate is this analysis?', de: 'Wie genau ist diese Analyse?' },
-  accurate:     { ko: '정확해요', en: 'Accurate', de: 'Genau' },
-  inaccurate:   { ko: '조정이 필요해요', en: 'Needs tweaking', de: 'Braucht Anpassung' },
+  question: { ko: '분석 결과가 정확한가요?', en: 'How accurate is this analysis?', de: 'Wie genau ist diese Analyse?' },
+  accurate: { ko: '정확해요', en: 'Accurate', de: 'Genau' },
+  inaccurate: { ko: '조정이 필요해요', en: 'Needs tweaking', de: 'Braucht Anpassung' },
   zoneQuestion: { ko: 'AI가 놓친 부위는?', en: 'Which area did we miss?', de: 'Welchen Bereich haben wir übersehen?' },
   condQuestion: { ko: '실제 피부 상태는?', en: 'What is the actual condition?', de: 'Wie ist der tatsächliche Zustand?' },
-  selectHint:   { ko: '(복수 선택 가능)', en: '(Select multiple)', de: '(Mehrfachauswahl)' },
-  comment:      { ko: '추가 의견 (선택)', en: 'Additional comments (optional)', de: 'Zusätzliche Anmerkungen (optional)' },
-  submit:       { ko: '보정 제출하기', en: 'Submit Correction', de: 'Korrektur absenden' },
-  submitting:   { ko: '전송 중...', en: 'Sending...', de: 'Senden...' },
-  thanks:       { ko: '소중한 피드백 감사합니다! AI가 진화합니다 🧬', en: 'Thank you! Your feedback helps our AI evolve 🧬', de: 'Danke! Ihr Feedback hilft unserer KI, sich weiterzuentwickeln 🧬' },
-  ctaTitle:     { ko: '더 정확한 분석을 원하시나요?', en: 'Want a more precise analysis?', de: 'Möchten Sie eine genauere Analyse?' },
-  ctaDesc:      { ko: '얼굴 존별 정밀 진단 설문으로 AI를 보정하세요.', en: 'Calibrate AI results with our zone-by-zone diagnosis.', de: 'Kalibrieren Sie die KI mit unserer zonenweisen Diagnose.' },
-  ctaButton:    { ko: '정밀 진단 시작', en: 'Start Precision Diagnosis', de: 'Präzisionsdiagnose starten' },
+  selectHint: { ko: '(복수 선택 가능)', en: '(Select multiple)', de: '(Mehrfachauswahl)' },
+  comment: { ko: '추가 의견 (선택)', en: 'Additional comments (optional)', de: 'Zusätzliche Anmerkungen (optional)' },
+  submit: { ko: '보정 제출하기', en: 'Submit Correction', de: 'Korrektur absenden' },
+  submitting: { ko: '전송 중...', en: 'Sending...', de: 'Senden...' },
+  thanks: { ko: '소중한 피드백 감사합니다! AI가 진화합니다 🧬', en: 'Thank you! Your feedback helps our AI evolve 🧬', de: 'Danke! Ihr Feedback hilft unserer KI, sich weiterzuentwickeln 🧬' },
+  ctaTitle: { ko: '더 정확한 분석을 원하시나요?', en: 'Want a more precise analysis?', de: 'Möchten Sie eine genauere Analyse?' },
+  ctaDesc: { ko: '얼굴 존별 정밀 분석 설문으로 AI를 보정하세요.', en: 'Calibrate AI results with our zone-by-zone diagnosis.', de: 'Kalibrieren Sie die KI mit unserer zonenweisen Diagnose.' },
+  ctaButton: { ko: '정밀 분석 시작', en: 'Start Precision Diagnosis', de: 'Präzisionsdiagnose starten' },
 } as const;
 
 // ── Glassmorphism tokens ────────────────────────────────────────────────────

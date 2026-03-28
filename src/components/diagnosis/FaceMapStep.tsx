@@ -402,9 +402,9 @@ const gt = (t: LocalizedText, lang: Lang): string =>
 // Mobile-safe annotation endpoint adjustments to keep labels within visible bounds
 const MOBILE_ANNOT_OVERRIDES: Partial<Record<ZoneId, { x2: number; y2?: number }>> = {
   forehead: { x2: 55 },
-  eyes:     { x2: 420 },
-  mouth:    { x2: 400 },
-  neck:     { x2: 395 },
+  eyes: { x2: 420 },
+  mouth: { x2: 400 },
+  neck: { x2: 395 },
 };
 
 function FaceSVG({
@@ -632,7 +632,7 @@ const PATTERN_CARDS: Record<string, Record<Lang, { title: string; body: string }
   HORMONAL_ACNE: {
     en: { title: "Hormonal Pattern Detected", body: "Recurring breakouts on your jawline strongly suggest hormonal influence — we'll factor this into your diagnosis." },
     de: { title: "Hormonelles Muster erkannt", body: "Wiederkehrende Unreinheiten an der Kieferlinie deuten auf hormonellen Einfluss hin." },
-    ko: { title: "호르몬 패턴 감지", body: "턱선의 반복 트러블은 호르몬 영향을 강하게 시사해요 — 진단에 반영합니다." },
+    ko: { title: "호르몬 패턴 감지", body: "턱선의 반복 트러블은 호르몬 영향을 강하게 시사해요 — 분석에 반영합니다." },
   },
   BARRIER_STRESS: {
     en: { title: "Barrier Stress Detected", body: "High sensitivity combined with dryness suggests your skin's protective barrier needs repair before other treatments." },

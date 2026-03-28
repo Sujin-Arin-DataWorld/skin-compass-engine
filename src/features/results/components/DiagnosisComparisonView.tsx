@@ -37,26 +37,26 @@ const SORT_ORDER: Record<Direction, number> = { improved: 0, stable: 1, worsened
 
 const DIR_COLOR: Record<Direction, string> = {
   improved: "hsl(var(--success))",
-  stable:   "rgba(140,150,165,0.9)",
+  stable: "rgba(140,150,165,0.9)",
   worsened: "hsl(var(--warning))",
 };
 
 const DIR_BG: Record<Direction, string> = {
   improved: "rgba(34,197,94,0.08)",
-  stable:   "rgba(140,150,165,0.09)",
+  stable: "rgba(140,150,165,0.09)",
   worsened: "rgba(245,158,11,0.08)",
 };
 
 const DIR_ARROW: Record<Direction, string> = {
   improved: "↓",
-  stable:   "→",
+  stable: "→",
   worsened: "↑",
 };
 
 const PILL_LABEL: Record<Direction, Record<Lang, string>> = {
-  improved: { en: "improved",       de: "verbessert",  ko: "개선됨"    },
-  stable:   { en: "stable",         de: "stabil",      ko: "안정됨"    },
-  worsened: { en: "need attention", de: "beachten",    ko: "주의 필요" },
+  improved: { en: "improved", de: "verbessert", ko: "개선됨" },
+  stable: { en: "stable", de: "stabil", ko: "안정됨" },
+  worsened: { en: "need attention", de: "beachten", ko: "주의 필요" },
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -102,11 +102,11 @@ function AxisChangeCard({
   const change = comparison.changes[axis];
   const prev = comparison.previous.scores[axis];
   const curr = comparison.current.scores[axis];
-  const dir  = change.direction;
+  const dir = change.direction;
   const axisName =
     lang === "de" ? AXIS_LABELS_DE[axis] :
-    lang === "ko" ? AXIS_LABELS_KO[axis] :
-    AXIS_LABELS[axis];
+      lang === "ko" ? AXIS_LABELS_KO[axis] :
+        AXIS_LABELS[axis];
 
   // Delta badge: negative = score went down (good), positive = score went up (bad)
   const deltaSign = change.delta > 0 ? "−" : change.delta < 0 ? "+" : "±";
@@ -194,7 +194,7 @@ export default function DiagnosisComparisonView({
     <div style={{ marginBottom: 24 }}>
       {/* Eyebrow */}
       <p className="slide-eyebrow mb-3" style={{ letterSpacing: "0.14em" }}>
-        {lang === "ko" ? "재진단 비교" : lang === "de" ? "Re-Diagnose Vergleich" : "Re-Diagnosis Comparison"}
+        {lang === "ko" ? "재분석 비교" : lang === "de" ? "Re-Analyse Vergleich" : "Re-Analysis Comparison"}
       </p>
 
       {/* ── Section C: Overall progress banner ── */}
@@ -211,7 +211,7 @@ export default function DiagnosisComparisonView({
         {/* Count pills */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
           <CountPill count={improvedCount} dir="improved" lang={lang} />
-          <CountPill count={stableCount}   dir="stable"   lang={lang} />
+          <CountPill count={stableCount} dir="stable" lang={lang} />
           <CountPill count={worsenedCount} dir="worsened" lang={lang} />
         </div>
 
@@ -256,10 +256,10 @@ export default function DiagnosisComparisonView({
         >
           ⓘ{" "}
           {lang === "ko"
-            ? "진단 알고리즘이 업데이트되었습니다. 비교 결과에 방법론 변경이 반영될 수 있습니다."
+            ? "분석 알고리즘이 업데이트되었습니다. 비교 결과에 방법론 변경이 반영될 수 있습니다."
             : lang === "de"
-            ? "Der Scoring-Algorithmus wurde zwischen den Diagnosen aktualisiert. Der Vergleich kann Methodenänderungen widerspiegeln."
-            : "The scoring algorithm was updated between diagnoses. Comparison may reflect methodology changes."}
+              ? "Der Scoring-Algorithmus wurde zwischen den Analysen aktualisiert. Der Vergleich kann Methodenänderungen widerspiegeln."
+              : "The scoring algorithm was updated between analyses. Comparison may reflect methodology changes."}
         </motion.p>
       )}
 
@@ -278,10 +278,10 @@ export default function DiagnosisComparisonView({
         >
           ⓘ{" "}
           {lang === "ko"
-            ? "마지막 진단이 3개월 이상 전입니다. 생활 습관 변화가 비교 정확도에 영향을 줄 수 있습니다."
+            ? "마지막 분석이 3개월 이상 전입니다. 생활 습관 변화가 비교 정확도에 영향을 줄 수 있습니다."
             : lang === "de"
-            ? "Ihre letzte Diagnose liegt über 3 Monate zurück. Erhebliche Lebensstiländerungen können die Vergleichsgenauigkeit beeinflussen."
-            : "Your last diagnosis was over 3 months ago. Significant lifestyle changes may affect comparison accuracy."}
+              ? "Ihre letzte Analyse liegt über 3 Monate zurück. Erhebliche Lebensstiländerungen können die Vergleichsgenauigkeit beeinflussen."
+              : "Your last analysis was over 3 months ago. Significant lifestyle changes may affect comparison accuracy."}
         </motion.p>
       )}
 

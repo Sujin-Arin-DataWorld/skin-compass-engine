@@ -26,7 +26,7 @@ function UserVectorHistory({ user, onClose }: { user: UserProfile; onClose: () =
             </div>
 
             {user.savedResults.length === 0 ? (
-                <p className="text-sm text-foreground/40 italic py-4">Keine Diagnosen vorhanden.</p>
+                <p className="text-sm text-foreground/40 italic py-4">Keine Analysen vorhanden.</p>
             ) : (
                 <div className="space-y-4">
                     {user.savedResults.map((result, idx) => (
@@ -163,7 +163,9 @@ function ProductEditor() {
 
 /* ── Main Admin Dashboard ── */
 export default function AdminDashboard() {
-    const { isLoggedIn, userProfile, allUsers } = useAuthStore();
+    const { isLoggedIn, userProfile } = useAuthStore();
+    // allUsers was never implemented in AuthState — fallback to current user
+    const allUsers: UserProfile[] = userProfile ? [userProfile] : [];
     const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
     const [activeTab, setActiveTab] = useState<"analysis" | "products">("analysis");
 
@@ -223,7 +225,7 @@ export default function AdminDashboard() {
                                 10-Dimensionen Durchschnitt (alle Nutzer)
                             </p>
                             {totalDiagnoses === 0 ? (
-                                <p className="text-sm text-foreground/40 italic py-4">Noch keine Diagnosen vorhanden.</p>
+                                <p className="text-sm text-foreground/40 italic py-4">Noch keine Analysen vorhanden.</p>
                             ) : (
                                 <div className="space-y-2.5">
                                     {avgScores.map((a, i) => (
@@ -278,7 +280,7 @@ export default function AdminDashboard() {
                                                 <th className="text-left py-2 text-[0.65rem] uppercase tracking-wider text-foreground/40 font-medium">Name</th>
                                                 <th className="text-left py-2 text-[0.65rem] uppercase tracking-wider text-foreground/40 font-medium">E-Mail</th>
                                                 <th className="text-left py-2 text-[0.65rem] uppercase tracking-wider text-foreground/40 font-medium hidden sm:table-cell">Mitglied seit</th>
-                                                <th className="text-right py-2 text-[0.65rem] uppercase tracking-wider text-foreground/40 font-medium">Diagnosen</th>
+                                                <th className="text-right py-2 text-[0.65rem] uppercase tracking-wider text-foreground/40 font-medium">Analysen</th>
                                                 <th className="text-right py-2 text-[0.65rem] uppercase tracking-wider text-foreground/40 font-medium">Aktion</th>
                                             </tr>
                                         </thead>

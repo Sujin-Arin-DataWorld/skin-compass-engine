@@ -23,7 +23,7 @@ const T = {
     de: 'Ihre Hautbarriere ist stark beschädigt. Alle aktiven Inhaltsstoffe (BHA, Vitamin C, Retinol etc.) werden vorübergehend ausgesetzt. Wir empfehlen, sich 2 Wochen lang ausschließlich auf Barrierereparatur (Ceramid 2:4:2) und Beruhigung (Centella 69%) zu konzentrieren.',
   },
   recovery_cta: {
-    ko: '2주 후 재진단하기',
+    ko: '2주 후 재분석하기',
     en: 'Re-diagnose after 2 weeks',
     de: 'Nach 2 Wochen erneut diagnostizieren',
   },

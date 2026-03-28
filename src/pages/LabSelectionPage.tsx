@@ -322,7 +322,7 @@ export default function LabSelectionPage() {
               }}
             >
               {language === 'ko'
-                ? '진단 결과를 기반으로 각 부위에 맞는 제품을 선택하고, 안전한 루틴을 완성하세요.'
+                ? '분석 결과를 기반으로 각 부위에 맞는 제품을 선택하고, 안전한 루틴을 완성하세요.'
                 : language === 'de'
                   ? 'Wählen Sie Produkte basierend auf Ihren Analyseergebnissen und erstellen Sie Ihre sichere Pflege.'
                   : 'Select products matched to your analysis, zone by zone, and build a safe skincare routine.'}

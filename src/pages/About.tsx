@@ -26,14 +26,14 @@ const ABOUT_COPY = {
     heroHeadline: "당신의 평생\n피부 나침반",
     heroSub: "Skin Strategy Lab",
     pillars: [
-      { icon: "cpu",   label: "KI-gestützte\nPräzisions-Analyse", title: "AI 정밀 분석" },
+      { icon: "cpu", label: "KI-gestützte\nPräzisions-Analyse", title: "AI 정밀 분석" },
       { icon: "cycle", label: "Intelligente\nZyklus-Steuerung", title: "적응형 피부 지능" },
       { icon: "flask", label: "Wissenschaftlich belegte\nWirksamkeit", title: "과학 기반 효능" },
-      { icon: "drop",  label: "Lückenlose\nTransparenz", title: "타협 없는 진실성" },
+      { icon: "drop", label: "Lückenlose\nTransparenz", title: "타협 없는 진실성" },
     ],
     manifesto: [
       "넘쳐나는 정보와 쏟아지는 신제품 속, 내 피부에 '진짜' 맞는 제품을 찾기란 쉽지 않습니다.",
-      "Skin Strategy Lab은 AI 사진 진단, 생활습관 분석, 부위별 정밀 설문을 결합한 하이브리드 맞춤형 솔루션입니다.",
+      "Skin Strategy Lab은 AI 사진 분석, 생활습관 분석, 부위별 정밀 설문을 결합한 하이브리드 맞춤형 솔루션입니다.",
       "우리는 생애주기에 따라 변하는 당신의 피부결과 타입을 평생 추적 관찰하여, 지금 이 순간 가장 필요한 최적의 제품을 제안합니다.",
       "타협은 없습니다. 피부 임상 논문으로 검증된 성분, 투명하게 공개된 함량까지. 확실한 효과를 자부하며 엄선한 진짜 스킨케어만을 큐레이션합니다.",
       "믿고 살 수 있는 단 하나의 뷰티 플랫폼, 이제 Skin Strategy Lab을 믿고 당신의 피부를 맡겨보세요.",
@@ -47,14 +47,14 @@ const ABOUT_COPY = {
     heroHeadline: "Your Lifelong\nSkincare Compass",
     heroSub: "Skin Strategy Lab",
     pillars: [
-      { icon: "cpu",   label: "Precision\nAI Analysis",       title: "Precision AI Analysis" },
-      { icon: "cycle", label: "Adaptive Skin\nIntelligence",  title: "Adaptive Skin Intelligence" },
-      { icon: "flask", label: "Science-Driven\nEfficacy",     title: "Science-Driven Efficacy" },
-      { icon: "drop",  label: "Uncompromising\nIntegrity",    title: "Uncompromising Integrity" },
+      { icon: "cpu", label: "Precision\nAI Analysis", title: "Precision AI Analysis" },
+      { icon: "cycle", label: "Adaptive Skin\nIntelligence", title: "Adaptive Skin Intelligence" },
+      { icon: "flask", label: "Science-Driven\nEfficacy", title: "Science-Driven Efficacy" },
+      { icon: "drop", label: "Uncompromising\nIntegrity", title: "Uncompromising Integrity" },
     ],
     manifesto: [
       "Lost in a sea of endless beauty trends and new products? Finding what truly works for your skin shouldn\u2019t be a guessing game.",
-      "Skin Strategy Lab is your complete hybrid personalized solution, combining AI photo diagnostics, lifestyle analysis, and targeted skin-zone surveys.",
+      "Skin Strategy Lab is your complete hybrid personalized solution, combining AI photo analysis, lifestyle analysis, and targeted skin-zone surveys.",
       "We track your skin\u2019s evolving texture and type across every life stage, recommending exactly what you need, right when you need it.",
       "We don\u2019t compromise. Backed by clinical dermatology papers and fully transparent ingredient concentrations, we confidently curate only highly effective products that deliver undeniable results.",
       "Stop guessing\u2014trust our platform and experience skincare that truly works.",
@@ -68,14 +68,14 @@ const ABOUT_COPY = {
     heroHeadline: "Ihr lebenslanger\nHautpflege-Kompass",
     heroSub: "Skin Strategy Lab",
     pillars: [
-      { icon: "cpu",   label: "KI-gestützte\nPräzisions-Analyse",        title: "KI-Präzisionsanalyse" },
-      { icon: "cycle", label: "Intelligente\nZyklus-Steuerung",          title: "Intelligente Zyklus-Steuerung" },
-      { icon: "flask", label: "Wissenschaftlich belegte\nWirksamkeit",   title: "Wissenschaftliche Wirksamkeit" },
-      { icon: "drop",  label: "Lückenlose\nTransparenz",                 title: "Lückenlose Transparenz" },
+      { icon: "cpu", label: "KI-gestützte\nPräzisions-Analyse", title: "KI-Präzisionsanalyse" },
+      { icon: "cycle", label: "Intelligente\nZyklus-Steuerung", title: "Intelligente Zyklus-Steuerung" },
+      { icon: "flask", label: "Wissenschaftlich belegte\nWirksamkeit", title: "Wissenschaftliche Wirksamkeit" },
+      { icon: "drop", label: "Lückenlose\nTransparenz", title: "Lückenlose Transparenz" },
     ],
     manifesto: [
       "Verloren in der endlosen Flut von Beauty-Trends und neuen Produkten? Die richtige Pflege zu finden, sollte kein Rätselraten sein.",
-      "Skin Strategy Lab ist Ihre hybride, personalisierte Lösung, die KI-Fotodiagnostik mit Lebensstil-Analysen und gezielten Zonen-Fragebögen vereint.",
+      "Skin Strategy Lab ist Ihre hybride, personalisierte Lösung, die KI-Fotoanalyse mit Lebensstil-Analysen und gezielten Zonen-Fragebögen vereint.",
       "Wir begleiten Ihre sich verändernde Hautstruktur und Ihren Hauttyp in jeder Lebensphase und empfehlen stets genau das, was Sie in diesem Moment benötigen.",
       "Wir machen keine Kompromisse. Basierend auf dermatologischen Studien und absolut transparenten Wirkstoffkonzentrationen kuratieren wir voller Überzeugung nur hochwirksame Produkte, die echte Ergebnisse liefern.",
       "Vertrauen Sie unserer Plattform und erleben Sie Hautpflege, die wirklich funktioniert.",
@@ -86,10 +86,10 @@ const ABOUT_COPY = {
 } as const;
 
 const ICON_MAP = {
-  cpu:   Cpu,
+  cpu: Cpu,
   cycle: RefreshCw,
   flask: FlaskConical,
-  drop:  Droplets,
+  drop: Droplets,
 } as const;
 
 // ── Anim presets ──────────────────────────────────────────────────────────────

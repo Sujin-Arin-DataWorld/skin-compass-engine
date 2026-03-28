@@ -35,7 +35,7 @@ function EmptyWishlist({ de }: { de: boolean }) {
             <p className="text-sm text-center max-w-xs mb-6 text-gray-500 dark:text-[var(--ssl-accent-deep)]">
                 {de
                     ? "Führen Sie eine Analyse durch, um personalisierte Produktempfehlungen zu erhalten."
-                    : "Complete a diagnosis to receive personalized product recommendations."}
+                    : "Complete an analysis to receive personalized product recommendations."}
             </p>
 
             <Link

@@ -21,13 +21,13 @@
 ```
 src/
 ├── app/                    # 라우트 엔트리
-│   ├── diagnosis/          # 진단 플로우
+│   ├── diagnosis/          # 분석 플로우
 │   ├── result/             # 결과 페이지
 │   ├── lab/                # 맞춤 루틴 Lab
 │   └── profile/            # 사용자 프로필
 ├── components/
 │   ├── ui/                 # 범용 UI (Button, Card, Modal, Skeleton...)
-│   ├── diagnosis/          # 진단 전용 컴포넌트
+│   ├── diagnosis/          # 분석 전용 컴포넌트
 │   ├── result/             # 결과 전용 컴포넌트
 │   │   ├── HeroSection.tsx
 │   │   ├── VulnerabilityCard.tsx

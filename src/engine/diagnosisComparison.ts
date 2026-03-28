@@ -9,7 +9,7 @@ import type { Lang } from "@/engine/questionRoutingV5";
 
 export interface DiagnosisComparison {
   previous: { date: string; scores: AxisScores };
-  current:  { date: string; scores: AxisScores };
+  current: { date: string; scores: AxisScores };
   changes: Record<AxisKey, {
     delta: number;                                          // positive = improved (score went DOWN)
     direction: "improved" | "stable" | "worsened";
@@ -17,7 +17,7 @@ export interface DiagnosisComparison {
   }>;
   overallProgress: {
     improvedCount: number;
-    stableCount:   number;
+    stableCount: number;
     worsenedCount: number;
     summary: Record<Lang, string>;
   };
@@ -82,23 +82,23 @@ export function buildDiagnosisComparison(
     en: improvedCount > worsenedCount
       ? `Great progress — ${improvedCount} axes improved since your last diagnosis.`
       : worsenedCount > improvedCount
-      ? `${worsenedCount} areas need attention — let's review your routine.`
-      : `Your skin is holding steady — ${stableCount} axes are stable.`,
+        ? `${worsenedCount} areas need attention — let's review your routine.`
+        : `Your skin is holding steady — ${stableCount} axes are stable.`,
     de: improvedCount > worsenedCount
       ? `Guter Fortschritt — ${improvedCount} Bereiche haben sich seit der letzten Diagnose verbessert.`
       : worsenedCount > improvedCount
-      ? `${worsenedCount} Bereiche brauchen Aufmerksamkeit — überprüfen wir Ihre Pflege.`
-      : `Ihre Haut ist stabil — ${stableCount} Bereiche halten das Niveau.`,
+        ? `${worsenedCount} Bereiche brauchen Aufmerksamkeit — überprüfen wir Ihre Pflege.`
+        : `Ihre Haut ist stabil — ${stableCount} Bereiche halten das Niveau.`,
     ko: improvedCount > worsenedCount
-      ? `좋은 진전이에요 — 지난 진단 이후 ${improvedCount}개 항목이 개선됐습니다.`
+      ? `좋은 진전이에요 — 지난 분석 이후 ${improvedCount}개 항목이 개선됐습니다.`
       : worsenedCount > improvedCount
-      ? `${worsenedCount}개 항목에 주의가 필요해요 — 루틴을 함께 점검해 봐요.`
-      : `피부가 안정적이에요 — ${stableCount}개 항목이 유지되고 있습니다.`,
+        ? `${worsenedCount}개 항목에 주의가 필요해요 — 루틴을 함께 점검해 봐요.`
+        : `피부가 안정적이에요 — ${stableCount}개 항목이 유지되고 있습니다.`,
   };
 
   return {
     previous: { date: previousDate, scores: previousScores },
-    current:  { date: currentDate,  scores: currentScores  },
+    current: { date: currentDate, scores: currentScores },
     changes,
     overallProgress: { improvedCount, stableCount, worsenedCount, summary },
   };
@@ -109,18 +109,18 @@ export function buildDiagnosisComparison(
 export const RECHECK_PROMPT: Record<Lang, { title: string; body: string; cta: string }> = {
   en: {
     title: "Time for a Re-Check",
-    body:  "It's been 4 weeks since your last diagnosis. Your skin changes with seasons, hormones, and habits.",
-    cta:   "Re-diagnose now →",
+    body: "It's been 4 weeks since your last diagnosis. Your skin changes with seasons, hormones, and habits.",
+    cta: "Re-diagnose now →",
   },
   de: {
     title: "Zeit für einen Re-Check",
-    body:  "4 Wochen seit Ihrer letzten Diagnose. Ihre Haut verändert sich mit Jahreszeiten, Hormonen und Gewohnheiten.",
-    cta:   "Jetzt neu diagnostizieren →",
+    body: "4 Wochen seit Ihrer letzten Diagnose. Ihre Haut verändert sich mit Jahreszeiten, Hormonen und Gewohnheiten.",
+    cta: "Jetzt neu diagnostizieren →",
   },
   ko: {
-    title: "재진단 시간이에요",
-    body:  "마지막 진단 후 4주가 지났어요. 피부는 계절, 호르몬, 습관에 따라 변합니다.",
-    cta:   "지금 재진단하기 →",
+    title: "재분석 시간이에요",
+    body: "마지막 분석 후 4주가 지났어요. 피부는 계절, 호르몬, 습관에 따라 변합니다.",
+    cta: "지금 재분석하기 →",
   },
 };
 
@@ -143,7 +143,7 @@ export function computeSkinAge(
   let skinAge = realAgeMidpoint;
 
   // High aging score → skin appears older
-  if      (scores.aging >= 60) skinAge += 5;
+  if (scores.aging >= 60) skinAge += 5;
   else if (scores.aging >= 40) skinAge += 2;
   else if (scores.aging <= 20) skinAge -= 3;
 
@@ -154,12 +154,12 @@ export function computeSkinAge(
   if (scores.hyd <= 30) skinAge -= 2;
 
   // §11: ox >= 50 now indicates genuine chip-confirmed damage
-  if      (scores.ox >= 50) skinAge += 3;
+  if (scores.ox >= 50) skinAge += 3;
   else if (scores.ox <= 20) skinAge -= 2;
 
   // Menopause acceleration
   if (menoStatus === "meno_post_early" && scores.aging >= 50) skinAge += 4;
-  if (menoStatus === "meno_post_late"  && scores.aging >= 50) skinAge += 2;
+  if (menoStatus === "meno_post_late" && scores.aging >= 50) skinAge += 2;
 
   // Clamp: max ±15 years from real age
   skinAge = Math.max(realAgeMidpoint - 10, Math.min(realAgeMidpoint + 15, Math.round(skinAge)));

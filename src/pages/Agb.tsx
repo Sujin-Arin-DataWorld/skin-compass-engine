@@ -57,17 +57,17 @@ const AGB_COPY = {
         ],
       },
       {
-        heading: "§ 6 피부 진단 서비스",
+        heading: "§ 6 피부 분석 서비스",
         paragraphs: [
-          "AI 기반 피부 진단은 정보 제공 목적으로만 사용되며, 전문 피부과 의사의 진단을 대체하지 않습니다.",
-          "진단에 사용된 얼굴 이미지는 AI 분석 직후 즉시 영구 삭제되며, 어떠한 형태로도 저장되지 않습니다.",
+          "AI 기반 피부 분석은 정보 제공 목적으로만 사용되며, 전문 피부과 의사의 분석을 대체하지 않습니다.",
+          "분석에 사용된 얼굴 이미지는 AI 분석 직후 즉시 영구 삭제되며, 어떠한 형태로도 저장되지 않습니다.",
         ],
       },
       {
         heading: "§ 7 책임 제한",
         paragraphs: [
           "회사는 고의 또는 중과실에 의한 손해에 대해서만 책임을 집니다.",
-          "피부 진단 결과에 기반한 개인적 결정에 대한 책임은 사용자에게 있습니다.",
+          "피부 분석 결과에 기반한 개인적 결정에 대한 책임은 사용자에게 있습니다.",
         ],
       },
       {
@@ -121,9 +121,9 @@ const AGB_COPY = {
         ],
       },
       {
-        heading: "§ 6 Skin Diagnosis Service",
+        heading: "§ 6 Skin Analysis Service",
         paragraphs: [
-          "AI-powered skin diagnosis is provided for informational purposes only and does not replace professional dermatological consultation.",
+          "AI-powered skin analysis is provided for informational purposes only and does not replace professional dermatological consultation.",
           "Facial images used for AI analysis are permanently deleted immediately after processing and are never stored in any form.",
         ],
       },
@@ -131,7 +131,7 @@ const AGB_COPY = {
         heading: "§ 7 Limitation of Liability",
         paragraphs: [
           "The Company is liable only for damages caused by intent or gross negligence.",
-          "Users are solely responsible for personal decisions made based on skin diagnosis results.",
+          "Users are solely responsible for personal decisions made based on skin analysis results.",
         ],
       },
       {
@@ -185,9 +185,9 @@ const AGB_COPY = {
         ],
       },
       {
-        heading: "§ 6 Hautdiagnose-Service",
+        heading: "§ 6 Hautanalyse-Service",
         paragraphs: [
-          "Die KI-gestützte Hautdiagnose dient ausschließlich Informationszwecken und ersetzt keine professionelle dermatologische Beratung.",
+          "Die KI-gestützte Hautanalyse dient ausschließlich Informationszwecken und ersetzt keine professionelle dermatologische Beratung.",
           "Die für die KI-Analyse verwendeten Gesichtsbilder werden unmittelbar nach der Verarbeitung unwiderruflich gelöscht und in keiner Form gespeichert.",
         ],
       },
@@ -195,7 +195,7 @@ const AGB_COPY = {
         heading: "§ 7 Haftungsbeschränkung",
         paragraphs: [
           "Der Anbieter haftet nur für Schäden, die durch Vorsatz oder grobe Fahrlässigkeit verursacht wurden.",
-          "Für persönliche Entscheidungen, die auf den Ergebnissen der Hautdiagnose beruhen, trägt der Nutzer die alleinige Verantwortung.",
+          "Für persönliche Entscheidungen, die auf den Ergebnissen der Hautanalyse beruhen, trägt der Nutzer die alleinige Verantwortung.",
         ],
       },
       {

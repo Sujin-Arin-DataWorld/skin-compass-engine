@@ -52,7 +52,7 @@ const COPY = {
   eyebrow: {
     en: "Re-test Reminder",
     de: "Re-Test Erinnerung",
-    ko: "재진단 알림",
+    ko: "재분석 알림",
   },
   title: {
     en: "Ready to see how your skin has changed?",
@@ -66,14 +66,14 @@ const COPY = {
     return `You last took the test on ${fmtDate}.`;
   },
   weeksSince: (weeks: number, lang: Lang): string => {
-    if (lang === "ko") return `마지막 진단 후 ${weeks}주가 지났습니다.`;
+    if (lang === "ko") return `마지막 분석 후 ${weeks}주가 지났습니다.`;
     if (lang === "de") return `Es sind ${weeks} Wochen seit Ihrem letzten Test vergangen.`;
     return `It has been ${weeks} week${weeks !== 1 ? "s" : ""} since your last test.`;
   },
   recommended: {
     en: `Our recommended testing interval is ${RECOMMENDED_INTERVAL_WEEKS} weeks.`,
     de: `Unser empfohlener Testintervall beträgt ${RECOMMENDED_INTERVAL_WEEKS} Wochen.`,
-    ko: `권장 재진단 주기는 ${RECOMMENDED_INTERVAL_WEEKS}주입니다.`,
+    ko: `권장 재분석 주기는 ${RECOMMENDED_INTERVAL_WEEKS}주입니다.`,
   },
   confirm: {
     en: "Yes, Test Now",

@@ -83,10 +83,10 @@ function withGloss(option: OptionDef, en: string, de: string, ko: string): Optio
 
 // Frequency options (reused across axes)
 const FREQ_OPTIONS: OptionDef[] = [
-  opt("constantly",   3, "Constantly",            "Ständig",          "항상"),
-  opt("frequently",   2, "Frequently",            "Häufig",           "자주"),
-  opt("occasionally", 1, "Occasionally",          "Gelegentlich",     "가끔"),
-  opt("never",        0, "None / Rarely",         "Nie / Selten",     "없음 / 드물게"),
+  opt("constantly", 3, "Constantly", "Ständig", "항상"),
+  opt("frequently", 2, "Frequently", "Häufig", "자주"),
+  opt("occasionally", 1, "Occasionally", "Gelegentlich", "가끔"),
+  opt("never", 0, "None / Rarely", "Nie / Selten", "없음 / 드물게"),
 ];
 
 // ─── Axis Definitions ─────────────────────────────────────────────────────────
@@ -113,9 +113,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: true,
         axisHints: { ox: 0.9 },
         options: [
-          opt("spf_daily",   0, "Yes, every morning",    "Ja, jeden Morgen",                  "네, 매일 아침",       "☀️", "Applied every morning regardless of weather", "Jeden Morgen aufgetragen, unabhängig vom Wetter", "날씨에 관계없이 매일 아침 사용"),
-          opt("spf_outdoor", 1, "Only when going outside","Nur wenn ich nach draußen gehe",    "야외 나갈 때만",     "🌤️", "Applied before outdoor activities only", "Nur vor Outdoor-Aktivitäten", "야외 활동 전에만 사용"),
-          opt("spf_rarely",  3, "Rarely or never",        "Selten oder nie",                   "거의 안 바름",       "🌙", "Rarely or not at all", "Selten oder gar nicht", "드물거나 전혀 사용하지 않음"),
+          opt("spf_daily", 0, "Yes, every morning", "Ja, jeden Morgen", "네, 매일 아침", "☀️", "Applied every morning regardless of weather", "Jeden Morgen aufgetragen, unabhängig vom Wetter", "날씨에 관계없이 매일 아침 사용"),
+          opt("spf_outdoor", 1, "Only when going outside", "Nur wenn ich nach draußen gehe", "야외 나갈 때만", "🌤️", "Applied before outdoor activities only", "Nur vor Outdoor-Aktivitäten", "야외 활동 전에만 사용"),
+          opt("spf_rarely", 3, "Rarely or never", "Selten oder nie", "거의 안 바름", "🌙", "Rarely or not at all", "Selten oder gar nicht", "드물거나 전혀 사용하지 않음"),
         ],
       },
       {
@@ -136,8 +136,8 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             "Das nennt man Doppelreinigung — sie entfernt Sonnenschutz- und Make-up-Rückstände, die Wasser allein nicht löst.",
             "더블 클렌징이라고 해요 — 물만으로는 지워지지 않는 선크림·메이크업 잔여물을 확실히 제거해줘요."
           ),
-          opt("cleanse_foam",   1, "Foam or gel cleanser only",          "Nur Schaum- oder Gelreiniger",         "폼/젤 클렌저만", "💧"),
-          opt("cleanse_water",  2, "Water or wipes only",                "Nur Wasser oder Tücher",               "물 세안 또는 클렌징 티슈만", "🌊"),
+          opt("cleanse_foam", 1, "Foam or gel cleanser only", "Nur Schaum- oder Gelreiniger", "폼/젤 클렌저만", "💧"),
+          opt("cleanse_water", 2, "Water or wipes only", "Nur Wasser oder Tücher", "물 세안 또는 클렌징 티슈만", "🌊"),
         ],
       },
       {
@@ -156,9 +156,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { bar: 0.3, texture: 0.2 },
         options: [
-          opt("spf_mineral_wp",    1, "Mineral / Waterproof SPF",   "Mineralisch / Wasserfest",         "무기자차 / 워터프루프"),
-          opt("spf_chemical_light",0, "Lightweight daily SPF",      "Leichter Tages-Sonnenschutz",      "가벼운 데일리 선크림"),
-          opt("spf_none",          2, "I don't use sunscreen",      "Ich benutze keinen Sonnenschutz",  "선크림을 안 써요"),
+          opt("spf_mineral_wp", 1, "Mineral / Waterproof SPF", "Mineralisch / Wasserfest", "무기자차 / 워터프루프"),
+          opt("spf_chemical_light", 0, "Lightweight daily SPF", "Leichter Tages-Sonnenschutz", "가벼운 데일리 선크림"),
+          opt("spf_none", 2, "I don't use sunscreen", "Ich benutze keinen Sonnenschutz", "선크림을 안 써요"),
         ],
       },
     ],
@@ -188,10 +188,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           source: "J Dermatological Science",
         },
         options: [
-          opt("shine_1hr",       3, "By breakfast time (~1 hr)",       "Bis zum Frühstück (~1 Std.)",     "아침 식사 무렵 (약 1시간)"),
-          opt("shine_midday",    2, "Around lunchtime",                "Gegen Mittag",                    "점심 무렵"),
-          opt("shine_afternoon", 1, "Late afternoon, barely noticeable","Nachmittags, kaum merklich",      "오후 늦게, 거의 느끼지 못함"),
-          opt("shine_never",     0, "Stays matte all day",             "Bleibt den ganzen Tag matt",      "하루 종일 매트함 유지"),
+          opt("shine_1hr", 3, "By breakfast time (~1 hr)", "Bis zum Frühstück (~1 Std.)", "아침 식사 무렵 (약 1시간)"),
+          opt("shine_midday", 2, "Around lunchtime", "Gegen Mittag", "점심 무렵"),
+          opt("shine_afternoon", 1, "Late afternoon, barely noticeable", "Nachmittags, kaum merklich", "오후 늦게, 거의 느끼지 못함"),
+          opt("shine_never", 0, "Stays matte all day", "Bleibt den ganzen Tag matt", "하루 종일 매트함 유지"),
         ],
       },
       {
@@ -201,10 +201,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { seb: 0.5 },
         options: [
-          opt("zone_forehead", 1, "Forehead", "Stirn",   "이마"),
-          opt("zone_nose",     1, "Nose",     "Nase",    "코"),
-          opt("zone_mouth",    1, "Mouth",    "Mund",    "입가/턱"),
-          opt("zone_cheeks",   1, "Cheeks",   "Wangen",  "볼"),
+          opt("zone_forehead", 1, "Forehead", "Stirn", "이마"),
+          opt("zone_nose", 1, "Nose", "Nase", "코"),
+          opt("zone_mouth", 1, "Mouth", "Mund", "입가/턱"),
+          opt("zone_cheeks", 1, "Cheeks", "Wangen", "볼"),
         ],
       },
       {
@@ -214,10 +214,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { texture: 0.8, seb: 0.3 },
         options: [
-          opt("tex_severe",   3, "Severe — Very rough & textured",      "Schwer — Sehr rau & strukturiert",    "심각 — 매우 거칠고 울퉁불퉁"),
-          opt("tex_moderate", 2, "Moderate — Noticeably rough",         "Mäßig — Merklich rau",                "중간 — 눈에 띄게 거침"),
-          opt("tex_mild",     1, "Mild — Slightly bumpy",               "Mild — Leicht uneben",                "약함 — 약간 울퉁불퉁"),
-          opt("tex_none",     0, "None — Smooth",                       "Nicht vorhanden — Glatt",             "없음 — 부드러움"),
+          opt("tex_severe", 3, "Severe — Very rough & textured", "Schwer — Sehr rau & strukturiert", "심각 — 매우 거칠고 울퉁불퉁"),
+          opt("tex_moderate", 2, "Moderate — Noticeably rough", "Mäßig — Merklich rau", "중간 — 눈에 띄게 거침"),
+          opt("tex_mild", 1, "Mild — Slightly bumpy", "Mild — Leicht uneben", "약함 — 약간 울퉁불퉁"),
+          opt("tex_none", 0, "None — Smooth", "Nicht vorhanden — Glatt", "없음 — 부드러움"),
         ],
       },
       {
@@ -233,10 +233,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { seb: 0.7, makeup_stability: 0.9 },
         options: [
-          opt("makeup_melted",  3, "Patchy and melted away",       "Fleckig und abgetragen",          "얼룩덜룩 녹아내림"),
-          opt("makeup_tzone",   2, "T-zone slightly faded",        "T-Zone leicht verblasst",         "T존만 살짝 지워짐"),
-          opt("makeup_intact",  0, "Still mostly intact",          "Noch weitgehend intakt",          "거의 그대로 유지"),
-          opt("makeup_nomake",  0, "I don't wear base makeup",     "Ich trage kein Foundation-Make-up","베이스 메이크업 안 함"),
+          opt("makeup_melted", 3, "Patchy and melted away", "Fleckig und abgetragen", "얼룩덜룩 녹아내림"),
+          opt("makeup_tzone", 2, "T-zone slightly faded", "T-Zone leicht verblasst", "T존만 살짝 지워짐"),
+          opt("makeup_intact", 0, "Still mostly intact", "Noch weitgehend intakt", "거의 그대로 유지"),
+          opt("makeup_nomake", 0, "I don't wear base makeup", "Ich trage kein Foundation-Make-up", "베이스 메이크업 안 함"),
         ],
       },
       {
@@ -256,10 +256,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { seb: 0.5, bar: 0.4, sen: 0.3 },
         options: [
-          opt("postshave_tight",  2, "Tight, dry, or irritated",      "Angespannt, trocken oder gereizt", "당기거나 건조하거나 자극받음"),
-          opt("postshave_oily",   2, "Oily or shiny",                 "Ölig oder glänzend",               "유분지고 번들거림"),
-          opt("postshave_fine",   0, "Comfortable — no issues",       "Angenehm — keine Probleme",        "편안해요 — 문제 없음"),
-          opt("postshave_noshave",0, "I don't shave",                 "Ich rasiere mich nicht",           "면도 안 해요"),
+          opt("postshave_tight", 2, "Tight, dry, or irritated", "Angespannt, trocken oder gereizt", "당기거나 건조하거나 자극받음"),
+          opt("postshave_oily", 2, "Oily or shiny", "Ölig oder glänzend", "유분지고 번들거림"),
+          opt("postshave_fine", 0, "Comfortable — no issues", "Angenehm — keine Probleme", "편안해요 — 문제 없음"),
+          opt("postshave_noshave", 0, "I don't shave", "Ich rasiere mich nicht", "면도 안 해요"),
         ],
       },
     ],
@@ -289,10 +289,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           source: "Int J Cosmetic Science",
         },
         options: [
-          opt("tight_constantly",  3, "Unbearable — skin might crack",           "Unerträglich — Haut könnte reißen",         "찢어질 것 같아요"),
-          opt("tight_frequently",  2, "Tight but fades after moisturizer",       "Angespannt, nachlassend nach Feuchtigkeitspflege", "당기지만 보습제 바르면 나아짐"),
-          opt("tight_after_wash",  1, "Brief tightness only after washing",      "Kurze Spannung nur nach dem Waschen",       "세안 직후에만 잠깐"),
-          opt("tight_never",       0, "Comfortable — no tightness at all",       "Angenehm — keine Spannung",                 "편안해요 — 전혀 당기지 않음"),
+          opt("tight_constantly", 3, "Unbearable — skin might crack", "Unerträglich — Haut könnte reißen", "찢어질 것 같아요"),
+          opt("tight_frequently", 2, "Tight but fades after moisturizer", "Angespannt, nachlassend nach Feuchtigkeitspflege", "당기지만 보습제 바르면 나아짐"),
+          opt("tight_after_wash", 1, "Brief tightness only after washing", "Kurze Spannung nur nach dem Waschen", "세안 직후에만 잠깐"),
+          opt("tight_never", 0, "Comfortable — no tightness at all", "Angenehm — keine Spannung", "편안해요 — 전혀 당기지 않음"),
         ],
       },
       {
@@ -302,10 +302,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { hyd: 0.7, bar: 0.5 },
         options: [
-          opt("dry_washing",  2, "Right after washing",           "Direkt nach der Reinigung",       "세안 직후"),
-          opt("dry_heated",   2, "In heated or air-conditioned rooms", "In beheizten oder klimatisierten Räumen", "난방 또는 에어컨 실내"),
-          opt("dry_outdoors", 2, "Outdoors in cold / wind",       "Draußen bei Kälte / Wind",        "야외 추위/바람"),
-          opt("dry_na",       0, "Not applicable",                "Nicht zutreffend",                "해당 없음"),
+          opt("dry_washing", 2, "Right after washing", "Direkt nach der Reinigung", "세안 직후"),
+          opt("dry_heated", 2, "In heated or air-conditioned rooms", "In beheizten oder klimatisierten Räumen", "난방 또는 에어컨 실내"),
+          opt("dry_outdoors", 2, "Outdoors in cold / wind", "Draußen bei Kälte / Wind", "야외 추위/바람"),
+          opt("dry_na", 0, "Not applicable", "Nicht zutreffend", "해당 없음"),
         ],
       },
       {
@@ -315,9 +315,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { hyd: 0.8, bar: 0.5 },
         options: [
-          opt("flake_severe", 3, "Severe — Visible peeling / cracking", "Stark — Sichtbares Abschälen / Risse",   "심각 — 눈에 띄는 벗겨짐 / 갈라짐"),
-          opt("flake_mild",   1, "Mild — Slight flaking",               "Mild — Leichtes Schuppen",               "약함 — 가벼운 각질"),
-          opt("flake_none",   0, "None",                                "Nicht vorhanden",                        "없음"),
+          opt("flake_severe", 3, "Severe — Visible peeling / cracking", "Stark — Sichtbares Abschälen / Risse", "심각 — 눈에 띄는 벗겨짐 / 갈라짐"),
+          opt("flake_mild", 1, "Mild — Slight flaking", "Mild — Leichtes Schuppen", "약함 — 가벼운 각질"),
+          opt("flake_none", 0, "None", "Nicht vorhanden", "없음"),
         ],
       },
     ],
@@ -337,11 +337,11 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { texture: 0.8, seb: 0.4 },
         options: [
-          opt("pore_round",    2, "Round (O-shape)",    "Rund (O-Form)",    "둥근형 (O자)",    "⭕",
+          opt("pore_round", 2, "Round (O-shape)", "Rund (O-Form)", "둥근형 (O자)", "⭕",
             "Round, open pores — typical oily T-zone", "Runde, offene Poren – typisch ölige T-Zone", "둥글고 열린 모공 — 유분이 많은 T존"),
           opt("pore_teardrop", 3, "Teardrop (Y-shape)", "Tropfen (Y-Form)", "물방울형 (Y자)", "🔽",
             "Elongated, stretched pores — common with aging / loss of elasticity", "Längliche Poren – typisch bei Hautalterung", "늘어진 모공 — 탄력 저하 시 흔함"),
-          opt("pore_notsure",  1, "Not Sure",           "Nicht sicher",     "잘 모르겠어요",  "❓"),
+          opt("pore_notsure", 1, "Not Sure", "Nicht sicher", "잘 모르겠어요", "❓"),
         ],
       },
       {
@@ -363,10 +363,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { seb: 0.5, texture: 0.4 },
         options: [
-          opt("tzone_yes",    3, "Yes — T-zone much larger",     "Ja — T-Zone viel größer",          "네 — T존이 훨씬 큼"),
-          opt("tzone_same",   1, "Same everywhere",              "Überall gleich groß",              "전체적으로 비슷"),
-          opt("tzone_no",     0, "No — Cheeks more visible",     "Nein — Wangen sichtbarer",         "아니요 — 볼이 더 뚜렷"),
-          opt("tzone_unsure", 0, "Not sure",                     "Nicht sicher",                     "잘 모르겠어요"),
+          opt("tzone_yes", 3, "Yes — T-zone much larger", "Ja — T-Zone viel größer", "네 — T존이 훨씬 큼"),
+          opt("tzone_same", 1, "Same everywhere", "Überall gleich groß", "전체적으로 비슷"),
+          opt("tzone_no", 0, "No — Cheeks more visible", "Nein — Wangen sichtbarer", "아니요 — 볼이 더 뚜렷"),
+          opt("tzone_unsure", 0, "Not sure", "Nicht sicher", "잘 모르겠어요"),
         ],
       },
     ],
@@ -394,20 +394,20 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             "아직 염증이 없는 막힌 모공으로 피부색 작은 돌기나 비립종처럼 나타납니다."
           ),
           withGloss(
-            opt("acne_pustular",  2, "Pus-filled pimples", "Eiter-Pickel", "고름이 있는 뾰루지", "🔴",
+            opt("acne_pustular", 2, "Pus-filled pimples", "Eiter-Pickel", "고름이 있는 뾰루지", "🔴",
               "Red, inflamed with visible pus", "Rot und entzündet mit sichtbarem Eiter", "붉고 염증성, 고름 보임"),
             "Infected pimples — red, inflamed spots with visible white or yellow pus at their centre.",
             "Infizierte Pickel — rote, entzündete Stellen mit sichtbarem weißem oder gelbem Eiter.",
             "감염된 여드름으로 중앙에 흰색 또는 노란색 고름이 보이는 붉고 염증성 병변입니다."
           ),
           withGloss(
-            opt("acne_cystic",    3, "Deep, painful lumps", "Tiefe, schmerzhafte Knoten", "크고 깊은 혹 같은 트러블", "🟣",
+            opt("acne_cystic", 3, "Deep, painful lumps", "Tiefe, schmerzhafte Knoten", "크고 깊은 혹 같은 트러블", "🟣",
               "Deep, painful nodules that don't surface", "Tiefe, schmerzhafte Knoten", "깊고 통증 있는 결절"),
             "Deep, painful lesions that form beneath the skin — a more severe form of acne often requiring medical treatment.",
             "Tiefe, schmerzhafte Läsionen unter der Hautoberfläche — schwere Akneform, die oft ärztliche Behandlung erfordert.",
             "피부 깊숙이 형성되는 크고 통증이 있는 병변으로, 의학적 치료가 필요한 심한 형태의 여드름입니다."
           ),
-          opt("acne_notsure",   1, "Not Sure", "Nicht sicher", "잘 모르겠어요", "❓"),
+          opt("acne_notsure", 1, "Not Sure", "Nicht sicher", "잘 모르겠어요", "❓"),
         ],
       },
       {
@@ -417,10 +417,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: true,
         axisHints: { acne: 1.0 },
         options: [
-          opt("acne_constantly",    3, "Constantly — Always active",       "Ständig — Immer aktiv",               "항상 — 계속 생김"),
-          opt("acne_frequently",    2, "Frequently — Weekly",              "Häufig — Wöchentlich",                "자주 — 매주"),
-          opt("acne_occasionally",  1, "Occasionally — Monthly / Cyclical", "Gelegentlich — Monatlich / Zyklisch", "가끔 — 월별 / 주기적"),
-          opt("acne_rarely",        0, "Rarely",                           "Selten",                              "드물게"),
+          opt("acne_constantly", 3, "Constantly — Always active", "Ständig — Immer aktiv", "항상 — 계속 생김"),
+          opt("acne_frequently", 2, "Frequently — Weekly", "Häufig — Wöchentlich", "자주 — 매주"),
+          opt("acne_occasionally", 1, "Occasionally — Monthly / Cyclical", "Gelegentlich — Monatlich / Zyklisch", "가끔 — 월별 / 주기적"),
+          opt("acne_rarely", 0, "Rarely", "Selten", "드물게"),
         ],
         conditional: {
           ifQuestionId: "AX4_Q2",
@@ -432,9 +432,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             required: false,
             axisHints: { acne: 0.6, sen: 0.3 },
             options: [
-              opt("hormonal_yes", 3, "Yes",                "Ja",                   "네"),
-              opt("hormonal_no",  0, "No",                 "Nein",                 "아니요"),
-              opt("hormonal_na",  0, "N/A",                "Nicht zutreffend",     "해당 없음"),
+              opt("hormonal_yes", 3, "Yes", "Ja", "네"),
+              opt("hormonal_no", 0, "No", "Nein", "아니요"),
+              opt("hormonal_na", 0, "N/A", "Nicht zutreffend", "해당 없음"),
             ],
           },
         },
@@ -447,25 +447,25 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         axisHints: { pigment: 0.7, acne: 0.3 },
         options: [
           withGloss(
-            opt("mark_pie",   2, "Red / pink marks after breakouts",   "Rote / rosa Flecken nach Unreinheiten",      "트러블 후 남는 붉은/분홍 흔적"),
+            opt("mark_pie", 2, "Red / pink marks after breakouts", "Rote / rosa Flecken nach Unreinheiten", "트러블 후 남는 붉은/분홍 흔적"),
             "PIE — Post-Inflammatory Erythema. Temporary red/pink flat marks after a pimple heals. Usually fade in weeks to months.",
             "PIE — Post-entzündliches Erythem. Vorübergehende rote/rosa Flecken nach dem Abheilen, meist in Wochen bis Monaten.",
             "PIE(홍반성 색소침착) — 트러블 치유 후 남는 일시적인 붉은/분홍 자국으로, 주로 몇 주에서 몇 달 내 사라집니다."
           ),
           withGloss(
-            opt("mark_pih",   3, "Dark marks after breakouts", "Dunkle Flecken nach Unreinheiten",  "트러블 후 남는 어두운 흔적"),
+            opt("mark_pih", 3, "Dark marks after breakouts", "Dunkle Flecken nach Unreinheiten", "트러블 후 남는 어두운 흔적"),
             "PIH — Post-Inflammatory Hyperpigmentation. Dark marks caused by excess melanin after inflammation. Can persist for months.",
             "PIH — Post-entzündliche Hyperpigmentierung. Dunkle Flecken durch Melaninüberschuss, können Monate anhalten.",
             "PIH(염증 후 과색소침착) — 염증 후 멜라닌 과다로 생기는 갈색/어두운 자국으로 몇 달간 지속될 수 있어요."
           ),
           withGloss(
-            opt("mark_scar",  2, "Indented scars",           "Eingefallene Narben",            "패인 흉터"),
+            opt("mark_scar", 2, "Indented scars", "Eingefallene Narben", "패인 흉터"),
             "Atrophic (indented) scars — permanent textural depressions caused by tissue loss during healing.",
             "Atrophe Narben — dauerhafte Gewebevertiefungen durch Gewebeverlust während der Heilung.",
             "위축성(패인) 흉터 — 치유 과정에서 조직이 손실되어 생기는 영구적인 함몰 자국입니다."
           ),
-          opt("mark_none",  0, "No marks",                 "Keine Flecken",                  "흔적 없음"),
-          opt("mark_unsure",0, "Not sure",                 "Nicht sicher",                   "잘 모르겠어요"),
+          opt("mark_none", 0, "No marks", "Keine Flecken", "흔적 없음"),
+          opt("mark_unsure", 0, "Not sure", "Nicht sicher", "잘 모르겠어요"),
         ],
       },
     ],
@@ -485,10 +485,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: true,
         axisHints: { sen: 1.0, bar: 0.8 },
         options: [
-          opt("barrier_severe",   3, "Severe — Stinging / Burning",    "Schwer — Brennen / Stechen",       "심각 — 따가움 / 화끈거림"),
-          opt("barrier_moderate", 2, "Moderate — Tightness / Pulling", "Mäßig — Spannung / Ziehen",        "중간 — 당김"),
-          opt("barrier_mild",     1, "Mild — Visible flaking",         "Mild — Sichtbares Schuppen",       "약함 — 눈에 띄는 각질"),
-          opt("barrier_none",     0, "None — No reaction",             "Keine — Keine Reaktion",           "없음 — 반응 없음"),
+          opt("barrier_severe", 3, "Severe — Stinging / Burning", "Schwer — Brennen / Stechen", "심각 — 따가움 / 화끈거림"),
+          opt("barrier_moderate", 2, "Moderate — Tightness / Pulling", "Mäßig — Spannung / Ziehen", "중간 — 당김"),
+          opt("barrier_mild", 1, "Mild — Visible flaking", "Mild — Sichtbares Schuppen", "약함 — 눈에 띄는 각질"),
+          opt("barrier_none", 0, "None — No reaction", "Keine — Keine Reaktion", "없음 — 반응 없음"),
         ],
         conditional: {
           ifQuestionId: "facemap_zones",
@@ -500,10 +500,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             required: false,
             axisHints: { sen: 0.7, bar: 0.5 },
             options: [
-              opt("shave_yes",    2, "Yes — Frequently",   "Ja — Häufig",          "네 — 자주"),
-              opt("shave_mild",   1, "Mild / Sometimes",   "Mild / Manchmal",      "약간 / 가끔"),
-              opt("shave_no",     0, "No",                 "Nein",                 "아니요"),
-              opt("shave_na",     0, "I don't shave",      "Ich rasiere mich nicht","면도 안 함"),
+              opt("shave_yes", 2, "Yes — Frequently", "Ja — Häufig", "네 — 자주"),
+              opt("shave_mild", 1, "Mild / Sometimes", "Mild / Manchmal", "약간 / 가끔"),
+              opt("shave_no", 0, "No", "Nein", "아니요"),
+              opt("shave_na", 0, "I don't shave", "Ich rasiere mich nicht", "면도 안 함"),
             ],
           },
         },
@@ -523,9 +523,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { sen: 0.8, bar: 0.5 },
         options: [
-          opt("tol_fine",    0, "Most are fine",              "Die meisten sind in Ordnung", "대부분 괜찮음"),
-          opt("tol_some",    2, "Some cause reactions",        "Einige verursachen Reaktionen", "일부는 반응 유발"),
-          opt("tol_few",     3, "Very few are tolerated",     "Sehr wenige werden vertragen", "극소수만 사용 가능"),
+          opt("tol_fine", 0, "Most are fine", "Die meisten sind in Ordnung", "대부분 괜찮음"),
+          opt("tol_some", 2, "Some cause reactions", "Einige verursachen Reaktionen", "일부는 반응 유발"),
+          opt("tol_few", 3, "Very few are tolerated", "Sehr wenige werden vertragen", "극소수만 사용 가능"),
         ],
       },
       {
@@ -545,9 +545,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           source: "APIA Protocol",
         },
         options: [
-          opt("barrier_sos",      3, "Immediately — can't wait 1 minute", "Sofort — kann keine Minute warten",  "즉시 — 1분도 못 참겠어요"),
-          opt("barrier_5min",     2, "Within 5 minutes",                  "Innerhalb von 5 Minuten",           "5분 이내"),
-          opt("barrier_norush",   0, "No rush — skin stays comfortable",  "Keine Eile — Haut bleibt angenehm", "서두를 필요 없어요"),
+          opt("barrier_sos", 3, "Immediately — can't wait 1 minute", "Sofort — kann keine Minute warten", "즉시 — 1분도 못 참겠어요"),
+          opt("barrier_5min", 2, "Within 5 minutes", "Innerhalb von 5 Minuten", "5분 이내"),
+          opt("barrier_norush", 0, "No rush — skin stays comfortable", "Keine Eile — Haut bleibt angenehm", "서두를 필요 없어요"),
         ],
       },
       {
@@ -567,9 +567,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           source: "Contact Dermatitis Journal",
         },
         options: [
-          opt("neuro_always",  3, "Almost every new product",  "Fast bei jedem neuen Produkt",  "거의 모든 새 제품에서"),
-          opt("neuro_some",    2, "Some products",             "Bei einigen Produkten",         "일부 제품에서"),
-          opt("neuro_never",   0, "Never noticed",             "Nie bemerkt",                   "느낀 적 없어요"),
+          opt("neuro_always", 3, "Almost every new product", "Fast bei jedem neuen Produkt", "거의 모든 새 제품에서"),
+          opt("neuro_some", 2, "Some products", "Bei einigen Produkten", "일부 제품에서"),
+          opt("neuro_never", 0, "Never noticed", "Nie bemerkt", "느낀 적 없어요"),
         ],
       },
       {
@@ -584,9 +584,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { sen: 1.0 },
         options: [
-          opt("inflam_severe", 3, "Intense redness, 30+ minutes",   "Starke Rötung, 30+ Minuten",    "강한 홍조, 30분 이상 지속"),
-          opt("inflam_mild",   1, "Slight flush, fades quickly",    "Leichte Rötung, verblasst schnell", "가볍게 붉어졌다 금방 사라짐"),
-          opt("inflam_none",   0, "No noticeable flushing",         "Keine merkliche Rötung",        "특별한 홍조 없음"),
+          opt("inflam_severe", 3, "Intense redness, 30+ minutes", "Starke Rötung, 30+ Minuten", "강한 홍조, 30분 이상 지속"),
+          opt("inflam_mild", 1, "Slight flush, fades quickly", "Leichte Rötung, verblasst schnell", "가볍게 붉어졌다 금방 사라짐"),
+          opt("inflam_none", 0, "No noticeable flushing", "Keine merkliche Rötung", "특별한 홍조 없음"),
         ],
       },
       {
@@ -607,9 +607,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         axisHints: { bar: 0.8, sen: 0.6 },
         options: [
           opt("razburn_severe", 3, "Severe — persistent redness or bumps", "Stark — anhaltende Rötung oder Pickel", "심각 — 지속적인 홍조 또는 모낭염"),
-          opt("razburn_mild",   1, "Mild — brief redness only",            "Mild — nur kurze Rötung",               "약함 — 짧은 홍조만"),
-          opt("razburn_none",   0, "None — skin tolerates shaving well",   "Keine — Haut verträgt Rasieren gut",    "없음 — 면도 잘 버텨요"),
-          opt("razburn_na",     0, "I don't shave",                        "Ich rasiere mich nicht",                "면도 안 해요"),
+          opt("razburn_mild", 1, "Mild — brief redness only", "Mild — nur kurze Rötung", "약함 — 짧은 홍조만"),
+          opt("razburn_none", 0, "None — skin tolerates shaving well", "Keine — Haut verträgt Rasieren gut", "없음 — 면도 잘 버텨요"),
+          opt("razburn_na", 0, "I don't shave", "Ich rasiere mich nicht", "면도 안 해요"),
         ],
       },
     ],
@@ -641,8 +641,8 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         },
         slider: {
           min: 1, max: 10, step: 1, defaultValue: 3,
-          labelMin: t("Gone — completely smooth", "Weg — völlig glatt",      "완전히 사라짐"),
-          labelMax: t("Deep, clearly visible",    "Tief, deutlich sichtbar", "깊고 선명하게 보임"),
+          labelMin: t("Gone — completely smooth", "Weg — völlig glatt", "완전히 사라짐"),
+          labelMax: t("Deep, clearly visible", "Tief, deutlich sichtbar", "깊고 선명하게 보임"),
         },
       },
       {
@@ -652,11 +652,11 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { aging: 0.7 },
         options: [
-          opt("firm_jaw",         2, "Jawline",         "Kieferlinie",      "턱선"),
-          opt("firm_cheeks",      2, "Cheeks",          "Wangen",           "볼"),
-          opt("firm_under_eyes",  2, "Around the eyes", "Um die Augen",     "눈 주변"),
-          opt("firm_neck",        2, "Neck",            "Hals",             "목"),
-          opt("firm_nasolabial",  2, "Nasolabial area", "Nasolabialbereich","팔자 부위"),
+          opt("firm_jaw", 2, "Jawline", "Kieferlinie", "턱선"),
+          opt("firm_cheeks", 2, "Cheeks", "Wangen", "볼"),
+          opt("firm_under_eyes", 2, "Around the eyes", "Um die Augen", "눈 주변"),
+          opt("firm_neck", 2, "Neck", "Hals", "목"),
+          opt("firm_nasolabial", 2, "Nasolabial area", "Nasolabialbereich", "팔자 부위"),
         ],
       },
       {
@@ -668,25 +668,25 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         exclusiveIds: ["active_none"],
         options: [
           withGloss(
-            opt("active_retinol",  1, "Retinol",    "Retinol",    "레티놀"),
+            opt("active_retinol", 1, "Retinol", "Retinol", "레티놀"),
             "Vitamin A derivative that speeds cell turnover — reduces fine lines, acne marks, and uneven tone. Start with low concentrations.",
             "Vitamin-A-Derivat, das die Zellerneuerung beschleunigt — reduziert Fältchen, Akneflecken und ungleichmäßigen Teint.",
             "세포 재생을 촉진하는 비타민 A 유도체로, 잔주름·여드름 흔적·피부톤 개선에 효과적입니다. 낮은 농도부터 시작하세요."
           ),
-          opt("active_vitc",     1, "Vitamin C",  "Vitamin C",  "비타민 C"),
+          opt("active_vitc", 1, "Vitamin C", "Vitamin C", "비타민 C"),
           withGloss(
-            opt("active_peptide",  1, "Peptides",   "Peptide",    "펩타이드"),
+            opt("active_peptide", 1, "Peptides", "Peptide", "펩타이드"),
             "Short chains of amino acids that signal your skin to produce more collagen and elastin — key for firmness and anti-aging.",
             "Kurze Aminosäureketten, die die Haut zur Kollagen- und Elastinproduktion anregen — essenziell für Festigkeit.",
             "피부에 콜라겐·엘라스틴 생성을 신호하는 짧은 아미노산 사슬로, 탄력 개선에 핵심적입니다."
           ),
           withGloss(
-            opt("active_aha_bha",  1, "AHA / BHA",  "AHA / BHA",  "AHA / BHA"),
+            opt("active_aha_bha", 1, "AHA / BHA", "AHA / BHA", "AHA / BHA"),
             "AHAs (e.g. Glycolic Acid) exfoliate the surface; BHAs (e.g. Salicylic Acid) exfoliate deep inside pores. Both improve texture and tone.",
             "AHAs (z.B. Glykolsäure) exfoliieren die Oberfläche; BHAs (z.B. Salicylsäure) exfoliieren tief in den Poren.",
             "AHA(예: 글리콜릭산)는 표면을, BHA(예: 살리실산)는 모공 안쪽을 각질 제거해요."
           ),
-          opt("active_none",     0, "None",       "Keine",      "없음"),
+          opt("active_none", 0, "None", "Keine", "없음"),
         ],
       },
     ],
@@ -706,15 +706,15 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: true,
         axisHints: { pigment: 1.0, ox: 0.3 },
         options: [
-          opt("pig_pih",     2, "Dark marks after breakouts", "Dunkle Flecken nach Unreinheiten", "트러블 후 어두운 흔적", "🟤",
+          opt("pig_pih", 2, "Dark marks after breakouts", "Dunkle Flecken nach Unreinheiten", "트러블 후 어두운 흔적", "🟤",
             "Dark marks where blemishes healed", "Dunkle Flecken nach Unreinheiten", "트러블 치유 후 어두운 흔적"),
-          opt("pig_sun",     2, "Sun-induced Spots",      "Sonnenflecken",                "자외선 색소침착",     "🌞",
+          opt("pig_sun", 2, "Sun-induced Spots", "Sonnenflecken", "자외선 색소침착", "🌞",
             "Discrete spots from UV exposure", "Diskrete Flecken durch UV-Bestrahlung", "자외선 노출로 인한 반점"),
-          opt("pig_melasma", 3, "Melasma-like Patches",   "Melasma-ähnliche Flecken",    "기미성 반점",         "🌑",
+          opt("pig_melasma", 3, "Melasma-like Patches", "Melasma-ähnliche Flecken", "기미성 반점", "🌑",
             "Larger symmetrical patches, often hormonal", "Größere symmetrische Flecken", "호르몬성 넓은 반점"),
-          opt("pig_dull",    1, "General Uneven Tone",    "Allgemein ungleichmäßiger Teint", "전체적인 칙칙함",   "🌫️",
+          opt("pig_dull", 1, "General Uneven Tone", "Allgemein ungleichmäßiger Teint", "전체적인 칙칙함", "🌫️",
             "Overall dullness without distinct spots", "Allgemeine Mattheit ohne auffällige Flecken", "뚜렷한 반점 없는 전체적 어둠"),
-          opt("pig_unsure",  1, "Not Sure",               "Nicht sicher",                 "잘 모르겠어요",       "❓"),
+          opt("pig_unsure", 1, "Not Sure", "Nicht sicher", "잘 모르겠어요", "❓"),
         ],
       },
       {
@@ -724,10 +724,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { pigment: 0.6 },
         options: [
-          opt("pig_recent",    1, "< 6 months",         "< 6 Monate",           "6개월 미만"),
-          opt("pig_6_12",      2, "6–12 months",        "6–12 Monate",          "6–12개월"),
-          opt("pig_years",     3, "1+ years",           "1+ Jahre",             "1년 이상"),
-          opt("pig_since_kid", 2, "Since childhood",   "Seit der Kindheit",    "어릴 때부터"),
+          opt("pig_recent", 1, "< 6 months", "< 6 Monate", "6개월 미만"),
+          opt("pig_6_12", 2, "6–12 months", "6–12 Monate", "6–12개월"),
+          opt("pig_years", 3, "1+ years", "1+ Jahre", "1년 이상"),
+          opt("pig_since_kid", 2, "Since childhood", "Seit der Kindheit", "어릴 때부터"),
         ],
       },
       {
@@ -737,10 +737,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { ox: 0.8, pigment: 0.5 },
         options: [
-          opt("uv_constantly",   3, "Constantly — Daily outdoors",    "Ständig — Täglich draußen",        "항상 — 매일 야외"),
-          opt("uv_frequently",   2, "Frequently",                     "Häufig",                           "자주"),
-          opt("uv_occasionally", 1, "Occasionally",                   "Gelegentlich",                     "가끔"),
-          opt("uv_rarely",       0, "Rarely — Mostly indoors",        "Selten — Meist drinnen",           "드물게 — 주로 실내"),
+          opt("uv_constantly", 3, "Constantly — Daily outdoors", "Ständig — Täglich draußen", "항상 — 매일 야외"),
+          opt("uv_frequently", 2, "Frequently", "Häufig", "자주"),
+          opt("uv_occasionally", 1, "Occasionally", "Gelegentlich", "가끔"),
+          opt("uv_rarely", 0, "Rarely — Mostly indoors", "Selten — Meist drinnen", "드물게 — 주로 실내"),
         ],
       },
     ],
@@ -762,9 +762,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         hideIfGender: [1],
         axisHints: { acne: 0.8, sen: 0.4 },
         options: [
-          opt("horm_severe", 3, "Severe fluctuations",  "Starke Schwankungen",  "심한 변화"),
-          opt("horm_mild",   2, "Mild fluctuations",    "Milde Schwankungen",   "가벼운 변화"),
-          opt("horm_none",   0, "None / N/A",           "Keine / N/A",          "없음 / 해당 없음"),
+          opt("horm_severe", 3, "Severe fluctuations", "Starke Schwankungen", "심한 변화"),
+          opt("horm_mild", 2, "Mild fluctuations", "Milde Schwankungen", "가벼운 변화"),
+          opt("horm_none", 0, "None / N/A", "Keine / N/A", "없음 / 해당 없음"),
         ],
       },
       {
@@ -775,10 +775,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         axisHints: { acne: 0.4 },
         hideIf: { questionId: "AX8_Q1", values: ["horm_none"] },
         options: [
-          opt("phase_before",    2, "Before period",          "Vor der Menstruation",  "생리 전"),
-          opt("phase_during",    2, "During period",          "Während der Menstruation", "생리 중"),
-          opt("phase_ovulation", 2, "Around ovulation",       "Rund um den Eisprung",  "배란 주변"),
-          opt("phase_notsure",   1, "Not sure",               "Nicht sicher",          "잘 모르겠어요"),
+          opt("phase_before", 2, "Before period", "Vor der Menstruation", "생리 전"),
+          opt("phase_during", 2, "During period", "Während der Menstruation", "생리 중"),
+          opt("phase_ovulation", 2, "Around ovulation", "Rund um den Eisprung", "배란 주변"),
+          opt("phase_notsure", 1, "Not sure", "Nicht sicher", "잘 모르겠어요"),
         ],
       },
       {
@@ -789,14 +789,14 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         axisHints: { acne: 0.3 },
         exclusiveIds: ["hormone_none"],
         options: [
-          opt("hormone_bc",       1, "Contraceptive pill",                     "Antibabypille",                              "피임약"),
-          opt("hormone_hormonal", 1, "Hormone therapy (HRT)",                  "Hormontherapie (HRT)",                       "호르몬 치료제 (에스트로겐·프로게스테론 등)"),
-          opt("hormone_adhd",     1, "ADHD medication",                        "ADHS-Medikament",                            "ADHD 약 (리탈린·콘서타 등)"),
-          opt("hormone_antidep",  1, "Antidepressants / Anxiolytics",          "Antidepressiva / Anxiolytika",               "항우울제 / 항불안제"),
-          opt("hormone_thyroid",  1, "Thyroid medication",                     "Schilddrüsenmedikament",                     "갑상선 약"),
-          opt("hormone_other",    1, "Other prescription medication",          "Andere verschreibungspflichtige Medikamente","기타 처방약 복용 중"),
-          opt("hormone_none",     0, "None",                                   "Keine",                                      "복용하지 않음"),
-          opt("hormone_unsure",   0, "Not sure",                               "Nicht sicher",                               "잘 모르겠어요"),
+          opt("hormone_bc", 1, "Contraceptive pill", "Antibabypille", "피임약"),
+          opt("hormone_hormonal", 1, "Hormone therapy (HRT)", "Hormontherapie (HRT)", "호르몬 치료제 (에스트로겐·프로게스테론 등)"),
+          opt("hormone_adhd", 1, "ADHD medication", "ADHS-Medikament", "ADHD 약 (리탈린·콘서타 등)"),
+          opt("hormone_antidep", 1, "Antidepressants / Anxiolytics", "Antidepressiva / Anxiolytika", "항우울제 / 항불안제"),
+          opt("hormone_thyroid", 1, "Thyroid medication", "Schilddrüsenmedikament", "갑상선 약"),
+          opt("hormone_other", 1, "Other prescription medication", "Andere verschreibungspflichtige Medikamente", "기타 처방약 복용 중"),
+          opt("hormone_none", 0, "None", "Keine", "복용하지 않음"),
+          opt("hormone_unsure", 0, "Not sure", "Nicht sicher", "잘 모르겠어요"),
         ],
       },
     ],
@@ -826,29 +826,29 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX9_Q2",
         type: "single",
-        text: t("Have you been diagnosed with Atopic Dermatitis or Psoriasis?", "Wurde bei Ihnen Atopische Dermatitis oder Psoriasis diagnostiziert?", "아토피 피부염이나 건선을 진단받은 적이 있나요?"),
+        text: t("Have you been diagnosed with Atopic Dermatitis or Psoriasis?", "Wurde bei Ihnen Atopische Dermatitis oder Psoriasis diagnostiziert?", "아토피 피부염이나 건선을 분석받은 적이 있나요?"),
         required: false,
         axisHints: { sen: 1.2, bar: 1.0 },
         options: [
           withGloss(
-            opt("dx_atopic",    3, "Yes — Atopic Dermatitis", "Ja — Atopische Dermatitis", "예 — 아토피 피부염"),
+            opt("dx_atopic", 3, "Yes — Atopic Dermatitis", "Ja — Atopische Dermatitis", "예 — 아토피 피부염"),
             "Atopic Dermatitis (Eczema) — chronic inflammatory condition causing intense itching, redness, and impaired skin barrier. Requires a gentle, barrier-repair-focused routine.",
             "Atopische Dermatitis (Ekzem) — chronisch entzündliche Erkrankung mit starkem Juckreiz und gestörter Hautschutzbarriere.",
             "아토피 피부염(습진) — 심한 가려움, 붉음증, 피부 장벽 기능 저하를 일으키는 만성 염증성 피부 질환입니다."
           ),
           withGloss(
-            opt("dx_psoriasis", 3, "Yes — Psoriasis",         "Ja — Psoriasis",            "예 — 건선"),
+            opt("dx_psoriasis", 3, "Yes — Psoriasis", "Ja — Psoriasis", "예 — 건선"),
             "Psoriasis — autoimmune condition that accelerates skin cell turnover, causing thick, scaly plaques. Requires specialised care.",
             "Psoriasis — Autoimmunerkrankung mit beschleunigter Hauterneuerung, die zu schuppigen Plaques führt.",
             "건선 — 피부 세포 재생이 가속화되어 두껍고 비늘 모양의 반점이 생기는 자가면역 질환입니다."
           ),
           withGloss(
-            opt("dx_suspected", 2, "Suspected / Undiagnosed", "Vermutet / Nicht diagnostiziert", "의심 / 미진단"),
+            opt("dx_suspected", 2, "Suspected / Undiagnosed", "Vermutet / Nicht diagnostiziert", "의심 / 미분석"),
             "If you suspect Atopic Dermatitis or Psoriasis but haven't been formally diagnosed, we'll factor this into a sensitivity-focused protocol.",
             "Wenn Sie Atopische Dermatitis oder Psoriasis vermuten, berücksichtigen wir dies in Ihrem sensibilitätsfokussierten Protokoll.",
-            "아토피 또는 건선이 의심되지만 진단받지 못하셨다면, 민감성 맞춤 프로토콜에 이를 반영해요."
+            "아토피 또는 건선이 의심되지만 분석받지 못하셨다면, 민감성 맞춤 프로토콜에 이를 반영해요."
           ),
-          opt("dx_no",        0, "No",                      "Nein",                      "아니요"),
+          opt("dx_no", 0, "No", "Nein", "아니요"),
         ],
       },
       {
@@ -858,9 +858,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: false,
         axisHints: { bar: 1.0, hyd: 0.6, sen: 0.5 },
         options: [
-          opt("crack_severe", 3, "Severe — Cracking / Weeping", "Schwer — Risse / Nässend",    "심각 — 갈라짐 / 진물"),
-          opt("crack_mild",   1, "Mild flaking",                "Leichtes Schuppen",           "가벼운 각질"),
-          opt("crack_none",   0, "None",                        "Nicht vorhanden",             "없음"),
+          opt("crack_severe", 3, "Severe — Cracking / Weeping", "Schwer — Risse / Nässend", "심각 — 갈라짐 / 진물"),
+          opt("crack_mild", 1, "Mild flaking", "Leichtes Schuppen", "가벼운 각질"),
+          opt("crack_none", 0, "None", "Nicht vorhanden", "없음"),
         ],
       },
     ],
@@ -871,48 +871,48 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
 
 const CONCERN_TO_AXES: Record<string, number[]> = {
   // Forehead
-  oily_f:        [1],
-  blackheads_f:  [1, 3],
-  whiteheads_f:  [1, 4],
-  lines_f:       [6],
-  breakouts_f:   [3, 4],
+  oily_f: [1],
+  blackheads_f: [1, 3],
+  whiteheads_f: [1, 4],
+  lines_f: [6],
+  breakouts_f: [3, 4],
 
   // Eyes
-  fine_lines_e:  [6],
-  dark_circles_e:[7],
-  puffiness_e:   [6],
-  dryness_e:     [2],
+  fine_lines_e: [6],
+  dark_circles_e: [7],
+  puffiness_e: [6],
+  dryness_e: [2],
 
   // Nose
-  pores_n:       [3],
-  blackheads_n:  [1, 3],
-  oily_n:        [1],
-  redness_n:     [5],
+  pores_n: [3],
+  blackheads_n: [1, 3],
+  oily_n: [1],
+  redness_n: [5],
 
   // Cheeks
-  redness_c:     [5],
-  acne_c:        [4],
-  dryness_c:     [2],
-  pigment_c:     [7],
-  pores_c:       [3],
+  redness_c: [5],
+  acne_c: [4],
+  dryness_c: [2],
+  pigment_c: [7],
+  pores_c: [3],
 
   // Mouth
-  dryness_m:     [2],
-  nasolabial:    [6],
-  pigment_m:     [7],
-  perioral_m:    [5],
+  dryness_m: [2],
+  nasolabial: [6],
+  pigment_m: [7],
+  perioral_m: [5],
 
   // Jawline
-  hormonal_j:    [4, 8],
-  cystic_j:      [4, 8],
-  texture_j:     [4],
-  sagging_j:     [6],
+  hormonal_j: [4, 8],
+  cystic_j: [4, 8],
+  texture_j: [4],
+  sagging_j: [6],
 
   // Neck
-  neck_lines:    [6],
-  sagging:       [6],
-  neck_red:      [5],
-  neck_dry:      [2],
+  neck_lines: [6],
+  sagging: [6],
+  neck_red: [5],
+  neck_dry: [2],
 };
 
 // ─── Routing ──────────────────────────────────────────────────────────────────

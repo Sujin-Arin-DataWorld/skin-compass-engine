@@ -35,22 +35,22 @@ const COPY = {
   upcoming: {
     en: "Your 4-week re-check is coming up!",
     de: "Ihr 4-Wochen Re-Check steht bevor!",
-    ko: "4주 재진단이 곧 다가와요!",
+    ko: "4주 재분석이 곧 다가와요!",
   },
   due: {
     en: "Time for a re-check! See how your skin has changed.",
     de: "Zeit für einen Re-Check! Sehen Sie, wie sich Ihre Haut verändert hat.",
-    ko: "재진단 시간이에요! 피부 변화를 확인해보세요.",
+    ko: "재분석 시간이에요! 피부 변화를 확인해보세요.",
   },
   overdue: (weeks: number): Record<Lang, string> => ({
     en: `It's been ${weeks} weeks since your last check. Time to re-evaluate your skin.`,
     de: `Es sind ${weeks} Wochen seit Ihrem letzten Check vergangen. Zeit für eine Neubewertung.`,
-    ko: `마지막 진단 후 ${weeks}주가 지났어요. 피부 상태를 다시 확인해보세요.`,
+    ko: `마지막 분석 후 ${weeks}주가 지났어요. 피부 상태를 다시 확인해보세요.`,
   }),
   cta: {
     en: "Start re-check →",
     de: "Re-Check starten →",
-    ko: "재진단 시작 →",
+    ko: "재분석 시작 →",
   },
   dismiss: {
     en: "Remind me later",

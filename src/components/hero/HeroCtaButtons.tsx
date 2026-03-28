@@ -17,7 +17,7 @@ const EASE_LUXURY = { duration: 0.6, ease: [0.22, 1, 0.36, 1] } as const;
 
 export const HeroCtaButtons = ({ lang, onPrimary, onSecondary }: HeroCtaButtonsProps) => {
   const copy = {
-    primary: { ko: '60초 AI 피부 진단', en: '60s AI Skin Analysis', de: 'KI-Analyse in 60 Sek.' },
+    primary: { ko: '60초 AI 피부 분석', en: '60s AI Skin Analysis', de: 'KI-Analyse in 60 Sek.' },
     secondary: { ko: '카메라 없이 시작', en: 'Without camera', de: 'Ohne Kamera' },
   };
 

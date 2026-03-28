@@ -939,9 +939,9 @@ export const phase1T = {
             routineTitle: "Speziell für Sie",
             routineSub: "Wissenschaftlich fundierte Pflegesets — exakt auf Ihre Hautdaten abgestimmt.",
             routines: [
-                { badge: "3-Step", title: "Basis", desc: "Reinigung<br />Feuchtigkeit<br />Schutz", cta: "Set entdecken" },
-                { badge: "5-Step", title: "Intensiv", desc: "Reinigung<br />Toner<br />Serum<br />Augenpflege<br />Feuchtigkeitspflege", cta: "Set entdecken" },
-                { badge: "5-Step + Gerät", title: "Premium", desc: "Vollständiges Protokoll<br />+ professionelles RF/LED Heimgerät", cta: "Set entdecken" },
+                { badge: "3-Step", title: "Basis", desc: "Reinigung\nFeuchtigkeit\nSchutz", cta: "Set entdecken" },
+                { badge: "5-Step", title: "Intensiv", desc: "Reinigung\nToner\nSerum\nAugenpflege\nFeuchtigkeitspflege", cta: "Set entdecken" },
+                { badge: "5-Step + Gerät", title: "Premium", desc: "Vollständiges Protokoll\n+ professionelles RF/LED Heimgerät", cta: "Set entdecken" },
             ],
             bannerHeadline: "Bestimmen Sie Ihren\nHauttyp",
             bannerSub: "Jede Haut ist einzigartig. Unser Algorithmus findet Ihr persönliches Protokoll.",

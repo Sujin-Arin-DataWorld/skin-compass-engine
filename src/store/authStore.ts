@@ -4,6 +4,7 @@ import { safeStorage } from "@/utils/safeStorage";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { DiagnosisResult } from "@/engine/types";
+import { useSkinProfileStore } from "./useSkinProfileStore";
 
 export interface Address {
     id: string;
@@ -134,20 +135,26 @@ export const useAuthStore = create<AuthState>()(
             logout: async () => {
                 // 1. Sign out from Supabase first — invalidates the server session.
                 await supabase.auth.signOut();
-                // 2. Wipe both Zustand persist slices from localStorage so the next
+                // 2. Wipe ALL Zustand persist slices from localStorage so the next
                 //    browser session (or a different user) starts completely clean.
                 try {
                     localStorage.removeItem("skin-strategy-auth");
                     localStorage.removeItem("skin-diagnosis-store");
+                    localStorage.removeItem("skin-analysis-store"); // AI 카메라 분석 기록
+                    localStorage.removeItem("skin-compass-cart-v1"); // 장바구니
+                    localStorage.removeItem("skin-compass-products-v2"); // 좀비 캐시 파기
                 } catch {
                     // Safari Private Mode — localStorage may be unavailable; no-op is safe.
                 }
-                // 3. Reset in-memory state as a safety net (in case navigation is delayed).
+                // 3. Reset in-memory state + DB profile cache.
                 set({ isLoggedIn: false, userProfile: null });
+                useSkinProfileStore.getState().clearProfile();
                 // 4. Hard redirect — a full page reload guarantees all React state is gone.
                 window.location.href = "/";
             },
 
+            // TODO (CRITICAL): 아래 함수들은 현재 로컬 Zustand 상태만 변경하며 Supabase DB와 동기화되지 않습니다.
+            // 새로고침 시 데이터가 유실되므로, 향후 마이페이지 고도화 시 반드시 Supabase API를 직접 호출하도록 리팩토링해야 합니다.
             updateProfile: (updates) => {
                 const profile = get().userProfile;
                 if (!profile) return;

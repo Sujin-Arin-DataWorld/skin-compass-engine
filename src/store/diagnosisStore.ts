@@ -526,27 +526,32 @@ export const useDiagnosisStore = create<DiagnosisState>()(
     {
       name: "skin-diagnosis-store",
       storage: createJSONStorage(() => safeStorage),
-      partialize: (state) => ({
-        currentStep: state.currentStep,
-        currentCategory: state.currentCategory,
-        selectedZones: state.selectedZones,
-        axisResponses: state.axisResponses,
-        // climateProfile is session-only — excluded so city resets on each fresh visit
-        lifestyle: { ...state.lifestyle, climateProfile: undefined, climate: undefined },
-        implicitFlags: state.implicitFlags,
-        completedAt: state.completedAt,
-        previousResultId: state.previousResultId,
-        lastVector: state.lastVector,
-        contexts: state.contexts,
-        skinType: state.skinType,
-        severities: state.severities,
-        metaAnswers: state.metaAnswers,
-        axisAnswers: state.axisAnswers,
-        selectedTier: state.selectedTier,
-        interactiveState: state.interactiveState,
-        specialCarePicks: state.specialCarePicks,
-        // uiSignals and result are NOT persisted (derived/large)
-      }),
+      partialize: (state) => {
+        // Base64 이미지는 용량 초과를 유발하므로 로컬 스토리지 저장에서 제외
+        const { acnePhoto, drynessPhoto, pigmentPhoto, ...safeInteractiveState } = state.interactiveState;
+
+        return {
+          currentStep: state.currentStep,
+          currentCategory: state.currentCategory,
+          selectedZones: state.selectedZones,
+          axisResponses: state.axisResponses,
+          // climateProfile is session-only — excluded so city resets on each fresh visit
+          lifestyle: { ...state.lifestyle, climateProfile: undefined, climate: undefined },
+          implicitFlags: state.implicitFlags,
+          completedAt: state.completedAt,
+          previousResultId: state.previousResultId,
+          lastVector: state.lastVector,
+          contexts: state.contexts,
+          skinType: state.skinType,
+          severities: state.severities,
+          metaAnswers: state.metaAnswers,
+          axisAnswers: state.axisAnswers,
+          selectedTier: state.selectedTier,
+          interactiveState: safeInteractiveState as typeof state.interactiveState, // 이미지 필드 제외됨
+          specialCarePicks: state.specialCarePicks,
+          // uiSignals and result are NOT persisted (derived/large)
+        };
+      },
     }
   )
 );

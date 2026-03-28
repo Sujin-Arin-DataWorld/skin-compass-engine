@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import { safeLocalStorage } from "@/utils/safeStorage";
 
 export type Language = "en" | "de" | "ko";
 
@@ -12,21 +13,6 @@ function detectInitialLanguage(): Language {
     if (prefix === 'de') return 'de';
     return 'de';
 }
-
-// [PWA-FIX] iOS Safari Private Mode throws QuotaExceededError on localStorage writes.
-// This wrapper silently falls back to an in-memory object to prevent White Screen of Death.
-const _memoryFallback: Record<string, string> = {};
-const safeLocalStorage = {
-    getItem: (key: string): string | null => {
-        try { return localStorage.getItem(key); } catch { return _memoryFallback[key] ?? null; }
-    },
-    setItem: (key: string, value: string): void => {
-        try { localStorage.setItem(key, value); } catch { _memoryFallback[key] = value; }
-    },
-    removeItem: (key: string): void => {
-        try { localStorage.removeItem(key); } catch { delete _memoryFallback[key]; }
-    },
-};
 
 interface I18nState {
     language: Language;

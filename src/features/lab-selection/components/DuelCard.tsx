@@ -139,7 +139,7 @@ function filterProductsByIngredients(products: Product[], requiredIngredientIds:
   }
   return products.filter(product => {
     const names = product.ingredients.map(i => (i.name_en || '').toLowerCase());
-    // @ts-ignore
+    // @ts-expect-error name_inci is not in the base type but present in DB data
     const inci = product.ingredients.map(i => (i.name_inci || '').toLowerCase());
     const roles = product.ingredients.map(i => (i.role || '').toLowerCase());
     const concerns = (product.skin_concerns ?? []).map(c => c.toLowerCase());
@@ -203,6 +203,7 @@ function ProductCard({
   const GREEN_LIGHT = '#3D6B4A';
   const AMBER = '#BA7517';
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const name = lang === 'ko' ? product.name_kr : lang === 'de' ? (product as any).name_de ?? product.name_en : product.name_en;
 
   // Daily price: assume 1ml/day

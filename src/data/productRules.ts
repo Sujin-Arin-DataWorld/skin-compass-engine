@@ -13,7 +13,6 @@
  * Health score = toHealthScore(axis, rawScore)
  */
 import type { SkinAxisScores } from '@/types/skinAnalysis';
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import productDbJson from '@/data/product_db_merged.json';
 
 /** Axis Korean label for display in product badges */

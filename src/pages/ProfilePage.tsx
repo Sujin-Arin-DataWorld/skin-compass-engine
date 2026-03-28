@@ -5,7 +5,6 @@ import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Eye, EyeOff, AlertTriangle, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { useProfile } from "@/hooks/useProfile";

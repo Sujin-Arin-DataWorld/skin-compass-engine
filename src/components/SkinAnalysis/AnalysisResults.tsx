@@ -325,6 +325,7 @@ export default function AnalysisResults({
       active_flags: [],
       radar_chart_data: [],
       product_bundle: {} as Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     // V5 Engine: build Full tier product bundle
@@ -379,6 +380,7 @@ export default function AnalysisResults({
         userId: user.id,
         scores,
         skinType: skinType as 'oily' | 'dry' | 'combination' | 'normal',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         primaryConcerns: primaryConcerns as any,
         analysisMethod: 'camera',
         confidenceScore: 85,

@@ -214,7 +214,7 @@ function questionSeverity(
     const positiveOpts = q.options.filter(o => o.score > 0);
     if (positiveOpts.length === 0) return answer.length / q.options.length;
     const meaningfulSelections = answer.filter(id =>
-      q.options!.find(o => o.id === id)?.score! > 0
+      (q.options!.find(o => o.id === id)?.score ?? 0) > 0
     );
     return positiveOpts.length > 0
       ? meaningfulSelections.length / positiveOpts.length

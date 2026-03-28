@@ -356,11 +356,13 @@ const ZoneCard = memo(function ZoneCard({
                       .filter(i => i.name_en !== 'HOLD_ALL_ACTIVES')
                       .slice(0, 3)
                       .map(i => {
+                        /* eslint-disable @typescript-eslint/no-explicit-any */
                         const desc = lang === 'ko'
                           ? (i as any).description_ko
                           : lang === 'de'
                             ? (i as any).description_de
                             : (i as any).description_en;
+                        /* eslint-enable @typescript-eslint/no-explicit-any */
                         return desc as string | undefined;
                       })
                       .filter(Boolean)
@@ -514,6 +516,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
   }, []);
 
   const handleProductSelect = useCallback((zone: FaceZone, product: Product, _tier: PriceTier) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setStorePick(zone, product as any);
   }, [setStorePick]);
 
@@ -523,6 +526,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
       onSpecialCareUpdate(
         Object.entries(storePicks).map(([zone, product]) => ({
           zone: zone as FaceZone,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           product: product as any,
         })),
       );
@@ -713,6 +717,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
                         zd={zd} lang={lang} isDark={isDark} tok={tok}
                         isExpanded={expandedZone === zd.faceZone}
                         onToggle={() => handleToggle(zd.faceZone)}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         selectedProduct={storePicks[zd.faceZone] as any ?? null}
                         onProductSelect={handleProductSelect}
                       />
@@ -737,6 +742,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
                         zd={zd} lang={lang} isDark={isDark} tok={tok}
                         isExpanded={expandedZone === zd.faceZone}
                         onToggle={() => handleToggle(zd.faceZone)}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         selectedProduct={storePicks[zd.faceZone] as any ?? null}
                         onProductSelect={handleProductSelect}
                       />

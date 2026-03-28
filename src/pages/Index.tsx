@@ -439,6 +439,7 @@ function ConcernSection({
                     {filteredProducts.map((product) => {
                       const state = cartStates[product.id] ?? "idle";
                       const pn = product.name;
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       const name = typeof pn === "string" ? pn : ((pn as any)[language] ?? pn.de ?? pn.en);
                       return (
                         <div
@@ -653,7 +654,8 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                       {rowProducts.map((product) => {
                         const state = cartStates[product.id] ?? "idle";
                         const pn = product.name;
-                        const name = typeof pn === "string" ? pn : ((pn as any)[language] ?? pn.de ?? pn.en);
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const name = typeof pn === "string" ? pn : ((pn as any)[language] ?? pn.de ?? pn.en);
                         return (
                           <div
                             key={product.id}

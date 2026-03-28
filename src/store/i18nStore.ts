@@ -813,6 +813,7 @@ export const translations = {
     },
     ko: {
         // Start with English defaults, override with Korean translations
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...({} as any), // populated below
 
         // ── Scalar string fallbacks ─────────────────────────────────────────

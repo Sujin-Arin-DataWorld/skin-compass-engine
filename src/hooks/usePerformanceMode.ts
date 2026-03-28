@@ -16,7 +16,7 @@ export function usePerformanceMode(): { reducedMotion: boolean } {
 
     // FPS sampling: measure over 500ms
     let frameCount = 0;
-    let startTime = performance.now();
+    const startTime = performance.now();
     let rafId: number;
 
     const measure = () => {

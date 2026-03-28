@@ -141,6 +141,7 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
       return { selectedProducts: next, finalRoutine: null };
     });
     // Sync to diagnosisStore.specialCarePicks so StickyCartBar / Results stays updated
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useDiagnosisStore.getState().setSpecialCarePick(zone, product as any);
   },
 

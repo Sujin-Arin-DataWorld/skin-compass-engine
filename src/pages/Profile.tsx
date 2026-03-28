@@ -853,7 +853,7 @@ export default function Profile() {
             {userProfile && (
               <>
                 {divider}
-                <AnalysisHistory userId={userProfile.uid ?? userProfile.id ?? ''} lang={lang} />
+                <AnalysisHistory userId={userProfile.userId} lang={lang} />
               </>
             )}
 

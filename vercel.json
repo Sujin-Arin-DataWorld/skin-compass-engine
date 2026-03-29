@@ -1,4 +1,17 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "(?i).*\\.vercel\\.app"
+        }
+      ],
+      "destination": "https://www.skinstrategylab.de/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/skin-analysis",

@@ -20,16 +20,21 @@
  *   ❌ No raw score exposure — all UI uses toHealthScore()
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useI18nStore } from '@/store/i18nStore';
+import { useRoutineStore } from '@/store/useRoutineStore';
+import { useDiagnosisStore } from '@/store/diagnosisStore';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import RoutinePicker from '@/components/routine/RoutinePicker';
+import { buildProductBundleV5 } from '@/engine/routineEngineV5';
 import type { UserSkinProfile, SkinAxis } from '@/types/skinProfile';
+import type { RoutineTierId } from '@/types/routine';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SHARED CONSTANTS
@@ -269,7 +274,7 @@ function ProfileHeader({ userName, activeProfile, lang }: {
 // SECTION 1: SKIN PROFILE GRID (10-axis)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function SkinProfileGrid({ activeProfile, lang }: { activeProfile: UserSkinProfile; lang: Lang }) {
+function SkinProfileGrid({ activeProfile, lang, onOpenPicker }: { activeProfile: UserSkinProfile; lang: Lang; onOpenPicker: () => void }) {
   return (
     <section className="px-5 py-6">
       <h2 className="text-base font-semibold mb-4" style={{
@@ -328,16 +333,16 @@ function SkinProfileGrid({ activeProfile, lang }: { activeProfile: UserSkinProfi
         })}
       </div>
 
-      <Link
-        to="/lab"
-        className="flex items-center justify-center gap-1 mt-4 py-3 rounded-xl text-sm font-medium"
-        style={{ backgroundColor: 'rgba(138, 154, 123, 0.08)', color: '#8a9a7b' }}
+      <button
+        onClick={onOpenPicker}
+        className="flex items-center justify-center gap-1 mt-4 py-3 rounded-xl text-sm font-medium w-full"
+        style={{ backgroundColor: 'rgba(138, 154, 123, 0.08)', color: '#8a9a7b', border: 'none', cursor: 'pointer' }}
       >
         {lang === 'ko' ? '맞춤 제품 추천 보러가기'
           : lang === 'de' ? 'Personalisierte Empfehlungen ansehen'
             : 'View Personalized Recommendations'}
         <span>→</span>
-      </Link>
+      </button>
     </section>
   );
 }
@@ -648,7 +653,7 @@ function AnalysisHistory({ userId, lang }: { userId: string; lang: Lang }) {
 // SECTION 4: MY ROUTINE
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function MyRoutineSection({ lang }: { lang: Lang }) {
+function MyRoutineSection({ lang, hasAnalysis, onOpenPicker }: { lang: Lang; hasAnalysis: boolean; onOpenPicker: () => void }) {
   return (
     <section className="px-5 py-6">
       <h2 className="text-base font-semibold mb-4" style={{
@@ -658,12 +663,13 @@ function MyRoutineSection({ lang }: { lang: Lang }) {
         {lang === 'ko' ? '내 루틴' : lang === 'de' ? 'Meine Routine' : 'My Routine'}
       </h2>
 
-      <Link
-        to="/lab"
-        className="block rounded-xl p-5 text-center"
+      <button
+        onClick={() => hasAnalysis ? onOpenPicker() : window.location.assign('/skin-analysis')}
+        className="block rounded-xl p-5 text-center w-full"
         style={{
           background: 'rgba(138,154,123,0.06)',
           border: '1px dashed rgba(138,154,123,0.3)',
+          cursor: 'pointer',
         }}
       >
         <p className="text-sm mb-1" style={{ color: '#1a1a18', fontWeight: 500 }}>
@@ -681,7 +687,7 @@ function MyRoutineSection({ lang }: { lang: Lang }) {
             : lang === 'de' ? 'Routine im Lab erstellen →'
               : 'Build routine in Lab →'}
         </span>
-      </Link>
+      </button>
     </section>
   );
 }
@@ -807,6 +813,7 @@ export default function Profile() {
   const { isLoggedIn, userProfile, logout } = useAuthStore();
   const { activeProfile } = useSkinProfileStore();
   const { language } = useI18nStore();
+  const { isPickerOpen, openPicker, closePicker, setSelectedTier } = useRoutineStore();
   const navigate = useNavigate();
   const lang = (['ko', 'de'].includes(language) ? language : 'en') as Lang;
 
@@ -841,7 +848,7 @@ export default function Profile() {
               <>
                 {/* Section 1: Skin Profile Grid */}
                 {divider}
-                <SkinProfileGrid activeProfile={activeProfile} lang={lang} />
+                <SkinProfileGrid activeProfile={activeProfile} lang={lang} onOpenPicker={openPicker} />
 
                 {/* Section 2: Top 3 Focus Points */}
                 {divider}
@@ -861,7 +868,7 @@ export default function Profile() {
               <>
                 {/* Section 4: My Routine */}
                 {divider}
-                <MyRoutineSection lang={lang} />
+                <MyRoutineSection lang={lang} hasAnalysis={!!activeProfile} onOpenPicker={openPicker} />
               </>
             )}
 
@@ -877,6 +884,54 @@ export default function Profile() {
       </main>
 
       <Footer />
+
+      {/* RoutinePicker bottom sheet */}
+      <RoutinePicker
+        isOpen={isPickerOpen}
+        onClose={closePicker}
+        onConfirm={(tierId) => {
+          closePicker();
+          setSelectedTier(tierId);
+          // Reconstruct result from activeProfile and navigate
+          if (activeProfile?.scores) {
+            const s = activeProfile.scores;
+            const axis_scores = {
+              seb: s.seb, hyd: s.hyd, bar: s.bar, sen: s.sen, ox: s.ox,
+              acne: s.acne, pigment: s.pigment, texture: s.texture,
+              aging: s.aging, makeup_stability: s.makeup_stability,
+            };
+            const axis_severity = {} as Record<string, number>;
+            const primaryConcerns: string[] = [];
+            for (const key of Object.keys(axis_scores)) {
+              const score = axis_scores[key as keyof typeof axis_scores];
+              axis_severity[key] = score > 60 ? 2 : score < 40 ? 1 : 0;
+              if (score > 60) primaryConcerns.push(key);
+            }
+            const tierMap: Record<string, 'Entry' | 'Full' | 'Premium'> = {
+              essential: 'Entry', complete: 'Full', pro: 'Premium',
+            };
+            const engineTier = tierMap[tierId] ?? 'Full';
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const tempResult: any = {
+              engineVersion: 'v5-profile-restore',
+              axis_scores,
+              axis_scores_normalized: { ...axis_scores },
+              axis_severity,
+              primary_concerns: primaryConcerns.slice(0, 5),
+              secondary_concerns: [],
+              detected_patterns: [],
+              urgency_level: 'MEDIUM',
+              active_flags: [],
+              radar_chart_data: Object.entries(axis_scores).map(([k, v]) => ({ axis: k, score: v, label: k })),
+              product_bundle: {},
+            };
+            const flags = { atopyFlag: false, likelyHormonalCycleUser: false, likelyShaver: false };
+            tempResult.product_bundle = buildProductBundleV5(tempResult, flags, engineTier);
+            useDiagnosisStore.getState().setResult(tempResult);
+          }
+          navigate('/results');
+        }}
+      />
     </div>
   );
 }

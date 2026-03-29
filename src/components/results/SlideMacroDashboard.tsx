@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Brain, ChevronDown } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useRoutineStore } from '@/store/useRoutineStore';
 import { buildRoutineV5 } from '@/engine/routineEngineV5';
 import type { DiagnosisResult, AxisKey } from '@/engine/types';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS } from '@/engine/types';
@@ -182,7 +183,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
   const tok = tokens(isDark);
   const glassTok = glassTokens(isDark);
 
-  const [activeTier, setActiveTier] = useState<TierKey>('5-step');
+  // Map RoutinePicker tier → SlideMacroDashboard tier key
+  const routineTier = useRoutineStore((s) => s.selectedTier);
+  const initialTierKey: TierKey = routineTier === 'essential' ? '3-step' : routineTier === 'pro' ? 'advanced' : '5-step';
+
+  const [activeTier, setActiveTier] = useState<TierKey>(initialTierKey);
   const [timing, setTiming] = useState<'am' | 'pm'>('am');
   const [activeTab, setActiveTab] = useState<TabKey>('routine');
   const [expandedId, setExpandedId] = useState<string | null>(null);

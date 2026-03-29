@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Navigate, useSearchParams, useNavigate } from "react-router-dom";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
 import { useAuthStore } from "@/store/authStore";
+import { useSkinProfileStore } from "@/store/useSkinProfileStore";
 import { getPendingDiagnosis } from "@/utils/diagnosisPersistence";
 import { useI18nStore } from "@/store/i18nStore";
 import Navbar from "@/components/Navbar";
@@ -14,6 +15,7 @@ import StickyCartBar from "@/components/results/StickyCartBar";
 import { AGE_CYCLE_MAP } from "@/components/results/sharedResultsData";
 import DebugPanel from "@/components/diagnosis/DebugPanel";
 import { useProductStore } from "@/store/productStore";
+import { buildProductBundleV5 } from "@/engine/routineEngineV5";
 import type {
   DiagnosisResult, AxisScores, AxisSeverity, Product,
   ClinicalGrade, ZoneId, ZoneHeatmapEntry, ScoreProvenance, ProjectedImprovement, AxisKey,
@@ -149,6 +151,7 @@ function makeMockResult(products: Product[]): DiagnosisResult {
 const ResultsPage = () => {
   const { result: storeResult, implicitFlags, setResult } = useDiagnosisStore();
   const { products } = useProductStore();
+  const activeProfile = useSkinProfileStore((s) => s.activeProfile);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const isDebug = searchParams.get("debug") === "true";
@@ -163,9 +166,48 @@ const ResultsPage = () => {
     if (storeResult) return storeResult;
     const pending = getPendingDiagnosis();
     if (pending?.fullResult) return pending.fullResult;
+
+    // ── P0 Fix: Reconstruct result from persisted skin profile ──────────
+    // When navigating from Profile → /results, the ephemeral Zustand store
+    // is empty but useSkinProfileStore has the database-backed scores.
+    if (activeProfile?.scores) {
+      const s = activeProfile.scores;
+      const axis_scores: AxisScores = {
+        seb: s.seb, hyd: s.hyd, bar: s.bar, sen: s.sen, ox: s.ox,
+        acne: s.acne, pigment: s.pigment, texture: s.texture,
+        aging: s.aging, makeup_stability: s.makeup_stability,
+      };
+      const axis_severity = {} as AxisSeverity;
+      const primaryConcerns: AxisKey[] = [];
+      for (const key of Object.keys(axis_scores) as AxisKey[]) {
+        const score = axis_scores[key];
+        axis_severity[key] = score > 60 ? 2 : score < 40 ? 1 : 0;
+        if (score > 60) primaryConcerns.push(key);
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const reconstructed: any = {
+        engineVersion: 'v5-profile-restore',
+        axis_scores,
+        axis_scores_normalized: { ...axis_scores },
+        axis_severity,
+        primary_concerns: primaryConcerns.slice(0, 5),
+        secondary_concerns: [],
+        detected_patterns: [],
+        urgency_level: 'MEDIUM',
+        active_flags: [],
+        radar_chart_data: Object.entries(axis_scores).map(([k, v]) => ({ axis: k, score: v, label: k })),
+        product_bundle: {},
+      };
+
+      const flags = { atopyFlag: false, likelyHormonalCycleUser: false, likelyShaver: false };
+      reconstructed.product_bundle = buildProductBundleV5(reconstructed, flags, 'Full');
+      return reconstructed as DiagnosisResult;
+    }
+
     if (import.meta.env.DEV) return makeMockResult(products);
     return null;
-  }, [storeResult, products]);
+  }, [storeResult, products, activeProfile]);
 
   // Restore pending diagnosis into Zustand store
   useEffect(() => {

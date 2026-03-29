@@ -150,6 +150,14 @@ export default function SkinAnalysisPage() {
       }
       setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId);
       localStorage.removeItem('ssl_pending_analysis');
+
+      // Show success toast after restore
+      const restoreMsg = language === 'ko' ? '분석 결과가 복원되었어요 ✓'
+        : language === 'de' ? 'Analyseergebnisse wiederhergestellt ✓'
+        : 'Analysis results restored ✓';
+      // Delay slightly so SkinAnalysisPage has rendered the result view
+      setTimeout(() => toast.success(restoreMsg), 600);
+
       // Non-blocking DB save
       (async () => {
         try {

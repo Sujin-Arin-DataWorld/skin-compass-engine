@@ -4,14 +4,17 @@
 import { useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { RotateCcw, Save, ChevronRight, ChevronDown } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useRoutineStore } from '@/store/useRoutineStore';
 import { brand, glass } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
+import RoutinePicker from '@/components/routine/RoutinePicker';
 import { AXIS_KO_SHORT } from '@/data/productRules';
 import { buildProductBundleV5 } from '@/engine/routineEngineV5';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
@@ -301,7 +304,9 @@ export default function AnalysisResults({
 
 
   // ── Navigation handlers ──────────────────────────────────────────────────
-  const handleNavigateToLab = useCallback(() => {
+  const { isPickerOpen, openPicker, closePicker, setSelectedTier } = useRoutineStore();
+
+  const handleNavigateToLab = useCallback((tierId?: string) => {
     const axisKeys = Object.keys(scores) as AxisKey[];
     const axisScores = { ...scores } as unknown as AxisScores;
     const axisSeverity = {} as AxisSeverity;
@@ -313,6 +318,12 @@ export default function AnalysisResults({
     }
 
     // Build temp result, then inject V5 product bundle
+    // Map RoutinePicker tier → engine tier
+    const tierMap: Record<string, 'Entry' | 'Full' | 'Premium'> = {
+      essential: 'Entry', complete: 'Full', pro: 'Premium',
+    };
+    const engineTier = tierMap[tierId ?? 'complete'] ?? 'Full';
+
     const tempResult = {
       engineVersion: 'v5-ai-camera',
       axis_scores: axisScores,
@@ -328,14 +339,20 @@ export default function AnalysisResults({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
-    // V5 Engine: build Full tier product bundle
+    // V5 Engine: build product bundle for selected tier
     const implicitFlags = { atopyFlag: false, likelyHormonalCycleUser: false, likelyShaver: false };
-    const bundle = buildProductBundleV5(tempResult, implicitFlags, 'Full');
+    const bundle = buildProductBundleV5(tempResult, implicitFlags, engineTier);
     tempResult.product_bundle = bundle;
 
     setResult(tempResult);
     navigate('/results');
   }, [scores, setResult, navigate]);
+
+  const handlePickerConfirm = useCallback((tierId: string) => {
+    closePicker();
+    setSelectedTier(tierId as 'essential' | 'complete' | 'pro');
+    handleNavigateToLab(tierId);
+  }, [closePicker, setSelectedTier, handleNavigateToLab]);
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const saveAnalysisResult = useSkinProfileStore((s) => s.saveAnalysisResult);
@@ -391,6 +408,10 @@ export default function AnalysisResults({
 
       if (!saved) throw new Error('Save returned null');
       setSaveStatus('saved');
+      const saveMsg = lang === 'ko' ? '분석 결과가 저장되었어요 ✓'
+        : lang === 'de' ? 'Ihre Analyse wurde gespeichert ✓'
+        : 'Your analysis has been saved ✓';
+      toast.success(saveMsg);
     } catch (err) {
       console.error('[Save] Failed:', err);
       setSaveStatus('error');
@@ -602,7 +623,7 @@ export default function AnalysisResults({
         {/* ── SECTION 4: Masterplan CTA ─────────────────────────────────────── */}
         <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="mt-10 mb-2">
           <motion.button
-            onClick={handleNavigateToLab}
+            onClick={openPicker}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full rounded-2xl py-5 flex flex-col items-center justify-center gap-2 transition-all"
@@ -687,6 +708,13 @@ export default function AnalysisResults({
         </div>
 
       </div>
+
+      {/* RoutinePicker bottom sheet */}
+      <RoutinePicker
+        isOpen={isPickerOpen}
+        onClose={closePicker}
+        onConfirm={handlePickerConfirm}
+      />
     </div>
   );
 }

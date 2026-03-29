@@ -219,7 +219,7 @@ export const LandingHero = ({ lang }: LandingHeroProps) => {
         <img
           src="/assets/hero-face-desktop.png?v=3"
           alt="AI-powered skin analysis — woman with natural, glowing skin"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute top-0 bottom-0 h-full w-[125%] max-w-none object-cover transform -translate-x-[20%]"
           style={{ objectPosition: 'center center' }}
           loading="eager"
           /* @ts-expect-error fetchPriority is valid HTML but TS may not recognize it */

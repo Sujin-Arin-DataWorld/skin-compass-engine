@@ -6,16 +6,16 @@
 // ── Slide 1 (Female model — warm, discovery) ─────────────────────────────────
 export const SLIDE1_COPY = {
   ko: {
-    headline: "피부가 원하는 것,\n처음으로 정확히 압니다",
-    sub: "60초 AI 분석으로 당신만의\n스킨케어 루틴을 찾아보세요.",
+    headline: "피부가 원하는 것,\n정확히 아는 순간",
+    sub: "60초 AI 분석으로 당신만의\n5가지 루틴을 찾아드립니다.",
   },
   en: {
     headline: "Finally, skincare that\nknows your skin",
-    sub: "Your personal skincare routine—\nin 60 seconds, with AI.",
+    sub: "AI analyzes your skin in 60 seconds\nand recommends 5 perfect products for you.",
   },
   de: {
     headline: "Endlich genau wissen,\nwas Ihre Haut braucht.",
-    sub: "In 60 Sekunden zur perfekten Hautpflege\npersonalisiert durch KI.",
+    sub: "KI analysiert Ihre Haut in 60 Sek.\nund empfiehlt 5 perfekte Produkte speziell für Sie.",
   },
 } as const;
 

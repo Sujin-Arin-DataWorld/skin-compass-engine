@@ -26,6 +26,14 @@ import AIScanOverlay from "@/components/hero/AIScanOverlay";
 import { HeroCtaButtons } from "@/components/hero/HeroCtaButtons";
 import { SLIDE1_COPY, SLIDE2_COPY, HERO_CTA, type HeroLang } from "@/constants/hero-copy";
 
+// ── New Modular Components ────────────────────────────────────────────────────
+import { LandingHero } from "@/components/home/LandingHero";
+import { TrustBadges } from "@/components/home/TrustBadges";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { InteractiveFunnel } from "@/components/home/InteractiveFunnel";
+import { CommunityTrust } from "@/components/home/CommunityTrust";
+import { StickyBottomCta } from "@/components/home/StickyBottomCta";
+
 // ── Intent-based prefetching — preload lazy chunks on hover/touch ─────────────
 const prefetchSkinAnalysis = () => { import("./SkinAnalysisPage"); };
 const prefetchDiagnosis    = () => { import("./Diagnosis"); };
@@ -881,13 +889,12 @@ function Newsletter({
 export default function Index() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
-  const t = tokens(isDark);
-  const accent = t.accent;
-  const accentDeep = t.accentDeep;
   const { language } = useI18nStore();
+  const lang = language as HeroLang;
   const p1 = phase1T[language] ?? phase1T.de;
   const { products } = useProductStore();
   const { addItem } = useCartStore();
+  const navigate = useNavigate();
 
   const [cartStates, setCartStates] = useState<Record<string, CartBtnState>>({});
 
@@ -904,17 +911,17 @@ export default function Index() {
   }, [addItem, language]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-transparent">
+    <div className="min-h-screen bg-[#FBFBFB] dark:bg-[#0A0D12]">
       <Navbar />
       <div className="h-12 md:h-[52px]" />
       <RecheckBanner />
 
       <main>
-        <HeroSlider accent={accent} accentDeep={accentDeep} isDark={isDark} language={language} />
-        <UspStrip items={p1.home.usp as unknown as { label: string }[]} accent={accent} isDark={isDark} />
-        <AISkinAnalysisHero />
-        {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
-        <ConcernSection
+        <LandingHero lang={lang} />
+        <HowItWorks lang={lang} />
+        
+        {/* Ihr Hautanliegen */}
+        <InteractiveFunnel
           title={p1.home.concernTitle}
           sub={p1.home.concernSub}
           concernLabels={p1.concerns as Record<ConcernKey, string>}
@@ -922,11 +929,10 @@ export default function Index() {
           products={products}
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
-          accent={accent}
-          isDark={isDark}
           addLabel={language === "ko" ? "담기" : language === "de" ? "Hinzufügen" : "Add"}
         />
-        {isDark && <div className="h-px w-full" style={{ background: `linear-gradient(to right, transparent, ${accent}40, transparent)` }} />}
+
+        {/* Routine Showcase ("Speziell für Sie") */}
         <RoutineShowcase
           title={p1.home.routineTitle}
           sub={p1.home.routineSub}
@@ -934,27 +940,16 @@ export default function Index() {
           products={products}
           cartStates={cartStates}
           onAddToCart={handleAddToCart}
-          accent={accent}
+          accent={isDark ? "var(--ssl-accent)" : "var(--ssl-accent-deep)"}
           isDark={isDark}
           addLabel={language === "ko" ? "담기" : language === "de" ? "Hinzufügen" : "Add"}
         />
-        <DiagnosisBanner
-          headline={p1.home.bannerHeadline}
-          sub={p1.home.bannerSub}
-          accent={accent}
-          accentDeep={accentDeep}
-          isDark={isDark}
-          language={language}
-        />
-        <Newsletter
-          headline={p1.home.newsletterHeadline}
-          sub={p1.home.newsletterSub}
-          placeholder={p1.home.newsletterPlaceholder}
-          submit={p1.home.newsletterSubmit}
-          gdprText={p1.home.newsletterGdpr}
-          accent={accent}
-          accentDeep={accentDeep}
-          isDark={isDark}
+
+        <CommunityTrust lang={lang} />
+        
+        <StickyBottomCta 
+          lang={lang} 
+          onPrimary={() => navigate('/skin-analysis')}
         />
       </main>
 

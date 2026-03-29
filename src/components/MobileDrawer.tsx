@@ -59,6 +59,13 @@ export default function MobileDrawer() {
   const redirectParam = encodeURIComponent(location.pathname);
   const loginUrl = `/login?redirect=${redirectParam}`;
 
+  // Firefox mobile fix: next-themes updates React state but may not update the DOM
+  // class in Firefox iOS. Force-sync the `dark` class on <html> whenever theme changes.
+  useEffect(() => {
+    if (theme === "dark") document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }, [theme]);
+
   // Close drawer on route change
   useEffect(() => { closeMobileMenu(); }, [location.pathname]);
 
@@ -200,12 +207,7 @@ export default function MobileDrawer() {
                   ] as { val: string; label: string; Icon: React.ElementType }[]).map(({ val, label, Icon }) => (
                     <button
                       key={val}
-                      onClick={() => {
-                        try { setTheme(val); } catch {
-                          if (val === "dark") document.documentElement.classList.add("dark");
-                          else document.documentElement.classList.remove("dark");
-                        }
-                      }}
+                      onClick={() => setTheme(val)}
                       className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.65rem] font-semibold border transition-all cursor-pointer select-none ${(val === "dark" ? theme === "dark" : theme !== "dark")
                         ? ""
                         : "border-stone-200 dark:border-white/10 text-gray-400 dark:text-gray-500"

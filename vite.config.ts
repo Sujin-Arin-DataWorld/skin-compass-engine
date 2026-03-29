@@ -90,12 +90,21 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
-            // Static assets (fonts, icons, images) — aggressive cache
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico|woff2?)$/i,
+            // Static images — serve cached instantly, fetch update in background
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+            handler: 'StaleWhileRevalidate' as const,
+            options: {
+              cacheName: 'static-images',
+              expiration: { maxEntries: 100, maxAgeSeconds: 7 * 24 * 60 * 60 },
+            },
+          },
+          {
+            // Fonts — immutable, aggressive cache is safe
+            urlPattern: /\.woff2?$/i,
             handler: 'CacheFirst' as const,
             options: {
-              cacheName: 'static-assets',
-              expiration: { maxEntries: 100, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              cacheName: 'static-fonts',
+              expiration: { maxEntries: 20, maxAgeSeconds: 365 * 24 * 60 * 60 },
             },
           },
         ],

@@ -96,7 +96,7 @@ function HeroSlider({ accent, accentDeep, isDark, language }: {
   }, [emblaApi]);
 
   return (
-    <section className="relative w-full overflow-hidden h-[78svh] md:h-[92svh] max-h-[680px] md:max-h-[850px]">
+    <section className="relative w-full overflow-hidden" style={{ height: 'clamp(360px, 78svh, 680px)' }}>
       <div ref={emblaRef} className="overflow-hidden h-full">
         <div className="flex h-full touch-pan-y">
           {HERO_IMAGES.map((img, i) => {

@@ -18,6 +18,13 @@ import { motion, useInView, useMotionValue, animate } from 'framer-motion';
 import { Camera, Cpu, ClipboardList, type LucideIcon } from 'lucide-react';
 import type { HeroLang } from '@/constants/hero-copy';
 
+// ─── Mounted hook (Firefox iOS hydration fix) ────────────────────────────────
+function useMounted() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted;
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface HowItWorksProps { lang: HeroLang; }
@@ -83,9 +90,9 @@ const containerVariants = {
 const LUXURY_EASE = [0.22, 1, 0.36, 1] as [number, number, number, number];
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 28, filter: 'blur(4px)' },
+  hidden: { opacity: 0, y: 28 },
   visible: {
-    opacity: 1, y: 0, filter: 'blur(0px)',
+    opacity: 1, y: 0,
     transition: { duration: 0.65, ease: LUXURY_EASE },
   },
 };
@@ -206,14 +213,20 @@ const StepCard = memo(({ step, lang, isDark, index }: {
           >
             {/* Back phone */}
             <motion.div
-              className="absolute right-0 top-0 md:-right-[5%] md:top-[0%] z-0"
+              className="absolute right-0 top-[12%] md:-right-[5%] md:top-[8%] z-0"
               animate={{ y: FLOAT_BACK.y }}
               transition={FLOAT_BACK.transition}
               style={{ willChange: 'transform' }}
             >
               <div
                 className="relative w-[145px] sm:w-[165px] md:w-[200px] aspect-[1/2.16] rounded-[32px] md:rounded-[44px] border-[6px] md:border-[8px] overflow-hidden bg-black shadow-[0_16px_32px_rgba(0,0,0,0.15)] opacity-80 hover:opacity-100 hover:scale-105 transition-all duration-500"
-                style={{ borderColor: backPhoneBorderColor, transform: 'rotate(8deg)' }}
+                style={{
+                  borderColor: backPhoneBorderColor,
+                  transform: 'rotate(8deg)',
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden',
+                  WebkitTransform: 'rotate(8deg) translateZ(0)',
+                }}
               >
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[36px] md:w-[48px] h-[11px] md:h-[16px] bg-black rounded-full z-20" />
                 <img
@@ -230,14 +243,20 @@ const StepCard = memo(({ step, lang, isDark, index }: {
 
             {/* Front phone */}
             <motion.div
-              className="absolute left-0 bottom-[5%] md:-left-[5%] md:-bottom-[2%] z-10"
+              className="absolute left-0 bottom-[0%] md:-left-[5%] md:-bottom-[2%] z-10"
               animate={{ y: FLOAT_FRONT.y }}
               transition={FLOAT_FRONT.transition}
               style={{ willChange: 'transform' }}
             >
               <div
                 className="relative w-[165px] sm:w-[185px] md:w-[220px] aspect-[1/2.16] rounded-[36px] md:rounded-[48px] border-[8px] md:border-[10px] overflow-hidden bg-black shadow-[0_24px_56px_rgba(0,0,0,0.3)] hover:scale-105 transition-transform duration-500"
-                style={{ borderColor: phoneBorderColor, transform: 'rotate(-5deg)' }}
+                style={{
+                  borderColor: phoneBorderColor,
+                  transform: 'rotate(-5deg)',
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden',
+                  WebkitTransform: 'rotate(-5deg) translateZ(0)',
+                }}
               >
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[44px] md:w-[62px] h-[14px] md:h-[20px] bg-black rounded-full z-20" />
                 <img
@@ -291,7 +310,12 @@ const StepCard = memo(({ step, lang, isDark, index }: {
             >
               <div
                 className="relative w-[120px] sm:w-[140px] md:w-[180px] aspect-[1/2.16] rounded-[32px] md:rounded-[44px] border-[7px] md:border-[9px] overflow-hidden bg-black shadow-[0_20px_56px_rgba(0,0,0,0.25)]"
-                style={{ borderColor: isDark ? '#1C1C1E' : '#1a1919' }}
+                style={{
+                  borderColor: isDark ? '#1C1C1E' : '#1a1919',
+                  WebkitBackfaceVisibility: 'hidden',
+                  backfaceVisibility: 'hidden',
+                  WebkitTransform: 'translateZ(0)',
+                }}
               >
                 <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[44px] md:w-[62px] h-[14px] md:h-[20px] bg-black rounded-full z-20" />
                 <img
@@ -316,7 +340,12 @@ const StepCard = memo(({ step, lang, isDark, index }: {
           >
             <div
               className="w-[180px] sm:w-[200px] md:w-[240px] aspect-[1/2.16] rounded-[36px] md:rounded-[48px] border-[8px] md:border-[10px] overflow-hidden relative bg-black shadow-[0_16px_48px_rgba(0,0,0,0.15)] hover:scale-105 transition-transform duration-500"
-              style={{ borderColor: phoneBorderColor }}
+              style={{
+                borderColor: phoneBorderColor,
+                WebkitBackfaceVisibility: 'hidden',
+                backfaceVisibility: 'hidden',
+                WebkitTransform: 'translateZ(0)',
+              }}
             >
               <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[54px] md:w-[72px] h-[16px] md:h-[22px] bg-black rounded-full z-20" />
               <img
@@ -358,8 +387,9 @@ const dividerVariants = {
 // ─── HowItWorks (exported) ────────────────────────────────────────────────────
 
 export const HowItWorks = ({ lang }: HowItWorksProps) => {
+  const mounted = useMounted();
   const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
+  const isDark = mounted ? resolvedTheme === 'dark' : false;
   const t = tokens(isDark);
 
   const headerRef = useRef<HTMLDivElement>(null);
@@ -373,7 +403,12 @@ export const HowItWorks = ({ lang }: HowItWorksProps) => {
   return (
     <section
       className="w-full py-20 md:py-28 overflow-hidden border-t relative transition-colors duration-500"
-      style={{ background: t.bgSurface, borderColor: t.border }}
+      style={{
+        background: t.bgSurface,
+        borderColor: t.border,
+        opacity: mounted ? 1 : 0,
+        transition: 'opacity 0.3s ease, background-color 0.5s ease, border-color 0.5s ease',
+      }}
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 md:px-12 lg:px-16">
 

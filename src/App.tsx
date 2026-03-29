@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
 import { useSkinProfileStore } from "@/store/useSkinProfileStore";
+import { useCartStore } from "@/store/cartStore";
 import { brand } from "@/lib/designTokens";
 import GdprConsentModal from "./components/GdprConsentModal";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -194,6 +195,8 @@ function AppInner() {
         }
         if (event === "SIGNED_OUT") {
           skinProfileStore.clearProfile();
+          // Also clear cart Zustand state on sign-out (covers token expiry, manual sign-out, etc.)
+          try { useCartStore.getState().clear(); } catch { /* safe */ }
         }
 
         // ── GDPR gate: trigger for all non-email social sign-ins (Google, Apple, etc.)

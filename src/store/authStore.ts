@@ -11,6 +11,7 @@ import { safeStorage } from "@/utils/safeStorage";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useSkinProfileStore } from "./useSkinProfileStore";
+import { useCartStore } from "./cartStore";
 
 // ── Lightweight profile shape — only what Navbar/UI needs from memory ────────
 export interface UserProfile {
@@ -120,19 +121,31 @@ export const useAuthStore = create<AuthState>()(
             },
 
             logout: async () => {
-                await supabase.auth.signOut();
+                // 1. Sign out — wrapped in try-catch so cleanup ALWAYS proceeds
+                try {
+                    await supabase.auth.signOut();
+                } catch (e) {
+                    console.warn('[authStore] signOut() threw:', e);
+                }
+
+                // 2. Clear all Zustand in-memory state FIRST (before localStorage)
+                set({ isLoggedIn: false, userProfile: null });
+                try { useCartStore.getState().clear(); } catch { /* safe */ }
+                try { useSkinProfileStore.getState().clearProfile(); } catch { /* safe */ }
+
+                // 3. Nuke persisted localStorage keys
                 try {
                     localStorage.removeItem("skin-strategy-auth");
                     localStorage.removeItem("skin-diagnosis-store");
                     localStorage.removeItem("skin-analysis-store");
                     localStorage.removeItem("skin-compass-cart-v1");
                     localStorage.removeItem("skin-compass-products-v2");
-                    localStorage.removeItem("ssl_diagnosis_progress"); // legacy key — hook deleted in Sprint C
+                    localStorage.removeItem("ssl_diagnosis_progress");
                 } catch {
                     // Safari Private Mode safe
                 }
-                set({ isLoggedIn: false, userProfile: null });
-                useSkinProfileStore.getState().clearProfile();
+
+                // 4. Hard redirect — guaranteed to fire regardless of errors above
                 window.location.href = "/";
             },
 

@@ -208,7 +208,7 @@ const StepCard = memo(({ step, lang, isDark, index }: {
         {step.isDualPhone ? (
           /* ── Dual-phone layout (Step 01) ── */
           <div
-            className="relative w-full max-w-[260px] sm:max-w-[300px] md:max-w-[340px] h-[320px] sm:h-[380px] md:h-[440px] mx-auto"
+            className="relative w-full max-w-[260px] sm:max-w-[300px] md:max-w-[340px] h-[320px] sm:h-[380px] md:h-[440px] mx-auto mt-[10px]"
             style={{ willChange: 'transform' }}
           >
             {/* Back phone */}
@@ -402,7 +402,7 @@ export const HowItWorks = ({ lang }: HowItWorksProps) => {
 
   return (
     <section
-      className="w-full py-20 md:py-28 overflow-hidden border-t relative transition-colors duration-500"
+      className="w-full pt-[76px] pb-20 md:pt-[108px] md:pb-28 overflow-hidden border-t relative transition-colors duration-500"
       style={{
         background: t.bgSurface,
         borderColor: t.border,
@@ -413,7 +413,7 @@ export const HowItWorks = ({ lang }: HowItWorksProps) => {
       <div className="mx-auto max-w-6xl px-4 sm:px-6 md:px-12 lg:px-16">
 
         {/* ── Section Header ── */}
-        <div ref={headerRef} className="text-center w-full max-w-3xl mx-auto mb-14 md:mb-24 space-y-4">
+        <div ref={headerRef} className="text-center w-full max-w-3xl mx-auto mb-6 md:mb-17 space-y-4">
           <motion.p
             initial="hidden"
             animate={headerInView ? 'visible' : 'hidden'}

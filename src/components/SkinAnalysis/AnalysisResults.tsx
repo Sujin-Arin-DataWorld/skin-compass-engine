@@ -378,8 +378,26 @@ export default function AnalysisResults({
     setSaveStatus('saving');
     try {
       const { supabase } = await import('@/integrations/supabase/client');
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      // BUG-6 FIX: Session expired on mobile (background tab GC'd the token).
+      // Save pending analysis → redirect to login so it auto-saves on return.
+      if (authError || !user) {
+        console.warn('[Save] Session expired:', authError?.message);
+        try {
+          localStorage.setItem('ssl_pending_analysis', JSON.stringify({
+            scores, analysisId, hasLifestyle, timestamp: Date.now(),
+          }));
+        } catch { /* safe */ }
+        setSaveStatus('idle');
+        toast.error(
+          lang === 'ko' ? '세션이 만료되었습니다. 다시 로그인해주세요.'
+            : lang === 'de' ? 'Sitzung abgelaufen. Bitte erneut anmelden.'
+            : 'Session expired. Please log in again.'
+        );
+        navigate('/login?redirect=/skin-analysis');
+        return;
+      }
 
       // Derive skinType & primaryConcerns from scores
       const sebHealth = 100 - scores.seb;
@@ -403,7 +421,8 @@ export default function AnalysisResults({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         primaryConcerns: primaryConcerns as any,
         analysisMethod: 'camera',
-        confidenceScore: 85,
+        // BUG-6 FIX: Normalize to 0-1 range (was 85 → DB constraint violation possible)
+        confidenceScore: hasLifestyle ? 0.92 : 0.75,
       });
 
       if (!saved) throw new Error('Save returned null');
@@ -415,10 +434,21 @@ export default function AnalysisResults({
     } catch (err) {
       console.error('[Save] Failed:', err);
       setSaveStatus('error');
+      // BUG-6 FIX: Show specific error message instead of silent failure
+      const errMsg = err instanceof Error ? err.message : '';
+      toast.error(
+        errMsg.includes('JWT') || errMsg.includes('auth') || errMsg.includes('authenticated')
+          ? (lang === 'ko' ? '인증 오류 — 다시 로그인해주세요'
+            : lang === 'de' ? 'Authentifizierungsfehler — bitte erneut anmelden'
+            : 'Auth error — please log in again')
+          : (lang === 'ko' ? '저장 실패 — 잠시 후 다시 시도해주세요'
+            : lang === 'de' ? 'Speichern fehlgeschlagen — bitte erneut versuchen'
+            : 'Save failed — please retry')
+      );
       // Auto-reset after 3s so user can retry
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
-  }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate, saveStatus, saveAnalysisResult]);
+  }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate, saveStatus, saveAnalysisResult, lang]);
 
   const resetDiagnosisStore = useDiagnosisStore((s) => s.reset);
 

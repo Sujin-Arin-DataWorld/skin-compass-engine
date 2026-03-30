@@ -28,7 +28,7 @@ const SlideNav = ({ current, total, labels, onPrev, onNext, onGoTo }: SlideNavPr
       {/* Top text navigation bar — below green progress line */}
       <div style={{
         position: 'absolute',
-        top: 58, // below navbar (57px) + progress bar (0.5px)
+        top: 64, // BUG-4 FIX: navbar is 64px (4rem), not 57px. Was causing 6px overlap.
         left: 0,
         right: 0,
         zIndex: 40,

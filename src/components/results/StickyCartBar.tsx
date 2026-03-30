@@ -108,7 +108,7 @@ const StickyCartBar = memo(function StickyCartBar({
       transition={prefersReducedMotion ? { duration: 0 } : { delay: 0.3, type: 'spring', stiffness: 400, damping: 30 }}
       style={{
         position: 'fixed',
-        bottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+        bottom: 'calc(4rem + 12px + env(safe-area-inset-bottom, 0px))', // BUG-5 FIX: 4rem = bottom nav height
         left: '50%',
         transform: 'translateX(-50%)',
         width: 'calc(100% - 32px)',

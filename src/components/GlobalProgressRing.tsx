@@ -101,7 +101,7 @@ export default function GlobalProgressRing() {
                                     />
                                     {/* Active Track Segment */}
                                     <circle
-                                        stroke="currentColor"
+                                        s
                                         fill="transparent"
                                         strokeWidth={stroke}
                                         strokeDasharray={`${segmentLength} ${circumference}`}

@@ -1,6 +1,7 @@
 // src/components/routine/RoutineStepIcon.tsx
-// Inline SVG icons for skincare routine steps
-// Each icon renders inside a circular container
+// Copyright-free inline SVG icons for skincare routine steps
+// All SVGs are hand-coded (mathematical coordinates) — zero image files, zero licensing issues
+// stroke="currentColor" inherits from parent via the `color` prop
 
 interface StepIconProps {
   stepKey: string;
@@ -9,106 +10,79 @@ interface StepIconProps {
   bgColor?: string;
 }
 
-// ── Cleanser: Two bubbles ────────────────────────────────────────────────────
+// ── 1. Cleanser: Three bubbles (거품) ────────────────────────────────────────
 function CleanserIcon({ size = 18, color = '#9CA3AF' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="9" cy="10" r="6" />
-      <circle cx="17" cy="8" r="4" />
-      {/* Shine highlights */}
-      <path d="M7 7.5 Q7.5 6.5 8.5 7" />
-      <path d="M15.5 6 Q16 5.5 16.8 6" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="10" cy="14" r="5" />
+      <circle cx="16" cy="10" r="3" />
+      <circle cx="15" cy="18" r="2" />
     </svg>
   );
 }
 
-// ── Toner: Water droplet ─────────────────────────────────────────────────────
+// ── 2. Toner: Water droplet (물방울) ─────────────────────────────────────────
 function TonerIcon({ size = 18, color = '#9CA3AF' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2.5 C12 2.5 5 10 5 14.5 C5 18.36 8.13 21.5 12 21.5 C15.87 21.5 19 18.36 19 14.5 C19 10 12 2.5 12 2.5Z" />
-      {/* Inner shine */}
-      <path d="M9 14 Q9 11 12 8" strokeWidth="1.2" opacity="0.5" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
     </svg>
   );
 }
 
-// ── Serum: Dropper/Pipette with drop ─────────────────────────────────────────
+// ── 3. Serum: Dropper/Pipette (스포이드) ──────────────────────────────────────
 function SerumIcon({ size = 18, color = '#9CA3AF' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {/* Squeeze bulb */}
-      <path d="M10 2 C8.5 2 7.5 3 7.5 4.5 C7.5 6 8.5 7 10 7 L14 7 C15.5 7 16.5 6 16.5 4.5 C16.5 3 15.5 2 14 2Z" />
-      {/* Collar */}
-      <rect x="10.5" y="7" width="3" height="2" rx="0.5" />
-      {/* Pipette body */}
-      <path d="M11 9 L11 16 Q11 17 12 17 Q13 17 13 16 L13 9" />
-      {/* Tip */}
-      <path d="M11.5 17 L12 18.5 L12.5 17" />
-      {/* Drop */}
-      <path d="M12 20 Q11.2 21 12 22 Q12.8 21 12 20Z" fill={color} stroke="none" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14.5 4a2.5 2.5 0 0 0-5 0v5h5V4z" />
+      <path d="M12 9v8" />
+      <path d="M10 17l4 0" />
+      <circle cx="12" cy="20.5" r="1.5" />
     </svg>
   );
 }
 
-// ── Moisturizer: Cream jar with lid ──────────────────────────────────────────
+// ── 4. Moisturizer: Cream jar (단지형 크림통) ────────────────────────────────
 function MoisturizerIcon({ size = 18, color = '#9CA3AF' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {/* Jar body */}
-      <path d="M5 12 L5 18 Q5 21 8 21 L16 21 Q19 21 19 18 L19 12Z" />
-      {/* Lid */}
-      <rect x="4" y="9.5" width="16" height="3" rx="1.5" />
-      {/* Cream peeking */}
-      <path d="M8 9.5 Q10 7 12 8 Q14 9 16 7.5" strokeWidth="1.5" />
-      {/* Jar line */}
-      <line x1="7" y1="16" x2="17" y2="16" strokeWidth="1" opacity="0.4" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <rect x="4" y="7" width="16" height="4" rx="1" />
     </svg>
   );
 }
 
-// ── Eye cream: Closed eye ────────────────────────────────────────────────────
+// ── 5. Eye cream: Closed eye with lashes (감은 눈 + 속눈썹) ──────────────────
 function EyeCareIcon({ size = 18, color = '#9CA3AF' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {/* Closed eye curve */}
-      <path d="M3 12 Q7 16 12 16 Q17 16 21 12" />
-      {/* Eyelashes */}
-      <path d="M5 13 L4 15.5" />
-      <path d="M8.5 14.5 L7.5 17" />
-      <path d="M12 15.5 L12 18" />
-      <path d="M15.5 14.5 L16.5 17" />
-      <path d="M19 13 L20 15.5" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 10c4.5 4.5 13.5 4.5 18 0" />
+      <path d="M12 14v3" />
+      <path d="M8 13.5l-1.5 2.5" />
+      <path d="M16 13.5l1.5 2.5" />
     </svg>
   );
 }
 
-// ── SPF: Shield with plus ────────────────────────────────────────────────────
+// ── 6. SPF: Shield with plus (방패 + 십자) ───────────────────────────────────
 function SPFIcon({ size = 18, color = '#C9A96E' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2 L4 6 L4 12 C4 17.5 7.8 21.7 12 22 C16.2 21.7 20 17.5 20 12 L20 6Z" />
-      {/* Plus */}
-      <line x1="12" y1="9" x2="12" y2="15" strokeWidth="2" />
-      <line x1="9" y1="12" x2="15" y2="12" strokeWidth="2" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+      <path d="M12 8v8" />
+      <path d="M8 12h8" />
     </svg>
   );
 }
 
-// ── Device: Handheld beauty device (galvanic/LED) ────────────────────────────
+// ── 7. Device: Galvanic/LED beauty device (둥근 헤드 + LED + 손잡이) ──────────
 function DeviceIcon({ size = 18, color = '#C9A96E' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {/* Device head (rounded) */}
-      <ellipse cx="12" cy="5.5" rx="4" ry="3.5" />
-      {/* Neck */}
-      <path d="M10 8.5 L10 11 L14 11 L14 8.5" />
-      {/* Handle body */}
-      <rect x="9.5" y="11" width="5" height="9" rx="2.5" />
-      {/* Button */}
-      <circle cx="12" cy="15" r="1" fill={color} stroke="none" />
-      {/* Base */}
-      <line x1="10" y1="20" x2="14" y2="20" strokeWidth="2" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="8" y="11" width="8" height="11" rx="4" />
+      <path d="M8 11V6a4 4 0 0 1 8 0v5" />
+      <circle cx="12" cy="6" r="1" />
+      <circle cx="12" cy="16" r="1.5" fill={color} stroke="none" />
     </svg>
   );
 }

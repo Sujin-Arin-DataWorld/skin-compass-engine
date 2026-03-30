@@ -121,11 +121,17 @@ export const useAuthStore = create<AuthState>()(
             },
 
             logout: async () => {
-                // 1. Sign out — wrapped in try-catch so cleanup ALWAYS proceeds
+                // 1. Sign out with 3s timeout — mobile networks can stall TCP connections
+                //    indefinitely (no throw, no resolve), blocking window.location.href forever.
                 try {
-                    await supabase.auth.signOut();
+                    await Promise.race([
+                        supabase.auth.signOut(),
+                        new Promise<never>((_, reject) =>
+                            setTimeout(() => reject(new Error('signOut timeout')), 3000)
+                        ),
+                    ]);
                 } catch (e) {
-                    console.warn('[authStore] signOut() threw:', e);
+                    console.warn('[authStore] signOut() failed or timed out:', e);
                 }
 
                 // 2. Clear all Zustand in-memory state FIRST (before localStorage)
@@ -133,7 +139,7 @@ export const useAuthStore = create<AuthState>()(
                 try { useCartStore.getState().clear(); } catch { /* safe */ }
                 try { useSkinProfileStore.getState().clearProfile(); } catch { /* safe */ }
 
-                // 3. Nuke persisted localStorage keys
+                // 3. Nuke persisted localStorage keys (app keys + Supabase sb-* session keys)
                 try {
                     localStorage.removeItem("skin-strategy-auth");
                     localStorage.removeItem("skin-diagnosis-store");
@@ -141,6 +147,10 @@ export const useAuthStore = create<AuthState>()(
                     localStorage.removeItem("skin-compass-cart-v1");
                     localStorage.removeItem("skin-compass-products-v2");
                     localStorage.removeItem("ssl_diagnosis_progress");
+                    // Belt-and-suspenders: force-clear Supabase session even if signOut timed out
+                    Object.keys(localStorage).forEach(k => {
+                        if (k.startsWith('sb-')) localStorage.removeItem(k);
+                    });
                 } catch {
                     // Safari Private Mode safe
                 }

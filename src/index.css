@@ -587,6 +587,9 @@
 /* ── Mobile-first base rules ── */
 html {
   text-size-adjust: 100%;
+  /* BUG-3 FIX: iOS Safari treats html (not body) as the scroll container.
+     Must apply overscroll-behavior-y: none here too to block pull-to-refresh. */
+  overscroll-behavior-y: none;
 }
 
 [lang="ko"] {

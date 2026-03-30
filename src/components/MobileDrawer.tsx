@@ -76,7 +76,10 @@ export default function MobileDrawer() {
   }, [mobileMenuOpen]);
 
   const handleLogout = async () => {
-    closeMobileMenu();
+    // BUG-1 FIX: Do NOT close drawer before logout.
+    // closeMobileMenu() triggers AnimatePresence exit → mobile browser GC's the
+    // async continuation before logout() completes. logout() ends with
+    // window.location.href = "/" which destroys the entire React tree naturally.
     await logout();
   };
 
@@ -231,7 +234,7 @@ export default function MobileDrawer() {
                       <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{userProfile.firstName}</p>
                       <Link to="/profile" className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">{t.profile}</Link>
                     </div>
-                    <button onClick={handleLogout} className="text-red-400 hover:text-red-500 transition-colors" aria-label="Logout">
+                    <button onClick={handleLogout} className="p-2.5 -m-2.5 text-red-400 hover:text-red-500 active:scale-90 transition-all rounded-full" aria-label="Logout">
                       <LogOut className="h-4 w-4" />
                     </button>
                   </div>

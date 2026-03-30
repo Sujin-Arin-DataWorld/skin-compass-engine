@@ -205,6 +205,17 @@ function AppInner() {
           session?.user?.app_metadata?.provider !== "email"
         ) {
           const userId = session.user.id;
+
+          // BUG-2 FIX: Check localStorage FIRST — it is the primary source of truth.
+          // This prevents the modal from re-appearing on every page refresh when
+          // the Supabase DB update may have silently failed.
+          try {
+            if (localStorage.getItem('ssl-privacy-consent-v1') === 'accepted') {
+              // Already accepted locally — skip DB query entirely
+              return;
+            }
+          } catch { /* private browsing — fall through to DB check */ }
+
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const { data: profile } = await (supabase as any)
             .from("profiles")
@@ -216,6 +227,9 @@ function AppInner() {
           if (!profile?.gdpr_consent) {
             setGdprUserId(userId);
             setShowGdpr(true);
+          } else {
+            // DB says accepted — sync to localStorage for future fast-path
+            try { localStorage.setItem('ssl-privacy-consent-v1', 'accepted'); } catch { /* safe */ }
           }
         }
       }
@@ -228,6 +242,10 @@ function AppInner() {
     if (!gdprUserId) return;
     setGdprLoading(true);
     try {
+      // BUG-2 FIX: Write to localStorage FIRST — this is the primary source of truth.
+      // Even if the Supabase DB update fails below, the user won't see the modal again.
+      try { localStorage.setItem('ssl-privacy-consent-v1', 'accepted'); } catch { /* safe */ }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (supabase as any)
         .from("profiles")
@@ -240,7 +258,7 @@ function AppInner() {
       setGdprUserId(null);
     } catch (err) {
       console.error("[App] GDPR accept save failed:", err);
-      // Non-fatal: close modal anyway so the user isn't stuck
+      // localStorage already written above — safe to close
       setShowGdpr(false);
       setGdprUserId(null);
     } finally {
@@ -263,27 +281,15 @@ function AppInner() {
           .eq("id", gdprUserId);
 
         // 2. Permanently delete the auth user via a SECURITY DEFINER RPC.
-        //    SQL to create it (run once in Supabase Dashboard → SQL Editor):
-        //
-        //    CREATE OR REPLACE FUNCTION public.delete_own_user()
-        //    RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
-        //    BEGIN
-        //      DELETE FROM auth.users WHERE id = auth.uid();
-        //    END;
-        //    $$;
-        //    GRANT EXECUTE ON FUNCTION public.delete_own_user() TO authenticated;
-        //
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { error: deleteError } = await (supabase as any).rpc("delete_own_user");
 
         if (deleteError) {
-          // RPC not yet created or failed — user stays rejected in profiles.
-          // They are effectively locked out since gdpr_rejected = true.
-          // Clean up happens when an admin runs a deferred deletion job.
           console.warn("delete_own_user RPC failed:", deleteError.message);
         }
       }
-      // Always sign out regardless of deletion outcome
+      // BUG-2 FIX: Do NOT setShowGdpr(false) before logout — same unmount pattern as BUG-1.
+      // logout() does window.location.href = '/' which destroys everything.
       await logout();
     } catch (err) {
       console.error("[App] GDPR decline failed:", err);

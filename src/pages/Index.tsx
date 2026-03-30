@@ -18,6 +18,7 @@ import RecheckBanner from "@/features/results/components/RecheckBanner";
 import { useI18nStore, phase1T } from "@/store/i18nStore";
 import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
+import { useDiagnosisStore } from "@/store/diagnosisStore";
 import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
 import { tokens, brand, button } from "@/lib/designTokens";
@@ -258,8 +259,8 @@ function HeroSlider({ accent, accentDeep, isDark, language }: {
                 >
                   <HeroCtaButtons
                     lang={lang}
-                    onPrimary={() => navigate('/skin-analysis')}
-                    onSecondary={() => navigate('/diagnosis')}
+                    onPrimary={() => { useDiagnosisStore.getState().reset(); navigate('/skin-analysis'); }}
+                    onSecondary={() => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); }}
                   />
                 </div>
               </div>
@@ -787,8 +788,8 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
         >
           <HeroCtaButtons
             lang={lang}
-            onPrimary={() => navigate('/skin-analysis')}
-            onSecondary={() => navigate('/diagnosis')}
+            onPrimary={() => { useDiagnosisStore.getState().reset(); navigate('/skin-analysis'); }}
+            onSecondary={() => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); }}
           />
         </motion.div>
       </div>
@@ -949,7 +950,7 @@ export default function Index() {
         
         <StickyBottomCta 
           lang={lang} 
-          onPrimary={() => navigate('/skin-analysis')}
+          onPrimary={() => { useDiagnosisStore.getState().reset(); navigate('/skin-analysis'); }}
         />
       </main>
 

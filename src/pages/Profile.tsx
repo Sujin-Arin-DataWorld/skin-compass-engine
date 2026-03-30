@@ -25,6 +25,7 @@ import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { useRoutineStore } from '@/store/useRoutineStore';
 import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -325,6 +326,7 @@ function CompactScoreHub({
 }
 
 function NoAnalysisCTA({ lang }: { lang: Lang }) {
+  const navigate = useNavigate();
   return (
     <div style={{
       borderRadius: 16, padding: 24, textAlign: 'center',
@@ -340,20 +342,20 @@ function NoAnalysisCTA({ lang }: { lang: Lang }) {
           : lang === 'de' ? 'KI analysiert Ihren Hautzustand in 30 Sekunden'
             : 'AI analyzes your skin in 30 seconds'}
       </p>
-      <Link
-        to="/skin-analysis"
+      <button
+        onClick={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
         style={{
           display: 'inline-block',
           padding: '10px 24px', borderRadius: 12,
           background: 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
           color: '#fff', fontSize: 14, fontWeight: 600,
-          textDecoration: 'none',
+          textDecoration: 'none', border: 'none', cursor: 'pointer',
         }}
       >
         {lang === 'ko' ? 'AI 피부 분석 시작 →'
           : lang === 'de' ? 'KI-Hautanalyse starten →'
             : 'Start AI Skin Analysis →'}
-      </Link>
+      </button>
     </div>
   );
 }
@@ -1062,7 +1064,7 @@ export default function Profile() {
               activeProfile={activeProfile}
               userName={userName}
               lang={lang}
-              onReanalyze={() => navigate('/skin-analysis')}
+              onReanalyze={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
             />
 
             {activeProfile && (

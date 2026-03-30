@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { HeroCtaButtons } from '@/components/hero/HeroCtaButtons';
 import { SLIDE1_COPY, type HeroLang } from '@/constants/hero-copy';
+import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -156,8 +158,8 @@ export const LandingHero = ({ lang }: LandingHeroProps) => {
   const prefersReduced = useReducedMotion();
   const item = prefersReduced ? noMotionItem : itemV;
 
-  const onPrimary = () => navigate('/skin-analysis');
-  const onSecondary = () => navigate('/diagnosis');
+  const onPrimary = () => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); };
+  const onSecondary = () => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); };
 
   return (
     <section className="relative w-full overflow-hidden" aria-label="Hero">

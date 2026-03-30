@@ -19,6 +19,7 @@ import { useI18nStore, phase1T } from "@/store/i18nStore";
 import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
 import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useSkinAnalysisStore } from "@/store/skinAnalysisStore";
 import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
 import { tokens, brand, button } from "@/lib/designTokens";
@@ -259,7 +260,7 @@ function HeroSlider({ accent, accentDeep, isDark, language }: {
                 >
                   <HeroCtaButtons
                     lang={lang}
-                    onPrimary={() => { useDiagnosisStore.getState().reset(); navigate('/skin-analysis'); }}
+                    onPrimary={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
                     onSecondary={() => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); }}
                   />
                 </div>
@@ -788,7 +789,7 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
         >
           <HeroCtaButtons
             lang={lang}
-            onPrimary={() => { useDiagnosisStore.getState().reset(); navigate('/skin-analysis'); }}
+            onPrimary={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
             onSecondary={() => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); }}
           />
         </motion.div>
@@ -950,7 +951,7 @@ export default function Index() {
         
         <StickyBottomCta 
           lang={lang} 
-          onPrimary={() => { useDiagnosisStore.getState().reset(); navigate('/skin-analysis'); }}
+          onPrimary={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
         />
       </main>
 

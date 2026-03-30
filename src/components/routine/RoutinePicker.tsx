@@ -41,6 +41,16 @@ const TX: Record<string, Record<Lang, string>> = {
     en: 'Aesthetic-grade home care. Complete routine plus LED or galvanic device treatment.',
     de: 'Ästhetik-Pflege für Zuhause. Komplette Routine plus LED- oder Galvanik-Behandlung.',
   },
+  spfNote: {
+    ko: '☀️ SPF 자외선 차단 자동 포함',
+    en: '☀️ SPF protection auto-included',
+    de: '☀️ SPF-Sonnenschutz automatisch enthalten',
+  },
+  totalProducts: {
+    ko: '총 {N}제품',
+    en: '{N} products total',
+    de: '{N} Produkte gesamt',
+  },
 };
 
 function tx(key: string, lang: Lang): string {
@@ -177,6 +187,26 @@ function TierCard({
             <RoutineStepIcon stepKey="device" size={36} />
           </>
         )}
+      </div>
+
+      {/* SPF notice + total products */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginTop: 10, paddingTop: 8,
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <span style={{
+          fontSize: 11, color: '#7C9CBF',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+        }}>
+          {tx('spfNote', lang)}
+        </span>
+        <span style={{
+          fontSize: 11, fontWeight: 600, color: '#9CA3AF',
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+        }}>
+          {tx('totalProducts', lang).replace('{N}', String(tier.steps.length + 1 + (tier.includesDevice ? 1 : 0)))}
+        </span>
       </div>
     </motion.button>
   );

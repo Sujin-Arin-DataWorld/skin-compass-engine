@@ -1,28 +1,25 @@
 /**
- * Sprint 5 — Profile Page Redesign
- *
- * Sections 0–5:
- *   0. Profile Header (avatar + overall health card)
- *   1. Skin Profile (10-axis health score grid)
- *   2. Top 3 Focus Points (lowest axes)
- *   3. Analysis History (timeline from Supabase)
- *   4. My Routine (CTA to Lab)
- *   5. Account Settings (email, language, logout, legal)
- *
- * Data source: useSkinProfileStore → activeProfile (UserSkinProfile)
- * Auth:        useAuthStore → isLoggedIn, userProfile, logout
- * i18n:        useI18nStore → language
- *
- * CONSTRAINTS:
- *   ❌ No Radar/Spider charts
- *   ❌ No new npm packages
- *   ❌ No Supabase schema changes
- *   ❌ No raw score exposure — all UI uses toHealthScore()
+ * Profile.tsx — "My Skin Journal" Redesign
+ * 
+ * Philosophy: 여행 일지, 성적표가 아님.
+ * 
+ * Sections:
+ *   ① Compact Score Hub — SVG ring (Oura-style) + 핵심 pill 3개
+ *   ② Active Routine Card — 루틴 CTA (Noom-style)
+ *   ③ Skin Trends — Sparkline + Target Trajectory
+ *   ④ Full Breakdown — 10축 아코디언
+ *   ⑤ Account — iOS Settings 스타일 경량화
+ * 
+ * Design tokens:
+ *   ⬜ Solid backgrounds only (light: #FAFAF8, dark: theme)
+ *   🎨 Status colors → ring gradient, thin border, text glow only
+ *   ❌ No colored cards / backgrounds for hierarchy
  */
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, ChevronRight, Sparkles, Calendar, LogOut, Globe, Mail } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useI18nStore } from '@/store/i18nStore';
@@ -32,17 +29,18 @@ import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import RoutinePicker from '@/components/routine/RoutinePicker';
+import RoutineStepIcon from '@/components/routine/RoutineStepIcon';
 import { buildProductBundleV5 } from '@/engine/routineEngineV5';
 import type { UserSkinProfile, SkinAxis } from '@/types/skinProfile';
-import type { RoutineTierId } from '@/types/routine';
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SHARED CONSTANTS
+// SHARED CONSTANTS & UTILS
 // ═══════════════════════════════════════════════════════════════════════════════
 
 type Lang = 'ko' | 'en' | 'de';
 
 const HIGH_IS_BAD: SkinAxis[] = ['seb', 'sen', 'acne', 'pigment', 'aging', 'ox'];
+const AXES: SkinAxis[] = ['seb', 'hyd', 'bar', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox', 'makeup_stability'];
 
 function toHealthScore(axis: SkinAxis, raw: number): number {
   return HIGH_IS_BAD.includes(axis) ? 100 - raw : raw;
@@ -55,33 +53,45 @@ function getScoreTier(h: number): 'excellent' | 'good' | 'attention' | 'critical
   return 'critical';
 }
 
-const TIER_COLORS = {
+// Status colors — ONLY for ring gradient, thin borders, text glow
+const TIER_ACCENT: Record<string, string> = {
   excellent: '#4ECDC4',
-  good: '#8a9a7b',
-  attention: '#c4a265',
-  critical: '#E8A87C',
-} as const;
+  good:      '#5E8B68',
+  attention: '#FFAB4C',
+  critical:  '#FF6B6B',
+};
 
 const TIER_LABELS: Record<string, Record<Lang, string>> = {
   excellent: { ko: '우수', en: 'Excellent', de: 'Ausgezeichnet' },
-  good: { ko: '양호', en: 'Good', de: 'Gut' },
-  attention: { ko: '보통', en: 'Fair', de: 'Mäßig' },
-  critical: { ko: '주의', en: 'Needs Care', de: 'Pflegebedarf' },
+  good:      { ko: '양호', en: 'Good', de: 'Gut' },
+  attention: { ko: '관리 필요', en: 'Needs Care', de: 'Pflegebedarf' },
+  critical:  { ko: '집중 케어', en: 'Urgent Care', de: 'Intensive Pflege' },
 };
 
-const AXES: SkinAxis[] = ['seb', 'hyd', 'bar', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox', 'makeup_stability'];
-
 const AXIS_LABELS: Record<SkinAxis, Record<Lang, string>> = {
-  seb: { ko: '유분 밸런스', en: 'Oil Balance', de: 'Öl-Balance' },
-  hyd: { ko: '수분도', en: 'Hydration', de: 'Feuchtigkeit' },
-  bar: { ko: '피부 장벽', en: 'Skin Barrier', de: 'Hautbarriere' },
-  sen: { ko: '민감도 방어', en: 'Sensitivity Defense', de: 'Empfindlichkeitsschutz' },
-  acne: { ko: '트러블 관리', en: 'Breakout Control', de: 'Unreinheiten-Kontrolle' },
-  pigment: { ko: '톤 균일도', en: 'Tone Evenness', de: 'Ton-Gleichmäßigkeit' },
-  texture: { ko: '피부결', en: 'Skin Texture', de: 'Hauttextur' },
-  aging: { ko: '탄력 방어', en: 'Firmness Defense', de: 'Straffheitsschutz' },
-  ox: { ko: '환경 방어', en: 'Environmental Shield', de: 'Umweltschutz' },
-  makeup_stability: { ko: '화장 지속력', en: 'Makeup Wear', de: 'Make-up-Haltbarkeit' },
+  seb:                { ko: '유분 밸런스', en: 'Oil Balance', de: 'Öl-Balance' },
+  hyd:                { ko: '수분도', en: 'Hydration', de: 'Feuchtigkeit' },
+  bar:                { ko: '피부 장벽', en: 'Skin Barrier', de: 'Hautbarriere' },
+  sen:                { ko: '민감도', en: 'Sensitivity', de: 'Empfindlichkeit' },
+  acne:               { ko: '트러블', en: 'Breakout Control', de: 'Unreinheiten' },
+  pigment:            { ko: '톤 균일도', en: 'Tone Evenness', de: 'Ton-Gleichmäßigkeit' },
+  texture:            { ko: '피부결', en: 'Texture', de: 'Hauttextur' },
+  aging:              { ko: '탄력', en: 'Firmness', de: 'Straffheit' },
+  ox:                 { ko: '환경 방어', en: 'Env. Shield', de: 'Umweltschutz' },
+  makeup_stability:   { ko: '화장 지속', en: 'Makeup Wear', de: 'Make-up-Halt' },
+};
+
+const AXIS_INSIGHTS: Record<SkinAxis, Record<Lang, { text: string; ingredients: string[] }>> = {
+  seb:  { ko: { text: 'T존 유분기가 높아요. 밸런싱 케어가 도움됩니다.', ingredients: ['나이아신아마이드', '살리실산', '그린티'] }, en: { text: 'T-zone tends to be oily. Balancing care helps.', ingredients: ['Niacinamide', 'Salicylic Acid', 'Green Tea'] }, de: { text: 'T-Zone neigt zu Öl. Ausgleichende Pflege hilft.', ingredients: ['Niacinamid', 'Salicylsäure', 'Grüntee'] } },
+  hyd:  { ko: { text: '수분 보유력이 낮아요. 히알루론산 기반 제품을 추천합니다.', ingredients: ['히알루론산', '세라마이드', '판테놀'] }, en: { text: 'Moisture retention is low. Hyaluronic acid recommended.', ingredients: ['Hyaluronic Acid', 'Ceramides', 'Panthenol'] }, de: { text: 'Feuchtigkeitsretention niedrig. Hyaluronsäure empfohlen.', ingredients: ['Hyaluronsäure', 'Ceramide', 'Panthenol'] } },
+  bar:  { ko: { text: '장벽이 약해져 있어요. 세라마이드 집중 보강이 필요합니다.', ingredients: ['세라마이드', '콜레스테롤', '지방산'] }, en: { text: 'Barrier is weakened. Ceramide reinforcement needed.', ingredients: ['Ceramides', 'Cholesterol', 'Fatty Acids'] }, de: { text: 'Barriere geschwächt. Ceramid-Verstärkung nötig.', ingredients: ['Ceramide', 'Cholesterin', 'Fettsäuren'] } },
+  sen:  { ko: { text: '자극에 민감한 상태예요. 저자극 제품을 사용하세요.', ingredients: ['시카', '알란토인', '마데카소사이드'] }, en: { text: 'Sensitive to stimuli. Use gentle products.', ingredients: ['Centella', 'Allantoin', 'Madecassoside'] }, de: { text: 'Empfindlich gegen Reize. Sanfte Produkte nutzen.', ingredients: ['Centella', 'Allantoin', 'Madecassosid'] } },
+  acne: { ko: { text: '트러블이 잦아요. 진정 + 각질 케어를 병행하세요.', ingredients: ['티트리', 'BHA', '아젤라산'] }, en: { text: 'Breakouts occur easily. Combine calming + exfoliation.', ingredients: ['Tea Tree', 'BHA', 'Azelaic Acid'] }, de: { text: 'Unreinheiten häufig. Beruhigung + Peeling kombinieren.', ingredients: ['Teebaum', 'BHA', 'Azelainsäure'] } },
+  pigment: { ko: { text: '색소 침착이 보여요. 브라이트닝 케어를 추천합니다.', ingredients: ['비타민C', '나이아신아마이드', '알부틴'] }, en: { text: 'Pigmentation visible. Brightening care recommended.', ingredients: ['Vitamin C', 'Niacinamide', 'Arbutin'] }, de: { text: 'Pigmentierung sichtbar. Aufhellende Pflege empfohlen.', ingredients: ['Vitamin C', 'Niacinamid', 'Arbutin'] } },
+  texture: { ko: { text: '피부결이 거칠어요. 부드러운 각질 제거를 추천합니다.', ingredients: ['AHA', 'PHA', '효소 클렌저'] }, en: { text: 'Texture is rough. Gentle exfoliation recommended.', ingredients: ['AHA', 'PHA', 'Enzyme Cleanser'] }, de: { text: 'Hauttextur rau. Sanftes Peeling empfohlen.', ingredients: ['AHA', 'PHA', 'Enzymreiniger'] } },
+  aging: { ko: { text: '탄력 저하가 시작됐어요. 콜라겐 부스팅이 효과적입니다.', ingredients: ['레티놀', '펩타이드', '콜라겐'] }, en: { text: 'Firmness decreasing. Collagen boosting effective.', ingredients: ['Retinol', 'Peptides', 'Collagen'] }, de: { text: 'Straffheit nimmt ab. Kollagen-Boosting effektiv.', ingredients: ['Retinol', 'Peptide', 'Kollagen'] } },
+  ox:   { ko: { text: '환경 스트레스에 노출돼 있어요. 항산화 케어를 강화하세요.', ingredients: ['비타민C', '비타민E', '페룰산'] }, en: { text: 'Exposed to environmental stress. Boost antioxidants.', ingredients: ['Vitamin C', 'Vitamin E', 'Ferulic Acid'] }, de: { text: 'Umweltstress ausgesetzt. Antioxidative Pflege verstärken.', ingredients: ['Vitamin C', 'Vitamin E', 'Ferulasäure'] } },
+  makeup_stability: { ko: { text: '메이크업이 쉽게 무너져요. 수분-유분 밸런스가 핵심입니다.', ingredients: ['프라이머 에센스', '수분크림', '세팅 미스트'] }, en: { text: 'Makeup fades easily. Oil-moisture balance is key.', ingredients: ['Primer Essence', 'Moisturizer', 'Setting Mist'] }, de: { text: 'Make-up verblasst leicht. Öl-Feuchtigkeits-Balance ist entscheidend.', ingredients: ['Primer-Essenz', 'Feuchtigkeitscreme', 'Setting-Spray'] } },
 };
 
 function calculateOverallHealth(profile: UserSkinProfile): number {
@@ -95,43 +105,250 @@ function formatDateShort(dateStr: string, lang: Lang): string {
   return d.toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { month: 'short', day: 'numeric' });
 }
 
-function formatMonth(dateStr: string, lang: Lang): string {
-  const d = new Date(dateStr);
-  if (lang === 'ko') return `${d.getMonth() + 1}월`;
-  return d.toLocaleDateString(lang === 'de' ? 'de-DE' : 'en-US', { month: 'short' });
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION ① — COMPACT SCORE HUB (SVG Ring)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
+  const tier = getScoreTier(score);
+  const color = TIER_ACCENT[tier];
+  const radius = (size - 12) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const progress = (score / 100) * circumference;
+  const trackColor = 'rgba(0,0,0,0.05)';
+
+  // Gradient colors based on tier
+  const gradientId = `ring-gradient-${tier}`;
+  const gradients: Record<string, [string, string]> = {
+    excellent: ['#4ECDC4', '#2BAE66'],
+    good:      ['#5E8B68', '#8FC49F'],
+    attention: ['#FFAB4C', '#FF8F1F'],
+    critical:  ['#FF6B6B', '#FF4444'],
+  };
+  const [g1, g2] = gradients[tier];
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={g1} />
+          <stop offset="100%" stopColor={g2} />
+        </linearGradient>
+      </defs>
+      {/* Track */}
+      <circle
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none" stroke={trackColor} strokeWidth={8}
+      />
+      {/* Progress */}
+      <motion.circle
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none" stroke={`url(#${gradientId})`} strokeWidth={8}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        initial={{ strokeDashoffset: circumference }}
+        animate={{ strokeDashoffset: circumference - progress }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
+        style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+      />
+      {/* Center text */}
+      <text
+        x="50%" y="46%"
+        textAnchor="middle" dominantBaseline="central"
+        style={{
+          fontFamily: "'Fraunces', serif",
+          fontSize: size * 0.3,
+          fontWeight: 700,
+          fill: '#1B2838',
+        }}
+      >
+        {score}
+      </text>
+      <text
+        x="50%" y="68%"
+        textAnchor="middle" dominantBaseline="central"
+        style={{
+          fontFamily: "'Plus Jakarta Sans', sans-serif",
+          fontSize: size * 0.09,
+          fontWeight: 500,
+          fill: color,
+        }}
+      >
+        / 100
+      </text>
+    </svg>
+  );
 }
 
-function formatDay(dateStr: string): string {
-  return new Date(dateStr).getDate().toString();
-}
+function CompactScoreHub({
+  activeProfile,
+  userName,
+  lang,
+  onReanalyze,
+}: {
+  activeProfile: UserSkinProfile | null;
+  userName: string;
+  lang: Lang;
+  onReanalyze: () => void;
+}) {
+  const overall = activeProfile ? calculateOverallHealth(activeProfile) : null;
+  const tier = overall !== null ? getScoreTier(overall) : null;
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 0: PROFILE HEADER
-// ═══════════════════════════════════════════════════════════════════════════════
+  // Top 3 concerns (lowest health scores)
+  const top3 = useMemo(() => {
+    if (!activeProfile) return [];
+    return AXES.map(axis => ({
+      axis,
+      health: toHealthScore(axis, activeProfile.scores[axis]),
+    }))
+      .sort((a, b) => a.health - b.health)
+      .slice(0, 3);
+  }, [activeProfile]);
+
+  return (
+    <section style={{ padding: '24px 20px 16px' }}>
+      {/* Name + Date */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+        <div
+          style={{
+            width: 44, height: 44, borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(94,139,104,0.1)',
+          }}
+        >
+          <span style={{
+            fontFamily: "'Fraunces', serif",
+            fontSize: 18, fontWeight: 600, color: '#5E8B68',
+          }}>
+            {userName?.charAt(0)?.toUpperCase() || 'S'}
+          </span>
+        </div>
+        <div style={{ flex: 1 }}>
+          <h1 style={{
+            fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
+            fontSize: 20, fontWeight: 600, color: '#1B2838', margin: 0, lineHeight: 1.3,
+          }}>
+            {userName || 'Guest'}
+          </h1>
+          {activeProfile && (
+            <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, marginTop: 2 }}>
+              {lang === 'ko'
+                ? `마지막 분석 · ${formatDateShort(activeProfile.createdAt, lang)}`
+                : lang === 'de'
+                  ? `Letzte Analyse · ${formatDateShort(activeProfile.createdAt, lang)}`
+                  : `Last analysis · ${formatDateShort(activeProfile.createdAt, lang)}`}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {activeProfile && overall !== null && tier !== null ? (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {/* Ring + Tier label */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
+            <ScoreRing score={overall} size={140} />
+            <div style={{
+              marginTop: 12,
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span style={{
+                fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
+                fontSize: 13, fontWeight: 600,
+                color: TIER_ACCENT[tier],
+              }}>
+                {TIER_LABELS[tier][lang]}
+              </span>
+              <span style={{ fontSize: 11, color: '#9CA3AF' }}>·</span>
+              <span style={{
+                fontSize: 11, color: '#9CA3AF',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+              }}>
+                {lang === 'ko' ? '종합 피부 건강도' : lang === 'de' ? 'Gesamt-Hautgesundheit' : 'Overall Skin Health'}
+              </span>
+            </div>
+          </div>
+
+          {/* Top 3 concern pills */}
+          <div style={{
+            display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap',
+            marginBottom: 16,
+          }}>
+            {top3.map(({ axis, health }) => {
+              const t = getScoreTier(health);
+              const c = TIER_ACCENT[t];
+              return (
+                <span
+                  key={axis}
+                  style={{
+                    fontSize: 12, fontWeight: 500,
+                    padding: '5px 12px', borderRadius: 99,
+                    border: `1px solid ${c}30`,
+                    color: c,
+                    fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
+                  }}
+                >
+                  {AXIS_LABELS[axis][lang]} {health}
+                </span>
+              );
+            })}
+          </div>
+
+          {/* Re-analyze button */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <motion.button
+              onClick={onReanalyze}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '8px 20px', borderRadius: 99,
+                border: '1px solid rgba(94,139,104,0.2)',
+                background: 'transparent',
+                color: '#5E8B68',
+                fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
+              }}
+            >
+              <Calendar size={14} />
+              {lang === 'ko' ? '다시 분석하기' : lang === 'de' ? 'Erneut analysieren' : 'Re-analyze'}
+            </motion.button>
+          </div>
+        </motion.div>
+      ) : (
+        <NoAnalysisCTA lang={lang} />
+      )}
+    </section>
+  );
+}
 
 function NoAnalysisCTA({ lang }: { lang: Lang }) {
   return (
-    <div
-      className="rounded-2xl p-6 text-center"
-      style={{
-        background: 'rgba(138, 154, 123, 0.06)',
-        border: '1px dashed rgba(138, 154, 123, 0.3)',
-      }}
-    >
-      <p className="text-sm mb-1" style={{ color: '#1a1a18', fontWeight: 500 }}>
+    <div style={{
+      borderRadius: 16, padding: 24, textAlign: 'center',
+      border: '1px dashed rgba(94,139,104,0.25)',
+    }}>
+      <p style={{ fontSize: 14, fontWeight: 500, color: '#1B2838', marginBottom: 4 }}>
         {lang === 'ko' ? '아직 피부 분석을 하지 않았어요'
-          : lang === 'de' ? 'Sie haben noch keine Hautanalyse durchgeführt'
+          : lang === 'de' ? 'Noch keine Hautanalyse durchgeführt'
             : "You haven't done a skin analysis yet"}
       </p>
-      <p className="text-xs mb-4" style={{ color: '#9a9590' }}>
+      <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 16 }}>
         {lang === 'ko' ? 'AI가 30초 안에 피부 상태를 분석해드려요'
           : lang === 'de' ? 'KI analysiert Ihren Hautzustand in 30 Sekunden'
-            : 'AI analyzes your skin condition in 30 seconds'}
+            : 'AI analyzes your skin in 30 seconds'}
       </p>
       <Link
         to="/skin-analysis"
-        className="inline-block px-5 py-2.5 rounded-xl text-sm font-medium"
-        style={{ backgroundColor: '#8a9a7b', color: '#fff' }}
+        style={{
+          display: 'inline-block',
+          padding: '10px 24px', borderRadius: 12,
+          background: 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
+          color: '#fff', fontSize: 14, fontWeight: 600,
+          textDecoration: 'none',
+        }}
       >
         {lang === 'ko' ? 'AI 피부 분석 시작 →'
           : lang === 'de' ? 'KI-Hautanalyse starten →'
@@ -141,349 +358,138 @@ function NoAnalysisCTA({ lang }: { lang: Lang }) {
   );
 }
 
-function OverallHealthCard({ score, lang }: { score: number; lang: Lang }) {
-  const tier = getScoreTier(score);
-  const color = TIER_COLORS[tier];
+// ═══════════════════════════════════════════════════════════════════════════════
+// SECTION ② — ACTIVE ROUTINE CARD (Noom-style CTA)
+// ═══════════════════════════════════════════════════════════════════════════════
 
-  const messages: Record<string, Record<Lang, string>> = {
-    excellent: {
-      ko: '피부 상태가 매우 좋습니다! 현재 루틴을 유지하세요.',
-      en: 'Your skin is in excellent condition!',
-      de: 'Ihre Haut ist in ausgezeichnetem Zustand!',
+function ActiveRoutineCard({
+  lang,
+  hasAnalysis,
+  onOpenPicker,
+}: {
+  lang: Lang;
+  hasAnalysis: boolean;
+  onOpenPicker: () => void;
+}) {
+  const selectedTier = useRoutineStore((s) => s.selectedTier);
+  const hasRoutine = selectedTier !== null;
+
+  const tierConfig: Record<string, { label: Record<Lang, string>; steps: string[]; total: number }> = {
+    essential: {
+      label: { ko: '에센셜 루틴', en: 'Essential Routine', de: 'Essential-Routine' },
+      steps: ['cleanser', 'toner', 'moisturizer'],
+      total: 4,
     },
-    good: {
-      ko: '전반적으로 양호해요. 몇 가지 포인트 케어로 더 좋아질 수 있어요.',
-      en: 'Overall good. Targeted care can make it even better.',
-      de: 'Insgesamt gut. Gezielte Pflege kann es noch verbessern.',
+    complete: {
+      label: { ko: '풀 케어 루틴', en: 'Complete Routine', de: 'Komplett-Routine' },
+      steps: ['cleanser', 'toner', 'serum', 'eye_care', 'moisturizer'],
+      total: 6,
     },
-    attention: {
-      ko: '지금이 케어 골든타임이에요 — 맞춤 솔루션을 확인해보세요.',
-      en: "Now is the golden time — check your customized solutions.",
-      de: 'Jetzt ist die goldene Zeit — prüfen Sie Ihre Lösungen.',
-    },
-    critical: {
-      ko: '집중 케어가 필요합니다. 맞춤 루틴을 시작해보세요.',
-      en: 'Intensive care is needed. Start your custom routine.',
-      de: 'Intensive Pflege nötig. Starten Sie Ihre Routine.',
+    pro: {
+      label: { ko: '프로 루틴', en: 'Pro Routine', de: 'Pro-Routine' },
+      steps: ['cleanser', 'toner', 'serum', 'eye_care', 'moisturizer'],
+      total: 7,
     },
   };
 
-  return (
-    <motion.div
-      className="rounded-2xl p-5"
-      style={{
-        background: '#fff',
-        border: '1px solid rgba(26, 26, 24, 0.06)',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-      }}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <p className="text-xs tracking-wider uppercase mb-3" style={{ color: '#9a9590' }}>
-        {lang === 'ko' ? '종합 피부 건강도' : lang === 'de' ? 'Gesamt-Hautgesundheit' : 'Overall Skin Health'}
-      </p>
-
-      <div className="flex items-center gap-3 mb-3">
-        <span style={{
-          fontFamily: "'Fraunces', serif",
-          fontSize: 40, fontWeight: 700, color: '#1a1a18', lineHeight: 1,
-        }}>
-          {score}
-        </span>
-        <span
-          className="px-2.5 py-1 rounded-full text-xs font-medium"
-          style={{ backgroundColor: `${color}20`, color }}
-        >
-          {TIER_LABELS[tier][lang]}
-        </span>
-      </div>
-
-      <div className="w-full h-2 rounded-full mb-3" style={{ backgroundColor: 'rgba(26,26,24,0.06)' }}>
-        <motion.div
-          className="h-full rounded-full"
-          style={{ backgroundColor: color }}
-          initial={{ width: 0 }}
-          animate={{ width: `${score}%` }}
-          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
-        />
-      </div>
-
-      <p className="text-sm leading-relaxed" style={{
-        fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
-        color: '#6B7280',
-      }}>
-        {messages[tier][lang]}
-      </p>
-    </motion.div>
-  );
-}
-
-function ProfileHeader({ userName, activeProfile, lang }: {
-  userName: string;
-  activeProfile: UserSkinProfile | null;
-  lang: Lang;
-}) {
-  const overallHealth = activeProfile ? calculateOverallHealth(activeProfile) : null;
+  const config = selectedTier ? tierConfig[selectedTier] : null;
 
   return (
-    <section className="px-5 pt-6 pb-4">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'rgba(138, 154, 123, 0.15)' }}
-          >
-            <span style={{
-              fontFamily: "'Fraunces', serif",
-              fontSize: 18, fontWeight: 600, color: '#8a9a7b',
-            }}>
-              {userName?.charAt(0)?.toUpperCase() || 'S'}
-            </span>
-          </div>
-          <div>
-            <h1 style={{
-              fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-              fontSize: 20, fontWeight: 600, color: '#1a1a18',
-            }}>
-              {userName || 'Guest'}
-            </h1>
-            {activeProfile && (
-              <p className="text-xs mt-0.5" style={{ color: '#9a9590' }}>
-                {lang === 'ko'
-                  ? `마지막 분석: ${formatDateShort(activeProfile.createdAt, lang)}`
-                  : lang === 'de'
-                    ? `Letzte Analyse: ${formatDateShort(activeProfile.createdAt, lang)}`
-                    : `Last analysis: ${formatDateShort(activeProfile.createdAt, lang)}`}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {activeProfile && overallHealth !== null ? (
-        <OverallHealthCard score={overallHealth} lang={lang} />
-      ) : (
-        <NoAnalysisCTA lang={lang} />
-      )}
-    </section>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 1: SKIN PROFILE GRID (10-axis)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-function SkinProfileGrid({ activeProfile, lang, onOpenPicker }: { activeProfile: UserSkinProfile; lang: Lang; onOpenPicker: () => void }) {
-  return (
-    <section className="px-5 py-6">
-      <h2 className="text-base font-semibold mb-4" style={{
-        fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-        color: '#1a1a18',
-      }}>
-        {lang === 'ko' ? '피부 프로필' : lang === 'de' ? 'Hautprofil' : 'Skin Profile'}
-      </h2>
-
-      <div className="grid grid-cols-2 gap-2.5">
-        {AXES.map((axis, i) => {
-          const raw = activeProfile.scores[axis];
-          const health = toHealthScore(axis, raw);
-          const tier = getScoreTier(health);
-          const color = TIER_COLORS[tier];
-
-          return (
-            <motion.div
-              key={axis}
-              className="rounded-xl p-3"
-              style={{
-                background: '#fff',
-                border: '1px solid rgba(26,26,24,0.06)',
-              }}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04, duration: 0.4 }}
-            >
-              <p className="text-[11px] mb-1.5" style={{ color: '#9a9590' }}>
-                {AXIS_LABELS[axis][lang]}
-              </p>
-
-              <div className="flex items-center gap-2 mb-2">
-                <span style={{
-                  fontFamily: "'Fraunces', serif",
-                  fontSize: 22, fontWeight: 700, color: '#1a1a18',
-                }}>
-                  {health}
-                </span>
-                <span
-                  className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
-                  style={{ backgroundColor: `${color}20`, color }}
-                >
-                  {TIER_LABELS[tier][lang]}
-                </span>
-              </div>
-
-              <div className="w-full h-1 rounded-full" style={{ backgroundColor: 'rgba(26,26,24,0.06)' }}>
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{ width: `${Math.max(health, 4)}%`, backgroundColor: color }}
-                />
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      <button
+    <section style={{ padding: '0 20px 16px' }}>
+      <motion.button
         onClick={onOpenPicker}
-        className="flex items-center justify-center gap-1 mt-4 py-3 rounded-xl text-sm font-medium w-full"
-        style={{ backgroundColor: 'rgba(138, 154, 123, 0.08)', color: '#8a9a7b', border: 'none', cursor: 'pointer' }}
+        whileTap={{ scale: 0.98 }}
+        style={{
+          width: '100%', textAlign: 'left',
+          borderRadius: 16, padding: 20,
+          border: hasRoutine ? '1px solid rgba(94,139,104,0.15)' : '1px dashed rgba(94,139,104,0.25)',
+          background: '#FFFFFF',
+          cursor: 'pointer',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+        }}
       >
-        {lang === 'ko' ? '맞춤 제품 추천 보러가기'
-          : lang === 'de' ? 'Personalisierte Empfehlungen ansehen'
-            : 'View Personalized Recommendations'}
-        <span>→</span>
-      </button>
+        {hasRoutine && config ? (
+          <>
+            {/* Active routine state */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Sparkles size={16} color="#5E8B68" />
+                <span style={{
+                  fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
+                  fontSize: 15, fontWeight: 600, color: '#1B2838',
+                }}>
+                  {config.label[lang]}
+                </span>
+              </div>
+              <span style={{
+                fontSize: 11, color: '#9CA3AF',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+              }}>
+                {lang === 'ko' ? `총 ${config.total}제품` : `${config.total} products`}
+              </span>
+            </div>
+
+            {/* Step icons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+              {config.steps.map((step) => (
+                <RoutineStepIcon key={step} stepKey={step} size={32} />
+              ))}
+              <span style={{ color: '#9CA3AF', fontSize: 12, marginInline: 2 }}>+</span>
+              <RoutineStepIcon stepKey="spf" size={32} />
+              {selectedTier === 'pro' && <RoutineStepIcon stepKey="device" size={32} />}
+            </div>
+
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              color: '#5E8B68', fontSize: 13, fontWeight: 500,
+            }}>
+              <span>
+                {lang === 'ko' ? 'Lab에서 루틴 관리하기'
+                  : lang === 'de' ? 'Routine im Lab verwalten'
+                    : 'Manage routine in Lab'}
+              </span>
+              <ChevronRight size={14} />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* No routine state */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <Sparkles size={18} color="#5E8B68" />
+              <span style={{
+                fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
+                fontSize: 15, fontWeight: 600, color: '#1B2838',
+              }}>
+                {lang === 'ko' ? '맞춤 루틴 만들기'
+                  : lang === 'de' ? 'Routine zusammenstellen'
+                    : 'Build your routine'}
+              </span>
+            </div>
+            <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 12, lineHeight: 1.5 }}>
+              {lang === 'ko' ? '분석 결과 기반으로 3가지 루틴 중 선택하세요'
+                : lang === 'de' ? 'Wählen Sie aus 3 Routinen basierend auf Ihrer Analyse'
+                  : 'Choose from 3 routines based on your analysis'}
+            </p>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              color: '#5E8B68', fontSize: 13, fontWeight: 500,
+            }}>
+              <span>
+                {lang === 'ko' ? '3가지 루틴 살펴보기'
+                  : lang === 'de' ? '3 Routinen ansehen'
+                    : 'Explore 3 routines'}
+              </span>
+              <ChevronRight size={14} />
+            </div>
+          </>
+        )}
+      </motion.button>
     </section>
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 2: TOP 3 FOCUS POINTS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-const INSIGHTS: Record<SkinAxis, Record<Lang, { insight: string; ingredients: string }>> = {
-  seb: {
-    ko: { insight: 'T존 유분기가 높은 편이에요. 밸런싱 케어가 도움됩니다.', ingredients: '나이아신아마이드, 살리실산, 그린티' },
-    en: { insight: 'T-zone tends to be oily. Balancing care helps.', ingredients: 'Niacinamide, Salicylic Acid, Green Tea' },
-    de: { insight: 'T-Zone neigt zu Öl. Ausgleichende Pflege hilft.', ingredients: 'Niacinamid, Salicylsäure, Grüntee' },
-  },
-  hyd: {
-    ko: { insight: '수분 보유력이 낮아요. 히알루론산 기반 제품을 추천합니다.', ingredients: '히알루론산, 세라마이드, 판테놀' },
-    en: { insight: 'Moisture retention is low. Hyaluronic acid products recommended.', ingredients: 'Hyaluronic Acid, Ceramides, Panthenol' },
-    de: { insight: 'Feuchtigkeitsretention ist niedrig. Hyaluronsäure empfohlen.', ingredients: 'Hyaluronsäure, Ceramide, Panthenol' },
-  },
-  bar: {
-    ko: { insight: '피부 장벽이 약해져 있어요. 세라마이드 집중 보강이 필요합니다.', ingredients: '세라마이드, 콜레스테롤, 지방산' },
-    en: { insight: 'Skin barrier is weakened. Ceramide reinforcement needed.', ingredients: 'Ceramides, Cholesterol, Fatty Acids' },
-    de: { insight: 'Die Hautbarriere ist geschwächt. Ceramid-Verstärkung nötig.', ingredients: 'Ceramide, Cholesterin, Fettsäuren' },
-  },
-  sen: {
-    ko: { insight: '외부 자극에 민감한 상태예요. 저자극 제품 위주로 사용하세요.', ingredients: '시카, 알란토인, 마데카소사이드' },
-    en: { insight: 'Sensitive to external stimuli. Use gentle products.', ingredients: 'Centella, Allantoin, Madecassoside' },
-    de: { insight: 'Empfindlich gegen Reize. Verwenden Sie sanfte Produkte.', ingredients: 'Centella, Allantoin, Madecassosid' },
-  },
-  acne: {
-    ko: { insight: '트러블이 자주 발생하는 편이에요. 진정 + 각질 관리를 병행하세요.', ingredients: '티트리, BHA, 아젤라산' },
-    en: { insight: 'Breakouts are frequent. Combine calming with exfoliation.', ingredients: 'Tea Tree, BHA, Azelaic Acid' },
-    de: { insight: 'Unreinheiten sind häufig. Beruhigung + Peeling kombinieren.', ingredients: 'Teebaum, BHA, Azelainsäure' },
-  },
-  pigment: {
-    ko: { insight: '색소 침착이 보여요. 브라이트닝 케어로 톤을 균일하게 만들어요.', ingredients: '비타민C, 나이아신아마이드, 알부틴' },
-    en: { insight: 'Pigmentation visible. Brightening care for even tone.', ingredients: 'Vitamin C, Niacinamide, Arbutin' },
-    de: { insight: 'Pigmentierung sichtbar. Aufhellende Pflege für gleichmäßigen Ton.', ingredients: 'Vitamin C, Niacinamid, Arbutin' },
-  },
-  texture: {
-    ko: { insight: '피부결이 거칠어요. 부드러운 각질 케어를 추천합니다.', ingredients: 'AHA, PHA, 효소 클렌저' },
-    en: { insight: 'Skin texture is rough. Gentle exfoliation recommended.', ingredients: 'AHA, PHA, Enzyme Cleanser' },
-    de: { insight: 'Die Hauttextur ist rau. Sanftes Peeling empfohlen.', ingredients: 'AHA, PHA, Enzymreiniger' },
-  },
-  aging: {
-    ko: { insight: '탄력 저하가 시작됐어요. 콜라겐 부스팅 케어가 효과적입니다.', ingredients: '레티놀, 펩타이드, 콜라겐' },
-    en: { insight: 'Firmness is decreasing. Collagen boosting care is effective.', ingredients: 'Retinol, Peptides, Collagen' },
-    de: { insight: 'Die Straffheit nimmt ab. Kollagen-Boosting ist effektiv.', ingredients: 'Retinol, Peptide, Kollagen' },
-  },
-  ox: {
-    ko: { insight: '자외선/환경 스트레스에 노출돼 있어요. 항산화 케어를 강화하세요.', ingredients: '비타민C, 비타민E, 페룰산' },
-    en: { insight: 'Exposed to UV/environmental stress. Boost antioxidant care.', ingredients: 'Vitamin C, Vitamin E, Ferulic Acid' },
-    de: { insight: 'UV-/Umweltstress ausgesetzt. Antioxidative Pflege verstärken.', ingredients: 'Vitamin C, Vitamin E, Ferulasäure' },
-  },
-  makeup_stability: {
-    ko: { insight: '메이크업이 쉽게 무너지는 편이에요. 수분-유분 밸런스 조절이 핵심입니다.', ingredients: '프라이머 에센스, 수분크림, 세팅 미스트' },
-    en: { insight: 'Makeup tends to fade easily. Oil-moisture balance is key.', ingredients: 'Primer Essence, Moisturizer, Setting Mist' },
-    de: { insight: 'Make-up verblasst leicht. Öl-Feuchtigkeits-Balance ist entscheidend.', ingredients: 'Primer-Essenz, Feuchtigkeitscreme, Setting-Spray' },
-  },
-};
-
-function TopConcerns({ activeProfile, lang }: { activeProfile: UserSkinProfile; lang: Lang }) {
-  const sorted = useMemo(() =>
-    AXES.map(axis => ({
-      axis,
-      health: toHealthScore(axis, activeProfile.scores[axis]),
-    }))
-      .sort((a, b) => a.health - b.health)
-      .slice(0, 3),
-    [activeProfile]);
-
-  return (
-    <section className="px-5 py-6">
-      <h2 className="text-base font-semibold mb-4" style={{
-        fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-        color: '#1a1a18',
-      }}>
-        {lang === 'ko' ? '집중 케어 포인트' : lang === 'de' ? 'Fokus-Pflegepunkte' : 'Focus Care Points'}
-      </h2>
-
-      <div className="flex flex-col gap-3">
-        {sorted.map(({ axis, health }, i) => {
-          const tier = getScoreTier(health);
-          const color = TIER_COLORS[tier];
-          const data = INSIGHTS[axis]?.[lang];
-
-          return (
-            <motion.div
-              key={axis}
-              className="rounded-xl p-4"
-              style={{
-                background: '#fff',
-                border: `1px solid ${color}25`,
-                borderLeft: `3px solid ${color}`,
-              }}
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.4 }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium" style={{ color: '#1a1a18' }}>
-                  {AXIS_LABELS[axis][lang]}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span style={{
-                    fontFamily: "'Fraunces', serif",
-                    fontSize: 18, fontWeight: 700, color,
-                  }}>
-                    {health}
-                  </span>
-                  <span
-                    className="text-[10px] px-1.5 py-0.5 rounded-full"
-                    style={{ backgroundColor: `${color}15`, color }}
-                  >
-                    {TIER_LABELS[tier][lang]}
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs leading-relaxed mb-2" style={{ color: '#6B7280' }}>
-                {data?.insight}
-              </p>
-
-              <div className="flex items-center gap-1">
-                <span className="text-[10px]" style={{ color: '#8a9a7b' }}>
-                  {lang === 'ko' ? '추천 성분' : lang === 'de' ? 'Empfohlene Wirkstoffe' : 'Recommended'}:
-                </span>
-                <span className="text-[10px] font-medium" style={{ color: '#1a1a18' }}>
-                  {data?.ingredients}
-                </span>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 3: ANALYSIS HISTORY
+// SECTION ③ — SKIN TRENDS (Sparkline + Target Trajectory)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 interface HistoryRecord {
@@ -503,258 +509,458 @@ interface HistoryRecord {
   score_makeup_stability: number;
 }
 
-function calculateOverallFromRecord(record: HistoryRecord): number {
+function overallFromRecord(r: HistoryRecord): number {
   const scores: Record<SkinAxis, number> = {
-    seb: record.score_sebum ?? 50,
-    hyd: record.score_hydration ?? 50,
-    bar: record.score_barrier ?? 50,
-    sen: record.score_sensitivity ?? 50,
-    acne: record.score_acne ?? 50,
-    pigment: record.score_pigment ?? 50,
-    texture: record.score_texture ?? 50,
-    aging: record.score_aging ?? 50,
-    ox: record.score_oxidation ?? 50,
-    makeup_stability: record.score_makeup_stability ?? 50,
+    seb: r.score_sebum ?? 50, hyd: r.score_hydration ?? 50, bar: r.score_barrier ?? 50,
+    sen: r.score_sensitivity ?? 50, acne: r.score_acne ?? 50, pigment: r.score_pigment ?? 50,
+    texture: r.score_texture ?? 50, aging: r.score_aging ?? 50, ox: r.score_oxidation ?? 50,
+    makeup_stability: r.score_makeup_stability ?? 50,
   };
   const total = AXES.reduce((sum, axis) => sum + toHealthScore(axis, scores[axis]), 0);
   return Math.round(total / AXES.length);
 }
 
-function ChangeIndicator({ current, previous, lang }: {
-  current: HistoryRecord;
-  previous: HistoryRecord;
-  lang: Lang;
-}) {
-  const curOverall = calculateOverallFromRecord(current);
-  const prevOverall = calculateOverallFromRecord(previous);
-  const diff = curOverall - prevOverall;
+function SparklineSVG({ points, width = 280, height = 60 }: { points: number[]; width?: number; height?: number }) {
+  if (points.length === 0) return null;
 
-  if (diff === 0) return null;
-  const isUp = diff > 0;
+  const padding = 8;
+  const w = width - padding * 2;
+  const h = height - padding * 2;
+  const minVal = Math.max(0, Math.min(...points) - 10);
+  const maxVal = Math.min(100, Math.max(...points) + 10);
+  const range = maxVal - minVal || 1;
+
+  const coords = points.map((v, i) => ({
+    x: padding + (points.length > 1 ? (i / (points.length - 1)) * w : w / 2),
+    y: padding + h - ((v - minVal) / range) * h,
+  }));
+
+  const pathD = coords.length === 1
+    ? ''
+    : coords.map((c, i) => `${i === 0 ? 'M' : 'L'} ${c.x} ${c.y}`).join(' ');
+
+  // Target trajectory (dotted line showing ideal improvement)
+  const lastScore = points[points.length - 1];
+  const targetScore = Math.min(85, lastScore + 15);
+  const targetY = padding + h - ((targetScore - minVal) / range) * h;
+  const targetStartX = coords[coords.length - 1]?.x ?? w / 2;
 
   return (
-    <div
-      className="flex items-center gap-2 px-3 py-2 rounded-lg"
-      style={{ backgroundColor: isUp ? 'rgba(78,205,196,0.08)' : 'rgba(232,168,124,0.08)' }}
-    >
-      <span style={{ color: isUp ? '#4ECDC4' : '#E8A87C', fontSize: 14 }}>
-        {isUp ? '↑' : '↓'}
-      </span>
-      <span className="text-xs" style={{ color: isUp ? '#4ECDC4' : '#E8A87C' }}>
-        {lang === 'ko'
-          ? `지난 분석 대비 ${Math.abs(diff)}점 ${isUp ? '개선' : '하락'}`
-          : lang === 'de'
-            ? `${Math.abs(diff)} Punkte ${isUp ? 'verbessert' : 'verschlechtert'} seit letzter Analyse`
-            : `${Math.abs(diff)} points ${isUp ? 'improved' : 'decreased'} since last`}
-      </span>
-    </div>
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
+      <defs>
+        <linearGradient id="sparkline-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#5E8B68" stopOpacity={0.3} />
+          <stop offset="100%" stopColor="#5E8B68" />
+        </linearGradient>
+      </defs>
+
+      {/* Actual data line */}
+      {coords.length > 1 && (
+        <motion.path
+          d={pathD}
+          fill="none" stroke="url(#sparkline-grad)" strokeWidth={2.5}
+          strokeLinecap="round" strokeLinejoin="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        />
+      )}
+
+      {/* Target trajectory (dotted) */}
+      <line
+        x1={targetStartX} y1={coords[coords.length - 1]?.y ?? h / 2}
+        x2={width - padding} y2={targetY}
+        stroke="#4ECDC4" strokeWidth={1.5}
+        strokeDasharray="4,4" opacity={0.5}
+      />
+
+      {/* Data points */}
+      {coords.map((c, i) => (
+        <motion.circle
+          key={i}
+          cx={c.x} cy={c.y} r={4}
+          fill="#FAFAF8" stroke="#5E8B68" strokeWidth={2}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3 + i * 0.1 }}
+        />
+      ))}
+
+      {/* Target point (hollow) */}
+      <circle
+        cx={width - padding} cy={targetY} r={4}
+        fill="none" stroke="#4ECDC4" strokeWidth={1.5}
+        strokeDasharray="2,2" opacity={0.6}
+      />
+    </svg>
   );
 }
 
-function AnalysisHistory({ userId, lang }: { userId: string; lang: Lang }) {
+function SkinTrends({
+  userId,
+  activeProfile,
+  lang,
+  onOpenPicker,
+}: {
+  userId: string;
+  activeProfile: UserSkinProfile | null;
+  lang: Lang;
+  onOpenPicker: () => void;
+}) {
   const [history, setHistory] = useState<HistoryRecord[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!userId) return;
-    const fetch = async () => {
+    const fetchHistory = async () => {
       try {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { data, error } = await (supabase as any)
           .from('user_skin_profiles')
           .select('*')
           .eq('user_id', userId)
-          .order('created_at', { ascending: false })
+          .order('created_at', { ascending: true })
           .limit(10);
         if (!error && data) setHistory(data as HistoryRecord[]);
       } catch { /* silent */ }
-      setLoading(false);
     };
-    fetch();
+    fetchHistory();
   }, [userId]);
 
-  if (loading || !history.length) return null;
+  const overallPoints = useMemo(() => history.map(overallFromRecord), [history]);
+  const currentScore = activeProfile ? calculateOverallHealth(activeProfile) : null;
+
+  // Change indicator
+  const change = useMemo(() => {
+    if (overallPoints.length < 2) return null;
+    const diff = overallPoints[overallPoints.length - 1] - overallPoints[overallPoints.length - 2];
+    return diff;
+  }, [overallPoints]);
 
   return (
-    <section className="px-5 py-6">
-      <h2 className="text-base font-semibold mb-4" style={{
+    <section style={{ padding: '0 20px 16px' }}>
+      <h2 style={{
         fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-        color: '#1a1a18',
+        fontSize: 16, fontWeight: 600, color: '#1B2838',
+        marginBottom: 12,
       }}>
-        {lang === 'ko' ? '분석 히스토리' : lang === 'de' ? 'Analyse-Verlauf' : 'Analysis History'}
+        {lang === 'ko' ? '피부 변화 추이' : lang === 'de' ? 'Hauttrends' : 'Skin Trends'}
       </h2>
 
-      {history.length >= 2 && (
-        <ChangeIndicator current={history[0]} previous={history[1]} lang={lang} />
-      )}
+      <div style={{
+        borderRadius: 16, padding: 20,
+        background: '#FFFFFF',
+        border: '1px solid rgba(0,0,0,0.05)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+      }}>
+        {/* Sparkline chart */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+          <SparklineSVG points={overallPoints.length > 0 ? overallPoints : (currentScore ? [currentScore] : [50])} />
+        </div>
 
-      <div className="flex flex-col gap-2 mt-3">
-        {history.map((record) => {
-          const overall = calculateOverallFromRecord(record);
-          const tier = getScoreTier(overall);
-
-          return (
-            <div
-              key={record.id}
-              className="flex items-center gap-3 rounded-xl p-3"
+        {/* Change indicator or target trajectory message */}
+        {change !== null && change !== 0 ? (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '8px 12px', borderRadius: 10,
+            border: `1px solid ${change > 0 ? '#4ECDC430' : '#FF6B6B30'}`,
+          }}>
+            <span style={{ fontSize: 16 }}>{change > 0 ? '↑' : '↓'}</span>
+            <span style={{
+              fontSize: 13, fontWeight: 500,
+              color: change > 0 ? '#4ECDC4' : '#FF6B6B',
+            }}>
+              {lang === 'ko'
+                ? `지난 분석 대비 ${Math.abs(change)}점 ${change > 0 ? '개선' : '하락'}`
+                : lang === 'de'
+                  ? `${Math.abs(change)} Punkte ${change > 0 ? 'verbessert' : 'verschlechtert'}`
+                  : `${Math.abs(change)} points ${change > 0 ? 'improved' : 'decreased'}`}
+            </span>
+          </div>
+        ) : (
+          /* Single data point — Target Trajectory message */
+          <div style={{ textAlign: 'center' }}>
+            <p style={{
+              fontSize: 12, color: '#9CA3AF', lineHeight: 1.6, marginBottom: 10,
+            }}>
+              {lang === 'ko'
+                ? 'Skin Strategy Lab의 맞춤 루틴을 꾸준히 진행했을 때\n기대되는 4주 뒤의 변화입니다'
+                : lang === 'de'
+                  ? 'Die erwartete Veränderung nach 4 Wochen\nmit Ihrer personalisierten Routine'
+                  : 'Expected improvement after 4 weeks\nwith your personalized routine'}
+            </p>
+            <motion.button
+              onClick={onOpenPicker}
+              whileTap={{ scale: 0.97 }}
               style={{
-                background: record.is_active ? 'rgba(138,154,123,0.06)' : '#fff',
-                border: '1px solid rgba(26,26,24,0.06)',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '8px 20px', borderRadius: 99,
+                background: 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
+                color: '#fff', fontSize: 13, fontWeight: 600,
+                border: 'none', cursor: 'pointer',
               }}
             >
-              <div className="flex-shrink-0 text-center" style={{ width: 48 }}>
-                <p className="text-[10px]" style={{ color: '#9a9590' }}>
-                  {formatMonth(record.created_at, lang)}
-                </p>
-                <p style={{
-                  fontFamily: "'Fraunces', serif",
-                  fontSize: 20, fontWeight: 700, color: '#1a1a18',
-                }}>
-                  {formatDay(record.created_at)}
-                </p>
-              </div>
-
-              <div className="w-px h-10" style={{ backgroundColor: 'rgba(26,26,24,0.08)' }} />
-
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium" style={{ color: '#1a1a18' }}>
-                    {record.analysis_method === 'camera'
-                      ? (lang === 'ko' ? 'AI 분석' : lang === 'de' ? 'KI-Analyse' : 'AI Analysis')
-                      : (lang === 'ko' ? '자가분석' : lang === 'de' ? 'Selbstanalyse' : 'Self-analysis')}
-                  </span>
-                  {record.is_active && (
-                    <span className="text-[9px] px-1.5 py-0.5 rounded-full"
-                      style={{ backgroundColor: '#8a9a7b', color: '#fff' }}>
-                      {lang === 'ko' ? '현재' : lang === 'de' ? 'Aktuell' : 'Current'}
-                    </span>
-                  )}
-                </div>
-                <p className="text-[11px] mt-0.5" style={{ color: '#9a9590' }}>
-                  {lang === 'ko' ? '종합 건강도' : lang === 'de' ? 'Gesamt' : 'Overall'}: {overall}
-                </p>
-              </div>
-
-              <span style={{
-                fontFamily: "'Fraunces', serif",
-                fontSize: 24, fontWeight: 700, color: TIER_COLORS[tier],
-              }}>
-                {overall}
-              </span>
-            </div>
-          );
-        })}
+              <Sparkles size={14} />
+              {lang === 'ko' ? '루틴 시작하기' : lang === 'de' ? 'Routine starten' : 'Start routine'}
+            </motion.button>
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 4: MY ROUTINE
+// SECTION ④ — FULL BREAKDOWN (Accordion)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function MyRoutineSection({ lang, hasAnalysis, onOpenPicker }: { lang: Lang; hasAnalysis: boolean; onOpenPicker: () => void }) {
-  return (
-    <section className="px-5 py-6">
-      <h2 className="text-base font-semibold mb-4" style={{
-        fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-        color: '#1a1a18',
-      }}>
-        {lang === 'ko' ? '내 루틴' : lang === 'de' ? 'Meine Routine' : 'My Routine'}
-      </h2>
+function AxisAccordionItem({
+  axis,
+  health,
+  lang,
+  isOpen,
+  onToggle,
+}: {
+  axis: SkinAxis;
+  health: number;
+  lang: Lang;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const tier = getScoreTier(health);
+  const color = TIER_ACCENT[tier];
+  const insight = AXIS_INSIGHTS[axis]?.[lang];
 
+  return (
+    <div style={{
+      borderBottom: '1px solid rgba(0,0,0,0.04)',
+    }}>
       <button
-        onClick={() => hasAnalysis ? onOpenPicker() : window.location.assign('/skin-analysis')}
-        className="block rounded-xl p-5 text-center w-full"
+        onClick={onToggle}
         style={{
-          background: 'rgba(138,154,123,0.06)',
-          border: '1px dashed rgba(138,154,123,0.3)',
-          cursor: 'pointer',
+          width: '100%', display: 'flex', alignItems: 'center',
+          padding: '14px 0', border: 'none', background: 'transparent',
+          cursor: 'pointer', gap: 12,
         }}
       >
-        <p className="text-sm mb-1" style={{ color: '#1a1a18', fontWeight: 500 }}>
-          {lang === 'ko' ? '맞춤 루틴을 구성해보세요'
-            : lang === 'de' ? 'Stellen Sie Ihre Routine zusammen'
-              : 'Build your custom routine'}
-        </p>
-        <p className="text-xs" style={{ color: '#9a9590' }}>
-          {lang === 'ko' ? '피부 분석 결과 기반으로 제품을 추천해드려요'
-            : lang === 'de' ? 'Wir empfehlen Produkte basierend auf Ihrer Analyse'
-              : 'Product recommendations based on your analysis'}
-        </p>
-        <span className="inline-block mt-3 text-sm font-medium" style={{ color: '#8a9a7b' }}>
-          {lang === 'ko' ? 'Lab에서 루틴 만들기 →'
-            : lang === 'de' ? 'Routine im Lab erstellen →'
-              : 'Build routine in Lab →'}
+        {/* Color dot */}
+        <div style={{
+          width: 8, height: 8, borderRadius: '50%',
+          background: color, flexShrink: 0,
+        }} />
+
+        {/* Axis name */}
+        <span style={{
+          flex: 1, textAlign: 'left',
+          fontSize: 14, fontWeight: 500, color: '#1B2838',
+          fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
+        }}>
+          {AXIS_LABELS[axis][lang]}
         </span>
+
+        {/* Score */}
+        <span style={{
+          fontFamily: "'Fraunces', serif",
+          fontSize: 18, fontWeight: 700, color,
+          marginRight: 8,
+        }}>
+          {health}
+        </span>
+
+        {/* Chevron */}
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <ChevronDown size={16} color="#9CA3AF" />
+        </motion.div>
       </button>
+
+      <AnimatePresence>
+        {isOpen && insight && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ paddingBottom: 14, paddingLeft: 20 }}>
+              <p style={{
+                fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 10,
+              }}>
+                {insight.text}
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                {insight.ingredients.map((ing) => (
+                  <span
+                    key={ing}
+                    style={{
+                      fontSize: 11, fontWeight: 500,
+                      padding: '3px 10px', borderRadius: 99,
+                      border: `1px solid ${color}30`,
+                      color,
+                    }}
+                  >
+                    {ing}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function FullBreakdown({ activeProfile, lang }: { activeProfile: UserSkinProfile; lang: Lang }) {
+  const [openAxis, setOpenAxis] = useState<SkinAxis | null>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const allAxes = useMemo(() =>
+    AXES.map(axis => ({
+      axis,
+      health: toHealthScore(axis, activeProfile.scores[axis]),
+    })).sort((a, b) => a.health - b.health),
+    [activeProfile]);
+
+  return (
+    <section style={{ padding: '0 20px 16px' }}>
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          border: 'none', background: 'transparent', cursor: 'pointer',
+          paddingBottom: 8,
+        }}
+      >
+        <h2 style={{
+          fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
+          fontSize: 16, fontWeight: 600, color: '#1B2838', margin: 0,
+        }}>
+          {lang === 'ko' ? '전체 피부 분석' : lang === 'de' ? 'Vollständige Analyse' : 'Full Breakdown'}
+        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#9CA3AF' }}>
+          <span style={{ fontSize: 12 }}>
+            {lang === 'ko' ? '10개 축' : '10 axes'}
+          </span>
+          <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+            <ChevronDown size={16} />
+          </motion.div>
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              overflow: 'hidden',
+              borderRadius: 16,
+              background: '#FFFFFF',
+              border: '1px solid rgba(0,0,0,0.05)',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+              paddingInline: 16,
+            }}
+          >
+            {allAxes.map(({ axis, health }) => (
+              <AxisAccordionItem
+                key={axis}
+                axis={axis}
+                health={health}
+                lang={lang}
+                isOpen={openAxis === axis}
+                onToggle={() => setOpenAxis(openAxis === axis ? null : axis)}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 5: ACCOUNT SETTINGS
+// SECTION ⑤ — ACCOUNT (iOS Settings style)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function AccountSettings({ email, lang, onLogout }: {
+function AccountSection({ email, lang, onLogout }: {
   email: string | undefined;
   lang: Lang;
   onLogout: () => void;
 }) {
   const langDisplay: Record<Lang, string> = { ko: '한국어', de: 'Deutsch', en: 'English' };
 
+  const items = [
+    {
+      icon: <Mail size={16} color="#9CA3AF" />,
+      label: lang === 'ko' ? '이메일' : 'Email',
+      value: email || '-',
+    },
+    {
+      icon: <Globe size={16} color="#9CA3AF" />,
+      label: lang === 'ko' ? '언어' : lang === 'de' ? 'Sprache' : 'Language',
+      value: langDisplay[lang],
+    },
+  ];
+
   return (
-    <section className="px-5 py-6 pb-32">
-      <h2 className="text-base font-semibold mb-4" style={{
+    <section style={{ padding: '0 20px 32px' }}>
+      <h2 style={{
         fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-        color: '#1a1a18',
+        fontSize: 14, fontWeight: 600, color: '#9CA3AF',
+        textTransform: 'uppercase', letterSpacing: '0.05em',
+        marginBottom: 8,
       }}>
         {lang === 'ko' ? '계정' : lang === 'de' ? 'Konto' : 'Account'}
       </h2>
 
-      <div className="flex flex-col gap-0 rounded-xl overflow-hidden"
-        style={{ border: '1px solid rgba(26,26,24,0.06)' }}
-      >
-        {/* Email */}
-        <div className="flex items-center justify-between p-4 bg-white">
-          <span className="text-sm" style={{ color: '#6B7280' }}>
-            {lang === 'ko' ? '이메일' : 'Email'}
-          </span>
-          <span className="text-sm" style={{ color: '#1a1a18' }}>
-            {email || '-'}
-          </span>
-        </div>
+      <div style={{
+        borderRadius: 12,
+        background: '#FFFFFF',
+        border: '1px solid rgba(0,0,0,0.05)',
+        overflow: 'hidden',
+      }}>
+        {items.map((item, i) => (
+          <div key={i}>
+            {i > 0 && <div style={{ height: 1, background: 'rgba(0,0,0,0.04)', marginLeft: 44 }} />}
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              padding: '13px 16px', gap: 12,
+            }}>
+              {item.icon}
+              <span style={{ flex: 1, fontSize: 14, color: '#6B7280' }}>{item.label}</span>
+              <span style={{ fontSize: 14, color: '#1B2838' }}>{item.value}</span>
+            </div>
+          </div>
+        ))}
 
-        <div className="h-px" style={{ backgroundColor: 'rgba(26,26,24,0.06)' }} />
+        <div style={{ height: 1, background: 'rgba(0,0,0,0.04)', marginLeft: 44 }} />
 
-        {/* Language */}
-        <div className="flex items-center justify-between p-4 bg-white">
-          <span className="text-sm" style={{ color: '#6B7280' }}>
-            {lang === 'ko' ? '언어' : lang === 'de' ? 'Sprache' : 'Language'}
-          </span>
-          <span className="text-sm" style={{ color: '#1a1a18' }}>
-            {langDisplay[lang]}
-          </span>
-        </div>
-
-        <div className="h-px" style={{ backgroundColor: 'rgba(26,26,24,0.06)' }} />
-
-        {/* Logout */}
         <button
           onClick={onLogout}
-          className="w-full text-left p-4 bg-white text-sm"
-          style={{ color: '#E8A87C' }}
+          style={{
+            width: '100%', display: 'flex', alignItems: 'center',
+            padding: '13px 16px', gap: 12,
+            border: 'none', background: 'transparent', cursor: 'pointer',
+          }}
         >
-          {lang === 'ko' ? '로그아웃' : lang === 'de' ? 'Abmelden' : 'Sign Out'}
+          <LogOut size={16} color="#FF6B6B" />
+          <span style={{ fontSize: 14, color: '#FF6B6B' }}>
+            {lang === 'ko' ? '로그아웃' : lang === 'de' ? 'Abmelden' : 'Sign Out'}
+          </span>
         </button>
       </div>
 
       {/* Legal links */}
-      <div className="flex gap-4 mt-4">
-        <Link to="/impressum" className="text-[11px]" style={{ color: '#9a9590' }}>
+      <div style={{ display: 'flex', gap: 16, marginTop: 16, justifyContent: 'center' }}>
+        <Link to="/impressum" style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'none' }}>
           {lang === 'ko' ? '이용약관' : 'Impressum'}
         </Link>
-        <Link to="/datenschutz" className="text-[11px]" style={{ color: '#9a9590' }}>
+        <Link to="/datenschutz" style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'none' }}>
           {lang === 'ko' ? '개인정보처리방침' : 'Datenschutz'}
         </Link>
       </div>
@@ -763,40 +969,53 @@ function AccountSettings({ email, lang, onLogout }: {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// SECTION 6: GUEST VIEW (not logged in)
+// GUEST VIEW (not logged in)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 function GuestView({ lang }: { lang: Lang }) {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] px-6 text-center">
-      <div
-        className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-        style={{ backgroundColor: 'rgba(138, 154, 123, 0.1)' }}
-      >
-        <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: '#8a9a7b' }}>S</span>
+    <div style={{
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      minHeight: '50vh', padding: '0 24px', textAlign: 'center',
+    }}>
+      <div style={{
+        width: 64, height: 64, borderRadius: '50%',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(94,139,104,0.08)', marginBottom: 16,
+      }}>
+        <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: '#5E8B68' }}>S</span>
       </div>
-      <p className="text-base font-medium mb-2" style={{ color: '#1a1a18' }}>
+      <p style={{ fontSize: 16, fontWeight: 600, color: '#1B2838', marginBottom: 4 }}>
         {lang === 'ko' ? '로그인 후 피부 분석 결과를 저장하세요'
           : lang === 'de' ? 'Melden Sie sich an, um Ihre Analyse zu speichern'
             : 'Sign in to save your skin analysis'}
       </p>
-      <p className="text-xs mb-6" style={{ color: '#9a9590' }}>
+      <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 24 }}>
         {lang === 'ko' ? '분석 기록, 루틴, 변화 추이를 한눈에 확인할 수 있어요'
           : lang === 'de' ? 'Verlauf, Routine und Veränderungen auf einen Blick'
             : 'View history, routine, and progress at a glance'}
       </p>
-      <div className="flex gap-3">
+      <div style={{ display: 'flex', gap: 12 }}>
         <Link
           to="/login"
-          className="px-5 py-2.5 rounded-xl text-sm font-medium"
-          style={{ border: '1px solid #8a9a7b', color: '#8a9a7b' }}
+          style={{
+            padding: '10px 24px', borderRadius: 12,
+            border: '1px solid rgba(94,139,104,0.3)',
+            color: '#5E8B68', fontSize: 14, fontWeight: 500,
+            textDecoration: 'none',
+          }}
         >
           {lang === 'ko' ? '로그인' : lang === 'de' ? 'Anmelden' : 'Sign In'}
         </Link>
         <Link
           to="/signup"
-          className="px-5 py-2.5 rounded-xl text-sm font-medium"
-          style={{ backgroundColor: '#8a9a7b', color: '#fff' }}
+          style={{
+            padding: '10px 24px', borderRadius: 12,
+            background: 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
+            color: '#fff', fontSize: 14, fontWeight: 500,
+            textDecoration: 'none',
+          }}
         >
           {lang === 'ko' ? '회원가입' : lang === 'de' ? 'Registrieren' : 'Sign Up'}
         </Link>
@@ -826,55 +1045,61 @@ export default function Profile() {
     navigate('/');
   };
 
-  const divider = <div className="h-px mx-5" style={{ backgroundColor: 'rgba(26,26,24,0.06)' }} />;
+  // Section spacing
+  const sectionGap = <div style={{ height: 8 }} />;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF8' }}>
       <Navbar />
 
-      <main className="pt-20 pb-4 relative z-10" style={{ maxWidth: 480, marginInline: 'auto' }}>
+      <main style={{ paddingTop: 80, paddingBottom: 16, maxWidth: 480, marginInline: 'auto', position: 'relative', zIndex: 10 }}>
         {!isLoggedIn || !userProfile ? (
           <GuestView lang={lang} />
         ) : (
           <>
-            {/* Section 0: Profile Header */}
-            <ProfileHeader
-              userName={userName}
+            {/* ① Compact Score Hub */}
+            <CompactScoreHub
               activeProfile={activeProfile}
+              userName={userName}
               lang={lang}
+              onReanalyze={() => navigate('/skin-analysis')}
             />
 
             {activeProfile && (
               <>
-                {/* Section 1: Skin Profile Grid */}
-                {divider}
-                <SkinProfileGrid activeProfile={activeProfile} lang={lang} onOpenPicker={openPicker} />
+                {sectionGap}
 
-                {/* Section 2: Top 3 Focus Points */}
-                {divider}
-                <TopConcerns activeProfile={activeProfile} lang={lang} />
+                {/* ② Active Routine Card */}
+                <ActiveRoutineCard
+                  lang={lang}
+                  hasAnalysis={!!activeProfile}
+                  onOpenPicker={openPicker}
+                />
+
+                {sectionGap}
+
+                {/* ③ Skin Trends */}
+                {userProfile && (
+                  <SkinTrends
+                    userId={userProfile.userId}
+                    activeProfile={activeProfile}
+                    lang={lang}
+                    onOpenPicker={openPicker}
+                  />
+                )}
+
+                {sectionGap}
+
+                {/* ④ Full Breakdown */}
+                <FullBreakdown activeProfile={activeProfile} lang={lang} />
               </>
             )}
 
-            {/* Section 3: Analysis History */}
-            {userProfile && (
-              <>
-                {divider}
-                <AnalysisHistory userId={userProfile.userId} lang={lang} />
-              </>
-            )}
+            {sectionGap}
+            {sectionGap}
 
-            {activeProfile && (
-              <>
-                {/* Section 4: My Routine */}
-                {divider}
-                <MyRoutineSection lang={lang} hasAnalysis={!!activeProfile} onOpenPicker={openPicker} />
-              </>
-            )}
-
-            {/* Section 5: Account Settings */}
-            {divider}
-            <AccountSettings
+            {/* ⑤ Account */}
+            <AccountSection
               email={userProfile.email}
               lang={lang}
               onLogout={handleLogout}
@@ -892,7 +1117,6 @@ export default function Profile() {
         onConfirm={(tierId) => {
           closePicker();
           setSelectedTier(tierId);
-          // Reconstruct result from activeProfile and navigate
           if (activeProfile?.scores) {
             const s = activeProfile.scores;
             const axis_scores = {

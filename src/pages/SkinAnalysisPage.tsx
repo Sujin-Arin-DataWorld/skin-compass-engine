@@ -142,6 +142,7 @@ export default function SkinAnalysisPage() {
         analysisId: string | null;
         hasLifestyle: boolean;
         timestamp: number;
+        capturedImage?: string | null;
       };
       // TTL guard: only restore if saved within the last 30 minutes
       if (Date.now() - (pending.timestamp || 0) > 30 * 60 * 1000) {
@@ -149,14 +150,33 @@ export default function SkinAnalysisPage() {
         return;
       }
       setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId);
+      if (pending.capturedImage) {
+        setCapturedImage(pending.capturedImage);
+      }
       localStorage.removeItem('ssl_pending_analysis');
 
       // Show success toast after restore
-      const restoreMsg = language === 'ko' ? '분석 결과가 복원되었어요 ✓'
-        : language === 'de' ? 'Analyseergebnisse wiederhergestellt ✓'
-        : 'Analysis results restored ✓';
+      const restoreMsg = language === 'ko' ? '분석 결과가 안전하게 복원되었어요' 
+        : language === 'de' ? 'Analyseergebnisse sicher wiederhergestellt'
+        : 'Analysis results safely restored';
+        
       // Delay slightly so SkinAnalysisPage has rendered the result view
-      setTimeout(() => toast.success(restoreMsg), 600);
+      setTimeout(() => {
+        toast.success(restoreMsg, {
+          style: {
+            background: 'rgba(36, 43, 61, 0.95)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid #333A4D',
+            color: '#F0EDE8',
+            borderRadius: '12px',
+            padding: '16px 20px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            fontFamily: "'SUIT', sans-serif"
+          },
+          icon: <CheckCircle2 size={18} color="#C9A96E" fill="#1A1F2E" />,
+          duration: 3000,
+        });
+      }, 600);
 
       // Non-blocking DB save
       (async () => {

@@ -5,7 +5,7 @@ import { useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { RotateCcw, Save, ChevronRight, ChevronDown } from 'lucide-react';
+import { RotateCcw, Save, ChevronRight, ChevronDown, CheckCircle2 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
@@ -15,6 +15,8 @@ import { useRoutineStore } from '@/store/useRoutineStore';
 import { brand, glass } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
 import RoutinePicker from '@/components/routine/RoutinePicker';
+import AuthModal from '@/components/ui/AuthModal';
+import { compressImageBase64 } from '@/utils/imageCompression';
 import { AXIS_KO_SHORT } from '@/data/productRules';
 import { buildProductBundleV5 } from '@/engine/routineEngineV5';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
@@ -267,6 +269,7 @@ export default function AnalysisResults({
   scores, capturedImage, analysisId, onRetake,
 }: AnalysisResultsProps) {
   const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { language } = useI18nStore();
   const { isLoggedIn } = useAuthStore();
   const resetAnalysis = useSkinAnalysisStore((s) => s.resetAnalysis);
@@ -357,20 +360,24 @@ export default function AnalysisResults({
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const saveAnalysisResult = useSkinProfileStore((s) => s.saveAnalysisResult);
 
+  const handleGoogleAuth = useCallback(async () => {
+    try {
+      const resizedImage = capturedImage ? await compressImageBase64(capturedImage, 600, 0.6) : null;
+      localStorage.setItem('ssl_pending_analysis', JSON.stringify({
+        scores, analysisId, hasLifestyle, timestamp: Date.now(),
+        capturedImage: resizedImage
+      }));
+    } catch(e) { console.warn('[GoogleAuth] Backup fail:', e); }
+    const { loginWithGoogle } = useAuthStore.getState();
+    await loginWithGoogle('/skin-analysis?action=oauth_return');
+  }, [capturedImage, scores, analysisId, hasLifestyle]);
+
   const handleSave = useCallback(async () => {
     if (saveStatus === 'saved' || saveStatus === 'saving') return;
 
-    // Not logged in → redirect to login
+    // Not logged in → display AuthModal instead of redirecting
     if (!isLoggedIn) {
-      try {
-        // Use localStorage (NOT sessionStorage) because Firefox Multi-Account
-        // Containers and popup blockers may open OAuth in a new tab.
-        // sessionStorage is NOT shared between tabs → data would be lost.
-        localStorage.setItem('ssl_pending_analysis', JSON.stringify({
-          scores, analysisId, hasLifestyle, timestamp: Date.now(),
-        }));
-      } catch (e) { console.warn('[AnalysisResults] localStorage failed:', e); }
-      navigate('/login?redirect=/skin-analysis');
+      setShowAuthModal(true);
       return;
     }
 
@@ -380,22 +387,10 @@ export default function AnalysisResults({
       const { supabase } = await import('@/integrations/supabase/client');
       const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-      // BUG-6 FIX: Session expired on mobile (background tab GC'd the token).
-      // Save pending analysis → redirect to login so it auto-saves on return.
       if (authError || !user) {
         console.warn('[Save] Session expired:', authError?.message);
-        try {
-          localStorage.setItem('ssl_pending_analysis', JSON.stringify({
-            scores, analysisId, hasLifestyle, timestamp: Date.now(),
-          }));
-        } catch { /* safe */ }
+        setShowAuthModal(true);
         setSaveStatus('idle');
-        toast.error(
-          lang === 'ko' ? '세션이 만료되었습니다. 다시 로그인해주세요.'
-            : lang === 'de' ? 'Sitzung abgelaufen. Bitte erneut anmelden.'
-            : 'Session expired. Please log in again.'
-        );
-        navigate('/login?redirect=/skin-analysis');
         return;
       }
 
@@ -421,34 +416,44 @@ export default function AnalysisResults({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         primaryConcerns: primaryConcerns as any,
         analysisMethod: 'camera',
-        // BUG-6 FIX: Normalize to 0-1 range (was 85 → DB constraint violation possible)
+        // Normalize to 0-1 range
         confidenceScore: hasLifestyle ? 0.92 : 0.75,
       });
 
       if (!saved) throw new Error('Save returned null');
       setSaveStatus('saved');
-      const saveMsg = lang === 'ko' ? '분석 결과가 저장되었어요 ✓'
-        : lang === 'de' ? 'Ihre Analyse wurde gespeichert ✓'
-        : 'Your analysis has been saved ✓';
-      toast.success(saveMsg);
+      
+      const saveMsg = lang === 'ko' ? '분석 결과가 안전하게 저장되었어요' : 'Analysis safely saved';
+      toast.success(saveMsg, {
+        style: {
+          background: 'rgba(36, 43, 61, 0.95)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid #333A4D',
+          color: '#F0EDE8',
+          borderRadius: '12px',
+          padding: '16px 20px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          fontFamily: "'SUIT', sans-serif"
+        },
+        icon: <CheckCircle2 size={18} color="#C9A96E" fill="#1A1F2E" />,
+        duration: 2500,
+      });
     } catch (err) {
       console.error('[Save] Failed:', err);
       setSaveStatus('error');
-      // BUG-6 FIX: Show specific error message instead of silent failure
       const errMsg = err instanceof Error ? err.message : '';
-      toast.error(
-        errMsg.includes('JWT') || errMsg.includes('auth') || errMsg.includes('authenticated')
-          ? (lang === 'ko' ? '인증 오류 — 다시 로그인해주세요'
-            : lang === 'de' ? 'Authentifizierungsfehler — bitte erneut anmelden'
-            : 'Auth error — please log in again')
-          : (lang === 'ko' ? '저장 실패 — 잠시 후 다시 시도해주세요'
-            : lang === 'de' ? 'Speichern fehlgeschlagen — bitte erneut versuchen'
-            : 'Save failed — please retry')
-      );
-      // Auto-reset after 3s so user can retry
+      if (errMsg.includes('JWT') || errMsg.includes('auth') || errMsg.includes('authenticated')) {
+         setShowAuthModal(true);
+      } else {
+         toast.error(
+           lang === 'ko' ? '저장 실패 — 잠시 후 다시 시도해주세요'
+             : lang === 'de' ? 'Speichern fehlgeschlagen — bitte erneut versuchen'
+             : 'Save failed — please retry'
+         );
+      }
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
-  }, [isLoggedIn, scores, analysisId, hasLifestyle, navigate, saveStatus, saveAnalysisResult, lang]);
+  }, [saveStatus, isLoggedIn, scores, hasLifestyle, lang, saveAnalysisResult]);
 
   const resetDiagnosisStore = useDiagnosisStore((s) => s.reset);
 
@@ -744,6 +749,18 @@ export default function AnalysisResults({
         isOpen={isPickerOpen}
         onClose={closePicker}
         onConfirm={handlePickerConfirm}
+      />
+
+      {/* Auth Modal for Saving */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => {
+          setShowAuthModal(false);
+          // Auto-trigger save now that we are logged in
+          handleSave();
+        }}
+        onGoogleClick={handleGoogleAuth}
       />
     </div>
   );

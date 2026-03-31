@@ -52,8 +52,9 @@ const AGB_COPY = {
       {
         heading: "§ 5 철회권 (Widerrufsrecht)",
         paragraphs: [
-          "소비자는 제품 수령일로부터 14일 이내에 별도 사유 없이 계약을 철회할 수 있습니다.",
-          "철회 시 제품은 미사용 원래 상태로 반환되어야 하며, 반환 배송비는 소비자가 부담합니다.",
+          "소비자는 제품 수령일로부터 14일(역일) 이내에 별도 사유 없이 계약을 철회할 수 있습니다.",
+          "제품은 미사용 원래 상태로 반환해야 하며, 반환 배송비는 소비자가 부담합니다.",
+          "전체 철회 안내 및 표준 철회 양식: https://www.skinstrategylab.de/widerrufsbelehrung",
         ],
       },
       {
@@ -116,8 +117,9 @@ const AGB_COPY = {
       {
         heading: "§ 5 Right of Withdrawal",
         paragraphs: [
-          "Consumers may withdraw from the contract within 14 days of receiving the product without stating a reason.",
+          "Consumers may withdraw from the contract within 14 calendar days of receiving the product without stating a reason.",
           "Products must be returned in their original, unused condition. Return shipping costs are borne by the consumer.",
+          "The full withdrawal instructions and the standard withdrawal form are available at: https://www.skinstrategylab.de/widerrufsbelehrung",
         ],
       },
       {
@@ -180,8 +182,9 @@ const AGB_COPY = {
       {
         heading: "§ 5 Widerrufsrecht",
         paragraphs: [
-          "Verbraucher können den Vertrag innerhalb von 14 Tagen nach Erhalt der Ware ohne Angabe von Gründen widerrufen.",
+          "Verbraucher können den Vertrag innerhalb von 14 Kalendertagen nach Erhalt der Ware ohne Angabe von Gründen widerrufen.",
           "Die Ware ist in ihrem ursprünglichen, unbenutzten Zustand zurückzusenden. Die Kosten der Rücksendung trägt der Verbraucher.",
+          "Die vollständige Widerrufsbelehrung und das Muster-Widerrufsformular finden Sie unter: https://www.skinstrategylab.de/widerrufsbelehrung",
         ],
       },
       {

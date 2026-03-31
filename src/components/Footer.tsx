@@ -46,6 +46,16 @@ const Footer = () => {
         <p className="border-t border-border/30 pt-4 mt-2 max-w-[600px] text-center text-[10px] leading-relaxed text-muted-foreground/60 transition-colors">
           {DISCLAIMER[lang] ?? DISCLAIMER.en}
         </p>
+        <a
+          href="https://ec.europa.eu/consumers/odr"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[11px] text-muted-foreground/70 hover:text-foreground transition-colors underline underline-offset-2 mt-1 inline-block"
+        >
+          {lang === 'de' ? 'EU-Streitbeilegung (OS)' :
+           lang === 'ko' ? 'EU 온라인 분쟁해결 (ODR)' :
+           'EU Online Dispute Resolution (ODR)'}
+        </a>
         <p className="text-[11px] font-bold tracking-[0.15em] text-muted-foreground/70 uppercase">
           POWERED BY KOREAN BIOMETRIC DATA SCIENCE — GERMANY
         </p>

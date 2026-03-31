@@ -168,6 +168,16 @@ const EN = {
             ],
         },
         {
+            title: "3b. Data Storage and Deletion Periods (Data Retention)",
+            blocks: [
+                "We process and store your personal data only as long as necessary to achieve the purpose of storage or as required by statutory retention periods.",
+                "##Zero Data Retention Policy for Health Data:",
+                "• Biometric data (facial images) are irreversibly deleted immediately after the real-time analysis. There is no intermediate storage on our servers.",
+                "• Calculated analysis results (scores) are tied to your user account and can be completely deleted in the account settings at any time.",
+                "• Analyses created without a user account are stored locally (Local/Session Storage) to maintain session functionality and are deleted or anonymized server-side after 90 days by automated routines (pg_cron)."
+            ],
+        },
+        {
             title: "4. Registration and User Account",
             blocks: [
                 "When you create an account, we process your email address and name to manage your profile and orders (legal basis: Article 6(1)(b) GDPR).",
@@ -270,6 +280,16 @@ const KO = {
                 "• 얼굴 사진은 서버, 데이터베이스, 클라우드 저장소 등 어떠한 저장소에도 보관되지 않습니다.",
                 "• 제3자에게 얼굴 사진이 제공되지 않습니다.",
                 "처리의 법적 근거: 「개인정보 보호법」 제23조에 따른 이용자의 명시적 동의 (사진 촬영 전 별도 동의 취득).",
+            ],
+        },
+        {
+            title: "제3b조 데이터 보관 및 파기 기간 (Data Retention)",
+            blocks: [
+                "회사는 데이터 보관 목적을 달성하는 데 필요한 기간 동안 또는 법정 보관 의무 기간(예: 전자상거래법 등)에 따라 이용자의 개인정보를 처리 및 보유합니다.",
+                "##건강 데이터에 대한 영구 삭제 보장 정책 (Zero Data Retention Policy):",
+                "• 생체 데이터(얼굴 사진)는 실시간 분석 직후 복원할 수 없도록 영구적으로 파기됩니다. 당사 서버에는 어떠한 임시 저장도 이루어지지 않습니다.",
+                "• 산출된 분석 결과(점수)는 귀하의 사용자 계정에 연결되며, 계정 설정에서 언제든지 완전히 삭제할 수 있습니다.",
+                "• 사용자 계정 없이 생성된 분석 결과는 세션 기능 유지를 위해 기기에 로컬로(Local/Session Storage) 저장되며, 서버 측 데이터는 90일 후 자동화된 매크로(pg_cron)에 의해 삭제되거나 익명화됩니다."
             ],
         },
         {

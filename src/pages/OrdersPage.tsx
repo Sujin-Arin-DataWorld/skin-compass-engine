@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, ChevronDown, Check, RefreshCw } from "lucide-react";
+import { ShoppingBag, ChevronDown, Check, RefreshCw, Undo2, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useOrders, type OrderItem, type OrderRecord } from "@/hooks/useOrders";
 import { useCartStore } from "@/store/cartStore";
 import { useProductStore } from "@/store/productStore";
+import { useI18nStore } from "@/store/i18nStore";
+import { useAuthStore } from "@/store/authStore";
+import { supabase } from "@/integrations/supabase/client";
 import type { Product } from "@/engine/types";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
@@ -31,6 +34,201 @@ const STATUS_BADGE: Record<string, { bg: string; color: string; en: string; de: 
     delivered: { bg: "rgba(34,197,94,0.12)", color: "#22C55E", en: "Delivered", de: "Geliefert" },
     cancelled: { bg: "rgba(239,68,68,0.12)", color: "#EF4444", en: "Cancelled", de: "Storniert" },
 };
+
+// ── Phase 25 REV2: Cancellation eligibility (§ 356a BGB 2026) ─────────────────
+const isEligibleForCancellation = (deliveredAt: string | null): boolean => {
+  // 1. If not yet delivered (processing/shipped), user has the absolute right to cancel IMMEDIATELY.
+  if (!deliveredAt) return true; 
+
+  const deliveryDate = new Date(deliveredAt);
+  if (isNaN(deliveryDate.getTime())) return false; // Safety check
+  
+  // 2. The window closes exactly 14 days after delivery, at 23:59:59 local time.
+  const deadlineDate = new Date(deliveryDate.getTime() + (14 * 24 * 60 * 60 * 1000));
+  deadlineDate.setHours(23, 59, 59, 999);
+  
+  return Date.now() <= deadlineDate.getTime();
+};
+
+// ── Phase 25: Withdrawal Modal (2-step Framer Motion) ─────────────────────────
+function WithdrawalModal({
+    order, de, onClose, onSuccess,
+}: {
+    order: OrderRecord; de: boolean; onClose: () => void; onSuccess: () => void;
+}) {
+    const [step, setStep] = useState(1);
+    const [isCancelling, setIsCancelling] = useState(false);
+    const { language } = useI18nStore();
+    const { userProfile } = useAuthStore();
+
+    const handleConfirmWithdrawal = async () => {
+        try {
+            setIsCancelling(true);
+
+            // 1. Backend Mutation
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
+                .from('orders')
+                .update({
+                    status: 'cancelled',
+                    cancelled_at: new Date().toISOString(),
+                    cancellation_reason: 'BGB §356a User Withdrawal',
+                })
+                .eq('id', order.id)
+                .eq('user_id', userProfile?.userId ?? '');
+
+            if (error) throw error;
+
+            // 2. Success Feedback
+            toast.success(
+                language === 'de' ? 'Vertrag erfolgreich widerrufen.' :
+                language === 'ko' ? '계약이 성공적으로 철회되었습니다.' :
+                'Contract successfully cancelled.',
+                { description: de ? `Bestell-Nr. ${order.id.slice(0, 8).toUpperCase()}` : `Order #${order.id.slice(0, 8).toUpperCase()}` }
+            );
+            onSuccess();
+        } catch (err) {
+            console.error('Cancellation error:', err);
+            toast.error(
+                language === 'de' ? 'Fehler bei der Stornierung. Bitte kontaktieren Sie den Support.' :
+                language === 'ko' ? '취소 처리 중 오류가 발생했습니다. 고객센터에 문의해주세요.' :
+                'Error processing cancellation. Please contact support.'
+            );
+        } finally {
+            setIsCancelling(false);
+        }
+    };
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)" }}
+            onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        >
+            <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.92 }}
+                className="w-full max-w-[440px] rounded-2xl overflow-hidden
+                    bg-white dark:bg-[#111]
+                    border border-gray-200 dark:border-[#2a2a2a]"
+            >
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-[#2a2a2a]">
+                    <div className="flex items-center gap-2">
+                        <Undo2 className="w-5 h-5" strokeWidth={1.5} style={{ color: GOLD }} />
+                        <h2 className="text-sm font-semibold text-gray-900 dark:text-[#e8e8e8]">
+                            {de ? "Vertrag widerrufen" : "Withdraw from Contract"}
+                        </h2>
+                    </div>
+                    <button onClick={onClose}>
+                        <X className="w-4 h-4 text-gray-400 dark:text-[var(--ssl-accent-deep)]" strokeWidth={1.5} />
+                    </button>
+                </div>
+
+                {/* Steps */}
+                <div className="p-5">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={step}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+                        >
+                            {step === 1 && (
+                                <div className="space-y-4">
+                                    <p className="text-xs text-gray-500 dark:text-[var(--ssl-accent-deep)] mb-3">
+                                        {de ? "Bitte überprüfen Sie Ihre Daten:" : "Please review your details:"}
+                                    </p>
+
+                                    <div className="rounded-xl p-4 bg-gray-50 dark:bg-[rgba(255,255,255,0.025)] border border-gray-200 dark:border-[#2a2a2a] space-y-2">
+                                        <div className="flex justify-between">
+                                            <span className="text-xs text-gray-500 dark:text-[var(--ssl-accent-deep)]">
+                                                {de ? "Bestell-Nr." : "Order #"}
+                                            </span>
+                                            <span className="text-xs font-mono text-gray-900 dark:text-[#e8e8e8]">
+                                                {order.id.slice(0, 8).toUpperCase()}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-xs text-gray-500 dark:text-[var(--ssl-accent-deep)]">
+                                                {de ? "Bestelldatum" : "Order Date"}
+                                            </span>
+                                            <span className="text-xs text-gray-900 dark:text-[#e8e8e8]">
+                                                {new Date(order.created_at).toLocaleDateString(de ? 'de-DE' : 'en-GB')}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-xs text-gray-500 dark:text-[var(--ssl-accent-deep)]">
+                                                {de ? "Betrag" : "Amount"}
+                                            </span>
+                                            <span className="text-xs font-semibold text-gray-900 dark:text-[#e8e8e8]">
+                                                €{order.total.toFixed(2)}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        {order.items.map((item, i) => (
+                                            <p key={i} className="text-xs text-gray-600 dark:text-[#ccc]">
+                                                {item.quantity}× {item.product_name}
+                                            </p>
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        onClick={() => setStep(2)}
+                                        className="w-full mt-4 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80"
+                                        style={{ background: GOLD, color: '#F5F5F7' }}
+                                    >
+                                        {de ? "Weiter" : "Continue"}
+                                    </button>
+                                </div>
+                            )}
+
+                            {step === 2 && (
+                                <div className="space-y-4">
+                                    <p className="text-sm text-gray-700 dark:text-[#e8e8e8] leading-relaxed">
+                                        {de
+                                            ? "Hiermit widerrufe ich den Vertrag über die Lieferung der oben genannten Waren gemäß § 355 BGB."
+                                            : "I hereby withdraw from the contract for the delivery of the above goods pursuant to § 355 BGB."}
+                                    </p>
+
+                                    <p className="text-xs text-gray-500 dark:text-[var(--ssl-accent-deep)] leading-relaxed">
+                                        {de
+                                            ? "Sie erhalten eine Bestätigung per E-Mail. Die Erstattung erfolgt innerhalb von 14 Tagen nach Eingang der Rücksendung."
+                                            : "You will receive a confirmation by email. The refund will be processed within 14 days of receiving the returned goods."}
+                                    </p>
+
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setStep(1)}
+                                            className="flex-1 py-2.5 rounded-xl text-sm font-medium
+                                                border border-gray-200 dark:border-[#2a2a2a]
+                                                text-gray-600 dark:text-[var(--ssl-accent-deep)]"
+                                        >
+                                            {de ? "Zurück" : "Back"}
+                                        </button>
+                                        <button
+                                            onClick={handleConfirmWithdrawal}
+                                            disabled={isCancelling}
+                                            className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-60 flex items-center justify-center gap-2"
+                                            style={{ background: '#EF4444', color: '#fff' }}
+                                        >
+                                            {isCancelling && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                                            {de ? "Widerruf bestätigen" : "Confirm Withdrawal"}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </div>
+            </motion.div>
+        </div>
+    );
+}
 
 // ── Build a minimal Product from an OrderItem for "Buy Again" ─────────────────
 function minimalProduct(item: OrderItem): Product {
@@ -144,11 +342,14 @@ function StatusStepper({ status, de }: { status: string; de: boolean }) {
 function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
     const [expanded, setExpanded] = useState(false);
     const [buying, setBuying] = useState(false);
+    const [withdrawalOpen, setWithdrawalOpen] = useState(false);
 
     const { addItem } = useCartStore();
     const { products } = useProductStore();
 
     const badge = STATUS_BADGE[order.status] ?? STATUS_BADGE.pending;
+    // Don't show cancel button if already cancelled, otherwise check eligibility
+    const canCancel = order.status !== 'cancelled' && isEligibleForCancellation(order.delivered_at);
 
     const handleBuyAgain = () => {
         setBuying(true);
@@ -323,7 +524,36 @@ function OrderCard({ order, de }: { order: OrderRecord; de: boolean }) {
                                 />
                                 {de ? "Erneut kaufen" : "Buy Again"}
                             </button>
+
+                            {/* Phase 25: Widerrufsbutton (§ 356a BGB 2026) */}
+                            {canCancel && (
+                                <button
+                                    onClick={() => setWithdrawalOpen(true)}
+                                    className="w-full min-h-[44px] flex items-center justify-center gap-2
+                                        rounded-xl text-sm font-semibold
+                                        border border-red-200 dark:border-red-900/50
+                                        bg-red-50/50 dark:bg-red-950/20
+                                        text-red-600 dark:text-red-400
+                                        hover:bg-red-100/50 dark:hover:bg-red-950/40
+                                        transition-colors"
+                                >
+                                    <Undo2 className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                    {de ? "Vertrag widerrufen" : "Withdraw from Contract"}
+                                </button>
+                            )}
                         </div>
+
+                        {/* Withdrawal Modal */}
+                        <AnimatePresence>
+                            {withdrawalOpen && (
+                                <WithdrawalModal
+                                    order={order}
+                                    de={de}
+                                    onClose={() => setWithdrawalOpen(false)}
+                                    onSuccess={() => { setWithdrawalOpen(false); window.location.reload(); }}
+                                />
+                            )}
+                        </AnimatePresence>
                     </motion.div>
                 )}
             </AnimatePresence>

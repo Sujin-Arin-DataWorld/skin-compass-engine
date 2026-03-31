@@ -3,11 +3,14 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Eye, EyeOff, AlertTriangle, X, Loader2 } from "lucide-react";
+import { Check, Eye, EyeOff, AlertTriangle, X, Loader2, ShieldAlert, Brain } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { useProfile } from "@/hooks/useProfile";
+import { useSkinAnalysisStore } from "@/store/skinAnalysisStore";
+import { useI18nStore } from "@/store/i18nStore";
+import * as SwitchPrimitive from "@radix-ui/react-switch";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
 const GOLD = "var(--ssl-accent)";
@@ -294,6 +297,112 @@ function DeleteModal({
     );
 }
 
+// ── Phase 24 REV1: Bio-Data Purge Modal (separate from account delete) ────────
+function DangerBioDataModal({
+    language, onClose, onConfirm,
+}: {
+    language: string; onClose: () => void; onConfirm: () => Promise<void>;
+}) {
+    const [confirmText, setConfirmText] = useState("");
+    const [deleting, setDeleting] = useState(false);
+    const confirmWord = language === 'de' ? 'LÖSCHEN' : language === 'ko' ? '삭제' : 'DELETE';
+    const lang = (language === 'de' || language === 'ko') ? language : 'en';
+    const matches = confirmText === confirmWord;
+
+    const handleConfirm = async () => {
+        if (!matches) return;
+        setDeleting(true);
+        await onConfirm();
+        setDeleting(false);
+    };
+
+    const title = lang === 'de' ? 'Biometrische Daten löschen'
+        : lang === 'ko' ? '생체 데이터 삭제'
+        : 'Erase Biometric Data';
+
+    const desc = lang === 'de'
+        ? 'Diese Aktion löscht unwiderruflich alle KI-Hautanalysen, Scores und biometrischen Einwilligungen. Ihr Konto, Ihre Bestellungen und Ihr Warenkorb bleiben erhalten.'
+        : lang === 'ko'
+            ? '이 작업은 모든 AI 피부 분석, 점수, 생체 동의를 영구적으로 삭제합니다. 계정, 주문 내역, 장바구니는 유지됩니다.'
+            : 'This will irreversibly delete all AI skin analyses, scores, and biometric consents. Your account, orders, and cart are preserved.';
+
+    const promptLabel = lang === 'de' ? `Geben Sie "${confirmWord}" ein zur Bestätigung:`
+        : lang === 'ko' ? `확인하려면 "${confirmWord}"을 입력하세요:`
+        : `Type "${confirmWord}" to confirm:`;
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)" }}
+            onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+        >
+            <motion.div
+                initial={{ opacity: 0, scale: 0.92 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.92 }}
+                className="bg-red-950/30 border border-red-900/50 w-full max-w-[420px] p-7 rounded-[18px]"
+            >
+                <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                        <ShieldAlert className="w-5 h-5 text-red-400" strokeWidth={1.5} />
+                        <h2 className="text-base font-semibold text-red-400">
+                            {title}
+                        </h2>
+                    </div>
+                    <button onClick={onClose}>
+                        <X className="w-4 h-4 text-red-400/70" strokeWidth={1.5} />
+                    </button>
+                </div>
+
+                <p className="text-[13px] text-red-400/80 leading-relaxed mb-5">
+                    {desc}
+                </p>
+
+                <p className="text-xs text-red-400/90 mb-2">
+                    {promptLabel}
+                </p>
+                <input
+                    value={confirmText}
+                    onChange={(e) => setConfirmText(e.target.value)}
+                    placeholder={confirmWord}
+                    style={{
+                        width: "100%",
+                        padding: "0.625rem 0.875rem",
+                        background: "rgba(239,68,68,0.06)",
+                        border: `1px solid ${matches ? "#EF4444" : "rgba(239,68,68,0.2)"}`,
+                        borderRadius: "8px",
+                        fontSize: "0.875rem",
+                        color: "#e8e8e8",
+                        outline: "none",
+                        fontFamily: "monospace",
+                        letterSpacing: "0.12em",
+                        transition: "border-color 0.2s",
+                    }}
+                />
+
+                <div className="flex gap-3 mt-5">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-2.5 rounded-xl text-sm font-medium"
+                        style={{ border: "1px solid rgba(255,255,255,0.1)", color: BRONZE }}
+                    >
+                        {lang === 'de' ? 'Abbrechen' : lang === 'ko' ? '취소' : 'Cancel'}
+                    </button>
+                    <button
+                        onClick={handleConfirm}
+                        disabled={!matches || deleting}
+                        className="flex-1 py-2.5 rounded-xl text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2"
+                        style={{ background: matches ? "#EF4444" : "rgba(239,68,68,0.2)", color: "#fff" }}
+                    >
+                        {deleting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                        {title}
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+}
+
 // ── ProfilePage ───────────────────────────────────────────────────────────────
 export default function ProfilePage({ de }: { de: boolean }) {
     const { userProfile, logout } = useAuthStore();
@@ -304,6 +413,9 @@ export default function ProfilePage({ de }: { de: boolean }) {
     const [showPwd, setShowPwd] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
+    const [bioDataPurgeOpen, setBioDataPurgeOpen] = useState(false);
+    const [aiProfilingEnabled, setAiProfilingEnabled] = useState(true);
+    const { language } = useI18nStore();
 
     // ── Profile form ─────────────────────────────────────────────────────────
     const profileForm = useForm<ProfileFormValues>({
@@ -369,6 +481,59 @@ export default function ProfilePage({ de }: { de: boolean }) {
             toast.error(error.message);
         } else {
             await logout();
+        }
+    };
+
+    // ── Phase 24 REV1: Purge bio-data only (Art. 17) ─────────────────────────
+    const handlePurgeBiometricData = async () => {
+        // 1. Clear sensitive data from Zustand store
+        useSkinAnalysisStore.getState().clearSensitiveData();
+        // 2. Reset biometric consent
+        localStorage.removeItem("biometric_consent");
+        localStorage.removeItem("biometric_consent_at");
+        // 3. Purge analysis history from Zustand
+        useSkinAnalysisStore.getState().resetAnalysis();
+        // 4. Fire Supabase RPC to purge server-side skin profiles
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: { user } } = await (supabase as any).auth.getUser();
+            if (user) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                await (supabase as any)
+                    .from('user_skin_profiles')
+                    .delete()
+                    .eq('user_id', user.id);
+            }
+        } catch (e) {
+            console.warn('[BioData Purge] Server purge failed:', e);
+        }
+
+        toast.success(
+            de ? "Biometrische Daten erfolgreich gelöscht."
+               : language === 'ko' ? "생체 데이터가 성공적으로 삭제되었습니다."
+               : "Biometric data successfully deleted."
+        );
+        setBioDataPurgeOpen(false);
+    };
+
+    // ── Phase 24 REV1: Art. 21 AI Profiling toggle (optimistic UI) ────────────
+    const handleToggleAiProfiling = async (checked: boolean) => {
+        const prev = aiProfilingEnabled;
+        setAiProfilingEnabled(checked); // Optimistic update
+
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { data: { user } } = await (supabase as any).auth.getUser();
+            if (user) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                await (supabase as any)
+                    .from('user_profiles')
+                    .update({ metadata: { allow_ai_profiling: checked } })
+                    .eq('user_id', user.id);
+            }
+        } catch {
+            setAiProfilingEnabled(prev); // Rollback
+            toast.error(de ? "Änderung fehlgeschlagen." : "Change failed.");
         }
     };
 
@@ -609,7 +774,69 @@ export default function ProfilePage({ de }: { de: boolean }) {
                 )}
             </div>
 
-            {/* ── Card 3: Danger Zone ── */}
+            {/* ── Card 3: Privacy Settings (Phase 24 — Art. 21 & Art. 17) ── */}
+            <div style={CARD}>
+                <p style={{
+                    fontSize: "0.6rem", letterSpacing: "0.28em",
+                    color: GOLD, textTransform: "uppercase", fontWeight: 600,
+                    marginBottom: "1.25rem",
+                }}>
+                    {de ? "Datenschutz-Einstellungen" : language === 'ko' ? "개인정보 설정" : "Privacy Settings"}
+                </p>
+
+                {/* Art. 21: AI Profiling Toggle */}
+                <div className="flex items-center justify-between gap-4 mb-6 pb-6" style={{ borderBottom: "1px solid rgba(45,107,74,0.1)" }}>
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                        <Brain className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: GOLD }} strokeWidth={1.5} />
+                        <div>
+                            <p style={{ fontSize: "0.8125rem", color: "#e8e8e8", fontWeight: 500, marginBottom: "0.2rem" }}>
+                                {de ? "KI-Personalisierung (Profiling) erlauben" : language === 'ko' ? "AI 개인화 (프로파일링) 허용" : "Allow AI Personalization (Profiling)"}
+                            </p>
+                            <p style={{ fontSize: "0.7rem", color: BRONZE, lineHeight: 1.5 }}>
+                                {de ? "DSGVO Art. 21 — Widerspruchsrecht" : language === 'ko' ? "GDPR 제21조 — 이의제기권" : "GDPR Art. 21 — Right to Object"}
+                            </p>
+                        </div>
+                    </div>
+                    <SwitchPrimitive.Root
+                        checked={aiProfilingEnabled}
+                        onCheckedChange={handleToggleAiProfiling}
+                        className="relative w-[42px] h-[24px] rounded-full transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:ring-primary/50"
+                        style={{
+                            background: aiProfilingEnabled ? GOLD : "rgba(255,255,255,0.1)",
+                            border: `1px solid ${aiProfilingEnabled ? 'transparent' : 'rgba(255,255,255,0.15)'}`,
+                        }}
+                    >
+                        <SwitchPrimitive.Thumb
+                            className="block w-[18px] h-[18px] rounded-full bg-white shadow-sm transition-transform"
+                            style={{ transform: aiProfilingEnabled ? 'translateX(20px)' : 'translateX(2px)' }}
+                        />
+                    </SwitchPrimitive.Root>
+                </div>
+
+                {/* Art. 17: Bio-Data Purge */}
+                <div className="flex items-start gap-3">
+                    <ShieldAlert className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#EF4444' }} strokeWidth={1.5} />
+                    <div className="flex-1">
+                        <p style={{ fontSize: "0.8125rem", color: "#e8e8e8", fontWeight: 500, marginBottom: "0.2rem" }}>
+                            {de ? "Biometrische Daten löschen" : language === 'ko' ? "생체 데이터 삭제" : "Erase Biometric Data"}
+                        </p>
+                        <p style={{ fontSize: "0.7rem", color: BRONZE, lineHeight: 1.5, marginBottom: "0.75rem" }}>
+                            {de ? "DSGVO Art. 17 — Recht auf Löschung. Löscht alle KI-Hautanalysen und biometrischen Einwilligungen. Ihr Konto und Ihre Bestellhistorie bleiben erhalten."
+                                : language === 'ko' ? "GDPR 제17조 — 잊힐 권리. 모든 AI 피부 분석 및 생체 동의를 삭제합니다. 계정과 주문 내역은 유지됩니다."
+                                : "GDPR Art. 17 — Right to Erasure. Deletes all AI skin analyses and biometric consents. Your account and order history are preserved."}
+                        </p>
+                        <button
+                            onClick={() => setBioDataPurgeOpen(true)}
+                            className="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                            style={{ color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)' }}
+                        >
+                            {de ? "Biometrische Daten jetzt löschen" : language === 'ko' ? "지금 생체 데이터 삭제" : "Erase Bio Data Now"}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Card 4: Danger Zone (account deletion — unchanged) ── */}
             <div style={{ ...CARD, borderColor: "rgba(239,68,68,0.2)" }}>
                 <p style={{
                     fontSize: "0.6rem", letterSpacing: "0.28em",
@@ -639,6 +866,17 @@ export default function ProfilePage({ de }: { de: boolean }) {
                         de={de}
                         onClose={() => setDeleteOpen(false)}
                         onConfirm={handleDeleteAccount}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Phase 24 REV1: Bio-Data Purge Modal (separate from account delete) */}
+            <AnimatePresence>
+                {bioDataPurgeOpen && (
+                    <DangerBioDataModal
+                        language={language}
+                        onClose={() => setBioDataPurgeOpen(false)}
+                        onConfirm={handlePurgeBiometricData}
                     />
                 )}
             </AnimatePresence>

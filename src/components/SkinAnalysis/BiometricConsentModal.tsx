@@ -7,6 +7,7 @@ import { tokens, glassTokens } from "@/lib/designTokens";
 
 const PREMIUM_CONSENT_DATA = {
   de: {
+    badge: "Datenschutz",
     title: "Vorbereitung zur Hautanalyse",
     intro: "Um Ihnen die präzisesten kosmetischen Empfehlungen geben zu können, analysiert unsere KI Ihr Gesichtsfoto in Echtzeit.",
     bullets: [
@@ -20,8 +21,10 @@ const PREMIUM_CONSENT_DATA = {
       "Ich willige ausdrücklich in die Verarbeitung meiner biometrischen Gesichtsdaten gemäß Art. 9 Abs. 2 lit. a DSGVO ein.",
     accept: "Zustimmen & Kamera starten",
     privacyLink: "Vollständige Datenschutzerklärung",
+    withdrawNote: "Sie können diese Einwilligung jederzeit widerrufen. Die Hautanalyse per Fragebogen steht Ihnen auch ohne diese Einwilligung zur Verfügung.",
   },
   en: {
+    badge: "Privacy",
     title: "Premium Consultation Prep",
     intro: "To provide the most precise cosmetic recommendations, our AI analyzes your facial photo in real-time.",
     bullets: [
@@ -35,8 +38,10 @@ const PREMIUM_CONSENT_DATA = {
       "I explicitly consent to the processing of my biometric facial data under Article 9(2)(a) GDPR.",
     accept: "Agree & Start Camera",
     privacyLink: "Full Privacy Policy",
+    withdrawNote: "You can withdraw this consent at any time. The questionnaire-based skin analysis remains available without this consent.",
   },
   ko: {
+    badge: "개인정보 보호",
     title: "프리미엄 분석 준비",
     intro: "가장 정밀한 화장품 추천을 제공하기 위해 AI가 고객님의 얼굴 사진을 실시간으로 분석합니다.",
     bullets: [
@@ -50,6 +55,7 @@ const PREMIUM_CONSENT_DATA = {
       "GDPR 제9조 제2항 (a)호에 기반한 생체인식 얼굴 데이터 처리에 명시적으로 동의합니다.",
     accept: "동의 및 카메라 시작",
     privacyLink: "전체 개인정보 처리방침",
+    withdrawNote: "이 동의는 언제든지 철회할 수 있습니다. 설문 기반 피부 분석은 이 동의 없이도 이용 가능합니다.",
   },
 };
 
@@ -120,6 +126,19 @@ export default function BiometricConsentModal({ isOpen, onAccept, onCancel }: Ph
               style={{ background: isDark ? "rgba(74, 158, 104, 0.15)" : "rgba(74, 158, 104, 0.1)", border: `1px solid rgba(74, 158, 104, 0.3)` }}
             >
               <Shield size={22} color="#4A9E68" />
+            </div>
+
+            <div className="flex items-center gap-3 mb-3">
+              <span 
+                className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-sm"
+                style={{ 
+                  background: isDark ? "rgba(74, 158, 104, 0.2)" : "rgba(74, 158, 104, 0.1)", 
+                  color: "#4A9E68",
+                  fontFamily: "var(--font-sans)"
+                }}
+              >
+                {content.badge}
+              </span>
             </div>
 
             <h2 
@@ -199,10 +218,13 @@ export default function BiometricConsentModal({ isOpen, onAccept, onCancel }: Ph
               {allChecked && <ArrowRight size={16} />}
             </button>
             
-            <div className="mt-4 text-center">
+            <div className="mt-5 text-center flex flex-col items-center gap-2">
               <a href="/datenschutz" target="_blank" className="text-[11px] underline underline-offset-2 transition-colors" style={{ color: tok.textSecondary, fontFamily: "var(--font-sans)" }}>
                 {content.privacyLink}
               </a>
+              <p className="text-[10px] max-w-[90%] text-center" style={{ color: tok.textTertiary, fontFamily: "var(--font-sans)", lineHeight: 1.5 }}>
+                {content.withdrawNote}
+              </p>
             </div>
 
           </motion.div>

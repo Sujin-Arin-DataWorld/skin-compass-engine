@@ -17,17 +17,62 @@ export default function Cart() {
   const { isLoggedIn } = useAuthStore();
   const { language } = useI18nStore();
   
-  const CHECKOUT_LABELS = {
-    de: "Zahlungspflichtig bestellen",
-    en: "Order with obligation to pay",
-    ko: "결제 의무 주문하기", // Literal Korean translation of German law requirement
-  };
-  const checkoutText = CHECKOUT_LABELS[language as keyof typeof CHECKOUT_LABELS] || CHECKOUT_LABELS.en;
+  const CHECKOUT_BUTTON_COPY = {
+    de: { label: "Zahlungspflichtig bestellen", loading: "Bestellung wird aufgegeben…" },
+    en: { label: "Place Binding Order", loading: "Placing Order…" },
+    ko: { label: "결제 의무 주문", loading: "주문 처리 중…" },
+  } as const;
+  
+  const CHECKOUT_SUBTITLE = {
+    de: "Sichere Bezahlung · Widerruf innerhalb von 14 Tagen · EU-Versand 3–5 Tage",
+    en: "Secure checkout · 14-day withdrawal right · Ships EU 3–5 days",
+    ko: "안전 결제 · 14일 이내 청약철회 가능 · EU 배송 3~5일",
+  } as const;
+
+  const btnLang = (language === 'de' || language === 'ko') ? language : 'en';
+  const checkoutCopy = CHECKOUT_BUTTON_COPY[btnLang];
+  const checkoutSubtitle = CHECKOUT_SUBTITLE[btnLang];
   const { placeOrder } = useOrders();
   const navigate = useNavigate();
   const [placing, setPlacing] = useState(false);
+  const [agbAccepted, setAgbAccepted] = useState(false);
+  const [shaking, setShaking] = useState(false);
+
+  const AGB_CHECKBOX_LABEL = {
+    de: 'Ich akzeptiere die AGB und die Widerrufsbelehrung.',
+    en: 'I accept the Terms & Conditions and the Withdrawal Policy.',
+    ko: '이용약관 및 청약철회 안내에 동의합니다.',
+  } as const;
+
+  const AGB_TOAST_MSG = {
+    de: 'Bitte akzeptieren Sie die AGB, um fortzufahren.',
+    en: 'Please accept the Terms & Conditions to proceed.',
+    ko: '계속하려면 이용약관에 동의해주세요.',
+  } as const;
+
+  const PANGV_VAT = {
+    de: 'inkl. MwSt. zzgl. Versandkosten',
+    en: 'incl. VAT, excl. shipping',
+    ko: 'VAT 포함, 배송비 별도',
+  } as const;
 
   const handleCheckout = async () => {
+    // Phase 23: Smart validation — no disabled button, intercept event
+    if (!agbAccepted) {
+      setShaking(true);
+      setTimeout(() => setShaking(false), 350);
+      toast.error(AGB_TOAST_MSG[btnLang], {
+        style: {
+          background: 'rgba(239,68,68,0.1)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          color: 'hsl(var(--destructive))',
+          border: '1px solid rgba(239,68,68,0.2)',
+        },
+      });
+      return;
+    }
+
     if (!isLoggedIn) {
       toast.error("Please sign in to complete your purchase.");
       navigate("/login?redirect=/cart");
@@ -188,7 +233,31 @@ export default function Cart() {
                 <p className="text-sm text-foreground/60">Shipping (EU)</p>
                 <p className="text-sm text-foreground/60">Calculated at checkout</p>
               </div>
-              <p className="text-xs text-foreground/40 mb-6">Free shipping on orders over €60</p>
+              <p className="text-xs text-foreground/40 mb-2">Free shipping on orders over €60</p>
+
+              {/* PAngV VAT & Shipping Adjacency (CRITICAL) */}
+              <span className="block text-[11px] text-muted-foreground mt-1 mb-4">inkl. MwSt. zzgl. <Link to="/widerrufsbelehrung" className="underline hover:text-foreground transition-colors">Versandkosten</Link></span>
+
+              {/* Phase 23: AGB Checkbox — smart friction */}
+              <div className={`mb-4 ${shaking ? 'animate-shake' : ''}`}>
+                <label className="flex items-start gap-3 cursor-pointer select-none group">
+                  <input
+                    type="checkbox"
+                    checked={agbAccepted}
+                    onChange={(e) => setAgbAccepted(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-gray-400 shrink-0 cursor-pointer transition-all"
+                    style={{ accentColor: 'hsl(var(--primary))' }}
+                  />
+                  <span className="text-xs text-foreground/60 leading-relaxed">
+                    {AGB_CHECKBOX_LABEL[btnLang]}{' '}
+                    <a href="/agb" target="_blank" className="underline underline-offset-2 hover:text-foreground transition-colors">AGB</a>
+                    {' · '}
+                    <a href="/widerrufsbelehrung" target="_blank" className="underline underline-offset-2 hover:text-foreground transition-colors">
+                      {btnLang === 'de' ? 'Widerrufsbelehrung' : btnLang === 'ko' ? '청약철회 안내' : 'Withdrawal Policy'}
+                    </a>
+                  </span>
+                </label>
+              </div>
 
               <button
                 onClick={handleCheckout}
@@ -196,14 +265,14 @@ export default function Cart() {
                 className="w-full rounded-2xl py-4 font-bold text-xs sm:text-sm tracking-wide uppercase bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 flex flex-wrap items-center justify-center gap-2 px-4 disabled:opacity-60 leading-tight"
               >
                 {placing ? (
-                  <><Loader2 className="w-4 h-4 animate-spin shrink-0" /> Placing Order…</>
+                  <><Loader2 className="w-4 h-4 animate-spin shrink-0" /> {checkoutCopy.loading}</>
                 ) : (
-                  <><span className="text-center">{checkoutText}</span> <ArrowRight className="w-4 h-4 shrink-0" /></>
+                  <><span className="text-center">{checkoutCopy.label}</span> <ArrowRight className="w-4 h-4 shrink-0" /></>
                 )}
               </button>
 
               <p className="text-xs text-foreground/40 text-center mt-3">
-                Secure checkout · Cancel anytime · Ships EU 3–5 days
+                {checkoutSubtitle}
               </p>
             </motion.div>
 

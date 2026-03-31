@@ -13,9 +13,10 @@ export interface OrderItem {
 export interface OrderRecord {
     id: string;
     created_at: string;
-    status: "pending" | "shipped" | "delivered";
+    status: "pending" | "paid" | "shipped" | "delivered" | "cancelled";
     total: number;
     items: OrderItem[];
+    delivered_at: string | null;
 }
 
 export function useOrders() {
@@ -35,7 +36,7 @@ export function useOrders() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const { data } = await (supabase as any)
                 .from("orders")
-                .select("id, created_at, status, total, order_items(product_id, product_name, quantity, unit_price)")
+                .select("id, created_at, status, total, delivered_at, order_items(product_id, product_name, quantity, unit_price)")
                 .eq("user_id", user.id)
                 .order("created_at", { ascending: false });
 
@@ -45,6 +46,7 @@ export function useOrders() {
                     created_at: string;
                     status: string;
                     total: number;
+                    delivered_at: string | null;
                     order_items: OrderItem[];
                 }>).map((row) => ({
                     id: row.id,
@@ -52,6 +54,7 @@ export function useOrders() {
                     status: (row.status as OrderRecord["status"]) ?? "pending",
                     total: row.total,
                     items: row.order_items ?? [],
+                    delivered_at: row.delivered_at ?? null,
                 }));
                 setOrders(mapped);
             }
@@ -126,6 +129,7 @@ export function useOrders() {
             created_at: orderData.created_at,
             status: "pending",
             total,
+            delivered_at: null,
             items: itemRows.map(({ product_id, product_name, quantity, unit_price }) => ({
                 product_id,
                 product_name,

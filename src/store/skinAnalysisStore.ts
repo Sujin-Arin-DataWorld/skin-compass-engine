@@ -94,6 +94,9 @@ interface SkinAnalysisState {
   // History persisted for future trend chart
   analysisHistory: AnalysisHistoryEntry[];
 
+  // GDPR Art.9 audit trail: explicit biometric data cleanup
+  clearSensitiveData: () => void;
+
   resetAnalysis: () => void;
 }
 
@@ -143,6 +146,14 @@ export const useSkinAnalysisStore = create<SkinAnalysisState>()(
       setTrainingConsentGiven: (given) => set({ trainingConsentGiven: given }),
 
       analysisHistory: [],
+
+      // GDPR Art.9 audit trail: explicit biometric data nullification
+      clearSensitiveData: () => set({
+        capturedImageBase64: null,
+        // Explicit nullification for GDPR compliance audit trail.
+        // Guarantees the raw facial image is dropped from Zustand + IndexedDB
+        // even if the component unmounts before natural garbage collection.
+      }),
 
       resetAnalysis: () =>
         set({

@@ -302,6 +302,9 @@ export default function SkinAnalysisPage() {
           response.analysis_id,
         );
 
+        // GDPR Art.9: Explicit biometric data cleanup after successful analysis
+        useSkinAnalysisStore.getState().clearSensitiveData();
+
         // ── Persist to user_skin_profiles if logged in (non-blocking) ──────
         (async () => {
           if (hasSavedRef.current) return; // Guard against React remount double-save
@@ -347,6 +350,8 @@ export default function SkinAnalysisPage() {
           }
         })();
       } catch (err) {
+        // GDPR Art.9: Explicit biometric data cleanup even on failure
+        useSkinAnalysisStore.getState().clearSensitiveData();
         setError(err instanceof Error ? err.message : t.camera.analysisError);
       }
     },

@@ -30,14 +30,13 @@ function tx(obj: LT, lang: Lang): string {
 // ─── Copy ─────────────────────────────────────────────────────────────────────
 
 const C = {
-  // Shorter KO placeholder so it doesn't overflow on small cards
-  placeholder:   { en: "Search your city...", de: "Stadt suchen...",      ko: "도시 검색..." } as LT,
+  placeholder:   { en: "City or postal code...",  de: "Stadt oder PLZ...",        ko: "도시명 또는 우편번호..." } as LT,
   loading:       { en: "Analysing climate data...", de: "Klimadaten werden analysiert...", ko: "기후 데이터 분석 중..." } as LT,
   noResults:     { en: "No cities found",      de: "Keine Städte gefunden",  ko: "도시를 찾을 수 없습니다" } as LT,
   noResultsHint: {
-    en: "",
-    de: "Tipp: Versuche den Stadtnamen auf Englisch (z. B. Munich)",
-    ko: "도움말: 영어로 검색해 보세요 (예: Suwon, Seoul)",
+    en: "Tip: Try a nearby major city or postal code.",
+    de: "Tipp: PLZ oder den Stadtnamen auf Englisch versuchen (z. B. Munich)",
+    ko: "도움말: 우편번호 또는 영어로 검색해 보세요 (예: 06779, Seoul)",
   } as LT,
   dryness:    { en: "Dryness",  de: "Trockenheit", ko: "건조함"  } as LT,
   humidity:   { en: "Humidity", de: "Feuchtigkeit", ko: "습도"   } as LT,
@@ -45,10 +44,13 @@ const C = {
   changeCity: { en: "Change",   de: "Ändern",       ko: "변경"   } as LT,
   error:      { en: "Failed to load climate data. Please try again.", de: "Klimadaten konnten nicht geladen werden.", ko: "기후 데이터를 불러오지 못했습니다." } as LT,
   searchTip:  {
-    en: "💡 Tip: Try searching in English if your local city name isn't found.",
-    de: "💡 Tipp: Versuche den Stadtnamen auf Englisch, wenn deine Stadt nicht erscheint.",
-    ko: "💡 팁: 원하는 도시가 없다면 '수원시'처럼 시/군/구를 붙이거나 영어(예: Suwon)로 검색해 보세요.",
+    en: "💡 Search by city name or postal code (e.g. 10967, Seoul, Munich)",
+    de: "💡 Suche nach Stadtname oder PLZ (z. B. 10967, München, Seoul)",
+    ko: "💡 도시명 또는 우편번호로 검색하세요 (예: 06779, 수원시, Frankfurt)",
   } as LT,
+  now:      { en: "Now",          de: "Jetzt",       ko: "현재" } as LT,
+  today:    { en: "Today",        de: "Heute",       ko: "오늘" } as LT,
+  avg90:    { en: "90-day avg",   de: "90-Tage Ø",   ko: "90일 평균" } as LT,
 } as const;
 
 // ─── Risk badge colours ───────────────────────────────────────────────────────
@@ -117,11 +119,12 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
     setLoading(true);
     setError(null);
     try {
-      const { archive, forecast } = await fetchClimateData(city.latitude, city.longitude);
+      const { archive, forecast, current } = await fetchClimateData(city.latitude, city.longitude);
       const profile = computeClimateSkInScore(
         archive, forecast,
         city.name, city.country,
-        city.latitude, city.longitude
+        city.latitude, city.longitude,
+        current
       );
       setClimateProfile(profile);
       onLegacyChange(profile.climateType);
@@ -180,7 +183,7 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
                 {storedProfile.city}
               </p>
               <p className="text-[9px] sm:text-[10px] text-muted-foreground mt-0.5">
-                {storedProfile.country} · avg {storedProfile.avgMaxTemp}°C / {storedProfile.avgMinTemp}°C
+                {storedProfile.country}
               </p>
             </div>
           </div>
@@ -190,6 +193,53 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
           >
             {tx(C.changeCity, lang)}
           </button>
+        </div>
+
+        {/* Temperature display: Current + Today + 90-day avg */}
+        <div className="flex items-end gap-3 sm:gap-4">
+          {/* Current temp — big and prominent */}
+          {storedProfile.currentTemp != null && (
+            <div className="flex flex-col items-center">
+              <span className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-wider">
+                {tx(C.now, lang)}
+              </span>
+              <span className="text-xl sm:text-2xl font-semibold text-foreground leading-none mt-0.5">
+                {Math.round(storedProfile.currentTemp)}°
+              </span>
+            </div>
+          )}
+
+          {/* Divider */}
+          {storedProfile.currentTemp != null && (
+            <div className="h-8 w-px bg-border/60 flex-shrink-0" />
+          )}
+
+          {/* Today's forecast */}
+          {storedProfile.todayMaxTemp != null && storedProfile.todayMinTemp != null && (
+            <div className="flex flex-col">
+              <span className="text-[9px] sm:text-[10px] text-muted-foreground">
+                {tx(C.today, lang)}
+              </span>
+              <span className="text-xs sm:text-sm font-medium text-foreground/80 leading-snug">
+                {Math.round(storedProfile.todayMaxTemp)}° / {Math.round(storedProfile.todayMinTemp)}°
+              </span>
+            </div>
+          )}
+
+          {/* Divider */}
+          {storedProfile.todayMaxTemp != null && (
+            <div className="h-8 w-px bg-border/60 flex-shrink-0" />
+          )}
+
+          {/* 90-day average */}
+          <div className="flex flex-col">
+            <span className="text-[9px] sm:text-[10px] text-muted-foreground">
+              {tx(C.avg90, lang)}
+            </span>
+            <span className="text-xs sm:text-sm text-muted-foreground leading-snug">
+              {storedProfile.avgMaxTemp}° / {storedProfile.avgMinTemp}°
+            </span>
+          </div>
         </div>
 
         {/* Risk badges */}
@@ -304,11 +354,9 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
       {hasSearched && !searching && query.trim().length >= 2 && suggestions.length === 0 && (
         <div className="mt-2 space-y-1 text-center">
           <p className="text-xs sm:text-sm text-muted-foreground">{tx(C.noResults, lang)}</p>
-          {lang !== "en" && tx(C.noResultsHint, lang) && (
-            <p className="text-[10px] sm:text-[11px] text-muted-foreground/60 italic">
-              {tx(C.noResultsHint, lang)}
-            </p>
-          )}
+          <p className="text-[10px] sm:text-[11px] text-muted-foreground/60 italic">
+            {tx(C.noResultsHint, lang)}
+          </p>
         </div>
       )}
 

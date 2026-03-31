@@ -39,6 +39,11 @@ export interface ClimateProfile {
   avgMinTemp: number; // °C, 90-day average
   avgUV: number;      // UV index, 7-day average
   avgPrecip: number;  // mm/day, 90-day average
+
+  /** Current / today's weather — for user-facing display */
+  currentTemp: number | null;  // °C, real-time (from Forecast API `current`)
+  todayMaxTemp: number | null; // °C, today's forecast max
+  todayMinTemp: number | null; // °C, today's forecast min
 }
 
 export interface GeoSuggestion {
@@ -58,6 +63,11 @@ interface DailyWeather {
   uv_index_max?: number[];
 }
 
+interface CurrentWeather {
+  temperature_2m: number;
+  time: string;
+}
+
 // ─── Base URLs (proxy in dev, direct HTTPS in production) ────────────────────
 
 const GEO_BASE      = import.meta.env.DEV ? "/api/geo"      : "https://geocoding-api.open-meteo.com";
@@ -66,30 +76,43 @@ const FORECAST_BASE = import.meta.env.DEV ? "/api/forecast" : "https://api.open-
 
 // ─── Geocoding ────────────────────────────────────────────────────────────────
 
+/**
+ * Detects whether the input looks like a postal code (numeric or alphanumeric
+ * patterns like "10967", "SW1A 1AA", "06-400").
+ */
+function looksLikePostalCode(query: string): boolean {
+  const trimmed = query.trim();
+  // Pure digits (e.g. "10967", "06400", "135-080")
+  if (/^[\d\-\s]{3,10}$/.test(trimmed)) return true;
+  // Alphanumeric with spaces/dashes (UK/CA style: "SW1A 1AA", "M5V 3L9")
+  if (/^[A-Z0-9]{2,4}[\s\-]?[A-Z0-9]{2,4}$/i.test(trimmed)) return true;
+  return false;
+}
+
 export async function fetchCitySuggestions(
   query: string,
   lang: string = "en"
 ): Promise<GeoSuggestion[]> {
   if (!query || query.trim().length < 2) return [];
+
+  const isPostal = looksLikePostalCode(query);
+  // Postal codes may match fewer results — increase count to improve hit rate
+  const count = isPostal ? 20 : 15;
+
   const url =
     `${GEO_BASE}/v1/search` +
-    `?name=${encodeURIComponent(query.trim())}&count=15&language=${lang}&format=json`;
+    `?name=${encodeURIComponent(query.trim())}&count=${count}&language=${lang}&format=json`;
 
-  console.log("[climateEngine] geocoding URL →", url);
+  console.log(`[climateEngine] geocoding URL (postal=${isPostal}) →`, url);
 
   try {
     const res = await fetch(url);
-    console.log("[climateEngine] response status:", res.status, res.statusText);
-
     if (!res.ok) {
       console.warn("[climateEngine] non-ok response — returning []");
       return [];
     }
 
     const data = (await res.json()) as { results?: GeoSuggestion[] };
-    console.log("[climateEngine] raw JSON:", data);
-    console.log("[climateEngine] results array:", data.results ?? "(no results key)");
-
     return data.results ?? [];
   } catch (err) {
     console.error("[climateEngine] fetchCitySuggestions FAILED:", err);
@@ -106,7 +129,7 @@ function formatDate(d: Date): string {
 export async function fetchClimateData(
   lat: number,
   lon: number
-): Promise<{ archive: DailyWeather; forecast: DailyWeather }> {
+): Promise<{ archive: DailyWeather; forecast: DailyWeather; current: CurrentWeather | null }> {
   const today = new Date();
 
   // Archive has a ~2-day processing lag
@@ -122,10 +145,12 @@ export async function fetchClimateData(
     `&start_date=${formatDate(archiveStart)}&end_date=${formatDate(archiveEnd)}` +
     `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
 
+  // Add current=temperature_2m to get real-time temperature
   const forecastUrl =
     `${FORECAST_BASE}/v1/forecast` +
     `?latitude=${lat}&longitude=${lon}` +
     `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,uv_index_max` +
+    `&current=temperature_2m` +
     `&forecast_days=7&timezone=auto`;
 
   const [archiveRes, forecastRes] = await Promise.all([
@@ -139,12 +164,13 @@ export async function fetchClimateData(
 
   const [archiveData, forecastData] = await Promise.all([
     archiveRes.json() as Promise<{ daily: DailyWeather }>,
-    forecastRes.json() as Promise<{ daily: DailyWeather }>,
+    forecastRes.json() as Promise<{ daily: DailyWeather; current?: CurrentWeather }>,
   ]);
 
   return {
     archive: archiveData.daily,
     forecast: forecastData.daily,
+    current: forecastData.current ?? null,
   };
 }
 
@@ -177,7 +203,8 @@ export function computeClimateSkInScore(
   city: string,
   country: string,
   lat: number,
-  lon: number
+  lon: number,
+  current?: CurrentWeather | null
 ): ClimateProfile {
   const allMaxTemps = [...(archive.temperature_2m_max ?? []), ...(forecast.temperature_2m_max ?? [])];
   const allMinTemps = [...(archive.temperature_2m_min ?? []), ...(forecast.temperature_2m_min ?? [])];
@@ -188,6 +215,15 @@ export function computeClimateSkInScore(
   const avgMinTemp = Math.round(avg(allMinTemps) * 10) / 10;
   const avgPrecip  = Math.round(avg(allPrecip) * 10) / 10;   // mm/day
   const avgUV      = Math.round(avg(uvSamples) * 10) / 10;
+
+  // ── Today's forecast (first entry in forecast arrays) ───────────────────────
+  const todayMaxTemp = forecast.temperature_2m_max?.[0] ?? null;
+  const todayMinTemp = forecast.temperature_2m_min?.[0] ?? null;
+
+  // ── Current real-time temperature ───────────────────────────────────────────
+  const currentTemp = current?.temperature_2m != null
+    ? Math.round(current.temperature_2m * 10) / 10
+    : null;
 
   // ── 5 risk dimensions ───────────────────────────────────────────────────────
 
@@ -238,5 +274,8 @@ export function computeClimateSkInScore(
     avgMinTemp,
     avgUV,
     avgPrecip,
+    currentTemp,
+    todayMaxTemp,
+    todayMinTemp,
   };
 }

@@ -14,6 +14,8 @@ import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
 import CompatibilityBadge from "@/components/product/CompatibilityBadge";
 import { formatGrundpreis } from "@/utils/priceUtils";
+import MedicalDisclaimer from '@/components/legal/MedicalDisclaimer';
+import AiGeneratedBadge from '@/components/legal/AiGeneratedBadge';
 
 const PHASE_META: Record<string, { icon: string; name: string; desc: string }> = {
     "1": { icon: "💧", name: "Cleanse", desc: "Remove impurities without disrupting barrier integrity." },
@@ -254,6 +256,8 @@ export default function FormulaDetail() {
                     transition={{ delay: 0.1 }}
                     className="mb-8"
                 >
+                    {/* EU AI Act Art. 50 transparency */}
+                    <AiGeneratedBadge />
                     <CompatibilityBadge product={product} variant="expanded" />
                 </motion.section>
 
@@ -391,6 +395,9 @@ export default function FormulaDetail() {
                 {/* Verified Purchase Badge — future use with reviews */}
                 {/* When reviews are implemented, render: <VerifiedPurchaseBadge /> next to each verified review */}
                 <VerifiedPurchaseBadge className="hidden" />
+
+                {/* Legal: MDR/HWG Medical Disclaimer */}
+                <MedicalDisclaimer />
 
                 {/* DSA Notice & Action (MANDATORY ADDITION) */}
                 <button className="flex items-center gap-1.5 text-[10px] text-foreground/30 hover:text-destructive transition-colors mt-8"><Flag className="w-3 h-3" /> Dieses Produkt melden</button>

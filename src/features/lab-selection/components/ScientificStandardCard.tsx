@@ -71,7 +71,7 @@ const UI = {
   conc_min: { ko: '최소 ', en: 'min ', de: 'mind. ' },
   hold_title: { ko: '🛑 활성 성분 일시 중단', en: '🛑 Actives on hold', de: '🛑 Wirkstoffe pausiert' },
   hold_body: { ko: '현재 피부 상태에서는 모든 활성 성분을 중단하고 장벽 복구에 집중해야 합니다.', en: 'All active ingredients are on hold for this zone. Focus on barrier repair first.', de: 'Alle Wirkstoffe sind für diese Zone pausiert. Fokus auf Barrierereparatur.' },
-  no_concerns: { ko: '이 부위는 별도 처방이 필요하지 않습니다.', en: 'No specific concerns for this zone.', de: 'Keine besonderen Anforderungen für diese Zone.' },
+  no_concerns: { ko: '이 부위는 별도 집중 케어가 필요하지 않습니다.', en: 'No specific concerns for this zone.', de: 'Keine besonderen Anforderungen für diese Zone.' },
   axis_label: { ko: '분석 축', en: 'Analysis axes', de: 'Analysedimensionen' },
 } as const;
 

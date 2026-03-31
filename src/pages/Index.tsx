@@ -39,7 +39,7 @@ import { StickyBottomCta } from "@/components/home/StickyBottomCta";
 
 // ── Intent-based prefetching — preload lazy chunks on hover/touch ─────────────
 const prefetchSkinAnalysis = () => { import("./SkinAnalysisPage"); };
-const prefetchAnalysis = () => { import("./Analysis"); };
+const prefetchAnalysis = () => { import("./AnalysisHistoryPage"); };
 
 // ── Design tokens (consumed from designTokens.ts via tokens() helper) ─────────
 const BRONZE = "var(--ssl-accent-deep)";  // kept for non-active icon fallback

@@ -23,8 +23,7 @@ export interface PendingAnalysis {
   engineVersion: string;
 }
 
-/** @deprecated Use PendingAnalysis instead. */
-export type PendingAnalysis = PendingAnalysis;
+// @deprecated alias removed — PendingAnalysis is already exported above.
 
 /**
  * Save analysis results to localStorage immediately after scoring completes.
@@ -38,8 +37,7 @@ export function savePendingAnalysis(data: PendingAnalysis): void {
   }
 }
 
-/** @deprecated Use savePendingAnalysis instead. */
-export const savePendingAnalysis = savePendingAnalysis;
+// @deprecated alias removed — savePendingAnalysis is already exported above.
 
 /**
  * Retrieve pending analysis. Returns null if nothing stored,
@@ -66,16 +64,14 @@ export function getPendingAnalysis(): PendingAnalysis | null {
   }
 }
 
-/** @deprecated Use getPendingAnalysis instead. */
-export const getPendingAnalysis = getPendingAnalysis;
+// @deprecated alias removed — getPendingAnalysis is already exported above.
 
 /** True when a pending analysis is waiting to be synced. */
 export function hasPendingAnalysis(): boolean {
   return getPendingAnalysis() !== null;
 }
 
-/** @deprecated Use hasPendingAnalysis instead. */
-export const hasPendingAnalysis = hasPendingAnalysis;
+// @deprecated alias removed — hasPendingAnalysis is already exported above.
 
 /** Remove pending analysis after successful Supabase sync or expiry. */
 export function clearPendingAnalysis(): void {
@@ -83,5 +79,4 @@ export function clearPendingAnalysis(): void {
   try { sessionStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
 }
 
-/** @deprecated Use clearPendingAnalysis instead. */
-export const clearPendingAnalysis = clearPendingAnalysis;
+// @deprecated alias removed — clearPendingAnalysis is already exported above.

@@ -12,8 +12,7 @@ export interface AnalysisRecord {
     notes?: string;
 }
 
-/** @deprecated Use AnalysisRecord instead. */
-export type AnalysisRecord = AnalysisRecord;
+// @deprecated alias removed — AnalysisRecord is already exported above.
 
 export function useSkinAnalysis() {
     const [history, setHistory] = useState<AnalysisRecord[]>([]);

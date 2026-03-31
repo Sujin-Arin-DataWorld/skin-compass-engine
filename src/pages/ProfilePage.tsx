@@ -527,7 +527,7 @@ export default function ProfilePage({ de }: { de: boolean }) {
             if (user) {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 await (supabase as any)
-                    .from('user_profiles')
+                    .from('profiles')
                     .update({ metadata: { allow_ai_profiling: checked } })
                     .eq('user_id', user.id);
             }

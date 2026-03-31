@@ -327,8 +327,9 @@ interface AnalysisState {
 /** Public type alias — use this when you need to type a snapshot of the store */
 export type AnalysisStoreState = AnalysisState;
 
-/** @deprecated Use AnalysisStoreState instead. */
-export type AnalysisStoreState = AnalysisStoreState;
+
+/** @deprecated Use AnalysisStoreState (already exported above). */
+// duplicate type alias removed.
 
 // ─── Initial state ────────────────────────────────────────────────────────────
 
@@ -562,5 +563,5 @@ export const useAnalysisStore = create<AnalysisState>()(
   )
 );
 
-/** @deprecated Use useAnalysisStore instead. */
-export const useAnalysisStore = useAnalysisStore;
+/** @deprecated Use useAnalysisStore (already exported above). */
+// export alias removed — useAnalysisStore is already the canonical export.

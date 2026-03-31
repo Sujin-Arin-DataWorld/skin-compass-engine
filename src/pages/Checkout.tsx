@@ -34,7 +34,7 @@ const PLAN_DETAILS: Record<Tier, { price: string; includes: string[]; color: str
       "Active ingredient gating",
       "Microbiome & advanced barrier ampoule",
       "Bioheal collagen peptide serum",
-      "Clinical EMS/LED device (Month 2 reward)",
+      "Professional EMS/LED device (Month 2 reward)",
     ],
     color: "hsl(var(--primary))",
   },
@@ -137,7 +137,7 @@ const Checkout = () => {
                 <p className="text-sm font-semibold text-foreground mb-1">
                   {deviceLocked
                     ? "Dermatological Safety Logic · Locked for Month 1"
-                    : "Barrier Stable · Clinical Device Eligible"}
+                    : "Barrier Stable · Professional Device Eligible"}
                 </p>
                 <p className="text-xs" style={{ color: "#D1D1D1", lineHeight: 1.6 }}>
                   {deviceLocked
@@ -192,7 +192,7 @@ const Checkout = () => {
                   color: "#D1D1D1",
                 }}
               >
-                <strong className="text-foreground">Lease-to-own safety:</strong> Clinical device
+                <strong className="text-foreground">Lease-to-own safety:</strong> Professional device
                 ships in Month 2 after barrier readiness is confirmed. Full ownership transfers
                 after 3 months. No surprise charges.
               </div>

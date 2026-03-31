@@ -172,7 +172,7 @@ Dark mode multipliers: `scoreBorderColor` → ×1.8, `scoreBgColor` → ×2.5, `
 
 ### C1. `authStore.ts` — Persist migration v2 + logout key cleanup
 
-**Problem:** Old `authStore` versions wrote `addresses` and `savedResults` arrays directly into the persisted state. After Sprint A refactored those into dedicated hooks (`useAddresses`, `useDiagnosis`), the old keys became dead weight in `localStorage` — but were still being loaded into Zustand on hydration, growing the store unnecessarily.
+**Problem:** Old `authStore` versions wrote `addresses` and `savedResults` arrays directly into the persisted state. After Sprint A refactored those into dedicated hooks (`useAddresses`, `useAnalysis`), the old keys became dead weight in `localStorage` — but were still being loaded into Zustand on hydration, growing the store unnecessarily.
 
 **Before:** No `version` or `migrate` on the Zustand persist config — stale keys accumulated silently.
 
@@ -186,7 +186,7 @@ Dark mode multipliers: `scoreBorderColor` → ×1.8, `scoreBgColor` → ×2.5, `
     const state = (persistedState ?? {}) as Record<string, unknown>;
     if (version < 2) {
       delete state.addresses;      // moved to useAddresses hook
-      delete state.savedResults;   // moved to useDiagnosis hook
+      delete state.savedResults;   // moved to useAnalysis hook
     }
     return state;
   },
@@ -279,11 +279,11 @@ All 5 files were verified to have **zero external consumers** before deletion (g
 
 | ID | File | Lines | Reason |
 |----|------|-------|--------|
-| D1 | `src/features/results/components/DiagnosisComparisonView.tsx` | 343 | V4 comparison view — never rendered in Results.tsx post-3-Slide refactor |
+| D1 | `src/features/results/components/AnalysisComparisonView.tsx` | 343 | V4 comparison view — never rendered in Results.tsx post-3-Slide refactor |
 | D2 | `src/features/results/components/SkinAgeCard.tsx` | 351 | V4 skin age card — dropped in 3-Slide refactor |
 | D3 | `src/pages/LabSelectionPage.tsx` | 476 | No `<Route>` in App.tsx, no nav links pointing to it |
 | D4 | `src/components/SkinAnalysis/ProductRecommendationCard.tsx` | 160 | Replaced by inline product cards in Sprint B |
-| D5 | `src/features/results/hooks/useDiagnosisComparison.ts` | 114 | Paired exclusively with D1 (DiagnosisComparisonView) |
+| D5 | `src/features/results/hooks/useAnalysisComparison.ts` | 114 | Paired exclusively with D1 (AnalysisComparisonView) |
 
 ### Files intentionally kept
 
@@ -339,7 +339,7 @@ export default defineConfig(({ mode }) => ({
 ```
 ls dist/assets/*.map  → No .map files found ✅
 grep "console\." dist/assets/Results-*.js   → 0 results ✅
-grep "console\." dist/assets/Diagnosis-*.js → 0 results ✅
+grep "console\." dist/assets/Analysis-*.js → 0 results ✅
 grep "console\." dist/assets/SkinAnalysisPage-*.js → 0 results ✅
 ```
 
@@ -373,7 +373,7 @@ All errors were pre-existing (not introduced by Sprint A–D). Fixed by category
 
 | File | Error | Fix |
 |------|-------|-----|
-| `src/pages/DiagnosisHistoryPage.tsx:461` | `no-unused-expressions` — ternary used as statement | `next.has(key) ? next.delete(key) : next.add(key)` → `if/else` |
+| `src/pages/AnalysisHistoryPage.tsx:461` | `no-unused-expressions` — ternary used as statement | `next.has(key) ? next.delete(key) : next.add(key)` → `if/else` |
 | `src/engine/scoringEngineV5.ts:217` | `no-non-null-asserted-optional-chain` — `?.score!` | `?.score!` → `(?.score ?? 0)` |
 | `src/features/lab-selection/components/DuelCard.tsx:142` | `ban-ts-comment` — `@ts-ignore` | `@ts-ignore` → `@ts-expect-error` with description |
 | `src/hooks/usePerformanceMode.ts:19` | `prefer-const` — `let startTime` never reassigned | `let` → `const` |
@@ -408,7 +408,7 @@ All errors were pre-existing (not introduced by Sprint A–D). Fixed by category
 | Mock product IDs (`ssl-*`, `MOCK_PRODUCT_PRICES`) | ✅ Zero live code — only in `productBridge.ts` file-header comment |
 | References to Sprint D deleted files | ✅ Zero results |
 | Raw `fetch()` to `supabase/functions/v1` | ✅ Zero — all use `supabase.functions.invoke()` |
-| Dead `authStore` calls (`.addAddress`, `.removeAddress`, `.saveDiagnosisResult`) | ✅ Zero |
+| Dead `authStore` calls (`.addAddress`, `.removeAddress`, `.saveAnalysisResult`) | ✅ Zero |
 
 ---
 
@@ -423,7 +423,7 @@ Chunk                      Raw         Gzip
 ─────────────────────────────────────────────
 index-*.js             1,145.20 kB   323.94 kB
 Account-*.js             475.28 kB   126.84 kB
-Diagnosis-*.js           137.57 kB    55.31 kB
+Analysis-*.js           137.57 kB    55.31 kB
 Results-*.js              86.76 kB    28.68 kB
 SkinAnalysisPage-*.js     72.67 kB    23.49 kB
 SlideLabSpecialCare-*.js  64.04 kB    18.30 kB
@@ -465,10 +465,10 @@ Git commit hashes:
 `validateCart()`는 구현됐지만 Cart 컴포넌트가 마운트될 때 명시적으로 호출하는 코드가 있는지 확인이 필요합니다. Cart 아이콘 클릭 → 카트 열림 → `useEffect`에서 `validateCart()` 호출 흐름이 실제로 연결되어 있어야 좀비 방지 효과가 발동됩니다.
 
 **6. `useProgressPersistence.ts` 실제 연결 여부 확인**
-파일은 복원됐지만, Diagnosis 플로우에서 이 훅이 실제로 `import`되고 있는지 확인이 필요합니다. 연결이 끊겨 있다면 Survey 중간 새로고침 시 진행 상태가 복원되지 않습니다.
+파일은 복원됐지만, Analysis 플로우에서 이 훅이 실제로 `import`되고 있는지 확인이 필요합니다. 연결이 끊겨 있다면 Survey 중간 새로고침 시 진행 상태가 복원되지 않습니다.
 
 **7. `react-hooks/exhaustive-deps` 25개 경고 해소**
-`Diagnosis.tsx`, `FaceMapStep.tsx`, `BarrierRecoveryMode.tsx` 등에 남아 있는 exhaustive-deps 경고들은 버그는 아니지만, stale closure 문제로 이어질 수 있습니다. `useCallback`/`useMemo` dependency 배열을 정리하거나 `useRef`로 안정화하면 됩니다.
+`Analysis.tsx`, `FaceMapStep.tsx`, `BarrierRecoveryMode.tsx` 등에 남아 있는 exhaustive-deps 경고들은 버그는 아니지만, stale closure 문제로 이어질 수 있습니다. `useCallback`/`useMemo` dependency 배열을 정리하거나 `useRef`로 안정화하면 됩니다.
 
 ---
 

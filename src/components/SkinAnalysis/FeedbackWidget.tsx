@@ -54,8 +54,8 @@ const TX = {
   submitting: { ko: '전송 중...', en: 'Sending...', de: 'Senden...' },
   thanks: { ko: '소중한 피드백 감사합니다! AI가 진화합니다 🧬', en: 'Thank you! Your feedback helps our AI evolve 🧬', de: 'Danke! Ihr Feedback hilft unserer KI, sich weiterzuentwickeln 🧬' },
   ctaTitle: { ko: '더 정확한 분석을 원하시나요?', en: 'Want a more precise analysis?', de: 'Möchten Sie eine genauere Analyse?' },
-  ctaDesc: { ko: '얼굴 존별 정밀 분석 설문으로 AI를 보정하세요.', en: 'Calibrate AI results with our zone-by-zone diagnosis.', de: 'Kalibrieren Sie die KI mit unserer zonenweisen Diagnose.' },
-  ctaButton: { ko: '정밀 분석 시작', en: 'Start Precision Diagnosis', de: 'Präzisionsdiagnose starten' },
+  ctaDesc: { ko: '얼굴 존별 정밀 분석 설문으로 AI를 보정하세요.', en: 'Calibrate AI results with our zone-by-zone analysis.', de: 'Kalibrieren Sie die KI mit unserer zonenweisen Analyse.' },
+  ctaButton: { ko: '정밀 분석 시작', en: 'Start Precision Analysis', de: 'Präzisionsanalyse starten' },
 } as const;
 
 // ── Glassmorphism tokens ────────────────────────────────────────────────────
@@ -262,251 +262,251 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
 
   return (
     <>
-    <AnimatePresence mode="wait">
-      {/* ── Step 1: The Hook ────────────────────────────────────────────────── */}
-      {step === 'hook' && (
-        <motion.div
-          key="hook"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8, height: 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
-          className="rounded-2xl px-5 py-5 overflow-hidden"
-          style={{ ...GLASS, WebkitBackdropFilter: GLASS.backdropFilter }}
-        >
-          <p
-            className="text-center mb-4"
-            style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'rgba(255,255,255,0.75)' }}
+      <AnimatePresence mode="wait">
+        {/* ── Step 1: The Hook ────────────────────────────────────────────────── */}
+        {step === 'hook' && (
+          <motion.div
+            key="hook"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
+            className="rounded-2xl px-5 py-5 overflow-hidden"
+            style={{ ...GLASS, WebkitBackdropFilter: GLASS.backdropFilter }}
           >
-            {TX.question[lang]}
-          </p>
-
-          <div className="flex gap-3 justify-center">
-            <button
-              onClick={handleAccurate}
-              disabled={submitting}
-              className="flex items-center gap-2 rounded-full px-5 py-2.5 transition-all active:scale-95"
-              style={{
-                background: 'rgba(74,158,104,0.12)',
-                border: '1px solid rgba(74,158,104,0.3)',
-                color: '#4A9E68',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '14px',
-                fontWeight: 500,
-                opacity: submitting ? 0.5 : 1,
-              }}
+            <p
+              className="text-center mb-4"
+              style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', color: 'rgba(255,255,255,0.75)' }}
             >
-              <ThumbsUp size={15} />
-              {TX.accurate[lang]}
-            </button>
-            <button
-              onClick={handleInaccurate}
-              className="flex items-center gap-2 rounded-full px-5 py-2.5 transition-all active:scale-95"
-              style={{
-                background: 'rgba(201,169,110,0.1)',
-                border: '1px solid rgba(201,169,110,0.3)',
-                color: '#C9A96E',
-                fontFamily: 'var(--font-sans)',
-                fontSize: '14px',
-                fontWeight: 500,
-              }}
-            >
-              <ThumbsDown size={15} />
-              {TX.inaccurate[lang]}
-            </button>
-          </div>
-        </motion.div>
-      )}
-
-      {/* ── Step 2: Correction Funnel ──────────────────────────────────────── */}
-      {step === 'correction' && (
-        <motion.div
-          key="correction"
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-          className="rounded-2xl px-5 py-5 overflow-hidden"
-          style={{ ...GLASS, WebkitBackdropFilter: GLASS.backdropFilter }}
-        >
-          {/* Question A: Zone */}
-          <div className="mb-5">
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
-              {TX.zoneQuestion[lang]}{' '}
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>
-                {TX.selectHint[lang]}
-              </span>
+              {TX.question[lang]}
             </p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {ZONE_CHIPS.map((z) => (
-                <Chip
-                  key={z.id}
-                  label={z[lang]}
-                  selected={selectedZones.has(z.id)}
-                  onClick={() => toggleZone(z.id)}
-                  accentColor="#87B6BC"
-                />
-              ))}
+
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleAccurate}
+                disabled={submitting}
+                className="flex items-center gap-2 rounded-full px-5 py-2.5 transition-all active:scale-95"
+                style={{
+                  background: 'rgba(74,158,104,0.12)',
+                  border: '1px solid rgba(74,158,104,0.3)',
+                  color: '#4A9E68',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  opacity: submitting ? 0.5 : 1,
+                }}
+              >
+                <ThumbsUp size={15} />
+                {TX.accurate[lang]}
+              </button>
+              <button
+                onClick={handleInaccurate}
+                className="flex items-center gap-2 rounded-full px-5 py-2.5 transition-all active:scale-95"
+                style={{
+                  background: 'rgba(201,169,110,0.1)',
+                  border: '1px solid rgba(201,169,110,0.3)',
+                  color: '#C9A96E',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                }}
+              >
+                <ThumbsDown size={15} />
+                {TX.inaccurate[lang]}
+              </button>
             </div>
-          </div>
+          </motion.div>
+        )}
 
-          {/* Question B: Condition */}
-          <div className="mb-5">
-            <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
-              {TX.condQuestion[lang]}{' '}
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>
-                {TX.selectHint[lang]}
-              </span>
-            </p>
-            <div className="flex flex-wrap gap-2 mt-3">
-              {CONDITION_CHIPS.map((c) => (
-                <Chip
-                  key={c.id}
-                  label={c[lang]}
-                  selected={selectedConditions.has(c.id)}
-                  onClick={() => toggleCondition(c.id)}
-                  accentColor="#C9A96E"
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Optional comment */}
-          <input
-            type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder={TX.comment[lang]}
-            className="w-full rounded-xl px-3 py-2.5"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: 'rgba(255,255,255,0.85)',
-              fontFamily: 'var(--font-sans)',
-              fontSize: '13px',
-              outline: 'none',
-            }}
-          />
-
-          {/* Precision Diagnosis CTA (Part C entrypoint) */}
-          <div
-            className="mt-4 rounded-xl px-4 py-3.5"
-            style={{
-              background: 'rgba(74,158,104,0.06)',
-              border: '1px solid rgba(74,158,104,0.15)',
-            }}
+        {/* ── Step 2: Correction Funnel ──────────────────────────────────────── */}
+        {step === 'correction' && (
+          <motion.div
+            key="correction"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
+            className="rounded-2xl px-5 py-5 overflow-hidden"
+            style={{ ...GLASS, WebkitBackdropFilter: GLASS.backdropFilter }}
           >
-            <div className="flex items-start gap-3">
-              <ClipboardList size={18} style={{ color: '#4A9E68', flexShrink: 0, marginTop: 2 }} />
-              <div className="flex-1">
-                <p style={{ fontSize: '12px', fontWeight: 600, color: '#4A9E68', fontFamily: 'var(--font-sans)', marginBottom: 2 }}>
-                  {TX.ctaTitle[lang]}
-                </p>
-                <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-sans)', lineHeight: 1.5 }}>
-                  {TX.ctaDesc[lang]}
-                </p>
+            {/* Question A: Zone */}
+            <div className="mb-5">
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
+                {TX.zoneQuestion[lang]}{' '}
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>
+                  {TX.selectHint[lang]}
+                </span>
+              </p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {ZONE_CHIPS.map((z) => (
+                  <Chip
+                    key={z.id}
+                    label={z[lang]}
+                    selected={selectedZones.has(z.id)}
+                    onClick={() => toggleZone(z.id)}
+                    accentColor="#87B6BC"
+                  />
+                ))}
               </div>
             </div>
-            <button
-              onClick={() => navigate('/diagnosis')}
-              className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded-lg py-2 transition-all active:scale-[0.98]"
+
+            {/* Question B: Condition */}
+            <div className="mb-5">
+              <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>
+                {TX.condQuestion[lang]}{' '}
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontWeight: 400 }}>
+                  {TX.selectHint[lang]}
+                </span>
+              </p>
+              <div className="flex flex-wrap gap-2 mt-3">
+                {CONDITION_CHIPS.map((c) => (
+                  <Chip
+                    key={c.id}
+                    label={c[lang]}
+                    selected={selectedConditions.has(c.id)}
+                    onClick={() => toggleCondition(c.id)}
+                    accentColor="#C9A96E"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Optional comment */}
+            <input
+              type="text"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder={TX.comment[lang]}
+              className="w-full rounded-xl px-3 py-2.5"
               style={{
-                background: 'rgba(74,158,104,0.12)',
-                border: '1px solid rgba(74,158,104,0.25)',
-                color: '#4A9E68',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                color: 'rgba(255,255,255,0.85)',
                 fontFamily: 'var(--font-sans)',
-                fontSize: '12px',
-                fontWeight: 600,
+                fontSize: '13px',
+                outline: 'none',
+              }}
+            />
+
+            {/* Precision Analysis CTA (Part C entrypoint) */}
+            <div
+              className="mt-4 rounded-xl px-4 py-3.5"
+              style={{
+                background: 'rgba(74,158,104,0.06)',
+                border: '1px solid rgba(74,158,104,0.15)',
               }}
             >
-              {TX.ctaButton[lang]}
-              <ChevronRight size={13} />
-            </button>
-          </div>
+              <div className="flex items-start gap-3">
+                <ClipboardList size={18} style={{ color: '#4A9E68', flexShrink: 0, marginTop: 2 }} />
+                <div className="flex-1">
+                  <p style={{ fontSize: '12px', fontWeight: 600, color: '#4A9E68', fontFamily: 'var(--font-sans)', marginBottom: 2 }}>
+                    {TX.ctaTitle[lang]}
+                  </p>
+                  <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-sans)', lineHeight: 1.5 }}>
+                    {TX.ctaDesc[lang]}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate('/analysis')}
+                className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded-lg py-2 transition-all active:scale-[0.98]"
+                style={{
+                  background: 'rgba(74,158,104,0.12)',
+                  border: '1px solid rgba(74,158,104,0.25)',
+                  color: '#4A9E68',
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}
+              >
+                {TX.ctaButton[lang]}
+                <ChevronRight size={13} />
+              </button>
+            </div>
 
-          {/* Submit correction */}
-          <button
-            onClick={handleSubmitCorrection}
-            disabled={submitting || (selectedZones.size === 0 && selectedConditions.size === 0)}
-            className="mt-4 w-full rounded-full py-3 transition-all active:scale-[0.98]"
-            style={{
-              background: (selectedZones.size > 0 || selectedConditions.size > 0)
-                ? 'rgba(201,169,110,0.18)'
-                : 'rgba(255,255,255,0.04)',
-              border: `1px solid ${(selectedZones.size > 0 || selectedConditions.size > 0)
-                ? 'rgba(201,169,110,0.35)'
-                : 'rgba(255,255,255,0.08)'}`,
-              color: (selectedZones.size > 0 || selectedConditions.size > 0)
-                ? '#C9A96E'
-                : 'rgba(255,255,255,0.3)',
+            {/* Submit correction */}
+            <button
+              onClick={handleSubmitCorrection}
+              disabled={submitting || (selectedZones.size === 0 && selectedConditions.size === 0)}
+              className="mt-4 w-full rounded-full py-3 transition-all active:scale-[0.98]"
+              style={{
+                background: (selectedZones.size > 0 || selectedConditions.size > 0)
+                  ? 'rgba(201,169,110,0.18)'
+                  : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${(selectedZones.size > 0 || selectedConditions.size > 0)
+                  ? 'rgba(201,169,110,0.35)'
+                  : 'rgba(255,255,255,0.08)'}`,
+                color: (selectedZones.size > 0 || selectedConditions.size > 0)
+                  ? '#C9A96E'
+                  : 'rgba(255,255,255,0.3)',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '14px',
+                fontWeight: 600,
+                opacity: submitting ? 0.5 : 1,
+                cursor: (selectedZones.size === 0 && selectedConditions.size === 0) ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {submitting ? TX.submitting[lang] : TX.submit[lang]}
+            </button>
+          </motion.div>
+        )}
+
+        {/* ── Step 3: Success → 3s Auto-Close ───────────────────────────────── */}
+        {step === 'success' && (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, height: 0, marginTop: 0, paddingTop: 0, paddingBottom: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
+            className="rounded-2xl px-5 py-5 text-center overflow-hidden"
+            style={{ ...GLASS, WebkitBackdropFilter: GLASS.backdropFilter }}
+          >
+            {/* Animated checkmark */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 20 }}
+              className="mx-auto mb-3 rounded-full flex items-center justify-center"
+              style={{
+                width: 40,
+                height: 40,
+                background: 'rgba(74,158,104,0.15)',
+                border: '1px solid rgba(74,158,104,0.3)',
+              }}
+            >
+              <Check size={20} style={{ color: '#4A9E68' }} />
+            </motion.div>
+
+            <p style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '14px',
-              fontWeight: 600,
-              opacity: submitting ? 0.5 : 1,
-              cursor: (selectedZones.size === 0 && selectedConditions.size === 0) ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {submitting ? TX.submitting[lang] : TX.submit[lang]}
-          </button>
-        </motion.div>
-      )}
+              color: 'rgba(255,255,255,0.75)',
+              lineHeight: 1.6,
+            }}>
+              {TX.thanks[lang]}
+            </p>
 
-      {/* ── Step 3: Success → 3s Auto-Close ───────────────────────────────── */}
-      {step === 'success' && (
-        <motion.div
-          key="success"
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, height: 0, marginTop: 0, paddingTop: 0, paddingBottom: 0 }}
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
-          className="rounded-2xl px-5 py-5 text-center overflow-hidden"
-          style={{ ...GLASS, WebkitBackdropFilter: GLASS.backdropFilter }}
-        >
-          {/* Animated checkmark */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 20 }}
-            className="mx-auto mb-3 rounded-full flex items-center justify-center"
-            style={{
-              width: 40,
-              height: 40,
-              background: 'rgba(74,158,104,0.15)',
-              border: '1px solid rgba(74,158,104,0.3)',
-            }}
-          >
-            <Check size={20} style={{ color: '#4A9E68' }} />
+            {/* Subtle progress bar showing auto-close countdown */}
+            <motion.div
+              className="mt-4 h-0.5 rounded-full mx-auto"
+              style={{ background: 'rgba(74,158,104,0.4)', maxWidth: 120 }}
+              initial={{ width: '100%' }}
+              animate={{ width: '0%' }}
+              transition={{ duration: 3, ease: 'linear' }}
+            />
           </motion.div>
+        )}
+      </AnimatePresence>
 
-          <p style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '14px',
-            color: 'rgba(255,255,255,0.75)',
-            lineHeight: 1.6,
-          }}>
-            {TX.thanks[lang]}
-          </p>
-
-          {/* Subtle progress bar showing auto-close countdown */}
-          <motion.div
-            className="mt-4 h-0.5 rounded-full mx-auto"
-            style={{ background: 'rgba(74,158,104,0.4)', maxWidth: 120 }}
-            initial={{ width: '100%' }}
-            animate={{ width: '0%' }}
-            transition={{ duration: 3, ease: 'linear' }}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
-
-    {/* Phase 2: AI Training Consent Modal */}
-    <AiTrainingConsentModal
-      isOpen={showConsentModal}
-      onClose={() => setShowConsentModal(false)}
-      onSubmit={handleConsentSubmit}
-      hasImage={!!capturedImageBase64}
-      isAuthenticated={isAuthenticated}
-    />
+      {/* Phase 2: AI Training Consent Modal */}
+      <AiTrainingConsentModal
+        isOpen={showConsentModal}
+        onClose={() => setShowConsentModal(false)}
+        onSubmit={handleConsentSubmit}
+        hasImage={!!capturedImageBase64}
+        isAuthenticated={isAuthenticated}
+      />
     </>
   );
 }

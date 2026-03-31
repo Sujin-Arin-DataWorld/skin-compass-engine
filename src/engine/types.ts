@@ -10,41 +10,41 @@ export type AxisScores = Record<AxisKey, number>;
 export type AxisSeverity = Record<AxisKey, 0 | 1 | 2 | 3>;
 
 export const AXIS_LABELS: Record<AxisKey, string> = {
-  seb:              "Oiliness",
-  hyd:              "Dryness",
-  bar:              "Skin Barrier",
-  sen:              "Sensitivity",
-  ox:               "UV & Environmental Damage",
-  acne:             "Breakouts",
-  pigment:          "Dark Spots & Tone",
-  texture:          "Skin Texture",
-  aging:            "Firmness & Lines",
+  seb: "Oiliness",
+  hyd: "Dryness",
+  bar: "Skin Barrier",
+  sen: "Sensitivity",
+  ox: "UV & Environmental Damage",
+  acne: "Breakouts",
+  pigment: "Dark Spots & Tone",
+  texture: "Skin Texture",
+  aging: "Firmness & Lines",
   makeup_stability: "Makeup Wear",
 };
 
 export const AXIS_LABELS_DE: Record<AxisKey, string> = {
-  seb:              "Fettige Haut",
-  hyd:              "Trockene Haut",
-  bar:              "Hautschutzbarriere",
-  sen:              "Empfindlichkeit",
-  ox:               "UV- & Umweltbelastung",
-  acne:             "Unreinheiten",
-  pigment:          "Flecken & Hautton",
-  texture:          "Hautbild",
-  aging:            "Straffheit & Falten",
+  seb: "Fettige Haut",
+  hyd: "Trockene Haut",
+  bar: "Hautschutzbarriere",
+  sen: "Empfindlichkeit",
+  ox: "UV- & Umweltbelastung",
+  acne: "Unreinheiten",
+  pigment: "Flecken & Hautton",
+  texture: "Hautbild",
+  aging: "Straffheit & Falten",
   makeup_stability: "Make-up Haltbarkeit",
 };
 
 export const AXIS_LABELS_KO: Record<AxisKey, string> = {
-  seb:              "유분 / 번들거림",
-  hyd:              "건조 / 당김",
-  bar:              "피부 보호막",
-  sen:              "민감도",
-  ox:               "자외선 · 환경 스트레스",
-  acne:             "트러블",
-  pigment:          "잡티 · 피부톤",
-  texture:          "피부결",
-  aging:            "탄력 · 주름",
+  seb: "유분 / 번들거림",
+  hyd: "건조 / 당김",
+  bar: "피부 보호막",
+  sen: "민감도",
+  ox: "자외선 · 환경 스트레스",
+  acne: "트러블",
+  pigment: "잡티 · 피부톤",
+  texture: "피부결",
+  aging: "탄력 · 주름",
   makeup_stability: "화장 지속력",
 };
 
@@ -99,8 +99,8 @@ export interface RiskPattern {
   optional: string[];
   min_optional: number;
   axis_gates: Partial<Record<AxisKey, number>>;
-  clinical_en: string;
-  clinical_de?: string;
+  guidance_en: string;
+  guidance_de?: string;
   flag: string;
   urgency: Urgency;
   threshold: number;
@@ -154,7 +154,7 @@ export interface Product {
   texture_feel?: string;
 }
 
-export interface DiagnosisResult {
+export interface AnalysisResult {
   engineVersion: string;
   axis_scores: AxisScores;
   axis_severity: AxisSeverity;
@@ -170,8 +170,8 @@ export interface DiagnosisResult {
   // ── V5 optional additive fields ────────────────────────────────────────────
   /** Per-axis "why this recommendation" persuasion layer (Phase 3.5D). */
   axis_explanations?: AxisExplanation[];
-  /** Per-axis clinical grade (stable / watch / active / critical). */
-  axis_clinical_grade?: Record<AxisKey, { grade: ClinicalGrade; label: { en: string; de: string; ko: string } }>;
+  /** Per-axis severity grade (stable / watch / active / critical). */
+  axis_severity_grade?: Record<AxisKey, { grade: SeverityGrade; label: { en: string; de: string; ko: string } }>;
   /** Per-zone heatmap intensities and dominant axes from Phase 02 selections. */
   zone_heatmap?: Partial<Record<ZoneId, ZoneHeatmapEntry>>;
   /** Full score provenance trail from scoringEngineV5. */
@@ -192,6 +192,9 @@ export interface DiagnosisResult {
   };
 }
 
+/** @deprecated Use AnalysisResult instead. Kept for backward compatibility. */
+export type DiagnosisResult = AnalysisResult;
+
 export type Tier = "Entry" | "Full" | "Premium";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -201,15 +204,19 @@ export type Tier = "Entry" | "Full" | "Premium";
 /** The 7 face zones used in Phase 02 Face Map and zone heatmap. */
 export type ZoneId =
   | "forehead" | "eyes" | "nose" | "cheeks"
-  | "mouth"    | "jawline" | "neck";
+  | "mouth" | "jawline" | "neck";
 
-/** Four-band clinical severity grade per axis. */
-export type ClinicalGrade = "stable" | "watch" | "active" | "critical";
+
+/** Four-band severity grade per axis. */
+export type SeverityGrade = "stable" | "watch" | "active" | "critical";
+
+/** @deprecated Use SeverityGrade instead. */
+export type ClinicalGrade = SeverityGrade;
 
 /** Per-zone summary entry for the zone heatmap (used in SlideAxisBreakdown). */
 export interface ZoneHeatmapEntry {
   /** Normalised average axis score for this zone (0–1). */
-  intensity:    number;
+  intensity: number;
   /** The highest-scoring axis among this zone's selected concerns. */
   dominantAxis: AxisKey;
   /** Number of concern chips selected in this zone. */
@@ -223,17 +230,17 @@ export interface ZoneHeatmapEntry {
  * through the 5-layer scoring pipeline.
  */
 export interface ScoreProvenance {
-  axis:       AxisKey;
+  axis: AxisKey;
   totalScore: number;
   breakdown: {
-    zoneConcerns:        { zone: ZoneId; concernId: string; contribution: number }[];
-    deepDiveQuestions:   { questionId: string; contribution: number }[];
+    zoneConcerns: { zone: ZoneId; concernId: string; contribution: number }[];
+    deepDiveQuestions: { questionId: string; contribution: number }[];
     foundationModifiers: { factor: string; multiplier: number }[];
-    crossAxisBonuses:    { pattern: string; bonusPercent: number }[];
+    crossAxisBonuses: { pattern: string; bonusPercent: number }[];
   };
 }
 
-/** Per-axis clinical explanation for the results persuasion layer (Phase 3.5D). */
+/** Per-axis explanation for the results persuasion layer (Phase 3.5D). */
 export interface AxisExplanation {
   axis: AxisKey;
   score: number;

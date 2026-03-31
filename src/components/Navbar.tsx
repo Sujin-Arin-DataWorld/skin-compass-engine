@@ -111,7 +111,7 @@ const Navbar = () => {
 
           {/* ── Desktop nav links ── */}
           <div className="hidden md:flex flex-1 items-center gap-0">
-            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.hautAnalyse}</Link>
+            <Link to="/skin-assessment" className={navLink} style={navFont}>{p1.nav.hautAnalyse}</Link>
 
             {/* K-Mask Lab dropdown */}
             <div className="relative flex items-center h-full" ref={kMaskRef}>
@@ -156,10 +156,10 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
-            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.routinenSets}</Link>
-            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.hautbeduerfnisse}</Link>
-            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.bestseller}</Link>
-            <Link to="/diagnosis" className={navLink} style={navFont}>{p1.nav.science}</Link>
+            <Link to="/analysis" className={navLink} style={navFont}>{p1.nav.routinenSets}</Link>
+            <Link to="/analysis" className={navLink} style={navFont}>{p1.nav.hautbeduerfnisse}</Link>
+            <Link to="/analysis" className={navLink} style={navFont}>{p1.nav.bestseller}</Link>
+            <Link to="/analysis" className={navLink} style={navFont}>{p1.nav.science}</Link>
           </div>
 
           {/* ── Right icon cluster ── */}

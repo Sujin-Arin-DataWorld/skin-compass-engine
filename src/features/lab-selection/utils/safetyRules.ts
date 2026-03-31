@@ -1,7 +1,7 @@
 /**
- * src/features/lab-selection/utils/clinicalSafetyRules.ts
+ * src/features/lab-selection/utils/safetyRules.ts
  *
- * 5 clinical safety rules validated by dermatology review.
+ * 5 professional safety rules validated by dermatology review.
  * These are NOT optional UX features — they protect users from skin damage.
  *
  * Integration points are wired in Steps 7 (ZoneLabFlow) and 8 (RoutineBuilder).
@@ -72,8 +72,8 @@ export function checkCumulativeIrritation(routine: FinalRoutine): IrritationChec
       maxCount >= 3
         ? 'lab.safety.irritation_blocked'
         : maxCount >= 2
-        ? 'lab.safety.irritation_warning'
-        : null,
+          ? 'lab.safety.irritation_warning'
+          : null,
   };
 }
 
@@ -201,7 +201,7 @@ export function checkSpfRequirement(routine: FinalRoutine): SpfCheckResult {
 // Rosacea-prone skin can react to niacinamide with severe stinging and flushing,
 // even at 5%. Standard sensitive-skin protocol doesn't apply here.
 //
-// Detection: Diagnosis engine flags rosacea_prone based on questionnaire.
+// Detection: Analysis engine flags rosacea_prone based on questionnaire.
 // Adjustment: Niacinamide capped at 2%. Primary actives: Azelaic Acid, Panthenol.
 
 export interface RosaceaAdjustment {

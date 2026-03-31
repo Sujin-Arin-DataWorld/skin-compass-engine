@@ -24,10 +24,10 @@ const ElasticitySimulation = ({ value, onChange }: ElasticitySimulationProps) =>
   const t = language === "de" ? translations.de : translations.en;
 
   const LEVELS = [
-    { label: t.diagnosis.ui.elasticFirm, description: t.diagnosis.ui.elasticFirmDesc, recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: t.diagnosis.ui.recoveryFast, pct: 100, dipDepth: 6 },
-    { label: t.diagnosis.ui.elasticMild, description: t.diagnosis.ui.elasticMildDesc, recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: t.diagnosis.ui.recoveryMedium, pct: 72, dipDepth: 12 },
-    { label: t.diagnosis.ui.elasticModerate, description: t.diagnosis.ui.elasticModerateDesc, recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: t.diagnosis.ui.recoverySlow, pct: 42, dipDepth: 20 },
-    { label: t.diagnosis.ui.elasticSignificant, description: t.diagnosis.ui.elasticSignificantDesc, recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: t.diagnosis.ui.recoveryVerySlow, pct: 15, dipDepth: 28 },
+    { label: t.analysis.ui.elasticFirm, description: t.analysis.ui.elasticFirmDesc, recoveryRange: "~0.2–0.4s", recoverySec: 0.45, speedLabel: t.analysis.ui.recoveryFast, pct: 100, dipDepth: 6 },
+    { label: t.analysis.ui.elasticMild, description: t.analysis.ui.elasticMildDesc, recoveryRange: "~0.7–1.2s", recoverySec: 1.2, speedLabel: t.analysis.ui.recoveryMedium, pct: 72, dipDepth: 12 },
+    { label: t.analysis.ui.elasticModerate, description: t.analysis.ui.elasticModerateDesc, recoveryRange: "~1.8–2.5s", recoverySec: 2.5, speedLabel: t.analysis.ui.recoverySlow, pct: 42, dipDepth: 20 },
+    { label: t.analysis.ui.elasticSignificant, description: t.analysis.ui.elasticSignificantDesc, recoveryRange: "~3–5s", recoverySec: 4.8, speedLabel: t.analysis.ui.recoveryVerySlow, pct: 15, dipDepth: 28 },
   ];
 
   const config = LEVELS[value];

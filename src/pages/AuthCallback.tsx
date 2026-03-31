@@ -14,8 +14,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { getPendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { getPendingAnalysis, clearPendingAnalysis } from "@/utils/analysisPersistence";
+import { useAnalysisStore } from "@/store/analysisStore";
 
 const GOLD = "#c9a96e";
 const ROSE = "#b76e79";
@@ -33,8 +33,8 @@ export default function AuthCallback() {
       if (resolved) return;
       resolved = true;
 
-      // Sync any pending guest diagnosis to Supabase now that user is authenticated
-      const pending = getPendingDiagnosis();
+      // Sync any pending guest analysis to Supabase now that user is authenticated
+      const pending = getPendingAnalysis();
       if (pending) {
         try {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -42,7 +42,7 @@ export default function AuthCallback() {
           if (user) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await (supabase as any)
-              .from("diagnosis_history")
+              .from("analysis_history")
               .insert({
                 user_id: user.id,
                 radar_data: pending.axisScores,
@@ -51,10 +51,10 @@ export default function AuthCallback() {
               });
           }
           // Restore result to Zustand store so Results.tsx renders immediately
-          useDiagnosisStore.getState().setResult(pending.fullResult);
-          clearPendingDiagnosis();
+          useAnalysisStore.getState().setResult(pending.fullResult);
+          clearPendingAnalysis();
         } catch (syncErr) {
-          console.warn("[AuthCallback] pending diagnosis sync failed (non-fatal):", syncErr);
+          console.warn("[AuthCallback] pending analysis sync failed (non-fatal):", syncErr);
           // Non-fatal — Results.tsx will still restore from localStorage
         }
       }

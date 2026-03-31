@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useCallback, useRef } from "react"
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight } from "lucide-react";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 import { useI18nStore } from "@/store/i18nStore";
 import type { QuestionDef, LocalizedText, QuestionAnswer } from "@/engine/questionRoutingV5";
 import { MALE_ADJUSTMENTS } from "@/engine/tailQuestionRouter";
@@ -163,7 +163,7 @@ const ZONE_CONCERNS: Record<ZoneId, Concern[]> = {
     },
     {
       id: "cystic_j", label: { en: "Deep Painful Bumps", de: "Tiefe schmerzhafte Knoten", ko: "크고 깊은 혹 같은 트러블" }, axis: "acne",
-      glossary: { en: "Deep, painful lumps that don't come to a surface head. These form deep in the dermis and often need professional treatment.", de: "Tiefe, schmerzhafte Knoten, die nicht an die Oberfläche kommen. Sie bilden sich tief in der Dermis und brauchen oft professionelle Behandlung.", ko: "표면으로 나오지 않는 깊고 아픈 혹이에요. 진피 깊숙이 생기며 전문의 치료가 필요한 경우가 많아요." }
+      glossary: { en: "Deep, painful lumps that don't come to a surface head. These form deep in the dermis and often need professional care.", de: "Tiefe, schmerzhafte Knoten, die nicht an die Oberfläche kommen. Sie bilden sich tief in der Dermis und brauchen oft professionelle Pflege.", ko: "표면으로 나오지 않는 깊고 아픈 혹이에요. 진피 깊숙이 생기며 전문가 집중 케어가 필요한 경우가 많아요." }
     },
     {
       id: "texture_j", label: { en: "Rough / Bumpy Texture", de: "Raue / unebene Textur", ko: "턱선 피부 결 거칠음" }, axis: "texture",
@@ -203,7 +203,7 @@ const COPY: Record<Lang, {
 }> = {
   en: {
     title: "Where do you notice concerns?",
-    subtitle: "Tap a clinical zone on the face map to select your skin concerns.",
+    subtitle: "Tap a professional zone on the face map to select your skin concerns.",
     selected: (n) => n === 1 ? "1 concern selected" : `${n} concerns selected`,
     close: "Done", continue: "Continue",
     hint: "Tap a zone on the face map to begin",
@@ -630,14 +630,14 @@ const PATTERN_CARDS: Record<string, Record<Lang, { title: string; body: string }
     ko: { title: "다부위 노화 패턴", body: "3곳 이상에서 탄력 저하 신호가 감지됐어요 — 콜라겐 집중 프로토콜이 도움이 됩니다." },
   },
   HORMONAL_ACNE: {
-    en: { title: "Hormonal Pattern Detected", body: "Recurring breakouts on your jawline strongly suggest hormonal influence — we'll factor this into your diagnosis." },
+    en: { title: "Hormonal Pattern Detected", body: "Recurring breakouts on your jawline strongly suggest hormonal influence — we'll factor this into your analysis." },
     de: { title: "Hormonelles Muster erkannt", body: "Wiederkehrende Unreinheiten an der Kieferlinie deuten auf hormonellen Einfluss hin." },
     ko: { title: "호르몬 패턴 감지", body: "턱선의 반복 트러블은 호르몬 영향을 강하게 시사해요 — 분석에 반영합니다." },
   },
   BARRIER_STRESS: {
-    en: { title: "Barrier Stress Detected", body: "High sensitivity combined with dryness suggests your skin's protective barrier needs repair before other treatments." },
-    de: { title: "Barriere-Stress erkannt", body: "Empfindlichkeit + Trockenheit deuten auf eine geschwächte Hautbarriere hin — Reparatur hat Priorität." },
-    ko: { title: "장벽 스트레스 감지", body: "높은 민감도 + 건조함은 피부 보호막 손상을 시사해요 — 다른 관리 전에 장벽 회복이 우선입니다." },
+    en: { title: "Barrier Stress Detected", body: "High sensitivity combined with dryness suggests your skin's protective barrier needs repair before other active care." },
+    de: { title: "Barriere-Stress erkannt", body: "Empfindlichkeit + Trockenheit deuten auf eine geschwächte Hautbarriere hin — Reparatur hat Priorität vor weiteren Wirkstoffen." },
+    ko: { title: "장벽 스트레스 감지", body: "높은 민감도 + 건조함은 피부 보호막 손상을 시사해요 — 다른 집중 관리 전에 장벽 회복이 우선입니다." },
   },
   PIH_RISK: {
     en: { title: "Post-Breakout Marks Risk", body: "Breakouts + dark spots together mean your skin is prone to lasting marks after blemishes heal." },
@@ -953,7 +953,7 @@ function ConcernAndQuestionPanel({
   renderActions?: boolean;
 }) {
   const GOLD = isDark ? "#c9a96e" : "#7A9E82";
-  const store = useDiagnosisStore();
+  const store = useAnalysisStore();
   const ageBracket = (store.axisAnswers["EXP_AGE"] as number | undefined) ?? 2; // default 30s
 
   const concerns = ZONE_CONCERNS[zone].filter(c => {
@@ -1169,9 +1169,9 @@ function TailQuestionSection({
             isDark={isDark} onChange={onAnswer}
             lang={lang} allAnswers={axisAnswers}
           />
-          {(q as unknown as { clinicalBasis?: { method: string } }).clinicalBasis && (
+          {(q as unknown as { professionalBasis?: { method: string } }).professionalBasis && (
             <div style={{ fontSize: 10, color: isDark ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.25)", marginTop: 8, fontFamily: "var(--font-sans)" }}>
-              🔬 {(q as unknown as { clinicalBasis: { method: string } }).clinicalBasis.method}
+              🔬 {(q as unknown as { professionalBasis: { method: string } }).professionalBasis.method}
             </div>
           )}
         </motion.div>
@@ -1204,7 +1204,7 @@ export function getAxisLabel(axis: string, lang: Lang, gender: number): string {
 export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => void; isAnalyzing?: boolean }) {
   const { language } = useI18nStore();
   const lang = language as Lang;
-  const store = useDiagnosisStore();
+  const store = useAnalysisStore();
   const copy = COPY[lang];
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === "dark";
@@ -1214,7 +1214,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
   // Initialise from the Zustand store so selections survive back/forward navigation.
   // The store persists selectedZones (including per-concern severity) to localStorage.
   const [concernSeverity, setConcernSeverity] = useState<Record<string, 1 | 2 | 3>>(() => {
-    const zones = useDiagnosisStore.getState().selectedZones ?? {};
+    const zones = useAnalysisStore.getState().selectedZones ?? {};
     const out: Record<string, 1 | 2 | 3> = {};
     for (const zone of Object.values(zones)) {
       if (zone.severity) Object.assign(out, zone.severity);
@@ -1261,7 +1261,7 @@ export function FaceMapStep({ onNext, isAnalyzing = false }: { onNext: () => voi
 
   // Session-scoped axis answers (EXP_* only from store; AX_* freshly answered here)
   const [sessionAnswers, setSessionAnswers] = useState<Record<string, QuestionAnswer>>(() => {
-    const all = useDiagnosisStore.getState().axisAnswers;
+    const all = useAnalysisStore.getState().axisAnswers;
     return Object.fromEntries(Object.entries(all).filter(([k]) => k.startsWith("EXP_")));
   });
 

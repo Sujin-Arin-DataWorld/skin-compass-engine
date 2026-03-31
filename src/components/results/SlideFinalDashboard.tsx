@@ -13,9 +13,9 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import { useI18nStore } from '@/store/i18nStore';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 import { buildRoutineV5 } from '@/engine/routineEngineV5';
-import type { DiagnosisResult } from '@/engine/types';
+import type { AnalysisResult } from '@/engine/types';
 import type { RoutineStep, RealProduct } from '@/engine/routineEngine';
 import { tokens, ctaTokens } from '@/lib/designTokens';
 import {
@@ -65,7 +65,7 @@ const collectionVariants = {
 // ── Props ─────────────────────────────────────────────────────────────────────
 
 interface Props {
-  result: DiagnosisResult;
+  result: AnalysisResult;
   cartItemIds?: string[];
 }
 
@@ -84,10 +84,10 @@ export default function SlideFinalDashboard({ result, cartItemIds }: Props) {
   const ctaTok = ctaTokens(isDark);
 
   // ── Store reads ─────────────────────────────────────────────────────────────
-  const implicitFlags = useDiagnosisStore((s) => s.implicitFlags);
-  const specialCarePicks = useDiagnosisStore((s) => s.specialCarePicks);
-  const axisAnswers = useDiagnosisStore((s) => s.axisAnswers);
-  const selectedTier = useDiagnosisStore((s) => s.selectedTier);
+  const implicitFlags = useAnalysisStore((s) => s.implicitFlags);
+  const specialCarePicks = useAnalysisStore((s) => s.specialCarePicks);
+  const axisAnswers = useAnalysisStore((s) => s.axisAnswers);
+  const selectedTier = useAnalysisStore((s) => s.selectedTier);
   const isBarrierEmergency = result.active_flags?.includes('BARRIER_EMERGENCY') ?? false;
   const expAge = axisAnswers?.EXP_AGE as number | undefined;
   const ageGroup = expAge !== undefined && expAge in AGE_CYCLE_MAP ? expAge : 2;
@@ -175,8 +175,8 @@ export default function SlideFinalDashboard({ result, cartItemIds }: Props) {
 
   // ── Handlers ────────────────────────────────────────────────────────────────
   const handleRestart = () => {
-    useDiagnosisStore.getState().reset();
-    navigate('/diagnosis');
+    useAnalysisStore.getState().reset();
+    navigate('/analysis');
   };
 
   const handleGoToSlide1 = () => {

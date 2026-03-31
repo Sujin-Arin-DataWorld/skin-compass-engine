@@ -9,10 +9,20 @@ import { useOrders } from "@/hooks/useOrders";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
+import { useI18nStore } from "@/store/i18nStore";
+import { formatGrundpreis } from "@/utils/priceUtils";
 
 export default function Cart() {
   const { items, removeItem, updateQty, clear, totalItems, totalPrice } = useCartStore();
   const { isLoggedIn } = useAuthStore();
+  const { language } = useI18nStore();
+  
+  const CHECKOUT_LABELS = {
+    de: "Zahlungspflichtig bestellen",
+    en: "Order with obligation to pay",
+    ko: "결제 의무 주문하기", // Literal Korean translation of German law requirement
+  };
+  const checkoutText = CHECKOUT_LABELS[language as keyof typeof CHECKOUT_LABELS] || CHECKOUT_LABELS.en;
   const { placeOrder } = useOrders();
   const navigate = useNavigate();
   const [placing, setPlacing] = useState(false);
@@ -87,6 +97,9 @@ export default function Cart() {
               <AnimatePresence>
                 {items.map((item) => {
                   const price = item.product.price ?? item.product.price_eur;
+                  // @ts-expect-error Volume might not be typed on the lean product interface, but exists in DB
+                  const basicPriceText = formatGrundpreis(price, item.product.volume_ml);
+                  
                   return (
                     <motion.div
                       key={item.product.id}
@@ -132,12 +145,17 @@ export default function Cart() {
                       </div>
 
                       {/* Price */}
-                      <div className="text-right flex-shrink-0 min-w-[60px]">
+                      <div className="text-right flex-shrink-0 min-w-[70px]">
                         <p className="font-display text-base font-bold text-foreground">
                           €{(price * item.quantity).toFixed(2)}
                         </p>
                         {item.quantity > 1 && (
                           <p className="text-xs text-foreground/40">€{price} each</p>
+                        )}
+                        {basicPriceText && (
+                          <p className="text-[11px] text-muted-foreground mt-0.5 whitespace-nowrap">
+                            {basicPriceText}
+                          </p>
                         )}
                       </div>
 
@@ -175,12 +193,12 @@ export default function Cart() {
               <button
                 onClick={handleCheckout}
                 disabled={placing}
-                className="w-full rounded-2xl py-4 font-bold text-sm tracking-wide uppercase bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-60"
+                className="w-full rounded-2xl py-4 font-bold text-xs sm:text-sm tracking-wide uppercase bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 flex flex-wrap items-center justify-center gap-2 px-4 disabled:opacity-60 leading-tight"
               >
                 {placing ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Placing Order…</>
+                  <><Loader2 className="w-4 h-4 animate-spin shrink-0" /> Placing Order…</>
                 ) : (
-                  <>Complete Purchase <ArrowRight className="w-4 h-4" /></>
+                  <><span className="text-center">{checkoutText}</span> <ArrowRight className="w-4 h-4 shrink-0" /></>
                 )}
               </button>
 

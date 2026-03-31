@@ -26,21 +26,22 @@ import { BottomNav } from "./components/BottomNav";
 import MobileDrawer from "./components/MobileDrawer";
 
 // ── Heavy routes (lazy-loaded) ──────────────────────────────────────────────
-const Diagnosis       = lazy(() => import("./pages/Diagnosis"));
-const Results         = lazy(() => import("./pages/Results"));
+const SkinAssessment = lazy(() => import("./pages/SkinAssessment"));
+const Results = lazy(() => import("./pages/Results"));
 const SkinAnalysisPage = lazy(() => import("./pages/SkinAnalysisPage"));
-const Profile         = lazy(() => import("./pages/Profile"));
-const Account         = lazy(() => import("./pages/Account"));
-const AdminDashboard  = lazy(() => import("./pages/AdminDashboard"));
-const Cart            = lazy(() => import("./pages/Cart"));
-const Checkout        = lazy(() => import("./pages/Checkout"));
-const Wishlist        = lazy(() => import("./pages/Wishlist"));
-const Signup          = lazy(() => import("./pages/Signup"));
-const About           = lazy(() => import("./pages/About"));
-const Impressum       = lazy(() => import("./pages/Impressum"));
-const Datenschutz     = lazy(() => import("./pages/Datenschutz"));
-const Agb             = lazy(() => import("./pages/Agb"));
-const FormulaDetail   = lazy(() => import("./pages/FormulaDetail"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Account = lazy(() => import("./pages/Account"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Wishlist = lazy(() => import("./pages/Wishlist"));
+const Signup = lazy(() => import("./pages/Signup"));
+const About = lazy(() => import("./pages/About"));
+const Impressum = lazy(() => import("./pages/Impressum"));
+const Datenschutz = lazy(() => import("./pages/Datenschutz"));
+const Agb = lazy(() => import("./pages/Agb"));
+const Widerrufsbelehrung = lazy(() => import("./pages/Widerrufsbelehrung"));
+const FormulaDetail = lazy(() => import("./pages/FormulaDetail"));
 
 // ── Route-level loading spinner ─────────────────────────────────────────────
 function RouteSpinner() {
@@ -109,23 +110,23 @@ function AppInner() {
     const t = isDark ? brand.dark : brand.light;
     const root = document.documentElement.style;
 
-    root.setProperty("--ssl-bg",             t.bg);
-    root.setProperty("--ssl-bg-card",        t.bgCard);
-    root.setProperty("--ssl-bg-surface",     t.bgSurface);
-    root.setProperty("--ssl-bg-elevated",    t.bgElevated);
-    root.setProperty("--ssl-accent",         t.accent);
-    root.setProperty("--ssl-accent-deep",    t.accentDeep);
-    root.setProperty("--ssl-accent-muted",   t.accentMuted);
-    root.setProperty("--ssl-accent-bg",      t.accentBg);
-    root.setProperty("--ssl-accent-border",  t.accentBorder);
-    root.setProperty("--ssl-secondary",      t.secondary);
-    root.setProperty("--ssl-secondary-muted",t.secondaryMuted);
-    root.setProperty("--ssl-secondary-bg",   t.secondaryBg);
-    root.setProperty("--ssl-text",           t.text);
+    root.setProperty("--ssl-bg", t.bg);
+    root.setProperty("--ssl-bg-card", t.bgCard);
+    root.setProperty("--ssl-bg-surface", t.bgSurface);
+    root.setProperty("--ssl-bg-elevated", t.bgElevated);
+    root.setProperty("--ssl-accent", t.accent);
+    root.setProperty("--ssl-accent-deep", t.accentDeep);
+    root.setProperty("--ssl-accent-muted", t.accentMuted);
+    root.setProperty("--ssl-accent-bg", t.accentBg);
+    root.setProperty("--ssl-accent-border", t.accentBorder);
+    root.setProperty("--ssl-secondary", t.secondary);
+    root.setProperty("--ssl-secondary-muted", t.secondaryMuted);
+    root.setProperty("--ssl-secondary-bg", t.secondaryBg);
+    root.setProperty("--ssl-text", t.text);
     root.setProperty("--ssl-text-secondary", t.textSecondary);
-    root.setProperty("--ssl-text-tertiary",  t.textTertiary);
-    root.setProperty("--ssl-border",         t.border);
-    root.setProperty("--ssl-border-hover",   t.borderHover);
+    root.setProperty("--ssl-text-tertiary", t.textTertiary);
+    root.setProperty("--ssl-border", t.border);
+    root.setProperty("--ssl-border-hover", t.borderHover);
   }, [resolvedTheme]);
 
   // ── GDPR gate state ──────────────────────────────────────────────────────
@@ -308,62 +309,64 @@ function AppInner() {
   return (
     <MotionConfig reducedMotion="user">
       <Suspense fallback={<RouteSpinner />}>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        {/* ProtectedRoute temporarily removed for local dev */}
-        <Route path="/diagnosis" element={<Diagnosis />} />
-        <Route path="/results" element={<Results />} />
-        {/* /lab deprecated — redirect to unified funnel Slide 2 (Lab & Special Care) */}
-        <Route path="/lab" element={<Navigate to="/results?slide=2" replace />} />
-        <Route path="/formula/:id" element={<FormulaDetail />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route
-          path="/wishlist"
-          element={
-            <ProtectedRoute>
-              <Wishlist />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        {/* OAuth callback — must be public (not behind ProtectedRoute) */}
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        <Route
-          path="/profile"
-          element={
-            <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          {/* ProtectedRoute temporarily removed for local dev */}
+          <Route path="/skin-assessment" element={<SkinAssessment />} />
+          <Route path="/analysis" element={<Navigate to="/skin-assessment" replace />} />
+          <Route path="/results" element={<Results />} />
+          {/* /lab deprecated — redirect to unified funnel Slide 2 (Lab & Special Care) */}
+          <Route path="/lab" element={<Navigate to="/results?slide=2" replace />} />
+          <Route path="/formula/:id" element={<FormulaDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route
+            path="/wishlist"
+            element={
               <ProtectedRoute>
-                <Profile />
+                <Wishlist />
               </ProtectedRoute>
-            </ErrorBoundary>
-          }
-        />
-        <Route
-          path="/account"
-          element={
-            <ProtectedRoute>
-              <Account />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute allowedRole="admin">
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        {/* AI skin camera analysis — public route (camera requires HTTPS) */}
-        <Route path="/skin-analysis" element={<SkinAnalysisPage />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/impressum" element={<Impressum />} />
-        <Route path="/datenschutz" element={<Datenschutz />} />
-        <Route path="/agb" element={<Agb />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+            }
+          />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          {/* OAuth callback — must be public (not behind ProtectedRoute) */}
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route
+            path="/profile"
+            element={
+              <ErrorBoundary>
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute allowedRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          {/* AI skin camera analysis — public route (camera requires HTTPS) */}
+          <Route path="/skin-analysis" element={<SkinAnalysisPage />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/impressum" element={<Impressum />} />
+          <Route path="/datenschutz" element={<Datenschutz />} />
+          <Route path="/agb" element={<Agb />} />
+          <Route path="/widerrufsbelehrung" element={<Widerrufsbelehrung />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </Suspense>
 
       {!hideBottomNav && <BottomNav />}

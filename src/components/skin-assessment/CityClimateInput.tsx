@@ -17,7 +17,7 @@ import {
   fetchClimateData,
   computeClimateSkInScore,
 } from "@/engine/climateEngine";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -30,35 +30,35 @@ function tx(obj: LT, lang: Lang): string {
 // ─── Copy ─────────────────────────────────────────────────────────────────────
 
 const C = {
-  placeholder:   { en: "City or postal code...",  de: "Stadt oder PLZ...",        ko: "도시명 또는 우편번호..." } as LT,
-  loading:       { en: "Analysing climate data...", de: "Klimadaten werden analysiert...", ko: "기후 데이터 분석 중..." } as LT,
-  noResults:     { en: "No cities found",      de: "Keine Städte gefunden",  ko: "도시를 찾을 수 없습니다" } as LT,
+  placeholder: { en: "City or postal code...", de: "Stadt oder PLZ...", ko: "도시명 또는 우편번호..." } as LT,
+  loading: { en: "Analysing climate data...", de: "Klimadaten werden analysiert...", ko: "기후 데이터 분석 중..." } as LT,
+  noResults: { en: "No cities found", de: "Keine Städte gefunden", ko: "도시를 찾을 수 없습니다" } as LT,
   noResultsHint: {
     en: "Tip: Try a nearby major city or postal code.",
     de: "Tipp: PLZ oder den Stadtnamen auf Englisch versuchen (z. B. Munich)",
     ko: "도움말: 우편번호 또는 영어로 검색해 보세요 (예: 06779, Seoul)",
   } as LT,
-  dryness:    { en: "Dryness",  de: "Trockenheit", ko: "건조함"  } as LT,
-  humidity:   { en: "Humidity", de: "Feuchtigkeit", ko: "습도"   } as LT,
-  uv:         { en: "UV",       de: "UV",           ko: "자외선" } as LT,
-  changeCity: { en: "Change",   de: "Ändern",       ko: "변경"   } as LT,
-  error:      { en: "Failed to load climate data. Please try again.", de: "Klimadaten konnten nicht geladen werden.", ko: "기후 데이터를 불러오지 못했습니다." } as LT,
-  searchTip:  {
+  dryness: { en: "Dryness", de: "Trockenheit", ko: "건조함" } as LT,
+  humidity: { en: "Humidity", de: "Feuchtigkeit", ko: "습도" } as LT,
+  uv: { en: "UV", de: "UV", ko: "자외선" } as LT,
+  changeCity: { en: "Change", de: "Ändern", ko: "변경" } as LT,
+  error: { en: "Failed to load climate data. Please try again.", de: "Klimadaten konnten nicht geladen werden.", ko: "기후 데이터를 불러오지 못했습니다." } as LT,
+  searchTip: {
     en: "💡 Search by city name or postal code (e.g. 10967, Seoul, Munich)",
     de: "💡 Suche nach Stadtname oder PLZ (z. B. 10967, München, Seoul)",
     ko: "💡 도시명 또는 우편번호로 검색하세요 (예: 06779, 수원시, Frankfurt)",
   } as LT,
-  now:      { en: "Now",          de: "Jetzt",       ko: "현재" } as LT,
-  today:    { en: "Today",        de: "Heute",       ko: "오늘" } as LT,
-  avg90:    { en: "90-day avg",   de: "90-Tage Ø",   ko: "90일 평균" } as LT,
+  now: { en: "Now", de: "Jetzt", ko: "현재" } as LT,
+  today: { en: "Today", de: "Heute", ko: "오늘" } as LT,
+  avg90: { en: "90-day avg", de: "90-Tage Ø", ko: "90일 평균" } as LT,
 } as const;
 
 // ─── Risk badge colours ───────────────────────────────────────────────────────
 
 const RISK = {
-  low:      { bg: "bg-emerald-500/15", text: "text-emerald-600 dark:text-emerald-400", dot: "bg-emerald-500" },
-  moderate: { bg: "bg-amber-500/15",   text: "text-amber-600 dark:text-amber-400",     dot: "bg-amber-500"   },
-  high:     { bg: "bg-rose-500/15",    text: "text-rose-600 dark:text-rose-400",       dot: "bg-rose-500"    },
+  low: { bg: "bg-emerald-500/15", text: "text-emerald-600 dark:text-emerald-400", dot: "bg-emerald-500" },
+  moderate: { bg: "bg-amber-500/15", text: "text-amber-600 dark:text-amber-400", dot: "bg-amber-500" },
+  high: { bg: "bg-rose-500/15", text: "text-rose-600 dark:text-rose-400", dot: "bg-rose-500" },
 } as const;
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -70,20 +70,20 @@ interface CityClimateInputProps {
 }
 
 export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps) {
-  const setClimateProfile = useDiagnosisStore((s) => s.setClimateProfile);
-  const storedProfile     = useDiagnosisStore((s) => s.lifestyle.climateProfile);
+  const setClimateProfile = useAnalysisStore((s) => s.setClimateProfile);
+  const storedProfile = useAnalysisStore((s) => s.lifestyle.climateProfile);
 
-  const [query,      setQuery]      = useState("");
+  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<GeoSuggestion[]>([]);
-  const [searching,  setSearching]  = useState(false);
-  const [loading,    setLoading]    = useState(false);
-  const [error,      setError]      = useState<string | null>(null);
-  const [open,       setOpen]       = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
   // true only after a search request has fully completed for the current query
   const [hasSearched, setHasSearched] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const inputRef    = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // lang is a dep because fetchCitySuggestions receives it
   const search = useCallback(async (q: string) => {
@@ -136,7 +136,7 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
   }
 
   function clearSelection() {
-    useDiagnosisStore.getState().actions.updateLifestyle({ climateProfile: undefined, climate: undefined });
+    useAnalysisStore.getState().actions.updateLifestyle({ climateProfile: undefined, climate: undefined });
     setQuery("");
     setSuggestions([]);
     setOpen(false);
@@ -160,9 +160,9 @@ export function CityClimateInput({ lang, onLegacyChange }: CityClimateInputProps
   // ── Selected state: summary card ───────────────────────────────────────────
   if (storedProfile) {
     const badges = [
-      { key: "dryness",  label: tx(C.dryness,  lang), risk: storedProfile.drynessRisk,  Icon: Wind     },
+      { key: "dryness", label: tx(C.dryness, lang), risk: storedProfile.drynessRisk, Icon: Wind },
       { key: "humidity", label: tx(C.humidity, lang), risk: storedProfile.humidityRisk, Icon: Droplets },
-      { key: "uv",       label: tx(C.uv,       lang), risk: storedProfile.uvRisk,       Icon: Sun      },
+      { key: "uv", label: tx(C.uv, lang), risk: storedProfile.uvRisk, Icon: Sun },
     ] as const;
 
     return (

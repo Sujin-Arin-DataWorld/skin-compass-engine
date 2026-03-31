@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface TermTipProps {
-  /** Short clinical term shown as a heading inside the tooltip (e.g. "PIE") */
+  /** Short professional term shown as a heading inside the tooltip (e.g. "PIE") */
   term?: string;
   /** Plain-language explanation displayed in the tooltip body */
   explanation: string;

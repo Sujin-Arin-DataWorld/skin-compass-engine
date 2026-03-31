@@ -32,7 +32,7 @@ const COPY = {
         intro: "To use Skin Strategy Lab, we need your consent to collect and process the following personal data in accordance with the GDPR (EU 2016/679):",
         bullets: [
             "Account data: name and email address (via Google)",
-            "Skin profile data: diagnosis results, axis scores, and skin tier",
+            "Skin profile data: analysis results, axis scores, and skin tier",
             "Usage data: wishlist, order history, and saved addresses",
             "Facial images for AI skin analysis (instantly deleted after processing, never stored)",
         ],

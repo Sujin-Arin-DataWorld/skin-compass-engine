@@ -10,7 +10,7 @@
  *  - PremiumCard   — key results / Skin Age / Duel winner (gold top border)
  *  - PremiumButton — Save Routine, Enter Lab (gold gradient CTA)
  *  - SageButton    — regular actions (filled / outline / ghost)
- *  - StatusBadge   — clinical safety states
+ *  - StatusBadge   — professional safety states
  */
 
 import React from "react";
@@ -122,9 +122,9 @@ export function SageButton({
   variant?: "filled" | "outline" | "ghost";
 }) {
   const variants = {
-    filled:  "bg-primary text-primary-foreground hover:bg-primary/90 shadow-inner-highlight",
+    filled: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-inner-highlight",
     outline: "border border-primary text-primary hover:bg-primary/10",
-    ghost:   "text-primary hover:bg-primary/10",
+    ghost: "text-primary hover:bg-primary/10",
   };
 
   return (
@@ -155,10 +155,10 @@ export function StatusBadge({
   children: React.ReactNode;
 }) {
   const styles = {
-    success:     "bg-success/10 text-success dark:bg-success/20",
-    warning:     "bg-warning/10 text-warning dark:bg-warning/20",
+    success: "bg-success/10 text-success dark:bg-success/20",
+    warning: "bg-warning/10 text-warning dark:bg-warning/20",
     destructive: "bg-destructive/10 text-destructive dark:bg-destructive/20",
-    muted:       "bg-muted text-muted-foreground",
+    muted: "bg-muted text-muted-foreground",
   };
 
   return (

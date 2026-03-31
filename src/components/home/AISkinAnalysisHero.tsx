@@ -9,7 +9,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18nStore, phase1T } from '@/store/i18nStore';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import styles from './AISkinAnalysisHero.module.css';
 import CameraIcon from './CameraIcon';
@@ -51,13 +51,13 @@ export default function AISkinAnalysisHero() {
 
   // ── Navigation handlers ──
   const handleCameraAnalysis = useCallback(() => {
-    useDiagnosisStore.getState().reset();
+    useAnalysisStore.getState().reset();
     useSkinAnalysisStore.getState().resetAnalysis();
     navigate('/skin-analysis');
   }, [navigate]);
 
   const handleQuestionnaireAnalysis = useCallback(() => {
-    useDiagnosisStore.getState().reset();
+    useAnalysisStore.getState().reset();
     useSkinAnalysisStore.getState().resetAnalysis();
     navigate('/skin-analysis?method=questionnaire');
   }, [navigate]);

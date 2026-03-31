@@ -1,8 +1,8 @@
 /**
  * useRoutineBuilder.ts
  *
- * Builds the final routine and runs clinical safety checks (Rules 1 & 3).
- * Wires integration points for clinicalSafetyRules.ts per Step 8 spec.
+ * Builds the final routine and runs professional safety checks (Rules 1 & 3).
+ * Wires integration points for safetyRules.ts per Step 8 spec.
  *
  * Integration points active here:
  *   RULE 1 — checkCumulativeIrritation()  (irritation load counter)
@@ -19,7 +19,7 @@ import {
   checkSpfRequirement,
   IrritationCheckResult,
   SpfCheckResult,
-} from '../utils/clinicalSafetyRules';
+} from '../utils/safetyRules';
 import { FinalRoutine } from '../types';
 
 export interface RoutineBuilderResult {

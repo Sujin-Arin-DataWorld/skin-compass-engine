@@ -59,7 +59,7 @@ const AGB_COPY = {
       {
         heading: "§ 6 피부 분석 서비스",
         paragraphs: [
-          "AI 기반 피부 분석은 정보 제공 목적으로만 사용되며, 전문 피부과 의사의 분석을 대체하지 않습니다.",
+          "AI 기반 피부 분석은 정보 제공 목적으로만 사용되며, 전문가의 분석을 대체하지 않습니다.",
           "분석에 사용된 얼굴 이미지는 AI 분석 직후 즉시 영구 삭제되며, 어떠한 형태로도 저장되지 않습니다.",
         ],
       },
@@ -123,7 +123,7 @@ const AGB_COPY = {
       {
         heading: "§ 6 Skin Analysis Service",
         paragraphs: [
-          "AI-powered skin analysis is provided for informational purposes only and does not replace professional dermatological consultation.",
+          "AI-powered skin analysis is provided for informational purposes only and does not replace professional consultation.",
           "Facial images used for AI analysis are permanently deleted immediately after processing and are never stored in any form.",
         ],
       },
@@ -187,7 +187,7 @@ const AGB_COPY = {
       {
         heading: "§ 6 Hautanalyse-Service",
         paragraphs: [
-          "Die KI-gestützte Hautanalyse dient ausschließlich Informationszwecken und ersetzt keine professionelle dermatologische Beratung.",
+          "Die KI-gestützte Hautanalyse dient ausschließlich Informationszwecken und ersetzt keine professionelle Beratung.",
           "Die für die KI-Analyse verwendeten Gesichtsbilder werden unmittelbar nach der Verarbeitung unwiderruflich gelöscht und in keiner Form gespeichert.",
         ],
       },
@@ -275,7 +275,11 @@ export default function Agb() {
                     className="text-sm leading-[1.8]"
                     style={{ color: tok.textSecondary, fontFamily: "var(--font-sans)" }}
                   >
-                    {para}
+                    {para.includes("http") ? (
+                      <span dangerouslySetInnerHTML={{ __html: para.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color: var(--ssl-accent); text-decoration: underline;">$1</a>') }} />
+                    ) : (
+                      <>{para}</>
+                    )}
                   </p>
                 ))}
               </div>

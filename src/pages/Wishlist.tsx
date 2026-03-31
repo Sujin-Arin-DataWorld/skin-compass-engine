@@ -72,13 +72,13 @@ export default function Wishlist() {
                         <p className="text-foreground/60 text-sm mb-5">
                             {de
                                 ? "Ihre Wunschliste ist noch leer. Führen Sie eine Hautanalyse durch und speichern Sie empfohlene Produkte."
-                                : "Your wishlist is empty. Run a skin diagnosis and save recommended products."}
+                                : "Your wishlist is empty. Run a skin analysis and save recommended products."}
                         </p>
                         <Link
-                            to="/diagnosis"
+                            to="/skin-assessment"
                             className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-6 py-2.5 text-sm font-semibold hover:opacity-90 transition-opacity"
                         >
-                            {de ? "Diagnose starten" : "Start Diagnosis"}
+                            {de ? "Diagnose starten" : "Start Analysis"}
                         </Link>
                     </div>
                 )}
@@ -129,19 +129,19 @@ export default function Wishlist() {
                                     {/* Actions */}
                                     <div className="flex items-center gap-2 flex-shrink-0">
                                         {products.find((p) => p.id === item.product_id) && (
-                                        <button
-                                            onClick={() => {
-                                                const product = products.find((p) => p.id === item.product_id);
-                                                if (product) {
-                                                    addItem(product);
-                                                    toast.success(de ? "Zum Warenkorb hinzugefügt" : "Added to cart");
-                                                }
-                                            }}
-                                            aria-label={de ? "Zum Warenkorb" : "Add to cart"}
-                                            className="rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/15 p-2 transition-colors"
-                                        >
-                                            <ShoppingBag className="w-4 h-4 text-primary" />
-                                        </button>
+                                            <button
+                                                onClick={() => {
+                                                    const product = products.find((p) => p.id === item.product_id);
+                                                    if (product) {
+                                                        addItem(product);
+                                                        toast.success(de ? "Zum Warenkorb hinzugefügt" : "Added to cart");
+                                                    }
+                                                }}
+                                                aria-label={de ? "Zum Warenkorb" : "Add to cart"}
+                                                className="rounded-full border border-primary/30 bg-primary/5 hover:bg-primary/15 p-2 transition-colors"
+                                            >
+                                                <ShoppingBag className="w-4 h-4 text-primary" />
+                                            </button>
                                         )}
 
                                         <button

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { safeStorage } from "@/utils/safeStorage";
-import { SkinType, ContextKey, Tier, DiagnosisResult, Product } from "@/engine/types";
+import { SkinType, ContextKey, Tier, AnalysisResult, Product } from "@/engine/types";
 import type { FaceZone } from "@/features/lab-selection/types";
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
 import type { ClimateProfile } from "@/engine/climateEngine";
@@ -59,7 +59,7 @@ export interface HormonalResponses {
 
 export interface NeurodermatitisResponses {
   chronicItching?: string;
-  diagnosis?: string;
+  confirmedCondition?: string;
   extremeFlaking?: string;
 }
 
@@ -155,8 +155,8 @@ function deriveImplicitFlags(
 ): ImplicitFlags {
   const atopyFlag =
     axisResponses.neurodermatitis?.chronicItching === "constantly" ||
-    axisResponses.neurodermatitis?.diagnosis === "dx_atopic" ||
-    axisResponses.neurodermatitis?.diagnosis === "dx_psoriasis" ||
+    axisResponses.neurodermatitis?.confirmedCondition === "dx_atopic" ||
+    axisResponses.neurodermatitis?.confirmedCondition === "dx_psoriasis" ||
     axisAnswers["AX9_Q1"] === "constantly" ||
     axisAnswers["AX9_Q2"] === "dx_atopic" ||
     axisAnswers["AX9_Q2"] === "dx_psoriasis";
@@ -233,7 +233,7 @@ function applyAxisAnswerToTyped(
 
     // Neurodermatitis
     case "AX9_Q1": ar = { ...ar, neurodermatitis: { ...ar.neurodermatitis, chronicItching: value as string } }; break;
-    case "AX9_Q2": ar = { ...ar, neurodermatitis: { ...ar.neurodermatitis, diagnosis: value as string } }; break;
+    case "AX9_Q2": ar = { ...ar, neurodermatitis: { ...ar.neurodermatitis, confirmedCondition: value as string } }; break;
     case "AX9_Q3": ar = { ...ar, neurodermatitis: { ...ar.neurodermatitis, extremeFlaking: value as string } }; break;
 
     // Lifestyle (Exposome)
@@ -258,10 +258,10 @@ interface StoreActions {
   calculateImplicitFlags: () => void;
   nextStep: () => void;
   prevStep: () => void;
-  resetDiagnosis: () => void;
+  resetAnalysis: () => void;
 }
 
-interface DiagnosisState {
+interface AnalysisState {
   // Step tracking
   currentStep: number;
   currentCategory: number;
@@ -294,7 +294,7 @@ interface DiagnosisState {
   axisAnswers: Record<string, QuestionAnswer>;
 
   // Result (not persisted)
-  result: DiagnosisResult | null;
+  result: AnalysisResult | null;
 
   // Special care picks (persisted — survives slide unmount/remount)
   specialCarePicks: Record<string, Product>;   // keyed by zone ID
@@ -314,7 +314,7 @@ interface DiagnosisState {
   setAxisAnswer: (id: string, value: QuestionAnswer) => void;
   clearAxisAnswers: () => void;
   setClimateProfile: (profile: ClimateProfile) => void;
-  setResult: (result: DiagnosisResult) => void;
+  setResult: (result: AnalysisResult) => void;
   setUiSignals: (category: string, data: Record<string, unknown>) => void;
   setInteractive: <K extends keyof InteractiveState>(key: K, value: InteractiveState[K]) => void;
   addUserTags: (delta: Record<string, number>) => void;
@@ -325,7 +325,10 @@ interface DiagnosisState {
 }
 
 /** Public type alias — use this when you need to type a snapshot of the store */
-export type DiagnosisStoreState = DiagnosisState;
+export type AnalysisStoreState = AnalysisState;
+
+/** @deprecated Use AnalysisStoreState instead. */
+export type AnalysisStoreState = AnalysisStoreState;
 
 // ─── Initial state ────────────────────────────────────────────────────────────
 
@@ -353,13 +356,13 @@ const initialState = {
   selectedTier: "Full" as Tier,
   uiSignals: {} as Record<string, Record<string, unknown>>,
   interactiveState: { ...defaultInteractiveState },
-  result: null as DiagnosisResult | null,
+  result: null as AnalysisResult | null,
   specialCarePicks: {} as Record<string, Product>,
 };
 
 // ─── Store ────────────────────────────────────────────────────────────────────
 
-export const useDiagnosisStore = create<DiagnosisState>()(
+export const useAnalysisStore = create<AnalysisState>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -512,7 +515,7 @@ export const useDiagnosisStore = create<DiagnosisState>()(
         nextStep: () => set((state) => ({ currentStep: state.currentStep + 1 })),
         prevStep: () => set((state) => ({ currentStep: Math.max(0, state.currentStep - 1) })),
 
-        resetDiagnosis: () =>
+        resetAnalysis: () =>
           set({
             ...initialState,
             interactiveState: { ...defaultInteractiveState },
@@ -524,7 +527,7 @@ export const useDiagnosisStore = create<DiagnosisState>()(
       },
     }),
     {
-      name: "skin-diagnosis-store",
+      name: "skin-analysis-store",
       storage: createJSONStorage(() => safeStorage),
       partialize: (state) => {
         return {
@@ -558,3 +561,6 @@ export const useDiagnosisStore = create<DiagnosisState>()(
     }
   )
 );
+
+/** @deprecated Use useAnalysisStore instead. */
+export const useAnalysisStore = useAnalysisStore;

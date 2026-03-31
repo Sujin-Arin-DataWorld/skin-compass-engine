@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 
 export default function GlobalProgressRing() {
     const location = useLocation();
-    const store = useDiagnosisStore();
+    const store = useAnalysisStore();
     const [mappedStep, setMappedStep] = useState(1);
     const [label, setLabel] = useState("Skin Context");
 
-    // Only show the global ring on diagnosis, results, checkout pages
-    const isActiveFlow = ["/diagnosis", "/results", "/checkout"].includes(location.pathname);
+    // Only show the global ring on analysis, results, checkout pages
+    const isActiveFlow = ["/skin-assessment", "/results", "/checkout"].includes(location.pathname);
 
     useEffect(() => {
         // Map the internal 0-10 store step to an 8-step visual journey

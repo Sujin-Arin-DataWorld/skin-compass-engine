@@ -7,10 +7,10 @@ import { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Brain, ChevronDown } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 import { useRoutineStore } from '@/store/useRoutineStore';
 import { buildRoutineV5 } from '@/engine/routineEngineV5';
-import type { DiagnosisResult, AxisKey } from '@/engine/types';
+import type { AnalysisResult, AxisKey } from '@/engine/types';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS } from '@/engine/types';
 import type { RoutineStep, RealProduct } from '@/engine/routineEngine';
 import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
@@ -50,7 +50,7 @@ function toHealthScore(axis: AxisKey, rawScore: number): number {
 
 // ── i18n Copy ─────────────────────────────────────────────────────────────────
 const C = {
-  diagnosis_eyebrow: { ko: '피부 분석 결과', de: 'IHRE HAUTANALYSE', en: 'YOUR SKIN ANALYSIS' },
+  analysis_eyebrow: { ko: '피부 분석 결과', de: 'IHRE HAUTANALYSE', en: 'YOUR SKIN ANALYSIS' },
   confidence_badge: { ko: '{N}% 분석 신뢰도 · {M}개 신호 분석', de: '{N}% Analyse-Vertrauen · {M} Signale analysiert', en: '{N}% Analysis confidence · {M} signals analyzed' },
   top_concern_suffix: { ko: '이(가) 가장 높아요', de: ' ist am höchsten', en: ' is your top concern' },
   top_concern_neglect: { ko: '방치하면 악화가 가속돼요.', de: 'Unbehandelt beschleunigt sich die Verschlechterung.', en: 'Left untreated, this will accelerate.' },
@@ -109,10 +109,10 @@ const AIX_CONTENT: Record<string, { en: string; de: string; ko: string }> = {
   cleanser: { en: 'pH-balanced barrier support. Gentle surfactants that cleanse without stripping.', de: 'pH-ausgewogene Barriere-Unterstützung. Sanfte Tenside.', ko: 'pH 균형 클렌저. 순한 계면활성제 구성.' },
   toner: { en: 'Hydrating toner to restore moisture immediately after cleansing.', de: 'Feuchtigkeitstoner zur sofortigen Wiederherstellung.', ko: '세안 직후 수분 보충 토너.' },
   serum: { en: 'Active serum targeting your primary concern axis.', de: 'Aktives Serum für Ihre Hauptbesorgnis.', ko: '주요 축 타겟팅 액티브 세럼.' },
-  treatment: { en: 'Targeted treatment for secondary concerns.', de: 'Gezielte Behandlung für sekundäre Anliegen.', ko: '2차 관심사를 위한 타겟 트리트먼트.' },
+  treatment: { en: 'Targeted care for secondary concerns.', de: 'Gezielte Pflege für sekundäre Anliegen.', ko: '2차 관심사를 위한 타겟 케어.' },
   moisturizer: { en: 'Barrier-sealing moisturiser matched to your base type.', de: 'Barriere-versiegelnde Feuchtigkeitscreme.', ko: '기초 타입에 맞춘 장벽 밀봉 보습제.' },
   spf: { en: 'Broad-spectrum UV protection.', de: 'Breitspektrum UV-Schutz.', ko: '광범위 자외선 차단.' },
-  device: { en: 'Clinical EMS/LED device. Amplifies serum penetration by up to 3×.', de: 'Professionelles EMS/LED-Gerät.', ko: '임상 등급 EMS/LED 기기.' },
+  device: { en: 'Professional EMS/LED device. Amplifies serum penetration by up to 3×.', de: 'Professionelles EMS/LED-Gerät.', ko: '전문가급 EMS/LED 기기.' },
 };
 
 // ── Circular Score Ring 점수링 디자인 ─────────────────────────────────────────────────────
@@ -128,16 +128,16 @@ const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', overflow: 'visible' }}>
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5} opacity={0.15} />
-        <motion.circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round"
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3.5} opacity={0.15} />
+        <motion.circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round"
           strokeDasharray={circ}
           initial={{ strokeDashoffset: circ }}
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         />
-        <text x={size/2} y={size/2} textAnchor="middle" dominantBaseline="central"
+        <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central"
           fontSize={size * 0.32} fontWeight={600} fill={textColor}
-          transform={`rotate(90, ${size/2}, ${size/2})`}
+          transform={`rotate(90, ${size / 2}, ${size / 2})`}
         >{Math.round(score)}</text>
       </svg>
       <span style={{
@@ -160,7 +160,7 @@ type FilteredStep = RoutineStep & { product: RealProduct };
 
 type CartItem = { id: string; price: number; role: string; emoji: string };
 interface Props {
-  result: DiagnosisResult;
+  result: AnalysisResult;
   onGoToLab?: () => void;
   onTierChange?: (steps: FilteredStep[]) => void;
   onAddToCart?: (item: CartItem) => void;
@@ -174,10 +174,10 @@ const DISCOUNT_PCT = 0.18;
 export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, onAddToCart, onRemoveFromCart, cartItemIds }: Props) {
   const { language } = useI18nStore();
   const lang = (language === 'de' || language === 'ko') ? language : 'en' as LangKey;
-  const implicitFlags = useDiagnosisStore((s) => s.implicitFlags);
-  const axisAnswers = useDiagnosisStore((s) => s.axisAnswers);
-  const selectedZones = useDiagnosisStore((s) => s.selectedZones);
-  const setTier = useDiagnosisStore((s) => s.setTier);
+  const implicitFlags = useAnalysisStore((s) => s.implicitFlags);
+  const axisAnswers = useAnalysisStore((s) => s.axisAnswers);
+  const selectedZones = useAnalysisStore((s) => s.selectedZones);
+  const setTier = useAnalysisStore((s) => s.setTier);
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
@@ -414,289 +414,289 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   onRemoveFromCart={onRemoveFromCart}
                 />
               ) : (
-              <>
-              {/* Tier selector */}
-              <div style={{ display: 'flex', gap: 4, marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
-                {tierTabs.map((tab) => {
-                  const isActive = activeTier === tab.key;
-                  return (
-                    <button key={tab.key} onClick={() => {
-                      setActiveTier(tab.key);
-                      setExpandedId(null);
-                      // Sync to global store so Slide 2 reads the correct tier
-                      const tierMap: Record<TierKey, 'Entry'|'Full'|'Premium'> = { '3-step': 'Entry', '5-step': 'Full', 'advanced': 'Premium' };
-                      setTier(tierMap[tab.key]);
-                    }} style={{
-                      flex: 1, padding: '10px 4px', textAlign: 'center', border: 'none', cursor: 'pointer',
-                      borderRadius: 10, minHeight: 48,
-                      background: isActive ? (isDark ? 'rgba(74,158,104,0.08)' : 'rgba(94,139,104,0.08)') : (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'),
-                      outline: isActive ? `1px solid ${isDark ? 'rgba(74,158,104,0.15)' : 'rgba(94,139,104,0.15)'}` : 'none',
-                    }}>
-                      <div style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500, color: isActive ? tok.accent : tok.textSecondary }}>{tab.label}</div>
-                      <div style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: isActive ? (isDark ? 'rgba(74,158,104,0.7)' : 'rgba(61,107,74,0.7)') : tok.textTertiary }}>{tab.desc}</div>
-                    </button>
-                  );
-                })}
-              </div>
+                <>
+                  {/* Tier selector */}
+                  <div style={{ display: 'flex', gap: 4, marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
+                    {tierTabs.map((tab) => {
+                      const isActive = activeTier === tab.key;
+                      return (
+                        <button key={tab.key} onClick={() => {
+                          setActiveTier(tab.key);
+                          setExpandedId(null);
+                          // Sync to global store so Slide 2 reads the correct tier
+                          const tierMap: Record<TierKey, 'Entry' | 'Full' | 'Premium'> = { '3-step': 'Entry', '5-step': 'Full', 'advanced': 'Premium' };
+                          setTier(tierMap[tab.key]);
+                        }} style={{
+                          flex: 1, padding: '10px 4px', textAlign: 'center', border: 'none', cursor: 'pointer',
+                          borderRadius: 10, minHeight: 48,
+                          background: isActive ? (isDark ? 'rgba(74,158,104,0.08)' : 'rgba(94,139,104,0.08)') : (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'),
+                          outline: isActive ? `1px solid ${isDark ? 'rgba(74,158,104,0.15)' : 'rgba(94,139,104,0.15)'}` : 'none',
+                        }}>
+                          <div style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500, color: isActive ? tok.accent : tok.textSecondary }}>{tab.label}</div>
+                          <div style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: isActive ? (isDark ? 'rgba(74,158,104,0.7)' : 'rgba(61,107,74,0.7)') : tok.textTertiary }}>{tab.desc}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
 
-              {/* AM/PM toggle */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: `1px solid ${tok.border}` }}>
-                  {(['am', 'pm'] as const).map((t) => (
-                    <button key={t} onClick={() => setTiming(t)} style={{
-                      padding: '6px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
-                      background: timing === t ? (t === 'am' ? 'rgba(186,117,23,0.08)' : 'rgba(134,134,139,0.08)') : 'transparent',
-                      borderRight: t === 'am' ? `1px solid ${tok.border}` : 'none',
-                    }}>
-                      <span style={{ fontSize: 14 }}>{t === 'am' ? '☀️' : '🌙'}</span>
-                      <span style={{
-                        fontSize: 'clamp(0.5625rem, 0.8vw, 0.625rem)', fontWeight: 600,
-                        color: timing === t ? (t === 'am' ? '#BA7517' : (isDark ? '#86868B' : '#6B7280')) : tok.textTertiary,
-                      }}>{t.toUpperCase()}</span>
-                    </button>
-                  ))}
-                </div>
-                {timing === 'am' && (
-                  <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} style={{
-                    display: 'flex', alignItems: 'center', gap: 4, borderRadius: 99,
-                    padding: '4px 10px', background: 'rgba(226,75,74,0.06)',
-                  }}>
-                    <span style={{ fontSize: 11 }}>☀️</span>
-                    <span style={{ fontSize: 'clamp(0.625rem, 0.9vw, 0.75rem)', fontWeight: 600, color: isDark ? '#E24B4A' : '#A32D2D' }}>
-                      {tx('spf_required', lang)}
-                    </span>
-                  </motion.div>
-                )}
-              </div>
+                  {/* AM/PM toggle */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: `1px solid ${tok.border}` }}>
+                      {(['am', 'pm'] as const).map((t) => (
+                        <button key={t} onClick={() => setTiming(t)} style={{
+                          padding: '6px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4,
+                          background: timing === t ? (t === 'am' ? 'rgba(186,117,23,0.08)' : 'rgba(134,134,139,0.08)') : 'transparent',
+                          borderRight: t === 'am' ? `1px solid ${tok.border}` : 'none',
+                        }}>
+                          <span style={{ fontSize: 14 }}>{t === 'am' ? '☀️' : '🌙'}</span>
+                          <span style={{
+                            fontSize: 'clamp(0.5625rem, 0.8vw, 0.625rem)', fontWeight: 600,
+                            color: timing === t ? (t === 'am' ? '#BA7517' : (isDark ? '#86868B' : '#6B7280')) : tok.textTertiary,
+                          }}>{t.toUpperCase()}</span>
+                        </button>
+                      ))}
+                    </div>
+                    {timing === 'am' && (
+                      <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} style={{
+                        display: 'flex', alignItems: 'center', gap: 4, borderRadius: 99,
+                        padding: '4px 10px', background: 'rgba(226,75,74,0.06)',
+                      }}>
+                        <span style={{ fontSize: 11 }}>☀️</span>
+                        <span style={{ fontSize: 'clamp(0.625rem, 0.9vw, 0.75rem)', fontWeight: 600, color: isDark ? '#E24B4A' : '#A32D2D' }}>
+                          {tx('spf_required', lang)}
+                        </span>
+                      </motion.div>
+                    )}
+                  </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vw, 8px)' }}>
-                {currentSteps.map((step, i) => {
-                  const price = getProductPrice(step.product.id);
-                  const isKeyStep = topAxis && step.product.key_ingredients.some((ing) =>
-                    (topAxis.axis === 'ox' && /vitamin\s*c|ascorb|antioxid/i.test(ing)) ||
-                    (topAxis.axis === 'bar' && /ceramide|panthe|centella/i.test(ing)) ||
-                    (topAxis.axis === 'hyd' && /hyaluron|glycerin/i.test(ing)) ||
-                    (topAxis.axis === 'acne' && /salicyl|bha|niacin/i.test(ing)) ||
-                    (topAxis.axis === 'seb' && /niacin|zinc|bha/i.test(ing)) ||
-                    (topAxis.axis === 'aging' && /retinol|peptide|adenosine/i.test(ing)) ||
-                    (topAxis.axis === 'pigment' && /vitamin\s*c|arbutin|tranexam/i.test(ing)) ||
-                    (topAxis.axis === 'sen' && /centella|panthe|allantoin/i.test(ing)) ||
-                    (topAxis.axis === 'texture' && /bha|aha|niacin/i.test(ing))
-                  );
-                  const isExpanded = expandedId === step.product.id;
-                  const insight = AIX_CONTENT[step.role] ?? AIX_CONTENT['serum'];
-                  const topAxes = Object.entries(result.axis_scores).map(([k, s]) => [k, toHealthScore(k as AxisKey, s)] as [AxisKey, number]).filter(([_, s]) => s < 70).sort((a, b) => a[1] - b[1]).slice(0, 3);
-                  const proj = routines.full.projected_improvement[topAxis?.axis ?? 'hyd'];
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(6px, 1vw, 8px)' }}>
+                    {currentSteps.map((step, i) => {
+                      const price = getProductPrice(step.product.id);
+                      const isKeyStep = topAxis && step.product.key_ingredients.some((ing) =>
+                        (topAxis.axis === 'ox' && /vitamin\s*c|ascorb|antioxid/i.test(ing)) ||
+                        (topAxis.axis === 'bar' && /ceramide|panthe|centella/i.test(ing)) ||
+                        (topAxis.axis === 'hyd' && /hyaluron|glycerin/i.test(ing)) ||
+                        (topAxis.axis === 'acne' && /salicyl|bha|niacin/i.test(ing)) ||
+                        (topAxis.axis === 'seb' && /niacin|zinc|bha/i.test(ing)) ||
+                        (topAxis.axis === 'aging' && /retinol|peptide|adenosine/i.test(ing)) ||
+                        (topAxis.axis === 'pigment' && /vitamin\s*c|arbutin|tranexam/i.test(ing)) ||
+                        (topAxis.axis === 'sen' && /centella|panthe|allantoin/i.test(ing)) ||
+                        (topAxis.axis === 'texture' && /bha|aha|niacin/i.test(ing))
+                      );
+                      const isExpanded = expandedId === step.product.id;
+                      const insight = AIX_CONTENT[step.role] ?? AIX_CONTENT['serum'];
+                      const topAxes = Object.entries(result.axis_scores).map(([k, s]) => [k, toHealthScore(k as AxisKey, s)] as [AxisKey, number]).filter(([_, s]) => s < 70).sort((a, b) => a[1] - b[1]).slice(0, 3);
+                      const proj = routines.full.projected_improvement[topAxis?.axis ?? 'hyd'];
 
-                  return (
-                    <motion.div key={`${activeTier}-${timing}-${step.product.id}`}
-                      initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-40px' }}
-                      transition={{ duration: 0.4, delay: i * 0.05 }}
-                      style={{
-                        borderRadius: 12, overflow: 'hidden',
-                        background: isKeyStep ? 'rgba(226,75,74,0.03)' : tok.bgCard,
-                        border: `1px solid ${isKeyStep ? 'rgba(226,75,74,0.1)' : tok.border}`,
-                      }}
-                    >
-                      <button onClick={() => setExpandedId(isExpanded ? null : step.product.id)}
-                        style={{ width: '100%', padding: 'clamp(12px, 2vw, 16px)', textAlign: 'left', border: 'none', cursor: 'pointer', background: 'transparent', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        {/* Step number */}
-                        <span style={{
-                          width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', fontWeight: 600, flexShrink: 0,
-                          background: isKeyStep ? 'rgba(226,75,74,0.12)' : 'rgba(74,158,104,0.12)',
-                          color: isKeyStep ? '#E24B4A' : (tok.accent),
-                        }}>{i + 1}</span>
-                        {/* Product image */}
-                        <ProductImage productId={step.product.id} name={step.product.name[lang] ?? step.product.name.en} size="sm" />
-                        {/* Product info */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                      return (
+                        <motion.div key={`${activeTier}-${timing}-${step.product.id}`}
+                          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: '-40px' }}
+                          transition={{ duration: 0.4, delay: i * 0.05 }}
+                          style={{
+                            borderRadius: 12, overflow: 'hidden',
+                            background: isKeyStep ? 'rgba(226,75,74,0.03)' : tok.bgCard,
+                            border: `1px solid ${isKeyStep ? 'rgba(226,75,74,0.1)' : tok.border}`,
+                          }}
+                        >
+                          <button onClick={() => setExpandedId(isExpanded ? null : step.product.id)}
+                            style={{ width: '100%', padding: 'clamp(12px, 2vw, 16px)', textAlign: 'left', border: 'none', cursor: 'pointer', background: 'transparent', display: 'flex', alignItems: 'center', gap: 10 }}>
+                            {/* Step number */}
                             <span style={{
-                              fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600,
-                              letterSpacing: '0.1em', textTransform: 'uppercase',
-                              color: isKeyStep ? '#E24B4A' : tok.textTertiary,
-                            }}>
-                              {step.role.toUpperCase()}{isKeyStep ? ` — ${tx('step_targets', lang)}` : ''}
-                            </span>
-                          </div>
-                          <p style={{
-                            fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500,
-                            color: tok.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis',
-                            display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                          }}>{step.product.name[lang] ?? step.product.name.en}</p>
-                          <p style={{
-                            fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: tok.textSecondary, margin: 0,
-                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          }}>{step.product.key_ingredients.slice(0, 2).join(', ')}</p>
-                          {isKeyStep && topAxis && (() => {
-                            const hc = topAxis.score < 30 ? '#E24B4A' : topAxis.score < 70 ? '#BA7517' : '#4A9E68';
-                            const dispCurrent = Math.round(toHealthScore(topAxis.axis, proj.currentScore));
-                            const dispTarget = Math.round(toHealthScore(topAxis.axis, proj.targetScore4w));
-                            return (
-                            <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: hc, margin: '2px 0 0', fontWeight: 500 }}>
-                              {tx('step_score_goal', lang, { a: axisLabel(topAxis.axis, lang), c: dispCurrent, g: dispTarget, w: 4 })}
-                            </p>
-                            );
-                          })()}
-                        </div>
-                        {/* Price + add button + chevron */}
-                        <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                          {price > 0 && <div style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color: tok.text }}>€{price}</div>}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            {(onAddToCart || onRemoveFromCart) && (() => {
-                              const isAdded = cartItemIds?.includes(step.product.id);
-                              return (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (isAdded && onRemoveFromCart) {
-                                    onRemoveFromCart(step.product.id);
-                                  } else if (!isAdded && onAddToCart) {
-                                    const item = { id: step.product.id, price, role: step.role, emoji: '' };
-                                    onAddToCart(item);
-                                  }
-                                }}
-                                style={{
-                                  padding: '3px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                                  fontSize: '0.75rem', fontWeight: 600,
-                                  background: isAdded ? 'rgba(74,158,104,0.12)' : 'rgba(74,158,104,0.85)',
-                                  color: isAdded ? '#4A9E68' : '#FFFFFF',
-                                  transition: 'all 0.2s ease',
-                                  minWidth: 40,
-                                }}
-                              >
-                                {isAdded ? '✓' : (lang === 'ko' ? '추가' : lang === 'de' ? 'Add' : 'Add')}
-                              </button>
-                              );
-                            })(
-                            )}
-                            <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                              <ChevronDown size={14} style={{ color: tok.textTertiary }} />
-                            </motion.div>
-                          </div>
-                        </div>
-                      </button>
-
-                      {/* Expanded content */}
-                      <AnimatePresence>
-                        {isExpanded && (
-                          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                            style={{ overflow: 'hidden' }}>
-                            <div style={{ padding: '0 clamp(12px, 2vw, 16px) clamp(12px, 2vw, 16px)', borderTop: `1px solid ${tok.border}` }}>
-                              <div style={{ paddingTop: 8 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                                  <Sparkles size={12} style={{ color: tok.accent }} />
-                                  <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
-                                    {tx('why_ingredient', lang)}
-                                  </span>
-                                </div>
-                                <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary, lineHeight: 1.5, margin: '0 0 8px' }}>{insight[lang]}</p>
+                              width: 28, height: 28, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)', fontWeight: 600, flexShrink: 0,
+                              background: isKeyStep ? 'rgba(226,75,74,0.12)' : 'rgba(74,158,104,0.12)',
+                              color: isKeyStep ? '#E24B4A' : (tok.accent),
+                            }}>{i + 1}</span>
+                            {/* Product image */}
+                            <ProductImage productId={step.product.id} name={step.product.name[lang] ?? step.product.name.en} size="sm" />
+                            {/* Product info */}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <span style={{
+                                  fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600,
+                                  letterSpacing: '0.1em', textTransform: 'uppercase',
+                                  color: isKeyStep ? '#E24B4A' : tok.textTertiary,
+                                }}>
+                                  {step.role.toUpperCase()}{isKeyStep ? ` — ${tx('step_targets', lang)}` : ''}
+                                </span>
                               </div>
-                              <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                                  <Brain size={12} style={{ color: tok.accent }} />
-                                  <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
-                                    {tx('matching_logic', lang)}
-                                  </span>
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginBottom: 8 }}>
-                                  {[{ l: tx('role_label', lang), v: step.role }, { l: tx('form_label', lang), v: step.product.texture_type ?? '—' }].map(({ l, v }) => (
-                                    <div key={l} style={{ borderRadius: 6, padding: '4px 6px', background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
-                                      <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textSecondary }}>{l} </span>
-                                      <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600, color: tok.text }}>{v}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                              <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
-                                  <Brain size={12} style={{ color: tok.accent }} />
-                                  <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
-                                    {tx('aix_matching', lang)}
-                                  </span>
-                                </div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                                  {topAxes.map(([a, s]) => {
-                                    const hc = s < 30 ? '#E24B4A' : s < 70 ? '#BA7517' : '#4A9E68';
-                                    return (
-                                    <span key={a} style={{
-                                      fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, padding: '3px 8px', borderRadius: 99,
-                                      background: `${hc}15`, border: `1px solid ${hc}33`, color: hc,
-                                    }}>{axisLabel(a, lang)} {Math.round(s)}</span>
-                                    );
-                                  })}
-                                </div>
+                              <p style={{
+                                fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500,
+                                color: tok.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis',
+                                display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                              }}>{step.product.name[lang] ?? step.product.name.en}</p>
+                              <p style={{
+                                fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: tok.textSecondary, margin: 0,
+                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                              }}>{step.product.key_ingredients.slice(0, 2).join(', ')}</p>
+                              {isKeyStep && topAxis && (() => {
+                                const hc = topAxis.score < 30 ? '#E24B4A' : topAxis.score < 70 ? '#BA7517' : '#4A9E68';
+                                const dispCurrent = Math.round(toHealthScore(topAxis.axis, proj.currentScore));
+                                const dispTarget = Math.round(toHealthScore(topAxis.axis, proj.targetScore4w));
+                                return (
+                                  <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: hc, margin: '2px 0 0', fontWeight: 500 }}>
+                                    {tx('step_score_goal', lang, { a: axisLabel(topAxis.axis, lang), c: dispCurrent, g: dispTarget, w: 4 })}
+                                  </p>
+                                );
+                              })()}
+                            </div>
+                            {/* Price + add button + chevron */}
+                            <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                              {price > 0 && <div style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color: tok.text }}>€{price}</div>}
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                {(onAddToCart || onRemoveFromCart) && (() => {
+                                  const isAdded = cartItemIds?.includes(step.product.id);
+                                  return (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (isAdded && onRemoveFromCart) {
+                                          onRemoveFromCart(step.product.id);
+                                        } else if (!isAdded && onAddToCart) {
+                                          const item = { id: step.product.id, price, role: step.role, emoji: '' };
+                                          onAddToCart(item);
+                                        }
+                                      }}
+                                      style={{
+                                        padding: '3px 10px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                                        fontSize: '0.75rem', fontWeight: 600,
+                                        background: isAdded ? 'rgba(74,158,104,0.12)' : 'rgba(74,158,104,0.85)',
+                                        color: isAdded ? '#4A9E68' : '#FFFFFF',
+                                        transition: 'all 0.2s ease',
+                                        minWidth: 40,
+                                      }}
+                                    >
+                                      {isAdded ? '✓' : (lang === 'ko' ? '추가' : lang === 'de' ? 'Add' : 'Add')}
+                                    </button>
+                                  );
+                                })(
+                                )}
+                                <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                                  <ChevronDown size={14} style={{ color: tok.textTertiary }} />
+                                </motion.div>
                               </div>
                             </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                          </button>
 
-              {/* Routine total */}
-              <div style={{
-                marginTop: 'clamp(8px, 1.5vw, 12px)', padding: 'clamp(10px, 1.5vw, 14px)', borderRadius: 12,
-                background: tok.bgCard, border: `1px solid ${tok.border}`,
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              }}>
-                <span style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary }}>
-                  {tx('routine_summary', lang, { N: currentSteps.length, P: timing.toUpperCase() })}
-                </span>
-                <div>
-                  {routineTotal.original > 0 && (
-                    <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textTertiary, textDecoration: 'line-through', marginRight: 6 }}>€{routineTotal.original}</span>
-                  )}
-                  <span style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color: tok.text }}>€{routineTotal.discounted}</span>
-                </div>
-              </div>
-
-              {/* Zone Care Teaser — uses shared zoneCounts (urgent + moderate only) */}
-              {zoneCounts.total > 0 && (
-                <motion.button onClick={() => onGoToLab?.()}
-                  whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-                  style={{
-                    width: '100%', marginTop: 'clamp(8px, 1.5vw, 12px)', padding: '10px 14px', borderRadius: 12,
-                    background: isDark ? 'rgba(74,158,104,0.04)' : 'rgba(94,139,104,0.04)',
-                    border: `1px solid ${isDark ? 'rgba(74,158,104,0.1)' : 'rgba(94,139,104,0.1)'}`,
-                    cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary }}>{tx('tab_zone_care', lang)}</span>
-                    {!isBarrierEmergency && zoneCounts.needsCare > 0 ? (
-                      <span style={{
-                        fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600,
-                        padding: '3px 8px', borderRadius: 99,
-                        background: 'rgba(226,75,74,0.1)', color: '#E24B4A',
-                      }}>{tx('zone_teaser_badge', lang, { N: zoneCounts.needsCare })}</span>
-                    ) : !isBarrierEmergency ? (
-                      <span style={{
-                        fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 500,
-                        padding: '3px 8px', borderRadius: 99,
-                        background: isDark ? 'rgba(74,158,104,0.08)' : 'rgba(94,139,104,0.08)',
-                        color: tok.accent,
-                      }}>✓</span>
-                    ) : null}
+                          {/* Expanded content */}
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                                style={{ overflow: 'hidden' }}>
+                                <div style={{ padding: '0 clamp(12px, 2vw, 16px) clamp(12px, 2vw, 16px)', borderTop: `1px solid ${tok.border}` }}>
+                                  <div style={{ paddingTop: 8 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                                      <Sparkles size={12} style={{ color: tok.accent }} />
+                                      <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
+                                        {tx('why_ingredient', lang)}
+                                      </span>
+                                    </div>
+                                    <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary, lineHeight: 1.5, margin: '0 0 8px' }}>{insight[lang]}</p>
+                                  </div>
+                                  <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                                      <Brain size={12} style={{ color: tok.accent }} />
+                                      <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
+                                        {tx('matching_logic', lang)}
+                                      </span>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4, marginBottom: 8 }}>
+                                      {[{ l: tx('role_label', lang), v: step.role }, { l: tx('form_label', lang), v: step.product.texture_type ?? '—' }].map(({ l, v }) => (
+                                        <div key={l} style={{ borderRadius: 6, padding: '4px 6px', background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)' }}>
+                                          <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textSecondary }}>{l} </span>
+                                          <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600, color: tok.text }}>{v}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6 }}>
+                                      <Brain size={12} style={{ color: tok.accent }} />
+                                      <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: tok.accent }}>
+                                        {tx('aix_matching', lang)}
+                                      </span>
+                                    </div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                                      {topAxes.map(([a, s]) => {
+                                        const hc = s < 30 ? '#E24B4A' : s < 70 ? '#BA7517' : '#4A9E68';
+                                        return (
+                                          <span key={a} style={{
+                                            fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', fontWeight: 600, padding: '3px 8px', borderRadius: 99,
+                                            background: `${hc}15`, border: `1px solid ${hc}33`, color: hc,
+                                          }}>{axisLabel(a, lang)} {Math.round(s)}</span>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
+                      );
+                    })}
                   </div>
-                  <p style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary, margin: 0, lineHeight: 1.5 }}>
-                    {isBarrierEmergency
-                      ? tx('barrier_zone_teaser_focus', lang)
-                      : zoneCounts.needsCare > 0 ? tx('zone_teaser_desc', lang) : tx('zone_teaser_no_extra', lang)}
-                  </p>
-                  {!isBarrierEmergency && zoneCounts.needsCare > 0 && (
-                    <p style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.accent, margin: 0, fontWeight: 500 }}>
-                      {tx('zone_teaser_cta', lang)}
-                    </p>
+
+                  {/* Routine total */}
+                  <div style={{
+                    marginTop: 'clamp(8px, 1.5vw, 12px)', padding: 'clamp(10px, 1.5vw, 14px)', borderRadius: 12,
+                    background: tok.bgCard, border: `1px solid ${tok.border}`,
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  }}>
+                    <span style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary }}>
+                      {tx('routine_summary', lang, { N: currentSteps.length, P: timing.toUpperCase() })}
+                    </span>
+                    <div>
+                      {routineTotal.original > 0 && (
+                        <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textTertiary, textDecoration: 'line-through', marginRight: 6 }}>€{routineTotal.original}</span>
+                      )}
+                      <span style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color: tok.text }}>€{routineTotal.discounted}</span>
+                    </div>
+                  </div>
+
+                  {/* Zone Care Teaser — uses shared zoneCounts (urgent + moderate only) */}
+                  {zoneCounts.total > 0 && (
+                    <motion.button onClick={() => onGoToLab?.()}
+                      whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                      style={{
+                        width: '100%', marginTop: 'clamp(8px, 1.5vw, 12px)', padding: '10px 14px', borderRadius: 12,
+                        background: isDark ? 'rgba(74,158,104,0.04)' : 'rgba(94,139,104,0.04)',
+                        border: `1px solid ${isDark ? 'rgba(74,158,104,0.1)' : 'rgba(94,139,104,0.1)'}`,
+                        cursor: 'pointer', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 4,
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary }}>{tx('tab_zone_care', lang)}</span>
+                        {!isBarrierEmergency && zoneCounts.needsCare > 0 ? (
+                          <span style={{
+                            fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 600,
+                            padding: '3px 8px', borderRadius: 99,
+                            background: 'rgba(226,75,74,0.1)', color: '#E24B4A',
+                          }}>{tx('zone_teaser_badge', lang, { N: zoneCounts.needsCare })}</span>
+                        ) : !isBarrierEmergency ? (
+                          <span style={{
+                            fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', fontWeight: 500,
+                            padding: '3px 8px', borderRadius: 99,
+                            background: isDark ? 'rgba(74,158,104,0.08)' : 'rgba(94,139,104,0.08)',
+                            color: tok.accent,
+                          }}>✓</span>
+                        ) : null}
+                      </div>
+                      <p style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary, margin: 0, lineHeight: 1.5 }}>
+                        {isBarrierEmergency
+                          ? tx('barrier_zone_teaser_focus', lang)
+                          : zoneCounts.needsCare > 0 ? tx('zone_teaser_desc', lang) : tx('zone_teaser_no_extra', lang)}
+                      </p>
+                      {!isBarrierEmergency && zoneCounts.needsCare > 0 && (
+                        <p style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.accent, margin: 0, fontWeight: 500 }}>
+                          {tx('zone_teaser_cta', lang)}
+                        </p>
+                      )}
+                    </motion.button>
                   )}
-                </motion.button>
-              )}
-              </>
+                </>
               )}
 
 
@@ -731,8 +731,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                       {lang === 'ko'
                         ? '장벽이 무너진 상태에서는 평소의 스킨케어도 자극이 됩니다. 과학적인 "비우기-채우기-잠그기" 순서로 지질막을 먼저 재건해야 합니다.'
                         : lang === 'de'
-                        ? 'Bei kompromittierter Hautbarriere wirkt normale Pflege wie ein Reizstoff. Bauen Sie die Lipidschicht in der richtigen Reihenfolge wieder auf.'
-                        : 'When the barrier is compromised, regular skincare becomes an irritant. Rebuild the lipid layer in the exact sequence.'}
+                          ? 'Bei kompromittierter Hautbarriere wirkt normale Pflege wie ein Reizstoff. Bauen Sie die Lipidschicht in der richtigen Reihenfolge wieder auf.'
+                          : 'When the barrier is compromised, regular skincare becomes an irritant. Rebuild the lipid layer in the exact sequence.'}
                     </p>
                   </div>
 
@@ -745,8 +745,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                         desc: lang === 'ko'
                           ? '알칼리성 세안제와 활성 성분(레티놀/비타민C)은 지질을 씻어내고 미세 염증을 유발합니다. 즉시 중단하여 자극을 차단합니다.'
                           : lang === 'de'
-                          ? 'Alkalische Reiniger und Wirkstoffe (Retinol/Vitamin C) waschen Lipide ab und verursachen Mikro-Entzündungen. Sofort stoppen.'
-                          : 'Alkaline cleansers and actives wash away lipids and cause micro-inflammation. Stopping them is the first step.',
+                            ? 'Alkalische Reiniger und Wirkstoffe (Retinol/Vitamin C) waschen Lipide ab und verursachen Mikro-Entzündungen. Sofort stoppen.'
+                            : 'Alkaline cleansers and actives wash away lipids and cause micro-inflammation. Stopping them is the first step.',
                       },
                       {
                         step: lang === 'ko' ? '2. 채우기 (Fill)' : lang === 'de' ? '2. Auffüllen (Fill)' : '2. Fill',
@@ -754,8 +754,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                         desc: lang === 'ko'
                           ? '지질이 빠져나가 메마르고 열이 나는 피부에 판테놀과 병풀을 투입하여 염증을 가라앉히고 수분 통로를 엽니다.'
                           : lang === 'de'
-                          ? 'Panthenol und Centella in trockene, entzündete Haut einbringen, um die Entzündung zu mildern und Feuchtigkeitskanäle zu öffnen.'
-                          : 'Infuse Panthenol and Centella into dry, heated skin to soothe inflammation and open hydration channels.',
+                            ? 'Panthenol und Centella in trockene, entzündete Haut einbringen, um die Entzündung zu mildern und Feuchtigkeitskanäle zu öffnen.'
+                            : 'Infuse Panthenol and Centella into dry, heated skin to soothe inflammation and open hydration channels.',
                       },
                       {
                         step: lang === 'ko' ? '3. 잠그기 (Lock)' : lang === 'de' ? '3. Versiegeln (Lock)' : '3. Lock',
@@ -763,8 +763,8 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                         desc: lang === 'ko'
                           ? '세라마이드, 콜레스테롤로 구성된 보습제를 덮어 가짜 장벽을 만듭니다. 수분 증발을 차단해 스스로 회복할 시간을 줍니다.'
                           : lang === 'de'
-                          ? 'Ceramid-reiche Feuchtigkeitspflege auftragen, um eine künstliche Lipidbarriere zu schaffen und Feuchtigkeitsverlust zu stoppen.'
-                          : 'Create an artificial lipid shield with ceramides to prevent moisture loss and secure time for self-recovery.',
+                            ? 'Ceramid-reiche Feuchtigkeitspflege auftragen, um eine künstliche Lipidbarriere zu schaffen und Feuchtigkeitsverlust zu stoppen.'
+                            : 'Create an artificial lipid shield with ceramides to prevent moisture loss and secure time for self-recovery.',
                       },
                     ] as const).map((item, i) => (
                       <motion.div key={i}
@@ -812,125 +812,125 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
               ) : (
                 /* ── Normal Insights: Flag banners + 9-axis grid + Skin cycle ── */
                 <>
-              {/* Flag banners */}
-              {result.active_flags?.map((flag) => {
-                const msg = FLAG_MESSAGES[flag];
-                if (!msg) return null;
-                return (
-                  <div key={flag} style={{
-                    padding: 8, borderRadius: 10, marginBottom: 8,
-                    background: 'rgba(226,75,74,0.04)', border: '1px solid rgba(226,75,74,0.1)',
-                    display: 'flex', alignItems: 'flex-start', gap: 8,
-                  }}>
-                    <span style={{ fontSize: 16 }}>{msg.icon}</span>
-                    <div>
-                  <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 600, color: '#E24B4A', margin: 0 }}>{msg.title[lang] ?? msg.title.en}</p>
-                      <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: tok.textSecondary, margin: '2px 0 0', lineHeight: 1.4 }}>{msg.body[lang] ?? msg.body.en}</p>
-                    </div>
-                  </div>
-                );
-              })}
+                  {/* Flag banners */}
+                  {result.active_flags?.map((flag) => {
+                    const msg = FLAG_MESSAGES[flag];
+                    if (!msg) return null;
+                    return (
+                      <div key={flag} style={{
+                        padding: 8, borderRadius: 10, marginBottom: 8,
+                        background: 'rgba(226,75,74,0.04)', border: '1px solid rgba(226,75,74,0.1)',
+                        display: 'flex', alignItems: 'flex-start', gap: 8,
+                      }}>
+                        <span style={{ fontSize: 16 }}>{msg.icon}</span>
+                        <div>
+                          <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 600, color: '#E24B4A', margin: 0 }}>{msg.title[lang] ?? msg.title.en}</p>
+                          <p style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)', color: tok.textSecondary, margin: '2px 0 0', lineHeight: 1.4 }}>{msg.body[lang] ?? msg.body.en}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
 
-              {/* 9 Axis grid */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(56px, 1fr))',
-                gap: 'clamp(8px, 2vw, 16px)',
-                justifyItems: 'center',
-                marginBottom: 'clamp(12px, 2vw, 16px)',
-              }}>
-                {activeAxes.map(({ axis, score }) => (
-                  <button key={axis} onClick={() => setExpandedAxis(expandedAxis === axis ? null : axis)}
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}>
-                    <CircularScore axis={axis} score={score} lang={lang} size={56} isDark={isDark} />
-                  </button>
-                ))}
-              </div>
-
-              {/* Axis detail card */}
-              <AnimatePresence>
-                {expandedAxis && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
-                    style={{ overflow: 'hidden', marginBottom: 12 }}>
-                    <div style={{
-                      padding: 10, borderRadius: 10,
-                      background: tok.bgCard, border: `1px solid ${tok.border}`,
-                    }}>
-                      <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500, color: tok.text, margin: '0 0 4px' }}>
-                        {axisLabel(expandedAxis, lang)} ({Math.round(toHealthScore(expandedAxis, result.axis_scores[expandedAxis] ?? 0))}/100)
-                      </p>
-                      <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary, lineHeight: 1.5, margin: 0 }}>
-                        {AXIS_INTERPRETATIONS[expandedAxis]?.[lang]?.(result.axis_scores[expandedAxis] ?? 0) ?? ''}
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Skin Cell Turnover Cycle Card */}
-              <div style={{
-                padding: 14, borderRadius: 12,
-                background: tok.bgCard, border: `1px solid ${tok.border}`,
-              }}>
-                <p style={{
-                  fontSize: 'clamp(0.625rem, 1vw, 0.75rem)', fontWeight: 600,
-                  letterSpacing: '0.18em', textTransform: 'uppercase',
-                  color: tok.textTertiary, textAlign: 'center', marginBottom: 8,
-                }}>{tx('skin_cycle_eyebrow', lang)}</p>
-
-                <div style={{ textAlign: 'center', marginBottom: 10 }}>
-                  <span style={{ fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: tok.text }}>{cycleDays}</span>
-                  <span style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.75rem)', color: tok.textSecondary, marginLeft: 4 }}>{tx('skin_cycle_unit', lang)}</span>
-                  <p style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary, margin: '4px 0 0' }}>
-                    {tx('skin_cycle_age_desc', lang, { age: ageLabel[lang] ?? ageLabel.en })}
-                  </p>
-                </div>
-
-                {/* Progress bar */}
-                <div style={{ position: 'relative', marginBottom: 8 }}>
+                  {/* 9 Axis grid */}
                   <div style={{
-                    height: 8, borderRadius: 4, width: '100%',
-                    background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(56px, 1fr))',
+                    gap: 'clamp(8px, 2vw, 16px)',
+                    justifyItems: 'center',
+                    marginBottom: 'clamp(12px, 2vw, 16px)',
                   }}>
-                    <div style={{
-                      height: '100%', borderRadius: 4, width: '100%',
-                      background: 'linear-gradient(90deg, #4A9E68, #BA7517)',
-                    }} />
+                    {activeAxes.map(({ axis, score }) => (
+                      <button key={axis} onClick={() => setExpandedAxis(expandedAxis === axis ? null : axis)}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4 }}>
+                        <CircularScore axis={axis} score={score} lang={lang} size={56} isDark={isDark} />
+                      </button>
+                    ))}
                   </div>
+
+                  {/* Axis detail card */}
+                  <AnimatePresence>
+                    {expandedAxis && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+                        style={{ overflow: 'hidden', marginBottom: 12 }}>
+                        <div style={{
+                          padding: 10, borderRadius: 10,
+                          background: tok.bgCard, border: `1px solid ${tok.border}`,
+                        }}>
+                          <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500, color: tok.text, margin: '0 0 4px' }}>
+                            {axisLabel(expandedAxis, lang)} ({Math.round(toHealthScore(expandedAxis, result.axis_scores[expandedAxis] ?? 0))}/100)
+                          </p>
+                          <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary, lineHeight: 1.5, margin: 0 }}>
+                            {AXIS_INTERPRETATIONS[expandedAxis]?.[lang]?.(result.axis_scores[expandedAxis] ?? 0) ?? ''}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Skin Cell Turnover Cycle Card */}
                   <div style={{
-                    position: 'absolute', top: -4, left: '50%', transform: 'translateX(-50%)',
-                    width: 2, height: 16, borderRadius: 1,
-                    background: isDark ? '#F5F5F7' : '#1B2838',
-                  }} />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textTertiary }}>Day 1 · {tx('day_start', lang)}</span>
-                  <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textTertiary }}>Day {cycleDays} · {tx('day_end', lang)}</span>
-                </div>
+                    padding: 14, borderRadius: 12,
+                    background: tok.bgCard, border: `1px solid ${tok.border}`,
+                  }}>
+                    <p style={{
+                      fontSize: 'clamp(0.625rem, 1vw, 0.75rem)', fontWeight: 600,
+                      letterSpacing: '0.18em', textTransform: 'uppercase',
+                      color: tok.textTertiary, textAlign: 'center', marginBottom: 8,
+                    }}>{tx('skin_cycle_eyebrow', lang)}</p>
 
-                {/* Three metric boxes */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 10 }}>
-                  {[
-                    { weeks: Math.round(cycleDays / 7), label: tx('cycle_checkin', lang), bg: 'rgba(74,158,104,0.04)', border: 'rgba(74,158,104,0.1)', color: tok.accent },
-                    { weeks: Math.round(cycleDays * 2 / 7), label: tx('cycle_refill', lang), bg: 'rgba(186,117,23,0.04)', border: 'rgba(186,117,23,0.1)', color: '#BA7517' },
-                    { weeks: Math.round(cycleDays * 4 / 7), label: tx('cycle_results', lang), bg: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', border: tok.border, color: tok.text },
-                  ].map(({ weeks, label, bg, border, color }) => (
-                    <div key={label} style={{
-                      padding: 8, borderRadius: 8, textAlign: 'center',
-                      background: bg, border: `1px solid ${border}`,
-                    }}>
-                      <div style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color }}>{weeks}{tx('skin_cycle_unit', lang) === '일' ? '주' : (lang === 'de' ? ' Wo.' : 'wk')}</div>
-                      <div style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textSecondary, marginTop: 2 }}>{label}</div>
+                    <div style={{ textAlign: 'center', marginBottom: 10 }}>
+                      <span style={{ fontSize: 'clamp(1.5rem, 2.5vw, 2rem)', fontWeight: 300, color: tok.text }}>{cycleDays}</span>
+                      <span style={{ fontSize: 'clamp(0.6875rem, 1vw, 0.75rem)', color: tok.textSecondary, marginLeft: 4 }}>{tx('skin_cycle_unit', lang)}</span>
+                      <p style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary, margin: '4px 0 0' }}>
+                        {tx('skin_cycle_age_desc', lang, { age: ageLabel[lang] ?? ageLabel.en })}
+                      </p>
                     </div>
-                  ))}
-                </div>
 
-                <p style={{
-                  fontSize: 'clamp(0.75rem, 1vw, 0.875rem)',
-                  color: tok.textSecondary, lineHeight: 1.6, textAlign: 'center', margin: 0,
-                }}>{tx('cycle_explanation', lang, { N: cycleDays })}</p>
-              </div>
+                    {/* Progress bar */}
+                    <div style={{ position: 'relative', marginBottom: 8 }}>
+                      <div style={{
+                        height: 8, borderRadius: 4, width: '100%',
+                        background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+                      }}>
+                        <div style={{
+                          height: '100%', borderRadius: 4, width: '100%',
+                          background: 'linear-gradient(90deg, #4A9E68, #BA7517)',
+                        }} />
+                      </div>
+                      <div style={{
+                        position: 'absolute', top: -4, left: '50%', transform: 'translateX(-50%)',
+                        width: 2, height: 16, borderRadius: 1,
+                        background: isDark ? '#F5F5F7' : '#1B2838',
+                      }} />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textTertiary }}>Day 1 · {tx('day_start', lang)}</span>
+                      <span style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textTertiary }}>Day {cycleDays} · {tx('day_end', lang)}</span>
+                    </div>
+
+                    {/* Three metric boxes */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6, marginBottom: 10 }}>
+                      {[
+                        { weeks: Math.round(cycleDays / 7), label: tx('cycle_checkin', lang), bg: 'rgba(74,158,104,0.04)', border: 'rgba(74,158,104,0.1)', color: tok.accent },
+                        { weeks: Math.round(cycleDays * 2 / 7), label: tx('cycle_refill', lang), bg: 'rgba(186,117,23,0.04)', border: 'rgba(186,117,23,0.1)', color: '#BA7517' },
+                        { weeks: Math.round(cycleDays * 4 / 7), label: tx('cycle_results', lang), bg: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)', border: tok.border, color: tok.text },
+                      ].map(({ weeks, label, bg, border, color }) => (
+                        <div key={label} style={{
+                          padding: 8, borderRadius: 8, textAlign: 'center',
+                          background: bg, border: `1px solid ${border}`,
+                        }}>
+                          <div style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)', fontWeight: 500, color }}>{weeks}{tx('skin_cycle_unit', lang) === '일' ? '주' : (lang === 'de' ? ' Wo.' : 'wk')}</div>
+                          <div style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: tok.textSecondary, marginTop: 2 }}>{label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p style={{
+                      fontSize: 'clamp(0.75rem, 1vw, 0.875rem)',
+                      color: tok.textSecondary, lineHeight: 1.6, textAlign: 'center', margin: 0,
+                    }}>{tx('cycle_explanation', lang, { N: cycleDays })}</p>
+                  </div>
                 </>
               )}
             </motion.div>

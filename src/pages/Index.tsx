@@ -18,11 +18,12 @@ import RecheckBanner from "@/features/results/components/RecheckBanner";
 import { useI18nStore, phase1T } from "@/store/i18nStore";
 import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 import { useSkinAnalysisStore } from "@/store/skinAnalysisStore";
 import type { AxisKey, Product } from "@/engine/types";
 import type { LucideIcon } from "lucide-react";
 import { tokens, brand, button } from "@/lib/designTokens";
+import { formatGrundpreis } from "@/utils/priceUtils";
 import AISkinAnalysisHero from "@/components/home/AISkinAnalysisHero";
 import AIScanOverlay from "@/components/hero/AIScanOverlay";
 import { HeroCtaButtons } from "@/components/hero/HeroCtaButtons";
@@ -38,7 +39,7 @@ import { StickyBottomCta } from "@/components/home/StickyBottomCta";
 
 // ── Intent-based prefetching — preload lazy chunks on hover/touch ─────────────
 const prefetchSkinAnalysis = () => { import("./SkinAnalysisPage"); };
-const prefetchDiagnosis    = () => { import("./Diagnosis"); };
+const prefetchAnalysis = () => { import("./Analysis"); };
 
 // ── Design tokens (consumed from designTokens.ts via tokens() helper) ─────────
 const BRONZE = "var(--ssl-accent-deep)";  // kept for non-active icon fallback
@@ -109,163 +110,163 @@ function HeroSlider({ accent, accentDeep, isDark, language }: {
             const ghostBorder = (isAIScanSlide || isDark) ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)';
 
             return (
-            <div key={i} className="relative flex-[0_0_100%] h-full min-w-0">
-              {isAIScanSlide ? (
-                <>
-                  {/* Slide 2: dark base background (fullscreen) */}
-                  <div
-                    className="absolute inset-0 z-0"
-                    style={{
-                      background: isDark
-                        ? "linear-gradient(135deg, #0a0d12 0%, #111418 50%, #0d1210 100%)"
-                        : "linear-gradient(135deg, #0e1114 0%, #141a1e 50%, #0f1612 100%)",
-                    }}
-                  />
-                  {/* Group: portrait + overlay + data tags — full size, no scale */}
-                  <div
-                    className="absolute inset-0 z-[1] md:translate-y-0"
-                  >
-                    <img
-                      src={img}
-                      alt={allSlides[i]?.headline ?? ""}
-                      className="absolute inset-0 w-full h-full object-cover object-top md:translate-x-[13%] md:object-center"
-                      loading="lazy"
+              <div key={i} className="relative flex-[0_0_100%] h-full min-w-0">
+                {isAIScanSlide ? (
+                  <>
+                    {/* Slide 2: dark base background (fullscreen) */}
+                    <div
+                      className="absolute inset-0 z-0"
+                      style={{
+                        background: isDark
+                          ? "linear-gradient(135deg, #0a0d12 0%, #111418 50%, #0d1210 100%)"
+                          : "linear-gradient(135deg, #0e1114 0%, #141a1e 50%, #0f1612 100%)",
+                      }}
                     />
-                    {/* Overlay wrapper: data tags + scan line anchored to image */}
-                    {current === i && (
-                      <div className="absolute inset-0 z-[5] pointer-events-none">
-                        <div className="absolute top-0 left-0 w-full md:left-[37%] md:w-[50%] h-full">
-                          <AIScanOverlay />
+                    {/* Group: portrait + overlay + data tags — full size, no scale */}
+                    <div
+                      className="absolute inset-0 z-[1] md:translate-y-0"
+                    >
+                      <img
+                        src={img}
+                        alt={allSlides[i]?.headline ?? ""}
+                        className="absolute inset-0 w-full h-full object-cover object-top md:translate-x-[13%] md:object-center"
+                        loading="lazy"
+                      />
+                      {/* Overlay wrapper: data tags + scan line anchored to image */}
+                      {current === i && (
+                        <div className="absolute inset-0 z-[5] pointer-events-none">
+                          <div className="absolute top-0 left-0 w-full md:left-[37%] md:w-[50%] h-full">
+                            <AIScanOverlay />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                </>
-              ) : (
-                <img
-                  src={img}
-                  alt={allSlides[i]?.headline ?? ""}
-                  className={`absolute inset-0 w-full h-full object-cover ${i === 0 ? 'object-[center_15%] md:object-[92%_center]' : ''}`}
-                  style={{ zIndex: 0 }}
-                  loading={i === 0 ? "eager" : "lazy"}
-                />
-              )}
-              {/* Dark gradient overlay — mobile: bottom-heavy, desktop: left-to-right */}
-              {isAIScanSlide ? (
-                <>
-                  {/* AI scan mobile gradient: starts at 50% for clean face/text zone split */}
-                  <div
-                    className="absolute inset-0 pointer-events-none md:hidden"
-                    style={{
-                      background: "linear-gradient(to top, rgba(0,0,0,0.93) 0%, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.05) 65%, transparent 100%)",
-                      zIndex: 2,
-                    }}
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <img
+                    src={img}
+                    alt={allSlides[i]?.headline ?? ""}
+                    className={`absolute inset-0 w-full h-full object-cover ${i === 0 ? 'object-[center_15%] md:object-[92%_center]' : ''}`}
+                    style={{ zIndex: 0 }}
+                    loading={i === 0 ? "eager" : "lazy"}
                   />
-                  {/* AI scan desktop gradient */}
-                  <div
-                    className="absolute inset-0 pointer-events-none hidden md:block"
-                    style={{
-                      background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 35%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)",
-                      zIndex: 2,
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  {/* Mobile gradient: bottom-heavy for face visibility */}
-                  <div
-                    className="absolute inset-0 pointer-events-none md:hidden"
-                    style={{
-                      background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.12) 60%, rgba(0,0,0,0.03) 100%)",
-                      zIndex: 1,
-                    }}
-                  />
-                  {/* Desktop gradient: left-to-right for landscape */}
-                  <div
-                    className="absolute inset-0 pointer-events-none hidden md:block"
-                    style={{
-                      background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)",
-                      zIndex: 1,
-                    }}
-                  />
-                </>
-              )}
-              {/* Dreamy mist overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: isAIScanSlide
-                    ? "radial-gradient(ellipse 50% 60% at 75% 30%, rgba(201,169,110,0.08) 0%, rgba(45,107,74,0.06) 50%, transparent 100%)"
-                    : isDark
-                      ? "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(45,107,74,0.32) 0%, rgba(160,130,80,0.14) 55%, transparent 100%)"
-                      : "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(122,158,130,0.50) 0%, rgba(45,79,57,0.22) 55%, transparent 100%)",
-                  zIndex: isAIScanSlide ? 3 : 2,
-                  mixBlendMode: isAIScanSlide ? "normal" : isDark ? "screen" : "multiply",
-                }}
-              />
-              {/* Soft inset border glow */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  boxShadow: isDark
-                    ? "inset 0 0 140px rgba(45,107,74,0.22), inset 0 -60px 80px rgba(160,130,80,0.10)"
-                    : "inset 0 0 140px rgba(122,158,130,0.28), inset 0 -60px 80px rgba(45,79,57,0.12)",
-                  zIndex: isAIScanSlide ? 4 : 3,
-                }}
-              />
-              {/* Text + CTA — sits in bottom zone */}
-              <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-20 px-6 md:px-20 lg:px-28" style={{ zIndex: 10 }}>
-                <motion.p
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
-                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-3 md:mb-4 notranslate"
-                  style={{ color: accent, fontFamily: "var(--font-sans)" }}
-                  translate="no"
-                >
-                  S<span>k</span>in S<span>t</span>rategy L<span>a</span>b
-                </motion.p>
-                <motion.h1
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
-                  transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className={`text-white ${(i === 0 || i === 1) ? 'text-[26px]' : 'text-3xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-3' : 'mb-2 md:mb-5'} font-light`}
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  {allSlides[i]?.headline?.split('\n').map((line, idx, arr) => (
-                    <span key={idx}>
-                      {line}
-                      {idx < arr.length - 1 && <br />}
-                    </span>
-                  ))}
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
-                  transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-                  className={`text-white/80 text-sm md:text-lg leading-relaxed ${isAIScanSlide ? 'mb-6' : 'mb-3 md:mb-8'} max-w-lg break-keep`}
-                  style={{ fontFamily: "var(--font-sans)" }}
-                >
-                  {allSlides[i]?.sub?.split('\n').map((line, idx, arr) => (
-                    <span key={idx}>
-                      {line}
-                      {idx < arr.length - 1 && <br />}
-                    </span>
-                  ))}
-                </motion.p>
-                {/* ── Premium Dual CTA (gold shimmer + glass) ── */}
+                )}
+                {/* Dark gradient overlay — mobile: bottom-heavy, desktop: left-to-right */}
+                {isAIScanSlide ? (
+                  <>
+                    {/* AI scan mobile gradient: starts at 50% for clean face/text zone split */}
+                    <div
+                      className="absolute inset-0 pointer-events-none md:hidden"
+                      style={{
+                        background: "linear-gradient(to top, rgba(0,0,0,0.93) 0%, rgba(0,0,0,0.78) 30%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.05) 65%, transparent 100%)",
+                        zIndex: 2,
+                      }}
+                    />
+                    {/* AI scan desktop gradient */}
+                    <div
+                      className="absolute inset-0 pointer-events-none hidden md:block"
+                      style={{
+                        background: "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.65) 35%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)",
+                        zIndex: 2,
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    {/* Mobile gradient: bottom-heavy for face visibility */}
+                    <div
+                      className="absolute inset-0 pointer-events-none md:hidden"
+                      style={{
+                        background: "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 35%, rgba(0,0,0,0.12) 60%, rgba(0,0,0,0.03) 100%)",
+                        zIndex: 1,
+                      }}
+                    />
+                    {/* Desktop gradient: left-to-right for landscape */}
+                    <div
+                      className="absolute inset-0 pointer-events-none hidden md:block"
+                      style={{
+                        background: "linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%)",
+                        zIndex: 1,
+                      }}
+                    />
+                  </>
+                )}
+                {/* Dreamy mist overlay */}
                 <div
-                  onMouseEnter={() => { prefetchSkinAnalysis(); prefetchDiagnosis(); }}
-                  onTouchStart={() => { prefetchSkinAnalysis(); prefetchDiagnosis(); }}
-                >
-                  <HeroCtaButtons
-                    lang={lang}
-                    onPrimary={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
-                    onSecondary={() => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); }}
-                  />
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: isAIScanSlide
+                      ? "radial-gradient(ellipse 50% 60% at 75% 30%, rgba(201,169,110,0.08) 0%, rgba(45,107,74,0.06) 50%, transparent 100%)"
+                      : isDark
+                        ? "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(45,107,74,0.32) 0%, rgba(160,130,80,0.14) 55%, transparent 100%)"
+                        : "radial-gradient(ellipse 70% 60% at 72% 25%, rgba(122,158,130,0.50) 0%, rgba(45,79,57,0.22) 55%, transparent 100%)",
+                    zIndex: isAIScanSlide ? 3 : 2,
+                    mixBlendMode: isAIScanSlide ? "normal" : isDark ? "screen" : "multiply",
+                  }}
+                />
+                {/* Soft inset border glow */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    boxShadow: isDark
+                      ? "inset 0 0 140px rgba(45,107,74,0.22), inset 0 -60px 80px rgba(160,130,80,0.10)"
+                      : "inset 0 0 140px rgba(122,158,130,0.28), inset 0 -60px 80px rgba(45,79,57,0.12)",
+                    zIndex: isAIScanSlide ? 4 : 3,
+                  }}
+                />
+                {/* Text + CTA — sits in bottom zone */}
+                <div className="absolute inset-0 flex flex-col justify-end pb-10 md:pb-20 px-6 md:px-20 lg:px-28" style={{ zIndex: 10 }}>
+                  <motion.p
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    className="text-[0.62rem] tracking-[0.3em] uppercase font-medium mb-3 md:mb-4 notranslate"
+                    style={{ color: accent, fontFamily: "var(--font-sans)" }}
+                    translate="no"
+                  >
+                    S<span>k</span>in S<span>t</span>rategy L<span>a</span>b
+                  </motion.p>
+                  <motion.h1
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 16 }}
+                    transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    className={`text-white ${(i === 0 || i === 1) ? 'text-[26px]' : 'text-3xl'} md:text-5xl lg:text-5xl xl:text-6xl leading-[1.15] ${isAIScanSlide ? 'mb-3' : 'mb-2 md:mb-5'} font-light`}
+                    style={{ fontFamily: "var(--font-display)" }}
+                  >
+                    {allSlides[i]?.headline?.split('\n').map((line, idx, arr) => (
+                      <span key={idx}>
+                        {line}
+                        {idx < arr.length - 1 && <br />}
+                      </span>
+                    ))}
+                  </motion.h1>
+                  <motion.p
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: current === i ? 1 : 0, y: current === i ? 0 : 12 }}
+                    transition={{ duration: 0.6, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+                    className={`text-white/80 text-sm md:text-lg leading-relaxed ${isAIScanSlide ? 'mb-6' : 'mb-3 md:mb-8'} max-w-lg break-keep`}
+                    style={{ fontFamily: "var(--font-sans)" }}
+                  >
+                    {allSlides[i]?.sub?.split('\n').map((line, idx, arr) => (
+                      <span key={idx}>
+                        {line}
+                        {idx < arr.length - 1 && <br />}
+                      </span>
+                    ))}
+                  </motion.p>
+                  {/* ── Premium Dual CTA (gold shimmer + glass) ── */}
+                  <div
+                    onMouseEnter={() => { prefetchSkinAnalysis(); prefetchAnalysis(); }}
+                    onTouchStart={() => { prefetchSkinAnalysis(); prefetchAnalysis(); }}
+                  >
+                    <HeroCtaButtons
+                      lang={lang}
+                      onPrimary={() => { useAnalysisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
+                      onSecondary={() => { useAnalysisStore.getState().reset(); navigate('/skin-assessment'); }}
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
             );
           })}
         </div>
@@ -476,9 +477,16 @@ function ConcernSection({
                                 {name}
                               </p>
                             </Link>
-                            <p className="text-sm font-medium mb-2" style={{ color: theme.accent }}>
-                              €{(product.price ?? product.price_eur).toFixed(2)}
-                            </p>
+                            <div className="mb-3">
+                              <p className="text-sm font-medium" style={{ color: theme.accent }}>
+                                €{(product.price ?? product.price_eur).toFixed(2)}
+                              </p>
+                              {(() => {
+                                // @ts-expect-error type leniency for volume_ml
+                                const gp = formatGrundpreis(product.price ?? product.price_eur, product.volume_ml);
+                                return gp ? <span className="text-[11px] mt-0.5 text-muted-foreground whitespace-nowrap block">{gp}</span> : null;
+                              })()}
+                            </div>
                             <button
                               onClick={() => onAddToCart(product)}
                               disabled={state === "adding"}
@@ -548,7 +556,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
   addLabel: string;
 }) {
   const { language } = useI18nStore();
-  
+
   const routineSlices = [
     products.slice(0, Math.min(products.length, 6)),
     products.slice(0, Math.min(products.length, 8)),
@@ -574,7 +582,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
         <div className="space-y-16 md:space-y-24">
           {cards.map((card, i) => {
             const rowProducts = routineSlices[i] ?? products;
-            
+
             return (
               <motion.div
                 key={i}
@@ -603,16 +611,16 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                       // e.currentTarget.style.opacity = '0';
                     }}
                   />
-                  
+
                   {/* UPDATE: Conditional Dimmed Overlay for Contrast (Approached per specific feedback) */}
                   <div
                     className="absolute inset-0 transition-all duration-300"
-                    style={{ 
+                    style={{
                       // Apply stronger "light" overlay in Light Mode to protect dark text.
                       background: isDark ? overlayGradients.dark : overlayGradients.light,
                     }}
                   />
-                  
+
                   <div className="absolute bottom-0 left-0 p-6 md:p-8">
                     <span
                       className="text-xs tracking-[0.2em] md:tracking-[0.25em] uppercase font-semibold block mb-2 drop-shadow-md"
@@ -627,22 +635,22 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                       {card.title}
                     </h3>
                     <p className="text-white/80 text-sm leading-relaxed max-w-[200px] whitespace-pre-line drop-shadow-md">{card.desc}</p>
-                    
+
                     {/* FEEDBACK ADDRESS: The CTA Link contrast. We need either: */}
                     {/* 1. Use light accent text (white/very light green). (Current design uses standard accent). */}
                     {/* 2. Strengthen the overlay. I strengthened the overlay to the MAX (0.95), but dark green text is still hard. */}
                     {/* RECOMMENDATION: We SHOULD switch text to white with a text-shadow OR dynamic light accent if it is a moody image. */}
-                    
+
                     <Link
-                      to="/diagnosis"
-                      onMouseEnter={prefetchDiagnosis}
-                      onTouchStart={prefetchDiagnosis}
+                      to="/analysis"
+                      onMouseEnter={prefetchAnalysis}
+                      onTouchStart={prefetchAnalysis}
                       className="inline-flex items-center mt-6 text-sm md:text-base font-medium tracking-wide hover:opacity-75 transition-opacity drop-shadow-md"
-                      style={{ 
+                      style={{
                         // Architect Recommendation: Conditional text color.
                         // isDark ? accent : "white"
-                        color: accent, 
-                        fontFamily: "var(--font-sans)" 
+                        color: accent,
+                        fontFamily: "var(--font-sans)"
                       }}
                     >
                       {card.cta} →
@@ -665,7 +673,7 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                         const state = cartStates[product.id] ?? "idle";
                         const pn = product.name;
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      const name = typeof pn === "string" ? pn : ((pn as any)[language] ?? pn.de ?? pn.en);
+                        const name = typeof pn === "string" ? pn : ((pn as any)[language] ?? pn.de ?? pn.en);
                         return (
                           <div
                             key={product.id}
@@ -684,9 +692,16 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
                                   {name}
                                 </p>
                               </Link>
-                              <p className="text-sm font-medium mb-2" style={{ color: accent }}>
-                                €{(product.price ?? product.price_eur).toFixed(2)}
-                              </p>
+                              <div className="mb-3">
+                                <p className="text-sm font-medium" style={{ color: accent }}>
+                                  €{(product.price ?? product.price_eur).toFixed(2)}
+                                </p>
+                                {(() => {
+                                  // @ts-expect-error type leniency for volume_ml
+                                  const gp = formatGrundpreis(product.price ?? product.price_eur, product.volume_ml);
+                                  return gp ? <span className="text-[11px] mt-0.5 text-muted-foreground whitespace-nowrap block">{gp}</span> : null;
+                                })()}
+                              </div>
                               <button
                                 onClick={() => onAddToCart(product)}
                                 disabled={state === "adding"}
@@ -726,8 +741,8 @@ function RoutineShowcase({ title, sub, cards, products, cartStates, onAddToCart,
   );
 }
 
-// ── Diagnosis Banner ──────────────────────────────────────────────────────────
-function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }: { headline: string; sub: string; accent: string; accentDeep: string; isDark: boolean; language: string }) {
+// ── Analysis Banner ──────────────────────────────────────────────────────────
+function AnalysisBanner({ headline, sub, accent, accentDeep, isDark, language }: { headline: string; sub: string; accent: string; accentDeep: string; isDark: boolean; language: string }) {
   const navigate = useNavigate();
   const lang = language as HeroLang;
 
@@ -789,8 +804,8 @@ function DiagnosisBanner({ headline, sub, accent, accentDeep, isDark, language }
         >
           <HeroCtaButtons
             lang={lang}
-            onPrimary={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
-            onSecondary={() => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); }}
+            onPrimary={() => { useAnalysisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
+            onSecondary={() => { useAnalysisStore.getState().reset(); navigate('/analysis'); }}
           />
         </motion.div>
       </div>
@@ -921,7 +936,7 @@ export default function Index() {
       <main>
         <LandingHero lang={lang} />
         <HowItWorks lang={lang} />
-        
+
         {/* Ihr Hautanliegen */}
         <InteractiveFunnel
           title={p1.home.concernTitle}
@@ -948,10 +963,10 @@ export default function Index() {
         />
 
         <CommunityTrust lang={lang} />
-        
-        <StickyBottomCta 
-          lang={lang} 
-          onPrimary={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
+
+        <StickyBottomCta
+          lang={lang}
+          onPrimary={() => { useAnalysisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
         />
       </main>
 

@@ -1,4 +1,4 @@
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 import { useI18nStore, translations } from "@/store/i18nStore";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -18,7 +18,7 @@ export default function GlobalProgressLine({
     activeSegment: activeSegmentOverride,
     stepLabel,
 }: GlobalProgressLineProps = {}) {
-    const store = useDiagnosisStore();
+    const store = useAnalysisStore();
     const { language } = useI18nStore();
     const t = translations[language];
 
@@ -48,15 +48,15 @@ export default function GlobalProgressLine({
 
     // Encouragement logic
     const progress = activeSegmentIndex / Math.max(1, segments - 1);
-    let encouragement = t.diagnosis.progress.enc1;
+    let encouragement = t.analysis.progress.enc1;
     if (isFinale) {
-        encouragement = t.diagnosis.progress.encFinal;
+        encouragement = t.analysis.progress.encFinal;
     } else if (progress >= 0.75) {
-        encouragement = t.diagnosis.progress.enc4;
+        encouragement = t.analysis.progress.enc4;
     } else if (progress >= 0.5) {
-        encouragement = t.diagnosis.progress.enc3;
+        encouragement = t.analysis.progress.enc3;
     } else if (progress >= 0.25) {
-        encouragement = t.diagnosis.progress.enc2;
+        encouragement = t.analysis.progress.enc2;
     }
 
     // Typography logic
@@ -67,8 +67,8 @@ export default function GlobalProgressLine({
 
     const displayLabel = stepLabel ?? (
         isFinale
-            ? t.diagnosis.progress.processing
-            : `${t.diagnosis.progress.category} ${activeSegmentIndex + 1} ${t.diagnosis.progress.of} ${segments}`
+            ? t.analysis.progress.processing
+            : `${t.analysis.progress.category} ${activeSegmentIndex + 1} ${t.analysis.progress.of} ${segments}`
     );
 
     return (

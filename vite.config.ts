@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: "SkinStrategyLab",
         short_name: "SkinStrategy",
-        description: "AI-powered clinical skin analysis",
+        description: "AI-powered professional skin analysis",
         theme_color: "#0d0d12",
         background_color: "#0d0d12",
         display: "standalone",

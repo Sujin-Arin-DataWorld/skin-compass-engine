@@ -40,7 +40,7 @@ export type SkinProfile =
 
 export type Severity = 'mild' | 'moderate' | 'severe' | 'extreme';
 
-export type DiagnosisAxis =
+export type AssessmentAxis =
   | 'sebum' | 'hydration' | 'pores' | 'texture'
   | 'sensitivity' | 'aging' | 'pigmentation' | 'barrier'
   | 'neurodermatitis';
@@ -52,16 +52,16 @@ export type TimeOfDay = 'AM' | 'PM' | 'both';
 // ============================================
 
 export const SEVERITY_THRESHOLDS: Record<Severity, [number, number]> = {
-  mild:     [0, 25],
+  mild: [0, 25],
   moderate: [26, 50],
-  severe:   [51, 75],
-  extreme:  [76, 100],
+  severe: [51, 75],
+  extreme: [76, 100],
 };
 
 export function scoreToSeverity(score: number): Severity {
   if (score >= 80) return 'extreme';    // severity 3 (100) or stacked → extreme
   if (score >= 46) return 'severe';     // severity 2 single concern (67) → severe
-  if (score > 0)   return 'moderate';   // severity 1 single concern (33) → moderate
+  if (score > 0) return 'moderate';   // severity 1 single concern (33) → moderate
   return 'mild';
 }
 
@@ -130,11 +130,11 @@ export interface Product {
 }
 
 // ============================================
-// Zone Diagnosis
+// Zone Analysis
 // ============================================
 
 export interface AxisScore {
-  axis: DiagnosisAxis;
+  axis: AssessmentAxis;
   score: number;
   severity: Severity;
 }
@@ -152,12 +152,12 @@ export interface RequiredIngredient {
   contraindicated_with: string[];
 }
 
-export interface ZoneDiagnosis {
+export interface ZoneAssessment {
   zone: FaceZone;
   axis_scores: AxisScore[];
   matched_profile: SkinProfile;
   required_ingredients: RequiredIngredient[];
-  /** Detected from diagnosis questionnaire — triggers rosacea concentration adjustments */
+  /** Detected from analysis questionnaire — triggers rosacea concentration adjustments */
   is_rosacea_prone?: boolean;
 }
 
@@ -169,12 +169,12 @@ export type GateStatus = 'recovery_only' | 'caution' | 'full_routine';
 
 export interface GlobalGateResult {
   status: GateStatus;
-  triggered_by: DiagnosisAxis | null;
+  triggered_by: AssessmentAxis | null;
   severity: Severity;
   message_key: string;          // i18n key, not hardcoded text
   recovery_products: Product[];
   recovery_duration_weeks: number;
-  re_diagnosis_cta: boolean;
+  re_analysis_cta: boolean;
 }
 
 // ============================================
@@ -222,7 +222,7 @@ export interface PhConflict {
 
 export interface FinalRoutine {
   user_id: string;
-  diagnosis_session_id: string;
+  analysis_session_id: string;
   global_gate: GateStatus;
   am_routine: RoutineStep[];
   pm_routine: RoutineStep[];
@@ -242,8 +242,8 @@ export interface FinalRoutine {
 // ============================================
 
 export interface LabSelectionState {
-  // Input from diagnosis
-  zoneDiagnoses: ZoneDiagnosis[];
+  // Input from analysis
+  zoneDiagnoses: ZoneAssessment[];
 
   // Layer 1
   gateResult: GlobalGateResult | null;
@@ -254,7 +254,7 @@ export interface LabSelectionState {
   // Layer 3 - final output
   finalRoutine: FinalRoutine | null;
 
-  // Clinical safety flags (from diagnosis intake)
+  // Clinical safety flags (from analysis intake)
   isPregnantOrNursing: boolean;
   isRosaceaProne: boolean;
 
@@ -263,7 +263,7 @@ export interface LabSelectionState {
   error: string | null;
 
   // Actions
-  setZoneDiagnoses: (diagnoses: ZoneDiagnosis[]) => void;
+  setZoneDiagnoses: (diagnoses: ZoneAssessment[]) => void;
   evaluateGate: () => void;
   selectProduct: (zone: FaceZone, product: Product, tier: PriceTier) => void;
   removeProduct: (zone: FaceZone) => void;

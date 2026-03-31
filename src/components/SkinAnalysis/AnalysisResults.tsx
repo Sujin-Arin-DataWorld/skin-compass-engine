@@ -10,12 +10,14 @@ import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useSkinProfileStore } from '@/store/useSkinProfileStore';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 import { useRoutineStore } from '@/store/useRoutineStore';
 import { brand, glass } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
 import RoutinePicker from '@/components/routine/RoutinePicker';
 import AuthModal from '@/components/ui/AuthModal';
+import AiGeneratedBadge from '@/components/legal/AiGeneratedBadge';
+import MedicalDisclaimer from '@/components/legal/MedicalDisclaimer';
 import { compressImageBase64 } from '@/utils/imageCompression';
 import { AXIS_KO_SHORT } from '@/data/productRules';
 import { buildProductBundleV5 } from '@/engine/routineEngineV5';
@@ -31,11 +33,11 @@ const G = glass.card.dark;
 // ── Axis direction mapping ─────────────────────────────────────────────────
 // V5 engine: hyd = dehydration severity, bar = barrier damage → high = bad
 const HIGH_IS_BAD = new Set(['seb', 'sen', 'acne', 'pigment', 'texture', 'aging', 'ox', 'hyd', 'bar']);
-const LOW_IS_BAD  = new Set(['makeup_stability']);
+const LOW_IS_BAD = new Set(['makeup_stability']);
 
 function getSeverity(key: string, score: number): number {
   if (HIGH_IS_BAD.has(key)) return score;
-  if (LOW_IS_BAD.has(key))  return 100 - score;
+  if (LOW_IS_BAD.has(key)) return 100 - score;
   return 50;
 }
 
@@ -61,9 +63,9 @@ function getScoreTier(score: number): ScoreTier {
 
 const TIER_COLORS: Record<ScoreTier, string> = {
   excellent: '#4ECDC4',  // Neon mint
-  good:      '#8a9a7b',  // Sage
+  good: '#8a9a7b',  // Sage
   attention: '#c4a265',  // Gold
-  critical:  '#E8A87C',  // Muted coral
+  critical: '#E8A87C',  // Muted coral
 };
 
 const TIER_MESSAGES: Record<ScoreTier, Record<string, string>> = {
@@ -92,9 +94,9 @@ const TIER_MESSAGES: Record<ScoreTier, Record<string, string>> = {
 // ── Tier labels (i18n) ────────────────────────────────────────────────────
 const TIER_LABELS: Record<ScoreTier, Record<string, string>> = {
   excellent: { ko: '우수', en: 'Excellent', de: 'Ausgezeichnet' },
-  good:      { ko: '양호', en: 'Good', de: 'Gut' },
+  good: { ko: '양호', en: 'Good', de: 'Gut' },
   attention: { ko: '보통', en: 'Fair', de: 'Mäßig' },
-  critical:  { ko: '주의', en: 'Needs Care', de: 'Pflegebedarf' },
+  critical: { ko: '주의', en: 'Needs Care', de: 'Pflegebedarf' },
 };
 
 // ── Axis label helper ──────────────────────────────────────────────────────
@@ -106,16 +108,16 @@ function getAxisLabel(key: string, lang: string): string {
 
 // ── i18n texts ─────────────────────────────────────────────────────────────
 const TX = {
-  overallLabel:  { ko: '종합 피부 점수', en: 'Overall Skin Score', de: 'Gesamt-Hautpunktzahl' },
-  topConcerns:   { ko: '관리가 시급한 항목', en: 'Priority Concerns', de: 'Prioritäre Anliegen' },
-  allAxes:       { ko: '전체 상세 분석', en: 'Full Analysis', de: 'Vollständige Analyse' },
-  masterplan:    { ko: '🧪 AI가 설계한 내 맞춤 스킨케어 마스터플랜 보기', en: '🧪 View AI Custom Skincare Masterplan', de: '🧪 KI-Hautpflege-Masterplan ansehen' },
-  retake:        { ko: '다시 분석', en: 'Retake', de: 'Wiederholen' },
-  save:          { ko: '저장', en: 'Save', de: 'Speichern' },
-  saveLogin:     { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
-  saved:         { ko: '저장됨 ✓', en: 'Saved ✓', de: 'Gespeichert ✓' },
-  saveFail:      { ko: '저장 실패 — 재시도', en: 'Save failed — retry', de: 'Fehler — erneut versuchen' },
-  precision:     { ko: '정밀 분석 완료', en: 'Precision Analysis', de: 'Präzisionsanalyse' },
+  overallLabel: { ko: '종합 피부 점수', en: 'Overall Skin Score', de: 'Gesamt-Hautpunktzahl' },
+  topConcerns: { ko: '관리가 시급한 항목', en: 'Priority Concerns', de: 'Prioritäre Anliegen' },
+  allAxes: { ko: '전체 상세 분석', en: 'Full Analysis', de: 'Vollständige Analyse' },
+  masterplan: { ko: '🧪 AI가 설계한 내 맞춤 스킨케어 마스터플랜 보기', en: '🧪 View AI Custom Skincare Masterplan', de: '🧪 KI-Hautpflege-Masterplan ansehen' },
+  retake: { ko: '다시 분석', en: 'Retake', de: 'Wiederholen' },
+  save: { ko: '저장', en: 'Save', de: 'Speichern' },
+  saveLogin: { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
+  saved: { ko: '저장됨 ✓', en: 'Saved ✓', de: 'Gespeichert ✓' },
+  saveFail: { ko: '저장 실패 — 재시도', en: 'Save failed — retry', de: 'Fehler — erneut versuchen' },
+  precision: { ko: '정밀 분석 완료', en: 'Precision Analysis', de: 'Präzisionsanalyse' },
   precisionDesc: { ko: 'AI 사진 + 생활습관 통합 분석', en: 'AI Photo + Lifestyle Integrated', de: 'KI-Foto + Lebensstil-Analyse' },
 };
 
@@ -276,7 +278,7 @@ export default function AnalysisResults({
   const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
   const apiReasons = useSkinAnalysisStore((s) => s.reasons);
   const hasLifestyle = lifestyleAnswers !== null;
-  const setResult = useDiagnosisStore((s) => s.setResult);
+  const setResult = useAnalysisStore((s) => s.setResult);
 
   const lang = language as 'ko' | 'en' | 'de';
 
@@ -339,7 +341,7 @@ export default function AnalysisResults({
       active_flags: [],
       radar_chart_data: [],
       product_bundle: {} as Record<string, unknown>,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
 
     // V5 Engine: build product bundle for selected tier
@@ -368,7 +370,7 @@ export default function AnalysisResults({
         capturedImage: resizedImage,
         reasons: apiReasons ?? null,
       }));
-    } catch(e) { console.warn('[GoogleAuth] Backup fail:', e); }
+    } catch (e) { console.warn('[GoogleAuth] Backup fail:', e); }
     const { loginWithGoogle } = useAuthStore.getState();
     await loginWithGoogle('/skin-analysis?action=oauth_return');
   }, [capturedImage, scores, analysisId, hasLifestyle]);
@@ -400,11 +402,11 @@ export default function AnalysisResults({
       const hydHealth = scores.hyd;
       const skinType =
         sebHealth < 45 && hydHealth < 45 ? 'combination' :
-        sebHealth < 45 ? 'oily' :
-        hydHealth < 45 ? 'dry' : 'normal';
+          sebHealth < 45 ? 'oily' :
+            hydHealth < 45 ? 'dry' : 'normal';
 
       const HIGH_IS_BAD_KEYS = ['seb', 'sen', 'acne', 'pigment', 'aging', 'ox'] as const;
-      const LOW_IS_BAD_KEYS  = ['hyd', 'bar', 'texture', 'makeup_stability'] as const;
+      const LOW_IS_BAD_KEYS = ['hyd', 'bar', 'texture', 'makeup_stability'] as const;
       const primaryConcerns: string[] = [
         ...HIGH_IS_BAD_KEYS.filter(k => scores[k] > 60),
         ...LOW_IS_BAD_KEYS.filter(k => scores[k as keyof typeof scores] < 40),
@@ -423,7 +425,7 @@ export default function AnalysisResults({
 
       if (!saved) throw new Error('Save returned null');
       setSaveStatus('saved');
-      
+
       const saveMsg = lang === 'ko' ? '분석 결과가 안전하게 저장되었어요' : 'Analysis safely saved';
       toast.success(saveMsg, {
         style: {
@@ -444,27 +446,27 @@ export default function AnalysisResults({
       setSaveStatus('error');
       const errMsg = err instanceof Error ? err.message : '';
       if (errMsg.includes('JWT') || errMsg.includes('auth') || errMsg.includes('authenticated')) {
-         setShowAuthModal(true);
+        setShowAuthModal(true);
       } else {
-         toast.error(
-           lang === 'ko' ? '저장 실패 — 잠시 후 다시 시도해주세요'
-             : lang === 'de' ? 'Speichern fehlgeschlagen — bitte erneut versuchen'
-             : 'Save failed — please retry'
-         );
+        toast.error(
+          lang === 'ko' ? '저장 실패 — 잠시 후 다시 시도해주세요'
+            : lang === 'de' ? 'Speichern fehlgeschlagen — bitte erneut versuchen'
+              : 'Save failed — please retry'
+        );
       }
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
   }, [saveStatus, isLoggedIn, scores, hasLifestyle, lang, saveAnalysisResult]);
 
-  const resetDiagnosisStore = useDiagnosisStore((s) => s.reset);
+  const resetAnalysisStore = useAnalysisStore((s) => s.reset);
 
   const handleRetake = useCallback(() => {
     resetAnalysis();
-    // Also clear diagnosisStore to prevent UI flickering when
+    // Also clear analysisStore to prevent UI flickering when
     // navigating back to the camera view
-    resetDiagnosisStore();
+    resetAnalysisStore();
     onRetake();
-  }, [resetAnalysis, resetDiagnosisStore, onRetake]);
+  }, [resetAnalysis, resetAnalysisStore, onRetake]);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -491,6 +493,11 @@ export default function AnalysisResults({
 
         {/* Score overlay */}
         <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ minHeight: capturedImage ? '380px' : '200px' }}>
+          {/* Phase 1 AI Transparency Badge */}
+          <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible" className="mb-4">
+            <AiGeneratedBadge />
+          </motion.div>
+
           {/* Precision badge */}
           {hasLifestyle && (
             <motion.div
@@ -687,10 +694,15 @@ export default function AnalysisResults({
               letterSpacing: '0.05em',
             }}>
               {lang === 'ko' ? '3단계 / 5단계 / 기기 포함 프로토콜'
-               : lang === 'de' ? '3-Stufen / 5-Stufen / Geräte-Protokoll'
-               : '3-Step / 5-Step / Device Protocol'}
+                : lang === 'de' ? '3-Stufen / 5-Stufen / Geräte-Protokoll'
+                  : '3-Step / 5-Step / Device Protocol'}
             </span>
           </motion.button>
+        </motion.div>
+
+        {/* ── Phase 1: Medical Disclaimer ───────────────────────────────────── */}
+        <motion.div custom={7.5} variants={fadeUp} initial="hidden" animate="visible" className="mt-8 rounded-2xl overflow-hidden shadow-lg">
+          <MedicalDisclaimer />
         </motion.div>
 
         {/* ── SECTION 5: Action Buttons ─────────────────────────────────────── */}
@@ -709,28 +721,28 @@ export default function AnalysisResults({
             className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             style={{
               background:
-                saveStatus === 'saved'  ? 'rgba(138,154,123,0.15)' :
-                saveStatus === 'error'  ? 'rgba(232,168,124,0.10)' :
-                'rgba(255,255,255,0.03)',
+                saveStatus === 'saved' ? 'rgba(138,154,123,0.15)' :
+                  saveStatus === 'error' ? 'rgba(232,168,124,0.10)' :
+                    'rgba(255,255,255,0.03)',
               border:
-                saveStatus === 'saved'  ? '1px solid rgba(138,154,123,0.4)' :
-                saveStatus === 'error'  ? '1px solid rgba(232,168,124,0.35)' :
-                '1px solid rgba(255,255,255,0.06)',
+                saveStatus === 'saved' ? '1px solid rgba(138,154,123,0.4)' :
+                  saveStatus === 'error' ? '1px solid rgba(232,168,124,0.35)' :
+                    '1px solid rgba(255,255,255,0.06)',
               backdropFilter: 'blur(12px)',
               color:
-                saveStatus === 'saved'  ? '#8a9a7b' :
-                saveStatus === 'error'  ? '#E8A87C' :
-                isLoggedIn ? '#F5F5F7' : '#c4a265',
+                saveStatus === 'saved' ? '#8a9a7b' :
+                  saveStatus === 'error' ? '#E8A87C' :
+                    isLoggedIn ? '#F5F5F7' : '#c4a265',
               fontFamily: 'var(--font-sans)', fontSize: '14px',
               opacity: saveStatus === 'saving' ? 0.6 : 1,
               fontWeight: saveStatus === 'idle' && isLoggedIn ? 600 : 400,
             }}
           >
             <Save size={14} />
-            {saveStatus === 'saved'  ? TX.saved[lang] :
-             saveStatus === 'error'  ? TX.saveFail[lang] :
-             saveStatus === 'saving' ? '...' :
-             isLoggedIn ? TX.save[lang] : TX.saveLogin[lang]}
+            {saveStatus === 'saved' ? TX.saved[lang] :
+              saveStatus === 'error' ? TX.saveFail[lang] :
+                saveStatus === 'saving' ? '...' :
+                  isLoggedIn ? TX.save[lang] : TX.saveLogin[lang]}
           </button>
         </motion.div>
 

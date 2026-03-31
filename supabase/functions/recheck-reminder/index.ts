@@ -3,7 +3,7 @@
  *
  * Phase 6 Step 3 — Supabase Edge Function skeleton.
  * Triggered daily by pg_cron to send re-check reminders to users
- * whose last diagnosis was exactly 28 days ago.
+ * whose last analysis was exactly 28 days ago.
  *
  * pg_cron schedule (daily at 09:00 CET / 08:00 UTC):
  *   SELECT cron.schedule(
@@ -38,11 +38,11 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const supabaseUrl  = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey   = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase     = createClient(supabaseUrl, serviceKey);
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, serviceKey);
 
-    // ── 1. Find users whose last diagnosis was 28 days ago ──────────────────
+    // ── 1. Find users whose last analysis was 28 days ago ──────────────────
     const { data: users, error: queryError } = await supabase.rpc(
       "get_users_due_for_recheck",
     );
@@ -112,10 +112,10 @@ Deno.serve(async (req: Request) => {
  *     d.user_id,
  *     u.email,
  *     d.foundation_data
- *   FROM diagnosis_history d
+ *   FROM analysis_history d
  *   JOIN auth.users u ON u.id = d.user_id
  *   WHERE d.diagnosed_at = (
- *     SELECT MAX(diagnosed_at) FROM diagnosis_history WHERE user_id = d.user_id
+ *     SELECT MAX(diagnosed_at) FROM analysis_history WHERE user_id = d.user_id
  *   )
  *   AND d.diagnosed_at::date = (CURRENT_DATE - INTERVAL '28 days')
  *   ORDER BY d.user_id, d.diagnosed_at DESC;

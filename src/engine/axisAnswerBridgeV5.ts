@@ -6,9 +6,9 @@
  * 1. convertToScoringInput(store, zoneData?)
  *    Reads the Zustand store snapshot directly and produces a ScoringInput
  *    ready for scoringEngineV5.computeScores().  This is the preferred call
- *    site inside handleCompleteAnalysis() in Diagnosis.tsx.
+ *    site inside handleCompleteAnalysis() in Analysis.tsx.
  *
- * 2. runDiagnosisV5(input: BridgeInput)
+ * 2. runAnalysisV5(input: BridgeInput)
  *    Full V5 pipeline in a single call — kept for backward compat and for
  *    callers that pre-package their own BridgeInput.
  *
@@ -19,20 +19,20 @@
  *     ↓ computeScores()          [scoringEngineV5]
  *   ScoringOutput (scores, provenance, activeFlags)
  *     ↓ buildSkinVector()        [skinVectorEngineV5]
- *   SkinVectorResult (DiagnosisResult + V5 fields)
+ *   SkinVectorResult (AnalysisResult + V5 fields)
  *     ↓ buildProductBundleV5()   [routineEngineV5]
  *   product_bundle injected → final SkinVectorResult
  */
 
 import type { QuestionAnswer } from "@/engine/questionRoutingV5";
-import { computeScores }                          from "@/engine/scoringEngineV5";
-import type { ScoringInput }                      from "@/engine/scoringEngineV5";
-import { buildSkinVector }                        from "@/engine/skinVectorEngineV5";
+import { computeScores } from "@/engine/scoringEngineV5";
+import type { ScoringInput } from "@/engine/scoringEngineV5";
+import { buildSkinVector } from "@/engine/skinVectorEngineV5";
 import type { SkinVectorResult, SkinVectorInput } from "@/engine/skinVectorEngineV5";
 import { buildProductBundleV5, computeSeasonalGuidance } from "@/engine/routineEngineV5";
-import { generateAxisExplanations }               from "@/engine/axisExplanationEngine";
-import type { DiagnosisStoreState }               from "@/store/diagnosisStore";
-import type { SelectedZones, Lifestyle, ImplicitFlags } from "@/store/diagnosisStore";
+import { generateAxisExplanations } from "@/engine/axisExplanationEngine";
+import type { AnalysisStoreState } from "@/store/analysisStore";
+import type { SelectedZones, Lifestyle, ImplicitFlags } from "@/store/analysisStore";
 import type { Product, Tier } from "@/engine/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -62,8 +62,8 @@ const SLEEP_INDEX_MAP: Record<number, number> = {
  *   2 = 6+ glasses/day  (high)
  */
 const WATER_MAP: Record<string, number> = {
-  water_low:  0,
-  water_mid:  1,
+  water_low: 0,
+  water_mid: 1,
   water_high: 2,
 };
 
@@ -74,8 +74,8 @@ const WATER_MAP: Record<string, number> = {
  *   2 = High
  */
 const STRESS_MAP: Record<string, number> = {
-  stress_low:  0,
-  stress_mod:  1,
+  stress_low: 0,
+  stress_mod: 1,
   stress_high: 2,
 };
 
@@ -105,7 +105,7 @@ function buildFoundation(
 
   // Climate: climateProfile.climateType takes priority, then EXP_CLIMATE, then lifestyle.climate
   const climateFromProfile = lifestyle?.climateProfile?.climateType ?? null;
-  const climateFromAnswer  = axisAnswers["EXP_CLIMATE"];
+  const climateFromAnswer = axisAnswers["EXP_CLIMATE"];
   const climate =
     climateFromProfile ??
     (typeof climateFromAnswer === "string" ? climateFromAnswer : null) ??
@@ -140,17 +140,17 @@ function buildFoundation(
   const menopauseStatus = typeof menoRaw === "string" ? menoRaw : undefined;
 
   return {
-    sleep:             sleepIndex,
-    water:             waterIndex,
-    stress:            stressIndex,
-    climate:           climate ?? null,
-    age_bracket:       ageBracket,
-    gender:            gender,
-    outdoor:           outdoor,
-    altitude:          altitude,
-    seasonal_change:   seasonalChange,
-    texture_pref:      texturePref,
-    menopause_status:  menopauseStatus,
+    sleep: sleepIndex,
+    water: waterIndex,
+    stress: stressIndex,
+    climate: climate ?? null,
+    age_bracket: ageBracket,
+    gender: gender,
+    outdoor: outdoor,
+    altitude: altitude,
+    seasonal_change: seasonalChange,
+    texture_pref: texturePref,
+    menopause_status: menopauseStatus,
   };
 }
 
@@ -227,14 +227,14 @@ function buildAxisAnswers(
 // Public: convertToScoringInput
 //
 // Takes the live Zustand store snapshot directly — no intermediate object
-// needed.  zoneData can be supplied explicitly (e.g. if Diagnosis.tsx builds
+// needed.  zoneData can be supplied explicitly (e.g. if Analysis.tsx builds
 // it from local state before it has been flushed to the store).
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * convertToScoringInput
  *
- * Converts the Zustand diagnosis store snapshot into a ScoringInput that
+ * Converts the Zustand analysis store snapshot into a ScoringInput that
  * scoringEngineV5.computeScores() understands.
  *
  * Data sources (in priority order):
@@ -248,13 +248,13 @@ function buildAxisAnswers(
  *   implicitFlags                 — store.implicitFlags.atopyFlag
  */
 export function convertToScoringInput(
-  store:     DiagnosisStoreState,
+  store: AnalysisStoreState,
   zoneData?: Record<string, Record<string, 1 | 2 | 3>>,
 ): ScoringInput {
   return {
-    zoneData:      zoneData ?? buildZoneDataFromStore(store.selectedZones),
-    axisAnswers:   buildAxisAnswers(store.axisAnswers),
-    foundation:    buildFoundation(store.axisAnswers, store.lifestyle),
+    zoneData: zoneData ?? buildZoneDataFromStore(store.selectedZones),
+    axisAnswers: buildAxisAnswers(store.axisAnswers),
+    foundation: buildFoundation(store.axisAnswers, store.lifestyle),
     implicitFlags: { atopyFlag: store.implicitFlags.atopyFlag },
   };
 }
@@ -264,12 +264,12 @@ export function convertToScoringInput(
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface BridgeInput {
-  axisAnswers:   Record<string, QuestionAnswer>;
+  axisAnswers: Record<string, QuestionAnswer>;
   selectedZones: SelectedZones;
   implicitFlags: ImplicitFlags;
-  lifestyle?:    Lifestyle;
-  products?:     Product[];
-  tier?:         Tier;
+  lifestyle?: Lifestyle;
+  products?: Product[];
+  tier?: Tier;
 }
 
 /**
@@ -309,9 +309,9 @@ export function buildScoringInput(
   if ("selectedZones" in inputOrSeverity) {
     const input = inputOrSeverity as BridgeInput;
     return {
-      zoneData:      buildZoneDataFromStore(input.selectedZones),
-      axisAnswers:   buildAxisAnswers(input.axisAnswers),
-      foundation:    buildFoundation(input.axisAnswers, input.lifestyle),
+      zoneData: buildZoneDataFromStore(input.selectedZones),
+      axisAnswers: buildAxisAnswers(input.axisAnswers),
+      foundation: buildFoundation(input.axisAnswers, input.lifestyle),
       implicitFlags: { atopyFlag: input.implicitFlags.atopyFlag },
     };
   }
@@ -319,33 +319,33 @@ export function buildScoringInput(
   // Severity-map overload
   const concernSeverity = inputOrSeverity as Record<string, 1 | 2 | 3>;
   return {
-    zoneData:      buildZoneData(concernSeverity, zoneConcerns!),
-    axisAnswers:   axisAnswers!,
-    foundation:    foundationData!,
+    zoneData: buildZoneData(concernSeverity, zoneConcerns!),
+    axisAnswers: axisAnswers!,
+    foundation: foundationData!,
     implicitFlags: implicitFlags!,
   };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Public: runDiagnosisV5 — full V5 pipeline in one call
+// Public: runAnalysisV5 — full V5 pipeline in one call
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * runDiagnosisV5
+ * runAnalysisV5
  *
- * Orchestrates the complete V5 diagnosis pipeline:
+ * Orchestrates the complete V5 analysis pipeline:
  *   1. buildScoringInput()    → ScoringInput
  *   2. computeScores()        → ScoringOutput (raw scores + provenance + flags)
- *   3. buildSkinVector()      → SkinVectorResult (DiagnosisResult + V5 fields)
+ *   3. buildSkinVector()      → SkinVectorResult (AnalysisResult + V5 fields)
  *   4. buildProductBundleV5() → product_bundle injected into result
  *
- * Returns a SkinVectorResult fully compatible with DiagnosisResult
+ * Returns a SkinVectorResult fully compatible with AnalysisResult
  * and suitable for store.setResult() and navigation to /results.
  */
-export function runDiagnosisV5(input: BridgeInput): SkinVectorResult {
+export function runAnalysisV5(input: BridgeInput): SkinVectorResult {
   // ── Step 1 — Build scoring input ──────────────────────────────────────────
   console.log("[V5] Step 1: buildScoringInput…");
-  const scoringInput  = buildScoringInput(input);
+  const scoringInput = buildScoringInput(input);
   console.log("[V5] Step 1 OK — zoneData keys:", Object.keys(scoringInput.zoneData),
     "| concern count:", Object.values(scoringInput.zoneData).reduce((n, z) => n + Object.keys(z).length, 0),
     "| foundation.age_bracket:", scoringInput.foundation.age_bracket,
@@ -369,12 +369,12 @@ export function runDiagnosisV5(input: BridgeInput): SkinVectorResult {
   }
 
   const vectorInput: SkinVectorInput = {
-    scores:        scoringOutput.scores,
-    provenance:    scoringOutput.provenance,
-    zoneData:      flatZoneData,
+    scores: scoringOutput.scores,
+    provenance: scoringOutput.provenance,
+    zoneData: flatZoneData,
     implicitFlags: scoringInput.implicitFlags,
-    activeFlags:   scoringOutput.activeFlags,
-    products:      input.products ?? [],
+    activeFlags: scoringOutput.activeFlags,
+    products: input.products ?? [],
   };
   console.log("[V5] Step 3: buildSkinVector…");
   const result = buildSkinVector(vectorInput);
@@ -400,7 +400,7 @@ export function runDiagnosisV5(input: BridgeInput): SkinVectorResult {
   );
   console.log("[V5] Step 6 OK — axis_explanations count:", axis_explanations?.length ?? 0);
 
-  console.log("[V5] runDiagnosisV5 complete ✓");
+  console.log("[V5] runAnalysisV5 complete ✓");
   return {
     ...result,
     product_bundle: productBundle,

@@ -31,10 +31,10 @@ const OG_HTML = `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <title>AI Skin Analysis | SkinStrategyLab</title>
-  <meta name="description" content="Analyze your skin across 10 axes with a 60-second AI diagnosis and get personalized skincare recommendations." />
+  <meta name="description" content="Analyze your skin across 10 axes with a 60-second AI analysis and get personalized skincare recommendations." />
 
   <meta property="og:title" content="AI Skin Analysis | SkinStrategyLab" />
-  <meta property="og:description" content="Analyze your skin across 10 axes with a 60-second AI diagnosis and get personalized skincare recommendations." />
+  <meta property="og:description" content="Analyze your skin across 10 axes with a 60-second AI analysis and get personalized skincare recommendations." />
   <meta property="og:image" content="https://www.skinstrategylab.de/SkinStrategyLab.png" />
   <meta property="og:url" content="https://www.skinstrategylab.de/skin-analysis" />
   <meta property="og:type" content="website" />
@@ -44,7 +44,7 @@ const OG_HTML = `<!DOCTYPE html>
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AI Skin Analysis | SkinStrategyLab" />
-  <meta name="twitter:description" content="Analyze your skin across 10 axes with a 60-second AI diagnosis." />
+  <meta name="twitter:description" content="Analyze your skin across 10 axes with a 60-second AI analysis." />
   <meta name="twitter:image" content="https://www.skinstrategylab.de/SkinStrategyLab.png" />
 </head>
 <body>

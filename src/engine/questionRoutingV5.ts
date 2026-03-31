@@ -51,8 +51,8 @@ export interface QuestionDef {
   showForAge?: { min?: number; max?: number };
   /** Hide this question if the user's gender matches any of these values (0=female,1=male,2=other). */
   hideIfGender?: number[];
-  /** Clinical derivation — shown as a trust badge in TailQuestionSection */
-  clinicalBasis?: {
+  /** Scientific derivation — shown as a trust badge in TailQuestionSection */
+  scientificBasis?: {
     method: string;      // e.g. "SOS (Skin Oiliness Scale)"
     validation: string;  // e.g. "Correlates with Sebumeter at r=0.54, p<0.01"
     source: string;      // e.g. "Journal of Dermatological Science, 2020"
@@ -108,7 +108,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         hint: t(
           "80% of UV reaches you even through clouds. Daily SPF is the #1 anti-aging habit according to dermatologists worldwide.",
           "80% der UV-Strahlung dringt durch Wolken. Täglicher Sonnenschutz ist laut Dermatologen weltweit die wichtigste Anti-Aging-Gewohnheit.",
-          "구름을 뚫고도 자외선의 80%가 도달해요. 매일 선크림 바르기는 전 세계 피부과 의사가 인정하는 노화 방지 습관 1위입니다."
+          "구름을 뚫고도 자외선의 80%가 도달해요. 매일 선크림 바르기는 전 세계 전문가 의사가 인정하는 노화 방지 습관 1위입니다."
         ),
         required: true,
         axisHints: { ox: 0.9 },
@@ -182,7 +182,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         ),
         required: true,
         axisHints: { seb: 1.0, makeup_stability: 0.6 },
-        clinicalBasis: {
+        scientificBasis: {
           method: "Skin Oiliness Scale (SOS)",
           validation: "Sebumeter correlation r=0.54, p<0.01",
           source: "J Dermatological Science",
@@ -226,9 +226,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         hideIfGender: [1],  // male users don't typically wear base makeup
         text: t("By 2 PM, what does your base makeup look like?", "Wie sieht Ihr Foundation-Make-up gegen 14 Uhr aus?", "오후 2시경, 베이스 메이크업 상태는 어떤가요?"),
         hint: t(
-          "Makeup breakdown speed is a validated proxy for skin oil output in clinical dermatology.",
+          "Makeup breakdown speed is a validated proxy for skin oil output in professional skin science.",
           "Die Geschwindigkeit des Make-up-Abbaus ist ein wissenschaftlich validierter Indikator für die Hautöl-Produktion.",
-          "화장 무너짐 속도는 피부과 임상에서 검증된 피지량 추정 지표예요."
+          "화장 무너짐 속도는 전문적인 피부 과학에서 검증된 피지량 추정 지표예요."
         ),
         required: false,
         axisHints: { seb: 0.7, makeup_stability: 0.9 },
@@ -283,7 +283,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         ),
         required: true,
         axisHints: { hyd: 1.0, bar: 0.6 },
-        clinicalBasis: {
+        scientificBasis: {
           method: "TEWL Sensory Markers",
           validation: "Correlates with Tewameter readings",
           source: "Int J Cosmetic Science",
@@ -403,9 +403,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           withGloss(
             opt("acne_cystic", 3, "Deep, painful lumps", "Tiefe, schmerzhafte Knoten", "크고 깊은 혹 같은 트러블", "🟣",
               "Deep, painful nodules that don't surface", "Tiefe, schmerzhafte Knoten", "깊고 통증 있는 결절"),
-            "Deep, painful lesions that form beneath the skin — a more severe form of acne often requiring medical treatment.",
-            "Tiefe, schmerzhafte Läsionen unter der Hautoberfläche — schwere Akneform, die oft ärztliche Behandlung erfordert.",
-            "피부 깊숙이 형성되는 크고 통증이 있는 병변으로, 의학적 치료가 필요한 심한 형태의 여드름입니다."
+            "Deep, painful lesions that form beneath the skin — a more severe form of acne that may benefit from professional care.",
+            "Tiefe, schmerzhafte Läsionen unter der Hautoberfläche — schwere Akneform, die von professioneller Pflege profitieren kann.",
+            "피부 깊숙이 형성되는 크고 통증이 있는 병변으로, 전문적인 케어가 도움이 될 수 있는 심한 형태의 여드름입니다."
           ),
           opt("acne_notsure", 1, "Not Sure", "Nicht sicher", "잘 모르겠어요", "❓"),
         ],
@@ -539,9 +539,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         ),
         required: false,
         axisHints: { bar: 1.0, hyd: 0.5, sen: 0.3 },
-        clinicalBasis: {
+        scientificBasis: {
           method: "APIA Methodology",
-          validation: "European dermatology clinical framework",
+          validation: "European skin assessment framework",
           source: "APIA Protocol",
         },
         options: [
@@ -561,9 +561,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         ),
         required: false,
         axisHints: { sen: 1.0 },
-        clinicalBasis: {
+        scientificBasis: {
           method: "Lactic Acid Sting Test (proxy)",
-          validation: "Standard dermatology office assessment",
+          validation: "Standard skin sensitivity assessment",
           source: "Contact Dermatitis Journal",
         },
         options: [
@@ -634,9 +634,9 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
         required: true,
         showForAge: { min: 1 },
         axisHints: { aging: 1.0 },
-        clinicalBasis: {
+        scientificBasis: {
           method: "Fitzpatrick Wrinkle Scale",
-          validation: "Clinical grading system for photoaging",
+          validation: "Professional grading system for photoaging",
           source: "Dermatologic Surgery",
         },
         slider: {
@@ -794,7 +794,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
           opt("hormone_adhd", 1, "ADHD medication", "ADHS-Medikament", "ADHD 약 (리탈린·콘서타 등)"),
           opt("hormone_antidep", 1, "Antidepressants / Anxiolytics", "Antidepressiva / Anxiolytika", "항우울제 / 항불안제"),
           opt("hormone_thyroid", 1, "Thyroid medication", "Schilddrüsenmedikament", "갑상선 약"),
-          opt("hormone_other", 1, "Other prescription medication", "Andere verschreibungspflichtige Medikamente", "기타 처방약 복용 중"),
+          opt("hormone_other", 1, "Other regular medication", "Andere regelmäßige Medikamente", "기타 복용 중인 약"),
           opt("hormone_none", 0, "None", "Keine", "복용하지 않음"),
           opt("hormone_unsure", 0, "Not sure", "Nicht sicher", "잘 모르겠어요"),
         ],
@@ -805,8 +805,8 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
   // ── Axis 9: Neurodermatitis & Psoriasis ───────────────────────────────────
   {
     id: 9,
-    name: t("Chronic Skin Conditions", "Chronische Hauterkrankungen", "만성 피부 질환"),
-    eyebrow: t("Chronic Skin Check", "Chronische Haut-Check", "만성 피부 체크"),
+    name: t("Chronic Skin Conditions", "Chronische Hautbeschwerden", "만성 피부 고민"),
+    eyebrow: t("Chronic Skin Check", "Chronischer Haut-Check", "만성 피부 체크"),
     triggerConcerns: [],
     alwaysShow: true,
     questions: [
@@ -826,7 +826,7 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
       {
         id: "AX9_Q2",
         type: "single",
-        text: t("Have you been diagnosed with Atopic Dermatitis or Psoriasis?", "Wurde bei Ihnen Atopische Dermatitis oder Psoriasis diagnostiziert?", "아토피 피부염이나 건선을 분석받은 적이 있나요?"),
+        text: t("Have you been identified with Atopic Dermatitis or Psoriasis?", "Wurde bei Ihnen Atopische Dermatitis oder Psoriasis festgestellt?", "아토피 피부염이나 건선이 확인된 적이 있나요?"),
         required: false,
         axisHints: { sen: 1.2, bar: 1.0 },
         options: [
@@ -843,10 +843,10 @@ export const AXIS_DEFINITIONS: AxisDef[] = [
             "건선 — 피부 세포 재생이 가속화되어 두껍고 비늘 모양의 반점이 생기는 자가면역 질환입니다."
           ),
           withGloss(
-            opt("dx_suspected", 2, "Suspected / Undiagnosed", "Vermutet / Nicht diagnostiziert", "의심 / 미분석"),
-            "If you suspect Atopic Dermatitis or Psoriasis but haven't been formally diagnosed, we'll factor this into a sensitivity-focused protocol.",
+            opt("dx_suspected", 2, "Suspected / Not confirmed", "Vermutet / Nicht bestätigt", "의심 / 미확인"),
+            "If you suspect Atopic Dermatitis or Psoriasis but haven't been formally confirmed, we'll factor this into a sensitivity-focused protocol.",
             "Wenn Sie Atopische Dermatitis oder Psoriasis vermuten, berücksichtigen wir dies in Ihrem sensibilitätsfokussierten Protokoll.",
-            "아토피 또는 건선이 의심되지만 분석받지 못하셨다면, 민감성 맞춤 프로토콜에 이를 반영해요."
+            "아토피 또는 건선이 의심되지만 확인받지 못하셨다면, 민감성 맞춤 프로토콜에 이를 반영해요."
           ),
           opt("dx_no", 0, "No", "Nein", "아니요"),
         ],
@@ -976,6 +976,6 @@ export function checkAtopyFlag(answers: AnswerMap): boolean {
   const q1 = answers["AX9_Q1"];
   const q2 = answers["AX9_Q2"];
   const highItch = q1 === "constantly" || q1 === "frequently";
-  const diagnosed = q2 === "dx_atopic" || q2 === "dx_psoriasis";
-  return highItch || diagnosed;
+  const confirmed = q2 === "dx_atopic" || q2 === "dx_psoriasis";
+  return highItch || confirmed;
 }

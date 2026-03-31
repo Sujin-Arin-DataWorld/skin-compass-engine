@@ -2,13 +2,13 @@
  * ZoneLabFlow.tsx
  *
  * Layer 2 container: orchestrates per-zone Scientific Standard + Duel selection
- * for every zone in the user's diagnosis.
+ * for every zone in the user's analysis.
  *
  * Integration points (wired here per Step 7 spec):
  *   • applyCautionCaps()   — trims required ingredient concentrations for caution gate
  *   • applyRosaceaFilter() — adjusts niacinamide for rosacea-prone skin
  *
- * Clinical safety rules 1–5 from clinicalSafetyRules.ts are wired in Step 8
+ * Clinical safety rules 1–5 from safetyRules.ts are wired in Step 8
  * (RoutineBuilder), not here.
  */
 
@@ -21,7 +21,7 @@ import { useLabSelectionStore } from '../store/useLabSelectionStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { AXIS_INGREDIENT_MAP } from '../data/axisIngredientMap';
 import { applyCautionCaps } from '../utils/routineHelpers';
-import { applyRosaceaFilter } from '../utils/clinicalSafetyRules';
+import { applyRosaceaFilter } from '../utils/safetyRules';
 
 import ScientificStandardCard from './ScientificStandardCard';
 import DuelCard from './DuelCard';
@@ -33,7 +33,7 @@ import {
   PriceTier,
   RequiredIngredient,
   AxisScore,
-  ZoneDiagnosis,
+  ZoneAssessment,
 } from '../types';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ function getZoneLabel(zone: FaceZone, lang: string): string {
 // ── Zone panel ────────────────────────────────────────────────────────────────
 
 interface ZonePanelProps {
-  zoneDiagnosis: ZoneDiagnosis;
+  zoneAnalysis: ZoneAssessment;
   isActive: boolean;
   isCompleted: boolean;
   onActivate: () => void;
@@ -110,7 +110,7 @@ interface ZonePanelProps {
 }
 
 function ZonePanel({
-  zoneDiagnosis,
+  zoneAnalysis,
   isActive,
   isCompleted,
   onActivate,
@@ -118,7 +118,7 @@ function ZonePanel({
   isDark,
   language,
 }: ZonePanelProps) {
-  const { zone, axis_scores, matched_profile, is_rosacea_prone } = zoneDiagnosis;
+  const { zone, axis_scores, matched_profile, is_rosacea_prone } = zoneAnalysis;
 
   // Pull store flags
   const { gateResult, isRosaceaProne } = useLabSelectionStore();
@@ -340,7 +340,7 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
           ? '분석 결과를 불러오는 중입니다…'
           : language === 'de'
             ? 'Diagnosedaten werden geladen…'
-            : 'Loading diagnosis data…'}
+            : 'Loading analysis data…'}
       </div>
     );
   }
@@ -405,7 +405,7 @@ export default function ZoneLabFlow({ onContinueToRoutine }: ZoneLabFlowProps) {
         {zoneDiagnoses.map((zd, idx) => (
           <ZonePanel
             key={zd.zone}
-            zoneDiagnosis={zd}
+            zoneAnalysis={zd}
             isActive={activeZoneIndex === idx}
             isCompleted={selectedProducts.has(zd.zone)}
             onActivate={() => handleActivate(idx)}

@@ -7,7 +7,7 @@
  *   • Age-aware (mentions decade-specific context)
  *   • Season-aware (mentions current season if relevant)
  *   • Gender-aware (adjusts language for male skin)
- *   • Plain language (no clinical acronyms shown to users)
+ *   • Plain language (no technical acronyms shown to users)
  */
 
 import type { AxisKey, AxisExplanation } from "@/engine/types";

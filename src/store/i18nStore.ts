@@ -43,7 +43,6 @@ export const useI18nStore = create<I18nState>()(
 export const translations = {
     en: {
         products: "Products",
-        startDiagnosis: "Start Analysis",
         startAnalysis: "Start Analysis",
         login: "Login",
         signUp: "Sign Up",
@@ -62,7 +61,7 @@ export const translations = {
         addressBook: "Address Book",
         orders: "Orders",
         logout: "Log out",
-        noDiagnosis: "No analysis yet.",
+        noAnalysis: "No analysis yet.",
         startNow: "Start now →",
         myVector: "My Skin Vector (10 Axes)",
         myRoutine: "My Routine (5 Formulas)",
@@ -70,7 +69,7 @@ export const translations = {
 
         // Hero Data
         heroTitle: "Precision Skincare.",
-        heroSlogan: "Advanced skin intelligence. 10-Axis clinical profiling.",
+        heroSlogan: "Advanced skin intelligence. 10-Axis professionaln profiling.",
         targetPrecision: "Targeted Precision Scan",
         steps: {
             step1: "Algorithm Engine",
@@ -83,9 +82,9 @@ export const translations = {
         index: {
             journey: [
                 { title: "Context Setup", subtitle: "Age, environment & lifestyle baseline", desc: "We begin by establishing your environmental and lifestyle parameters. Every algorithmic decision accounts for your local climate and daily routine.", accent: "30 sec" },
-                { title: "Biometric Symptom Check", subtitle: "120 clinical markers assessed", desc: "Our analysis engine evaluates your skin across multiple dimensions based on IGA, TEWL, and MASI—the exact clinical scales used in dermatological research.", accent: "3-5 min" },
-                { title: "Data-Driven Analysis", subtitle: "10-axis scoring computed", desc: "Your responses generate a unique biometric skin vector. We don't sort you into a generic \"skin type.\" Your clinical metrics drive the entire recommendation engine.", accent: "< 3 sec" },
-                { title: "Your Targeted Protocol", subtitle: "5-phase K-beauty routine", desc: "Every product recommendation passes a dual filter: dermatological efficacy for your specific data vector, and EU-compliant safety standards. No guesswork.", accent: "Personalized" }
+                { title: "Biometric Symptom Check", subtitle: "120 professionalc markers assessed", desc: "Our analysis engine evaluates your skin across multiple dimensions based on IGA, TEWL, and MASI—the exactprofessionalional scales used in cosmetic research.", accent: "3-5 min" },
+                { title: "Data-Driven Analysis", subtitle: "10-axis scoring computed", desc: "Your responses generate a unique biometric skin vector. We don't sort you into a generic \"skin type.\" Your professionalc metrics drive the entire recommendation engine.", accent: "< 3 sec" },
+                { title: "Your Targeted Protocol", subtitle: "5-phase K-beauty routine", desc: "Every product recommendation passes a dual filter: cosmetic efficacy for your specific data vector, and EU-compliant safety standards. No guesswork.", accent: "Personalized" }
             ],
             expertSealTitle: "Biometric Skin Analysis",
             expertSealSub: "POWERED BY KOREAN BIOMETRIC DATA SCIENCE — GERMANY",
@@ -103,16 +102,16 @@ export const translations = {
             collectionSub: "All products are biometrically matched.",
             authority: {
                 confidence: "Analysis Confidence",
-                axes: "Clinical Axes",
+                axes: "Precision Axes",
                 markers: "Validated Markers",
                 phase: "Phase Protocol",
                 realResults: "Real Results. Visible Progress.",
-                realResultsSub: "See how a clinically matched K-Beauty protocol transforms your skin over time."
+                realResultsSub: "See how a professionaln-matched K-Beauty protocol transforms your skin over time."
             },
-            diagnosisMeets: "Analysis Meets Beauty.",
-            diagnosisMeetsSub: "End the cycle of skincare speculation. We curate exactly what your unique skin vector demands.",
+            analysisMeets: "Analysis Meets Beauty.",
+            analysisMeetsSub: "End the cycle of skincare speculation. We curate exactly what your unique skin vector demands.",
             kitTitle: "The Complete<br/>Strategy Lab Kit.",
-            kitSub: "5 formulas perfectly curated to shift your exact clinical vector toward harmony. Delivered monthly.",
+            kitSub: "5 formulas perfectly curated to shift your exact professionalc vector toward harmony. Delivered monthly.",
             exploreKit: "Explore Kit",
             initializing: "Initializing...",
             scanningSebum: "Scanning Skin Oil...",
@@ -125,16 +124,16 @@ export const translations = {
             analysisComplete: "Analysis Complete",
             targeting: "Targeting",
             tenAxisAnalysis: "10-Axis Skin Vector Analysis",
-            clinicallyMatched: "Clinically Matched Formulas",
+            professionallyMatched: "Precision-Matched Formulas",
             flow: {
-                diagnosis: "Analysis",
+                analysis: "Analysis",
                 protocol: "Your protocol",
                 routine: "K-beauty routine"
             },
             journeyTitle: "The Skin Strategy Journey",
-            journeySub: "A biometrically precise timeline — from intelligent clinical analysis to a vibrant, personalized European-Korean protocol.",
+            journeySub: "A biometrically precise timeline — from intelligent professionaln analysis to a vibrant, personalized European-Korean protocol.",
             readyTitle: "Ready to decode your skin?",
-            readySub: "No registration · Results in under 6 min · Backed by clinical scales",
+            readySub: "No registration · Results in under 6 min · Backed by professionalonal scales",
             startFree: "Start Free Assessment"
         },
         navbar: {
@@ -177,7 +176,7 @@ export const translations = {
         loginPage: {
             title: "Secure Access",
             titleSignup: "Create Account",
-            subtitle: "Your 10-Axis Skin Strategy is a clinical asset. Sign in to secure your precision data and unlock your personalized formula. Unsaved data will be lost.",
+            subtitle: "Your 10-Axis Skin Strategy is a professionalasset. Sign in to secure your precision data and unlock your personalized formula. Unsaved data will be lost.",
             subtitleSignup: "Create your Skin Strategy Lab account.",
             tabLogin: "Sign In",
             tabSignup: "Register",
@@ -226,7 +225,7 @@ export const translations = {
             aging: "Aging",
             makeup_stability: "Makeup Stability"
         },
-        diagnosis: {
+        analysis: {
             notSure: "Not sure",
             improveAccuracy: "Improve accuracy",
             moreQuestions: "more questions",
@@ -236,7 +235,7 @@ export const translations = {
             processing: "Analyzing dermal vectors...",
             completing: "Synthesizing 10-Axis Strategy...",
 
-            // Diagnosis.tsx additions
+            // Analysis.tsx additions
             contextTitle: "First, tell us about your skin context",
             contextSub: "Select all that apply — this personalises your assessment",
             skinTypeTitle: "What's your baseline skin type?",
@@ -273,7 +272,7 @@ export const translations = {
             },
             loading: [
                 "Mapping your symptom profile...",
-                "Scoring 10 clinical axes...",
+                "Scoring 10 professional axes...",
                 "Detecting high-risk patterns...",
                 "Building your protocol...",
             ],
@@ -366,9 +365,9 @@ export const translations = {
         results: {
             chooseSubscription: "Choose Your Subscription",
             adaptiveDelivery: "Adaptive monthly delivery — recalibrated to your skin every 28 days",
-            deviceGated: "Device gated: Your barrier score ({score}) indicates Month 1 should focus on repair. The clinical device ships in Month 2 once stability is confirmed.",
+            deviceGated: "Device gated: Your barrier score ({score}) indicates Month 1 should focus on repair. The professional device ships in Month 2 once stability is confirmed.",
             deviceUnlocked: "Barrier Stable · Clinical Device Eligible",
-            deviceUnlockedDesc: "Your barrier score qualifies for immediate device access. The clinical device ships with your Month 1 order.",
+            deviceUnlockedDesc: "Your barrier score qualifies for immediate device access. The professional device ships with your Month 1 order.",
             deviceLockedTitle: "Dermatological Safety Logic · Locked for Month 1",
             deviceLockedDesc: "Your barrier score is still building. The EMS/LED device ships once barrier stability is confirmed — this protects against device-induced sensitisation during the repair phase.",
             entry: "Entry",
@@ -429,7 +428,6 @@ export const translations = {
     },
     de: {
         products: "Produkte",
-        startDiagnosis: "Analyse starten",
         startAnalysis: "Analyse starten",
         login: "Login",
         signUp: "Registrieren",
@@ -448,7 +446,7 @@ export const translations = {
         addressBook: "Adressbuch",
         orders: "Bestellungen",
         logout: "Abmelden",
-        noDiagnosis: "Noch keine Analyse vorhanden.",
+        noAnalysis: "Noch keine Analyse vorhanden.",
         startNow: "Jetzt starten →",
         myVector: "Mein Skin-Vektor (10 Dimensionen)",
         myRoutine: "Meine Pflege (5 Formeln)",
@@ -469,9 +467,9 @@ export const translations = {
         index: {
             journey: [
                 { title: "Kontext-Setup", subtitle: "Alter, Umwelt & Lebensstil als Basis", desc: "Wir beginnen mit der Erfassung Ihrer Umwelt- und Lebensstilparameter. Jede algorithmische Entscheidung berücksichtigt Ihr lokales Klima und Ihren Alltag.", accent: "30 Sek" },
-                { title: "Biometrischer Hautbedürfnis-Check", subtitle: "120 Marker werden bewertet", desc: "Unsere Analyse-Engine bewertet Ihre Haut in mehreren Dimensionen basierend auf IGA, TEWL und MASI — exakt den wissenschaftlichen Skalen, die in der dermatologischen Forschung verwendet werden.", accent: "3-5 Min" },
-                { title: "Datengetriebene Analyse", subtitle: "Berechnung auf 10 Dimensionen", desc: "Ihre Antworten erzeugen einen einzigartigen biometrischen Hautvektor. Wir ordnen Sie nicht in einen generischen \"Hauttyp\" ein. Ihre wissenschaftlichen Metriken steuern die gesamte Empfehlungs-Engine.", accent: "< 3 Sek" },
-                { title: "Ihr gezieltes Protokoll", subtitle: "5-Phasen K-Beauty-Pflege", desc: "Jede Produktempfehlung durchläuft einen doppelten Filter: dermatologische Wirksamkeit für Ihren spezifischen Datenvektor und EU-konforme Sicherheitsstandards. Kein Raten.", accent: "Personalisiert" }
+                { title: "Biometrischer Hautbedürfnis-Check", subtitle: "120 biometrische Marker analysiert", desc: "Unsere Analyse-Engine bewertet Ihre Haut in mehreren Dimensionen basierend auf IGA, TEWL und MASI — exakt den professionellen Skalen, die in der kosmetischen Forschung verwendet werden.", accent: "3-5 Min" },
+                { title: "Datengetriebene Analyse", subtitle: "Berechnung auf 10 Dimensionen", desc: "Ihre Antworten erzeugen einen einzigartigen biometrischen Hautvektor. Wir ordnen Sie nicht in einen generischen \"Hauttyp\" ein. Ihre biometrischen Metriken steuern die gesamte Empfehlungs-Engine.", accent: "< 3 Sek" },
+                { title: "Ihr gezieltes Protokoll", subtitle: "5-Phasen K-Beauty-Pflege", desc: "Jede Produktempfehlung durchläuft einen doppelten Filter: kosmetische Wirksamkeit für Ihren spezifischen Datenvektor und EU-konforme Sicherheitsstandards. Kein Raten.", accent: "Personalisiert" }
             ],
             expertSealTitle: "Biometrische Hautanalyse",
             expertSealSub: "ANGETRIEBEN DURCH KOREANISCHE BIOMETRISCHE DATENVERARBEITUNG — DEUTSCHLAND",
@@ -489,14 +487,14 @@ export const translations = {
             collectionSub: "Alle Produkte werden per Biometrie gematcht.",
             authority: {
                 confidence: "Analytische Sicherheit",
-                axes: "Wissenschaftliche Dimensionen",
+                axes: "Präzisions-Dimensionen",
                 markers: "Validierte Marker",
                 phase: "Phasenprotokoll",
                 realResults: "Echte Ergebnisse. Sichtbarer Fortschritt.",
-                realResultsSub: "Sehen Sie, wie ein wissenschaftlich abgestimmtes K-Beauty-Protokoll Ihre Haut im Laufe der Zeit transformiert."
+                realResultsSub: "Sehen Sie, wie ein präzise abgestimmtes K-Beauty-Protokoll Ihre Haut im Laufe der Zeit transformiert."
             },
-            diagnosisMeets: "Analyse trifft Schönheit.",
-            diagnosisMeetsSub: "Beenden Sie den Kreislauf der Hautpflegespekulationen. Wir kuratieren genau das, was Ihr einzigartiger Hautvektor erfordert.",
+            analysisMeets: "Analyse trifft Schönheit.",
+            analysisMeetsSub: "Beenden Sie den Kreislauf der Hautpflegespekulationen. Wir kuratieren genau das, was Ihr einzigartiger Hautvektor erfordert.",
             kitTitle: "Das komplette<br/>Strategy Lab Kit.",
             kitSub: "5 Formeln, perfekt kuratiert, um Ihren exakten Hautvektor in Richtung Harmonie zu verschieben. Monatlich geliefert.",
             exploreKit: "Kit entdecken",
@@ -511,16 +509,16 @@ export const translations = {
             analysisComplete: "Analyse abgeschlossen",
             targeting: "Zielerfassung",
             tenAxisAnalysis: "10-Dimensionen Hautvektoranalyse",
-            clinicallyMatched: "Wissenschaftlich abgestimmte Formeln",
+            clinicallyMatched: "Präzise abgestimmte Formeln",
             flow: {
-                diagnosis: "Analyse",
+                analysis: "Analyse",
                 protocol: "Ihr Protokoll",
                 routine: "K-Beauty Pflege"
             },
             journeyTitle: "Die Skin Strategy Reise",
-            journeySub: "Ein biometrisch präziser Ablauf — von intelligenter wissenschaftlicher Analyse bis hin zu einem lebendigen, personalisierten europäisch-koreanischen Protokoll.",
+            journeySub: "Ein biometrisch präziser Ablauf — von intelligenter präziser Analyse bis hin zu einem lebendigen, personalisierten europäisch-koreanischen Protokoll.",
             readyTitle: "Bereit, Ihre Haut zu entschlüsseln?",
-            readySub: "Keine Registrierung · Ergebnisse in unter 6 Min · Unterstützt durch wissenschaftliche Skalen",
+            readySub: "Keine Registrierung · Ergebnisse in unter 6 Min · Unterstützt durch professionelle Skalen",
             startFree: "Kostenlose Analyse starten"
         },
         navbar: {
@@ -612,7 +610,7 @@ export const translations = {
             aging: "Alterung",
             makeup_stability: "Make-up-Stabilität"
         },
-        diagnosis: {
+        analysis: {
             notSure: "Nicht sicher",
             improveAccuracy: "Genauigkeit erhöhen",
             moreQuestions: "weitere Fragen",
@@ -622,7 +620,7 @@ export const translations = {
             processing: "Hautvektoren werden analysiert...",
             completing: "10-Dimensionen-Strategie wird synchronisiert...",
 
-            // Diagnosis.tsx additions
+            // Analysis.tsx additions
             contextTitle: "Erzählen Sie uns zunächst von Ihrem Hautkontext",
             contextSub: "Wählen Sie alle zutreffenden Aussagen — dies personalisiert Ihre Analyse",
             skinTypeTitle: "Was ist Ihr grundlegender Hauttyp?",
@@ -818,7 +816,6 @@ export const translations = {
 
         // ── Scalar string fallbacks ─────────────────────────────────────────
         get products() { return translations.en.products; },
-        get startDiagnosis() { return translations.en.startDiagnosis; },
         get startAnalysis() { return translations.en.startAnalysis; },
         get login() { return translations.en.login; },
         get signUp() { return translations.en.signUp; },
@@ -837,12 +834,12 @@ export const translations = {
         get addressBook() { return translations.en.addressBook; },
         get orders() { return translations.en.orders; },
         get logout() { return translations.en.logout; },
-        get noDiagnosis() { return translations.en.noDiagnosis; },
+        get noAnalysis() { return translations.en.noAnalysis; },
         get startNow() { return translations.en.startNow; },
         get myVector() { return translations.en.myVector; },
         get myRoutine() { return translations.en.myRoutine; },
         get diagnosesSaved() { return translations.en.diagnosesSaved; },
-        get diagnosisHistory() { return translations.en.diagnosisHistory; },
+        get analysisHistory() { return translations.en.analysisHistory; },
         get latestResult() { return translations.en.latestResult; },
         get retakeAdvice() { return translations.en.retakeAdvice; },
         get retakeFull() { return translations.en.retakeFull; },
@@ -863,7 +860,7 @@ export const translations = {
         get loginPage() { return translations.en.loginPage; },
         get markers() { return translations.en.markers; },
         get axes() { return translations.en.axes; },
-        get diagnosis() { return translations.en.diagnosis; },
+        get analysis() { return translations.en.analysis; },
         get results() { return translations.en.results; },
 
         // ── Korean-specific overrides ───────────────────────────────────────
@@ -988,7 +985,7 @@ export const phase1T = {
             hero: [
                 { headline: "Your perfect routine,\nfind it now.", sub: "Discover your bespoke skincare protocol\nwith a 60-second AI analysis.", cta: "Start My Analysis" },
                 { headline: "Skincare that understands you.", sub: "We analyze your skin state and concerns\nto build your perfect routine.", cta: "Begin Analysis" },
-                { headline: "Curated for your skin.", sub: "Start instantly with selected skincare\nand clinical home devices.", cta: "Find My Routine" },
+                { headline: "Curated for your skin.", sub: "Start instantly with selected skincare\nand professional home devices.", cta: "Find My Routine" },
             ],
             usp: [
                 { label: "Korean Biometric Science" },
@@ -1004,13 +1001,13 @@ export const phase1T = {
             routines: [
                 { badge: "3-Step", title: "Essentials", desc: "Cleanse · Moisturize · Protect", cta: "Explore Now" },
                 { badge: "5-Step", title: "Advanced", desc: "Cleanse · Toner · Serum · Eye Cream · Moisturizer", cta: "Explore Now" },
-                { badge: "5-Step + Device", title: "Premium", desc: "Full Protocol + clinical RF/LED home device", cta: "Explore Now" },
+                { badge: "5-Step + Device", title: "Premium", desc: "Full Protocol + professional RF/LED home device", cta: "Explore Now" },
             ],
             bannerHeadline: "Determine Your\nSkin Type",
             bannerSub: "Every skin is unique.\nOur algorithm finds your personal protocol.",
             bannerCta: "Free Skin Analysis",
             newsletterHeadline: "Exclusive Newsletter",
-            newsletterSub: "10% off your first order + clinical skincare tips\ndelivered to your inbox.",
+            newsletterSub: "10% off your first order + professional skincare tips\ndelivered to your inbox.",
             newsletterPlaceholder: "Your email address",
             newsletterSubmit: "Subscribe",
             newsletterGdpr: "I agree to the privacy policy.",
@@ -1050,7 +1047,7 @@ export const phase1T = {
         loginPage: {
             title: "안전한 접근",
             titleSignup: "계정 만들기",
-            subtitle: "10축 피부 전략은 임상적 자산입니다. 로그인하여 정밀 데이터를 보호하고 맞춤 포뮬러를 확인하세요. 저장되지 않은 데이터는 사라집니다.",
+            subtitle: "10축 피부 전략은 전문적인적 자산입니다. 로그인하여 정밀 데이터를 보호하고 맞춤 포뮬러를 확인하세요. 저장되지 않은 데이터는 사라집니다.",
             subtitleSignup: "Skin Strategy Lab 계정을 만드세요.",
             tabLogin: "로그인",
             tabSignup: "회원가입",
@@ -1085,7 +1082,7 @@ export const phase1T = {
             ],
             usp: [
                 { label: "한국 바이오메트릭 사이언스" },
-                { label: "피부과 테스트 완료" },
+                { label: "전문가 테스트 완료" },
                 { label: "Made in Korea" },
                 { label: "개인 맞춤 프로토콜" },
             ],
@@ -1093,17 +1090,17 @@ export const phase1T = {
             concernSub: "고민을 선택하면 맞춤 제품을 확인할 수 있습니다.",
             noProducts: "이 카테고리에 해당하는 제품이 없습니다.",
             routineTitle: "우리의 루틴",
-            routineSub: "임상적으로 선별된 스킨케어 세트 — 피부 데이터에 맞춤.",
+            routineSub: "전문적인적으로 선별된 스킨케어 세트 — 피부 데이터에 맞춤.",
             routines: [
                 { badge: "3단계", title: "입문", desc: "클렌징 · 보습 · 보호", cta: "루틴 시작" },
                 { badge: "5단계", title: "풀 프로토콜", desc: "클렌징 · 토너 · 세럼 · 아이크림 · 보습", cta: "루틴 시작" },
-                { badge: "5단계 + 디바이스", title: "프리미엄 전략", desc: "풀 프로토콜 +\n임상 RF/LED 홈 디바이스", cta: "루틴 시작" },
+                { badge: "5단계 + 디바이스", title: "프리미엄 전략", desc: "풀 프로토콜 +\n전문적인 RF/LED 홈 디바이스", cta: "루틴 시작" },
             ],
             bannerHeadline: "나의 피부 타입 알아보기",
             bannerSub: "모든 피부는 고유합니다.\n알고리즘이 당신만의 프로토콜을 찾아드립니다.",
             bannerCta: "무료 피부 분석",
             newsletterHeadline: "독점 뉴스레터",
-            newsletterSub: "첫 주문 10% 할인 + 임상 스킨케어 팁을 받아보세요.",
+            newsletterSub: "첫 주문 10% 할인 + 전문적인 스킨케어 팁을 받아보세요.",
             newsletterPlaceholder: "이메일 주소",
             newsletterSubmit: "구독하기",
             newsletterGdpr: "개인정보 처리방침에 동의합니다.",

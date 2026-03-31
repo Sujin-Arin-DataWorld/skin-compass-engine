@@ -30,7 +30,7 @@ const Impressum = () => (
         <section className="pt-8 border-t border-border/50 text-xs">
           <h3 className="font-medium text-foreground mb-2">Haftungsausschluss (Disclaimer)</h3>
           <p className="mb-4">
-            Die Inhalte dieser Website (insbesondere die Hautanalyse) dienen ausschließlich zu Informationszwecken und ersetzen keine professionelle medizinische Beratung, Diagnose oder Behandlung.
+            Die Inhalte dieser Website (insbesondere die Hautanalyse) dienen ausschließlich kosmetischen und informativen Zwecken und stellen keine medizinische Diagnose oder Behandlung dar.
           </p>
           <p>
             Wir sind gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen.

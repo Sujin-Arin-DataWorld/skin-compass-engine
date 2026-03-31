@@ -39,7 +39,7 @@ function EmptyWishlist({ de }: { de: boolean }) {
             </p>
 
             <Link
-                to="/diagnosis"
+                to="/skin-assessment"
                 className="px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-80"
                 style={{ background: GOLD, color: "#F5F5F7" }}
             >

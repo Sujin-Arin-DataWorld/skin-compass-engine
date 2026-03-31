@@ -1,7 +1,7 @@
 // Prompt 3 — PART C: SkinAnalysisPage
 // State machine: idle → camera → analyzing → result → error
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from 'next-themes';
@@ -10,6 +10,7 @@ import LiveCamera from '@/components/SkinAnalysis/LiveCamera';
 import LifestyleSurvey from '@/components/SkinAnalysis/LifestyleSurvey';
 import AnalysisLoading from '@/components/SkinAnalysis/AnalysisLoading';
 import AnalysisResults from '@/components/SkinAnalysis/AnalysisResults';
+import BiometricConsentModal from '@/components/SkinAnalysis/BiometricConsentModal';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { analyzeSkinImage } from '@/services/skinAnalysisService';
@@ -65,7 +66,7 @@ const SKIN_ANALYSIS_META = {
   },
   en: {
     title: 'AI Skin Analysis | SkinStrategyLab',
-    description: 'Analyze your skin across 10 axes with a 60-second AI diagnosis and get personalized skincare recommendations.',
+    description: 'Analyze your skin across 10 axes with a 60-second AI analysis and get personalized skincare recommendations.',
   },
   de: {
     title: 'KI-Hautanalyse | SkinStrategyLab',
@@ -98,6 +99,7 @@ function derivePrimaryConcerns(scores: SkinAxisScores): SkinConcern[] {
 }
 
 export default function SkinAnalysisPage() {
+  const [showBiometricModal, setShowBiometricModal] = useState(false);
   const {
     currentStep,
     capturedImageBase64,
@@ -157,10 +159,10 @@ export default function SkinAnalysisPage() {
       localStorage.removeItem('ssl_pending_analysis');
 
       // Show success toast after restore
-      const restoreMsg = language === 'ko' ? '분석 결과가 안전하게 복원되었어요' 
+      const restoreMsg = language === 'ko' ? '분석 결과가 안전하게 복원되었어요'
         : language === 'de' ? 'Analyseergebnisse sicher wiederhergestellt'
-        : 'Analysis results safely restored';
-        
+          : 'Analysis results safely restored';
+
       // Delay slightly so SkinAnalysisPage has rendered the result view
       setTimeout(() => {
         toast.success(restoreMsg, {
@@ -641,20 +643,20 @@ export default function SkinAnalysisPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.55 }}
                     onClick={async () => {
+                      const hasConsent = localStorage.getItem('biometric_consent') === 'true';
+                      if (!hasConsent) {
+                        setShowBiometricModal(true);
+                        return;
+                      }
+                      
                       try {
-                        // Request camera permission now — browser popup appears
-                        // over this friendly prompt screen, NOT a black camera view
+                        // Request camera permission now
                         const stream = await navigator.mediaDevices.getUserMedia({
                           video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
                         });
-                        // Permission granted — stop the preview stream immediately
-                        // (LiveCamera will create its own stream)
                         stream.getTracks().forEach((t) => t.stop());
-                        // Advance to camera step — getUserMedia will succeed instantly
-                        // since permission is now cached by the browser
                         setStep('camera');
                       } catch {
-                        // Permission denied or no camera — go to error
                         setError(t.camera.permissionNeeded);
                       }
                     }}

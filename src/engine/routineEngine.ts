@@ -9,7 +9,7 @@
  * Products sourced from product_db_merged.json via productBridge.ts.
  * Zero hardcoded product catalogs — ONE source of truth.
  *
- * Clinical Safety Gate (Advanced tier):
+ * Safety Gate (Advanced tier):
  *   IF barrier > 85 OR atopyFlag → advanced = null.
  *
  * Skin Rescue Hard Override (B-3):
@@ -20,7 +20,7 @@
  */
 
 import type { SkinVector } from "@/engine/types";
-import type { AxisResponses, ImplicitFlags } from "@/store/diagnosisStore";
+import type { AxisResponses, ImplicitFlags } from "@/store/analysisStore";
 import {
   findProductsForSlot,
   getProductById,
@@ -89,8 +89,8 @@ export interface RoutineLevel {
 export interface SkinRescueProtocol {
   isActive: true;
   /** Which trigger condition fired the override. */
-  trigger: "atopyFlag" | "diagnosis" | "itch+barrier";
-  /** Forced 3-Step routine using K-Derma clinical brands only. */
+  trigger: "atopyFlag" | "confirmed_condition" | "itch+barrier";
+  /** Forced 3-Step routine using K-Derma specialized brands only. */
   routine: RoutineLevel;
   disclaimer: { en: string; de: string; ko: string };
 }
@@ -99,7 +99,7 @@ export interface RoutineOutput {
   baseType: BaseType;
   targetTrouble: TargetTrouble;
   /**
-   * Non-null when advanced is blocked by the Clinical Safety Gate.
+   * Non-null when advanced is blocked by the Safety Gate.
    * The UI should show this message instead of the advanced routine.
    */
   advancedCaution: { en: string; de: string; ko: string } | null;
@@ -170,7 +170,7 @@ export function deriveBaseType(sebum: number, hydration: number): BaseType {
 }
 
 /**
- * Evaluates the SkinVector against a strict Clinical Hierarchy.
+ * Evaluates the SkinVector against a strict Priority Hierarchy.
  * The first condition matched becomes the PRIMARY TargetTrouble —
  * it is NOT overridden by lower-priority concerns.
  */
@@ -204,10 +204,10 @@ export function isSkinRescueRequired(
     return { required: true, trigger: "atopyFlag" };
   }
 
-  // Trigger 2: Confirmed clinical diagnosis via direct question answer
-  const dx = axisResponses.neurodermatitis?.diagnosis;
+  // Trigger 2: Confirmed skin condition via direct question answer
+  const dx = axisResponses.neurodermatitis?.confirmedCondition;
   if (dx === "dx_atopic" || dx === "dx_psoriasis") {
-    return { required: true, trigger: "diagnosis" };
+    return { required: true, trigger: "confirmed_condition" };
   }
 
   // Trigger 3: Chronic itch + severely compromised barrier (cross-validated)
@@ -265,9 +265,9 @@ function buildSkinRescueProtocol(
     trigger,
     routine,
     disclaimer: {
-      en: "Based on your responses, we recommend clinically-tested dermatological products. For chronic conditions, please also consult a dermatologist (Hautarzt).",
+      en: "Based on your responses, we recommend dermatologically-tested professional skincare products. For chronic conditions, please also consult a skin specialist (Hautarzt).",
       de: "Basierend auf Ihren Angaben empfehlen wir dermatologisch getestete Produkte. Bei chronischen Erkrankungen empfehlen wir zusätzlich die Konsultation eines Hautarztes.",
-      ko: "귀하의 응답을 바탕으로 임상 테스트된 피부과 전문 제품을 추천드립니다. 만성 질환의 경우 피부과 전문의(Hautarzt) 상담도 병행하시기 바랍니다.",
+      ko: "귀하의 응답을 바탕으로 전문적으로 테스트된 전문가 추천 제품을 안내드립니다. 만성 증상의 경우 피부 전문의(Hautarzt) 상담도 병행하시기 바랍니다.",
     },
   };
 }
@@ -373,13 +373,13 @@ function buildAdvancedLevel(base: BaseType, trouble: TargetTrouble): RoutineLeve
  * a RoutineOutput with:
  *   - skinRescue: SkinRescueProtocol | null  (B-3 hard override — checked FIRST)
  *   - minimalist (3-step), committed (5-step), advanced (device) routines
- *   - advancedCaution when the Clinical Safety Gate blocks the advanced tier
+ *   - advancedCaution when the Safety Gate blocks the advanced tier
  *
  * Evaluation order (STRICT):
  *   1. B-3 Skin Rescue — if active, skinRescue is non-null. Frontend MUST
  *      display the SOS UI and suppress the standard protocol display.
  *      Device is always locked out when rescue is active (atopyFlag → safetyBlocked).
- *   2. Clinical Safety Gate — barrier > 85 OR atopyFlag → advanced = null.
+ *   2. Safety Gate — barrier > 85 OR atopyFlag → advanced = null.
  *   3. Normal 3-tier routine assembly.
  *
  * All product slots use graceful fallback (null = omitted in UI).
@@ -399,7 +399,7 @@ export function buildRoutine(
     ? buildSkinRescueProtocol(baseType, rescueCheck.trigger!)
     : null;
 
-  // ── Clinical Safety Gate (Advanced tier) ──────────────────────────────────
+  // ── Safety Gate (Advanced tier) ──────────────────────────────────────────
   const safetyBlocked = vector.barrier > 85 || implicitFlags.atopyFlag;
 
   const advancedCaution: RoutineOutput["advancedCaution"] = safetyBlocked

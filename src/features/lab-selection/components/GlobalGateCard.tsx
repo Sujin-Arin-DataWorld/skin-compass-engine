@@ -48,8 +48,8 @@ const T = {
     de: 'Erhöhte Empfindlichkeit erkannt',
   },
   caution_message: {
-    ko: '현재 일부 부위의 민감도가 높아, 피부 장벽 보호를 위해 활성 성분 농도를 임상 안전 기준치 이하로 자동 조정했습니다.',
-    en: 'Some zones show elevated sensitivity. Active ingredient concentrations have been automatically adjusted to clinically safe levels to protect your barrier.',
+    ko: '현재 일부 부위의 민감도가 높아, 피부 장벽 보호를 위해 활성 성분 농도를 전문적인 안전 기준치 이하로 자동 조정했습니다.',
+    en: 'Some zones show elevated sensitivity. Active ingredient concentrations have been automatically adjusted to professionally safe levels to protect your barrier.',
     de: 'Einige Zonen zeigen erhöhte Empfindlichkeit. Die Konzentrationen aktiver Inhaltsstoffe wurden automatisch auf sichere Werte angepasst.',
   },
   caution_details_toggle: {
@@ -382,7 +382,7 @@ export default function GlobalGateCard() {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/diagnosis')}
+          onClick={() => navigate('/analysis')}
           style={{
             padding: '12px 32px', borderRadius: 32, cursor: 'pointer',
             fontSize: 13, fontWeight: 700, letterSpacing: '0.08em',

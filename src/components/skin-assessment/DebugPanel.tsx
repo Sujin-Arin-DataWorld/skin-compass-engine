@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Bug } from "lucide-react";
-import type { DiagnosisResult } from "@/engine/types";
+import type { AnalysisResult } from "@/engine/types";
 import { AXIS_KEYS, AXIS_LABELS } from "@/engine/types";
-type DebugData = NonNullable<DiagnosisResult["_debug"]>;
+type DebugData = NonNullable<AnalysisResult["_debug"]>;
 
 interface DebugPanelProps {
   debugData: DebugData;
@@ -52,11 +52,10 @@ const DebugPanel = ({ debugData }: DebugPanelProps) => {
                 <button
                   key={t.key}
                   onClick={() => setActiveTab(t.key)}
-                  className={`px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider rounded transition-colors ${
-                    activeTab === t.key
+                  className={`px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider rounded transition-colors ${activeTab === t.key
                       ? "bg-primary/20 text-primary"
                       : "text-muted-foreground hover:text-foreground"
-                  }`}
+                    }`}
                 >
                   {t.label}
                 </button>
@@ -80,10 +79,10 @@ const DebugPanel = ({ debugData }: DebugPanelProps) => {
                           debugData.axisSeverities[k] === 0
                             ? "text-severity-clear"
                             : debugData.axisSeverities[k] === 1
-                            ? "text-severity-mild"
-                            : debugData.axisSeverities[k] === 2
-                            ? "text-severity-moderate"
-                            : "text-severity-severe"
+                              ? "text-severity-mild"
+                              : debugData.axisSeverities[k] === 2
+                                ? "text-severity-moderate"
+                                : "text-severity-severe"
                         }
                       />
                     </div>
@@ -102,11 +101,10 @@ const DebugPanel = ({ debugData }: DebugPanelProps) => {
                   <div key={p.id} className="rounded border border-border p-2 font-mono text-[10px]">
                     <div className="flex justify-between items-center">
                       <span className="text-foreground font-medium">{p.name}</span>
-                      <span className={`px-1.5 py-0.5 rounded text-[9px] ${
-                        p.confidence >= 80 ? "bg-severity-severe/20 text-severity-severe"
-                        : p.confidence >= 60 ? "bg-severity-moderate/20 text-severity-moderate"
-                        : "bg-severity-mild/20 text-severity-mild"
-                      }`}>
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] ${p.confidence >= 80 ? "bg-severity-severe/20 text-severity-severe"
+                          : p.confidence >= 60 ? "bg-severity-moderate/20 text-severity-moderate"
+                            : "bg-severity-mild/20 text-severity-mild"
+                        }`}>
                         {p.confidence.toFixed(0)}%
                       </span>
                     </div>
@@ -126,9 +124,8 @@ const DebugPanel = ({ debugData }: DebugPanelProps) => {
                     {Object.entries(debugData.dedupScales).map(([sid, scale]) => (
                       <div
                         key={sid}
-                        className={`rounded border p-1.5 font-mono text-[9px] ${
-                          (scale as number) < 1 ? "border-severity-moderate/40 bg-severity-moderate/5" : "border-border"
-                        }`}
+                        className={`rounded border p-1.5 font-mono text-[9px] ${(scale as number) < 1 ? "border-severity-moderate/40 bg-severity-moderate/5" : "border-border"
+                          }`}
                       >
                         <span className="text-foreground">{sid}</span>
                         <span className="text-muted-foreground ml-1">×{String(scale)}</span>
@@ -146,9 +143,8 @@ const DebugPanel = ({ debugData }: DebugPanelProps) => {
                   <div key={s.id} className="flex items-center gap-2 font-mono text-[10px]">
                     <span className="text-muted-foreground w-4">{i + 1}.</span>
                     <span className="text-foreground w-12">{s.id}</span>
-                    <span className={`w-4 text-center ${
-                      s.severity >= 3 ? "text-severity-severe" : s.severity >= 2 ? "text-severity-moderate" : "text-severity-mild"
-                    }`}>
+                    <span className={`w-4 text-center ${s.severity >= 3 ? "text-severity-severe" : s.severity >= 2 ? "text-severity-moderate" : "text-severity-mild"
+                      }`}>
                       {s.severity}
                     </span>
                     <span className="text-muted-foreground truncate">{s.text}</span>

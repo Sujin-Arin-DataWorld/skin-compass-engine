@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { supabase } from '@/integrations/supabase/client';
 import {
   LabSelectionState,
-  ZoneDiagnosis,
+  ZoneAssessment,
   FaceZone,
   Product,
   PriceTier,
@@ -14,7 +14,7 @@ import {
 } from '../types';
 import { PH_CONFLICTS, ZONE_COLORS } from '../data/textureRules';
 import { inferTimeOfDay, buildZoneOverlay } from '../utils/routineHelpers';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -64,7 +64,7 @@ function detectConflicts(
 // ── Initial state ─────────────────────────────────────────────────────────────
 
 const INITIAL_STATE = {
-  zoneDiagnoses: [] as ZoneDiagnosis[],
+  zoneDiagnoses: [] as ZoneAssessment[],
   gateResult: null as GlobalGateResult | null,
   selectedProducts: new Map<FaceZone, { product: Product; tier: PriceTier }>(),
   finalRoutine: null as FinalRoutine | null,
@@ -80,7 +80,7 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
   ...INITIAL_STATE,
 
   // ── setZoneDiagnoses ────────────────────────────────────────────────────────
-  setZoneDiagnoses: (diagnoses: ZoneDiagnosis[]) => {
+  setZoneDiagnoses: (diagnoses: ZoneAssessment[]) => {
     set({ zoneDiagnoses: diagnoses, gateResult: null, finalRoutine: null });
   },
 
@@ -104,7 +104,7 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
           break; // No need to check further — worst case found
         }
 
-        if (axisScore.severity === 'severe' && status !== 'recovery_only') {
+        if (axisScore.severity === 'severe') {
           status = 'caution';
           triggeredAxis = axisScore.axis;
           worstSeverity = 'severe';
@@ -117,8 +117,8 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
       status === 'recovery_only'
         ? 'lab.gate.recovery_message'
         : status === 'caution'
-        ? 'lab.gate.caution_title'
-        : '';
+          ? 'lab.gate.caution_title'
+          : '';
 
     set({
       gateResult: {
@@ -128,7 +128,7 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
         message_key: messageKey,
         recovery_products: [],         // populated by GlobalGateCard via useProducts
         recovery_duration_weeks: 2,
-        re_diagnosis_cta: status === 'recovery_only',
+        re_analysis_cta: status === 'recovery_only',
       },
     });
   },
@@ -140,9 +140,9 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
       next.set(zone, { product, tier });
       return { selectedProducts: next, finalRoutine: null };
     });
-    // Sync to diagnosisStore.specialCarePicks so StickyCartBar / Results stays updated
+    // Sync to analysisStore.specialCarePicks so StickyCartBar / Results stays updated
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    useDiagnosisStore.getState().setSpecialCarePick(zone, product as any);
+    useAnalysisStore.getState().setSpecialCarePick(zone, product as any);
   },
 
   // ── removeProduct ───────────────────────────────────────────────────────────
@@ -223,7 +223,7 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
 
     const routine: FinalRoutine = {
       user_id: '',                           // filled in saveRoutine
-      diagnosis_session_id: crypto.randomUUID(),
+      analysis_session_id: crypto.randomUUID(),
       global_gate: gateResult?.status ?? 'full_routine',
       am_routine: amSteps,
       pm_routine: pmSteps,
@@ -254,7 +254,7 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
 
       const row = {
         user_id: user.id,
-        diagnosis_session_id: finalRoutine.diagnosis_session_id,
+        analysis_session_id: finalRoutine.analysis_session_id,
         global_gate_status: finalRoutine.global_gate,
         am_steps: finalRoutine.am_routine,
         pm_steps: finalRoutine.pm_routine,
@@ -268,7 +268,7 @@ export const useLabSelectionStore = create<LabSelectionState>()((set, get) => ({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error: saveErr } = await (supabase as any)
         .from('user_routines')
-        .upsert(row, { onConflict: 'diagnosis_session_id' });
+        .upsert(row, { onConflict: 'analysis_session_id' });
 
       if (saveErr) {
         set({ isLoading: false, error: saveErr.message });

@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
 import { useI18nStore } from "@/store/i18nStore";
 import { useTheme } from "next-themes";
-import { DiagnosisResult, AXIS_LABELS, AXIS_LABELS_DE, RADAR_AXES, AxisKey, AxisScores } from "@/engine/types";
+import { AnalysisResult, AXIS_LABELS, AXIS_LABELS_DE, RADAR_AXES, AxisKey, AxisScores } from "@/engine/types";
 
 interface RadarChartProps {
-    result: DiagnosisResult;
+    result: AnalysisResult;
     highlightAxis?: AxisKey;
-    /** When provided, renders a dashed gray comparison polygon (previous diagnosis) */
+    /** When provided, renders a dashed gray comparison polygon (previous analysis) */
     comparisonScores?: AxisScores;
     /** ISO date string for the previous (comparison) data — used by parent for legend */
     comparisonDate?: string;
@@ -48,7 +48,7 @@ export default function RadarChart({ result, highlightAxis, comparisonScores }: 
     });
     const poly = points.map((p) => `${p.x},${p.y}`).join(" ");
 
-    // Comparison polygon points (previous diagnosis — dashed gray layer)
+    // Comparison polygon points (previous analysis — dashed gray layer)
     const comparisonPoly = comparisonScores
         ? RADAR_AXES.map((key, i) => {
             const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
@@ -85,7 +85,7 @@ export default function RadarChart({ result, highlightAxis, comparisonScores }: 
                     const end = { x: CENTER + RADIUS * Math.cos(angle), y: CENTER + RADIUS * Math.sin(angle) };
                     return <line key={i} x1={CENTER} y1={CENTER} x2={end.x} y2={end.y} stroke="hsl(var(--border))" strokeWidth="0.5" opacity={0.2} />;
                 })}
-                {/* Comparison polygon (previous diagnosis — dashed gray, rendered below current) */}
+                {/* Comparison polygon (previous analysis — dashed gray, rendered below current) */}
                 {comparisonPoly && (
                     <polygon
                         points={comparisonPoly}

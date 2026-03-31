@@ -114,7 +114,7 @@ export const AXIS_INTERPRETATIONS: Partial<Record<AxisKey, {
 export const CRITICAL_MESSAGES: Partial<Record<AxisKey, { en: string; de: string; ko: string }>> = {
   acne: { en: "Inflammation control must come before any actives.", de: "Entzündungskontrolle muss vor anderen Wirkstoffen kommen.", ko: "모든 활성 성분 전에 염증 관리가 선행되어야 합니다." },
   seb: { en: "Oil regulation is the gateway to texture and pore improvement.", de: "Hautöl-Regulierung ist das Tor zur Verbesserung von Textur und Poren.", ko: "피지 조절이 피부결과 모공 개선의 시작점입니다." },
-  hyd: { en: "Barrier hydration is Phase 1 before any targeted treatment.", de: "Barriere-Hydratation ist Phase 1 vor jeder gezielten Behandlung.", ko: "장벽 수분 공급이 모든 집중 케어 전 1단계입니다." },
+  hyd: { en: "Barrier hydration is Phase 1 before any targeted care.", de: "Barriere-Hydratation ist Phase 1 vor jeder gezielten Pflege.", ko: "장벽 수분 공급이 모든 집중 케어 전 1단계입니다." },
   sen: { en: "Barrier calming must precede all active ingredients.", de: "Barriere-Beruhigung muss vor der starken Wirkstoffanwendung stehen.", ko: "모든 활성 성분 전에 장벽 진정이 선행되어야 합니다." },
   pigment: { en: "SPF protocol activation is the highest leverage action.", de: "Aktivierung des SPF-Protokolls ist die wirkungsvollste Maßnahme.", ko: "SPF 프로토콜 실천이 가장 효과적인 조치입니다." },
   texture: { en: "Gentle exfoliation cadence is the critical variable.", de: "Regelmäßiges, schonendes Peeling ist die entscheidende Variable.", ko: "부드러운 각질 제거 주기가 핵심 변수입니다." },
@@ -146,9 +146,9 @@ export const FLAG_MESSAGES: Record<string, {
     body: { en: "Track skin alongside your menstrual cycle for best results.", de: "Beobachten Sie Ihre Haut parallel zu Ihrem Zyklus.", ko: "최상의 효과를 위해 월경 주기와 함께 피부 상태를 기록하세요." },
   },
   DERMATOLOGIST_REFERRAL: {
-    icon: "⚕️",
-    title: { en: "Consultation Advised", de: "Konsultation Empfohlen", ko: "전문의 상담 권장" },
-    body: { en: "Acne severity may benefit from medical treatment.", de: "Die Schwere der Akne könnte von ärztlicher Behandlung profitieren.", ko: "여드름 심각도가 의학적 치료에서 도움을 받을 수 있습니다." },
+    icon: "✨",
+    title: { en: "Consultation Advised", de: "Konsultation Empfohlen", ko: "전문가 상담 권장" },
+    body: { en: "Acne severity may benefit from professional care.", de: "Die Schwere der Akne könnte von professioneller Pflege profitieren.", ko: "여드름 심각도는 전문가의 집중 케어에서 도움을 받을 수 있습니다." },
   },
   DEVICE_RECOMMENDED: {
     icon: "💡",

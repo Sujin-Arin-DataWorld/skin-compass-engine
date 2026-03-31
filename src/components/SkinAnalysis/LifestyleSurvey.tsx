@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Microscope } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { FOUNDATION_QUESTIONS, fqText, fqHint, optLabel } from '@/data/foundationQuestions';
-import { CityClimateInput } from '@/components/diagnosis/CityClimateInput';
+import { CityClimateInput } from '@/components/skin-assessment/CityClimateInput';
 import { useI18nStore } from '@/store/i18nStore';
 import { tokens, ctaTokens, glassTokens, spacing } from '@/lib/designTokens';
 
@@ -29,7 +29,7 @@ const INTRO_COPY = {
     ko: '생활 습관이 피부를 결정합니다',
   },
   desc: {
-    en: 'Answering these questions lets our AI analyze your skin photo with clinical-grade precision — not just what it sees, but why.',
+    en: 'Answering these questions lets our AI analyze your skin photo with professional-grade precision — not just what it sees, but why.',
     de: 'Ihre Antworten ermöglichen unserer KI eine wissenschaftlich präzise Analyse — nicht nur, was sie sieht, sondern warum.',
     ko: 'AI가 피부 사진을 더 정확하게 분석할 수 있도록, 먼저 생활 습관을 파악합니다.',
   },

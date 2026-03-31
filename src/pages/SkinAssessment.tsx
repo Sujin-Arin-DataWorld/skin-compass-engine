@@ -9,14 +9,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 import { useI18nStore } from "@/store/i18nStore";
-import { useDiagnosis } from "@/hooks/useDiagnosis";
+import { useSkinAnalysis } from "@/hooks/useSkinAnalysis";
 import Navbar from "@/components/Navbar";
-import { FaceMapStep } from "@/components/diagnosis/FaceMapStep";
-import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
-import { runDiagnosisV5 } from "@/engine/axisAnswerBridgeV5";
-import { savePendingDiagnosis, clearPendingDiagnosis } from "@/utils/diagnosisPersistence";
+import { FaceMapStep } from "@/components/skin-assessment/FaceMapStep";
+import { CityClimateInput } from "@/components/skin-assessment/CityClimateInput";
+import { runAnalysisV5 } from "@/engine/axisAnswerBridgeV5";
+import { savePendingAnalysis, clearPendingAnalysis } from "@/utils/analysisPersistence";
 import RetestReminderModal from "@/components/RetestReminderModal";
 import { tokens, ctaTokens, glassTokens, buttonTokens, spacing } from "@/lib/designTokens";
 
@@ -236,9 +236,9 @@ function MobileFoundationStepper({
 }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
-const DiagnosisPage: React.FC = () => {
+const SkinAssessmentPage: React.FC = () => {
   const navigate = useNavigate();
-  const store = useDiagnosisStore();
+  const store = useAnalysisStore();
   const { language } = useI18nStore();
   const lang = language as Lang;
   const { resolvedTheme } = useTheme();
@@ -246,7 +246,7 @@ const DiagnosisPage: React.FC = () => {
   const tok = tokens(isDark);
   const ctaTok = ctaTokens(isDark);
   const glassTok = glassTokens(isDark);
-  const { history, loading: historyLoading, saveDiagnosis } = useDiagnosis();
+  const { history, loading: historyLoading, saveAnalysis } = useSkinAnalysis();
 
   // ── URL-synced navigation state ──────────────────────────────────────────────
   // Each phase change (foundation ↔ facemap) creates a browser history entry,
@@ -322,9 +322,9 @@ const DiagnosisPage: React.FC = () => {
   const hasCheckedHistory = useRef(false);
 
   // Auth guard — temporarily disabled for local dev
-  // if (!isLoggedIn) return <Navigate to="/login?redirect=/diagnosis" replace />;
+  // if (!isLoggedIn) return <Navigate to="/login?redirect=/skin-assessment" replace />;
 
-  // ── Task 1: Reset diagnosis state on mount to clear leftover zone data ──────
+  // ── Task 1: Reset analysis state on mount to clear leftover zone data ──────
   useEffect(() => {
     store.reset();
     setFounds({});
@@ -355,7 +355,7 @@ const DiagnosisPage: React.FC = () => {
   // Retest modal data
   const lastRecord = history[0] ?? null;
   const radarScores = (lastRecord?.radar_data ?? null) as Record<string, number> | null;
-  const lastDiagnosedAt = lastRecord?.diagnosed_at ?? null;
+  const lastDiagnosedAt = lastRecord?.analyzed_at ?? null;
   const lastTier = lastRecord?.skin_tier ?? null;
 
   // Derived state
@@ -386,11 +386,11 @@ const DiagnosisPage: React.FC = () => {
   const handleCompleteAnalysis = useCallback(async () => {
     if (analyzing) return;
 
-    const { selectedZones } = useDiagnosisStore.getState();
+    const { selectedZones } = useAnalysisStore.getState();
 
     // Warn but don't silently block — user clicked the button, so proceed regardless
     const facemapConcerns = Object.values(selectedZones ?? {})
-      .reduce((sum, z) => sum + (z?.concerns?.length ?? 0), 0);
+      .reduce((sum, z: any) => sum + (z?.concerns?.length ?? 0), 0);
 
     if (facemapConcerns === 0) {
       console.warn("[handleCompleteAnalysis] No face map concerns found — proceeding with axis answers only");
@@ -403,8 +403,8 @@ const DiagnosisPage: React.FC = () => {
 
       // Use getState() to guarantee we read the latest Zustand state,
       // not the potentially-stale React hook snapshot captured in this closure.
-      const freshState = useDiagnosisStore.getState();
-      const result = runDiagnosisV5({
+      const freshState = useAnalysisStore.getState();
+      const result = runAnalysisV5({
         axisAnswers: freshState.axisAnswers,
         selectedZones: freshState.selectedZones ?? {},
         implicitFlags: freshState.implicitFlags,
@@ -432,7 +432,7 @@ const DiagnosisPage: React.FC = () => {
       );
 
       // Persist to localStorage immediately — survives guest→login page reload
-      savePendingDiagnosis({
+      savePendingAnalysis({
         completedAt: new Date().toISOString(),
         axisScores: result.axis_scores as Record<string, number>,
         axisSeverity: (result.axis_severity ?? {}) as Record<string, string>,
@@ -445,7 +445,7 @@ const DiagnosisPage: React.FC = () => {
       // saveDiagnosis failure is non-fatal — navigate regardless.
       // Race against an 8-second timeout so a Supabase hang never freezes the spinner.
       try {
-        const savePromise = saveDiagnosis(
+        const savePromise = saveAnalysis(
           result.axis_scores as Record<string, number>,
           TIER_MAP[freshState.selectedTier] ?? "Entry",
           flatProducts
@@ -455,9 +455,9 @@ const DiagnosisPage: React.FC = () => {
         );
         await Promise.race([savePromise, timeoutPromise]);
         // Authenticated save succeeded — no need to keep the localStorage copy
-        clearPendingDiagnosis();
+        clearPendingAnalysis();
       } catch (saveErr) {
-        console.warn("[handleCompleteAnalysis] saveDiagnosis failed (non-fatal):", saveErr);
+        console.warn("[handleCompleteAnalysis] saveAnalysis failed (non-fatal):", saveErr);
         toast.error(
           lang === "ko" ? "결과 저장에 실패했습니다. 다시 시도해주세요."
             : lang === "de" ? "Ergebnisse konnten nicht gespeichert werden. Bitte versuchen Sie es erneut."
@@ -472,7 +472,7 @@ const DiagnosisPage: React.FC = () => {
     } finally {
       setAnalyzing(false);
     }
-  }, [analyzing, store, saveDiagnosis, navigate]);
+  }, [analyzing, store, saveAnalysis, navigate]);
 
   return (
     <div style={{
@@ -732,4 +732,4 @@ const DiagnosisPage: React.FC = () => {
   );
 };
 
-export default DiagnosisPage;
+export default SkinAssessmentPage;

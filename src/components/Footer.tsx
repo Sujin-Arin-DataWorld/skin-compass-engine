@@ -6,6 +6,13 @@ const FOOTER_LINKS = {
   impressum:  { ko: '법적 고지',         en: 'Legal Notice',    de: 'Impressum'    },
   datenschutz:{ ko: '개인정보 처리방침', en: 'Privacy Policy',  de: 'Datenschutz'  },
   agb:        { ko: '이용약관',          en: 'Terms of Service', de: 'AGB'         },
+  widerruf:   { ko: '청약철회(환불) 안내', en: 'Right of Withdrawal', de: 'Widerrufsbelehrung' },
+} as const;
+
+const DISCLAIMER = {
+  ko: "본 툴은 화장품 추천 용도이며, 의학적 진단이나 치료를 제공하지 않습니다.",
+  en: "This tool is for cosmetic purposes only and does not provide medical analysis or treatment.",
+  de: "Dieses Tool dient ausschließlich kosmetischen Zwecken und stellt keine medizinische Diagnose oder Behandlung dar."
 } as const;
 
 type Lang = keyof typeof FOOTER_LINKS.about;
@@ -15,6 +22,7 @@ const LINKS: { key: keyof typeof FOOTER_LINKS; to: string }[] = [
   { key: "impressum",   to: "/impressum" },
   { key: "datenschutz", to: "/datenschutz" },
   { key: "agb",         to: "/agb" },
+  { key: "widerruf",    to: "/widerrufsbelehrung" },
 ];
 
 const Footer = () => {
@@ -35,6 +43,9 @@ const Footer = () => {
             </Link>
           ))}
         </div>
+        <p className="border-t border-border/30 pt-4 mt-2 max-w-[600px] text-center text-[10px] leading-relaxed text-muted-foreground/60 transition-colors">
+          {DISCLAIMER[lang] ?? DISCLAIMER.en}
+        </p>
         <p className="text-[11px] font-bold tracking-[0.15em] text-muted-foreground/70 uppercase">
           POWERED BY KOREAN BIOMETRIC DATA SCIENCE — GERMANY
         </p>

@@ -2,7 +2,7 @@
  * RoutineBuilder.tsx
  *
  * Layer 3 UI: displays the final AM/PM/mask routine, pH conflict warnings,
- * clinical safety banners, and the Save Routine CTA.
+ * professional safety banners, and the Save Routine CTA.
  *
  * Safety rules wired here (via useRoutineBuilder):
  *   RULE 1 — Cumulative Irritation  (warning banner or hard block)

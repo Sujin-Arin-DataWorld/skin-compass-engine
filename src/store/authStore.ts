@@ -2,7 +2,7 @@
  * authStore.ts — Authentication & Session Management (Single Responsibility)
  *
  * ⚡ Role: Auth state (login/logout/session) + lightweight Navbar profile cache.
- * ⚡ NOT responsible for: addresses (→ useAddresses), diagnosis history (→ useDiagnosis),
+ * ⚡ NOT responsible for: addresses (→ useAddresses), analysis history (→ useAnalysis),
  *    detailed profile data (→ useProfile). Those live in their dedicated Supabase hooks.
  */
 import { create } from "zustand";
@@ -142,11 +142,10 @@ export const useAuthStore = create<AuthState>()(
                 // 3. Nuke persisted localStorage keys (app keys + Supabase sb-* session keys)
                 try {
                     localStorage.removeItem("skin-strategy-auth");
-                    localStorage.removeItem("skin-diagnosis-store");
                     localStorage.removeItem("skin-analysis-store");
                     localStorage.removeItem("skin-compass-cart-v1");
                     localStorage.removeItem("skin-compass-products-v2");
-                    localStorage.removeItem("ssl_diagnosis_progress");
+                    localStorage.removeItem("ssl_analysis_progress");
                     // Belt-and-suspenders: force-clear Supabase session even if signOut timed out
                     Object.keys(localStorage).forEach(k => {
                         if (k.startsWith('sb-')) localStorage.removeItem(k);

@@ -1,13 +1,13 @@
-// src/engine/diagnosisComparison.ts
-// Re-diagnosis comparison utilities (Part C — Steps 3 & 4)
+// src/engine/analysisComparison.ts
+// Re-analysis comparison utilities (Part C — Steps 3 & 4)
 
 import { AXIS_KEYS, AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO } from "@/engine/types";
 import type { AxisKey, AxisScores } from "@/engine/types";
 import type { Lang } from "@/engine/questionRoutingV5";
 
-// ─── Step 3-B: DiagnosisComparison interface ─────────────────────────────────
+// ─── Step 3-B: AnalysisComparison interface ─────────────────────────────────
 
-export interface DiagnosisComparison {
+export interface AnalysisComparison {
   previous: { date: string; scores: AxisScores };
   current: { date: string; scores: AxisScores };
   changes: Record<AxisKey, {
@@ -61,13 +61,13 @@ function generateAxisChangeMessage(
 
 // ─── Build full comparison object ────────────────────────────────────────────
 
-export function buildDiagnosisComparison(
+export function buildAnalysisComparison(
   previousDate: string,
   previousScores: AxisScores,
   currentDate: string,
   currentScores: AxisScores,
-): DiagnosisComparison {
-  const changes = {} as DiagnosisComparison["changes"];
+): AnalysisComparison {
+  const changes = {} as AnalysisComparison["changes"];
   let improvedCount = 0, stableCount = 0, worsenedCount = 0;
 
   for (const axis of AXIS_KEYS) {
@@ -80,12 +80,12 @@ export function buildDiagnosisComparison(
 
   const summary: Record<Lang, string> = {
     en: improvedCount > worsenedCount
-      ? `Great progress — ${improvedCount} axes improved since your last diagnosis.`
+      ? `Great progress — ${improvedCount} axes improved since your last analysis.`
       : worsenedCount > improvedCount
         ? `${worsenedCount} areas need attention — let's review your routine.`
         : `Your skin is holding steady — ${stableCount} axes are stable.`,
     de: improvedCount > worsenedCount
-      ? `Guter Fortschritt — ${improvedCount} Bereiche haben sich seit der letzten Diagnose verbessert.`
+      ? `Guter Fortschritt — ${improvedCount} Bereiche haben sich seit der letzten Analyse verbessert.`
       : worsenedCount > improvedCount
         ? `${worsenedCount} Bereiche brauchen Aufmerksamkeit — überprüfen wir Ihre Pflege.`
         : `Ihre Haut ist stabil — ${stableCount} Bereiche halten das Niveau.`,
@@ -109,13 +109,13 @@ export function buildDiagnosisComparison(
 export const RECHECK_PROMPT: Record<Lang, { title: string; body: string; cta: string }> = {
   en: {
     title: "Time for a Re-Check",
-    body: "It's been 4 weeks since your last diagnosis. Your skin changes with seasons, hormones, and habits.",
-    cta: "Re-diagnose now →",
+    body: "It's been 4 weeks since your last analysis. Your skin changes with seasons, hormones, and habits.",
+    cta: "Re-analyze now →",
   },
   de: {
     title: "Zeit für einen Re-Check",
-    body: "4 Wochen seit Ihrer letzten Diagnose. Ihre Haut verändert sich mit Jahreszeiten, Hormonen und Gewohnheiten.",
-    cta: "Jetzt neu diagnostizieren →",
+    body: "4 Wochen seit Ihrer letzten Analyse. Ihre Haut verändert sich mit Jahreszeiten, Hormonen und Gewohnheiten.",
+    cta: "Jetzt neu analysieren →",
   },
   ko: {
     title: "재분석 시간이에요",
@@ -124,10 +124,10 @@ export const RECHECK_PROMPT: Record<Lang, { title: string; body: string; cta: st
   },
 };
 
-/** Returns true if the user's last diagnosis was ≥ 4 weeks ago */
-export function isRecheckDue(lastDiagnosisDate: string | null): boolean {
-  if (!lastDiagnosisDate) return false;
-  const ms = Date.now() - new Date(lastDiagnosisDate).getTime();
+/** Returns true if the user's last analysis was ≥ 4 weeks ago */
+export function isRecheckDue(lastAnalysisDate: string | null): boolean {
+  if (!lastAnalysisDate) return false;
+  const ms = Date.now() - new Date(lastAnalysisDate).getTime();
   return ms >= 28 * 24 * 60 * 60 * 1000; // 28 days
 }
 

@@ -72,7 +72,7 @@ const UI = {
   hold_title: { ko: '🛑 활성 성분 일시 중단', en: '🛑 Actives on hold', de: '🛑 Wirkstoffe pausiert' },
   hold_body: { ko: '현재 피부 상태에서는 모든 활성 성분을 중단하고 장벽 복구에 집중해야 합니다.', en: 'All active ingredients are on hold for this zone. Focus on barrier repair first.', de: 'Alle Wirkstoffe sind für diese Zone pausiert. Fokus auf Barrierereparatur.' },
   no_concerns: { ko: '이 부위는 별도 처방이 필요하지 않습니다.', en: 'No specific concerns for this zone.', de: 'Keine besonderen Anforderungen für diese Zone.' },
-  axis_label: { ko: '분석 축', en: 'Diagnosis axes', de: 'Analysedimensionen' },
+  axis_label: { ko: '분석 축', en: 'Analysis axes', de: 'Analysedimensionen' },
 } as const;
 
 function tUI(key: keyof typeof UI, lang: Lang, vars?: Record<string, string>): string {
@@ -399,7 +399,7 @@ export default function ScientificStandardCard({
             color: isDark ? 'rgba(147,197,253,0.6)' : 'rgba(29,78,216,0.6)',
             fontFamily: 'var(--font-sans)', marginBottom: 3,
           }}>
-            {lang === 'ko' ? '임상 분석' : lang === 'de' ? 'Wissenschaftliche Analyse' : 'Scientific Analysis'}
+            {lang === 'ko' ? '전문적인 분석' : lang === 'de' ? 'Wissenschaftliche Analyse' : 'Scientific Analysis'}
           </div>
           <div style={{
             fontSize: 18, fontWeight: 700,

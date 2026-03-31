@@ -1,7 +1,7 @@
 /**
  * scoringEngineV5.ts
  *
- * New scoring pipeline for the 3-phase diagnosis flow.
+ * New scoring pipeline for the 3-phase analysis flow.
  * Produces 0-100 axis scores from:
  *   Layer 1 — Zone concern spread          (max 45 pts)
  *   Layer 2 — Deep-dive question severity  (max 35 pts)
@@ -350,7 +350,7 @@ function buildFoundationMods(
     mods.ox.push({ factor: "altitude_occasional", multiplier: 1.18 });
   }
 
-  // ── Menopause modifiers (clinical: 30% collagen loss in first 5 years) ────────
+  // ── Menopause modifiers (research: 30% collagen loss in first 5 years) ────────
   const meno = f.menopause_status;
   if (meno === "meno_peri") {
     mods.sen.push(  { factor: "perimenopause_sensitivity",      multiplier: 1.12 });

@@ -37,9 +37,9 @@ const DE = {
             ],
         },
         {
-            title: "3a. KI-Hautdiagnose — Verarbeitung biometrischer Daten (Gesichtsbilder)",
+            title: "3a. KI-Hautanalyse — Verarbeitung biometrischer Daten (Gesichtsbilder)",
             blocks: [
-                "Im Rahmen der KI-Hautdiagnose können Sie ein Foto Ihres Gesichts aufnehmen oder hochladen. Dieses Gesichtsbild wird als biometrisches Datum gemäß Art. 9 DSGVO behandelt.",
+                "Im Rahmen der KI-Hautanalyse können Sie ein Foto Ihres Gesichts aufnehmen oder hochladen. Dieses Gesichtsbild wird als biometrisches Datum gemäß Art. 9 DSGVO behandelt.",
                 "##Null-Speicherung-Garantie (Zero Data Retention):",
                 "• Das Gesichtsbild wird über eine TLS-verschlüsselte Verbindung (HTTPS) an unsere KI-Analyse-API übertragen.",
                 "• Die Analyse erfolgt in Echtzeit — das Bild wird ausschließlich zur sofortigen Auswertung verarbeitet.",
@@ -47,6 +47,16 @@ const DE = {
                 "• Das Gesichtsbild wird NICHT auf unseren Servern, in der Datenbank, im Cloud-Speicher oder an einem anderen Ort gespeichert.",
                 "• Es erfolgt keine Weitergabe des Bildes an Dritte.",
                 "Die Rechtsgrundlage für die Verarbeitung ist Ihre ausdrückliche Einwilligung gemäß Art. 9 Abs. 2 lit. a DSGVO, die Sie vor der Aufnahme des Fotos erteilen.",
+            ],
+        },
+        {
+            title: "3b. Datenspeicherung und Löschfristen (Data Retention)",
+            blocks: [
+                "Wir verarbeiten und speichern Ihre personenbezogenen Daten nur so lange, wie dies zur Erreichung des Speicherungszwecks erforderlich ist oder sofern dies durch gesetzliche Aufbewahrungsfristen (z. B. nach HGB oder AO) vorgeschrieben wurde.",
+                "##Zero Data Retention Policy für Gesundheitsdaten:",
+                "• Biometrische Daten (Gesichtsbilder) werden unmittelbar nach der Echtzeitanalyse unwiderruflich gelöscht. Es gibt keine Zwischenspeicherung auf unseren Servern.",
+                "• Die errechneten Analyseergebnisse (Scores) werden an Ihr Nutzerkonto gebunden und können jederzeit in den Kontoeinstellungen vollständig gelöscht werden.",
+                "• Ohne Nutzerkonto erstellte Analysen werden zur Aufrechterhaltung der Sitzungs-Funktionalität lokal (Local/Session Storage) gespeichert und serverseitig nach 90 Tagen durch automatisierte Routinen (pg_cron) gelöscht oder anonymisiert."
             ],
         },
         {
@@ -71,7 +81,7 @@ const DE = {
                 "Die Datenverarbeitung erfolgt vollautomatisch über Supabase Auth. Es findet keine manuelle Einsichtnahme in Ihre Google-Nutzerdaten durch Mitarbeiter statt.",
                 "Ihre Google-Nutzerdaten werden NICHT verwendet für:",
                 "• Werbung, Marketing oder Remarketing\n• Profiling oder Verhaltensanalysen\n• Training von KI-/ML-Modellen\n• Datenanreicherung durch Drittquellen\n• Weiterverkauf, Vermietung oder sonstige kommerzielle Verwertung",
-                "Die Google-Nutzerdaten fließen NICHT in die Hautdiagnose-Engine oder die Produktempfehlungslogik ein.",
+                "Die Google-Nutzerdaten fließen NICHT in die Hautanalyse-Engine oder die Produktempfehlungslogik ein.",
                 "###5.3 Datenspeicherung und Sicherheit (Data Storage)",
                 "Ihre Google-Nutzerdaten werden an folgenden Orten gespeichert:",
                 "• Serverseitig: In der Supabase-Authentifizierungsdatenbank (auth.users-Tabelle), gehostet auf Amazon Web Services (AWS) in der Region eu-central-1 (Frankfurt, Deutschland).\n• Clientseitig: Im Local Storage Ihres Browsers (Schlüssel: skin-strategy-auth) zur Aufrechterhaltung Ihrer Sitzung.",
@@ -145,9 +155,9 @@ const EN = {
             ],
         },
         {
-            title: "3a. AI Skin Diagnosis — Processing of Biometric Data (Facial Images)",
+            title: "3a. AI Skin Analysis — Processing of Biometric Data (Facial Images)",
             blocks: [
-                "As part of our AI skin diagnosis, you may take or upload a photo of your face. This facial image is treated as biometric data under Article 9 GDPR.",
+                "As part of our AI skin analysis, you may take or upload a photo of your face. This facial image is treated as biometric data under Article 9 GDPR.",
                 "##Zero Data Retention Guarantee:",
                 "• The facial image is transmitted via a TLS-encrypted connection (HTTPS) to our AI analysis API.",
                 "• Analysis occurs in real-time — the image is processed solely for immediate evaluation.",
@@ -179,7 +189,7 @@ const EN = {
                 "Processing is fully automated via Supabase Auth. No staff member manually accesses your Google user data.",
                 "Your Google user data is NOT used for:",
                 "• Advertising, marketing, or remarketing\n• Profiling or behavioural analysis\n• AI/ML model training\n• Data enrichment from third-party sources\n• Sale, rental, or other commercial exploitation",
-                "Google user data does NOT feed into the skin diagnosis engine or product recommendation logic.",
+                "Google user data does NOT feed into the skin analysis engine or product recommendation logic.",
                 "###5.3 Data Storage and Security",
                 "Your Google user data is stored at:",
                 "• Server-side: In the Supabase authentication database (auth.users table), hosted on Amazon Web Services (AWS) in the eu-central-1 region (Frankfurt, Germany).\n• Client-side: In your browser's Local Storage (key: skin-strategy-auth) for session management.",

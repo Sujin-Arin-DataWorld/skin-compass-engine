@@ -23,7 +23,7 @@ const MENOPAUSE_STATUS_Q: QuestionDef = {
   },
   required: false,
   axisHints: { aging: 0.5, hyd: 0.5, bar: 0.5 },
-  clinicalBasis: {
+  scientificBasis: {
     method: "Brincat et al. Longitudinal Study",
     validation: "30% collagen loss in first 5 postmenopausal years",
     source: "PMC/NIH — J Cosmetic Dermatology 2025",
@@ -252,7 +252,7 @@ export function computeTailQuestions(
   }
 
   // ── CONDITIONAL: Axis clarifiers (max 2, ambiguous axes only) ───────────────
-  // The single most diagnostic question per axis
+  // The single most informative question per axis
   const CLARIFIER_IDS: Partial<Record<string, string>> = {
     seb:     "AX1_Q1",  // "When does shine appear?"
     hyd:     "AX2_Q1",  // "Tight mask feeling after washing?"

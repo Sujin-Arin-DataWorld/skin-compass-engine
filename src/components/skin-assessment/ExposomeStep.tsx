@@ -13,7 +13,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Lang, QuestionAnswer } from "@/engine/questionRoutingV5";
-import { CityClimateInput } from "@/components/diagnosis/CityClimateInput";
+import { CityClimateInput } from "@/components/skin-assessment/CityClimateInput";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

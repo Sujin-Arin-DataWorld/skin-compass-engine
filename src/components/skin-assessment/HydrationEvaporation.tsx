@@ -13,10 +13,10 @@ const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporation
   const t = language === "de" ? translations.de : translations.en;
 
   const RETENTION_LABELS = [
-    { label: t.diagnosis.ui.holdsWell, desc: t.diagnosis.ui.moistureStays },
-    { label: t.diagnosis.ui.fadesGradually, desc: t.diagnosis.ui.driesWithin },
-    { label: t.diagnosis.ui.evaporatesFast, desc: t.diagnosis.ui.goneWithin },
-    { label: t.diagnosis.ui.wontAbsorb, desc: t.diagnosis.ui.immediateLoss },
+    { label: t.analysis.ui.holdsWell, desc: t.analysis.ui.moistureStays },
+    { label: t.analysis.ui.fadesGradually, desc: t.analysis.ui.driesWithin },
+    { label: t.analysis.ui.evaporatesFast, desc: t.analysis.ui.goneWithin },
+    { label: t.analysis.ui.wontAbsorb, desc: t.analysis.ui.immediateLoss },
   ];
 
   const droplets = useMemo(() => {
@@ -36,7 +36,7 @@ const HydrationEvaporation = ({ retentionLevel, onChange }: HydrationEvaporation
   return (
     <LabCard>
       <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-        {t.diagnosis.ui.hydrationRetention}
+        {t.analysis.ui.hydrationRetention}
       </p>
 
       <div className="mt-4 flex flex-col items-center gap-5">

@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 // src/components/hero/AiScanBadge.tsx
-// Metric badge with count-up animation & clinical elegance palette
+// Metric badge with count-up animation & professional elegance palette
 // ═══════════════════════════════════════════════════════════════════════════════
 
 import { useState, useEffect } from 'react';

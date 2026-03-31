@@ -12,10 +12,10 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
   const t = language === "de" ? translations.de : translations.en;
 
   const RECOVERY_LABELS = [
-    { label: t.diagnosis.ui.recoveryFast, desc: t.diagnosis.ui.recoversHours },
-    { label: t.diagnosis.ui.recoveryMedium, desc: t.diagnosis.ui.daysToSettle },
-    { label: t.diagnosis.ui.recoverySlow, desc: t.diagnosis.ui.daysIrritation },
-    { label: t.diagnosis.ui.recoveryVerySlow, desc: t.diagnosis.ui.weekRecovery },
+    { label: t.analysis.ui.recoveryFast, desc: t.analysis.ui.recoversHours },
+    { label: t.analysis.ui.recoveryMedium, desc: t.analysis.ui.daysToSettle },
+    { label: t.analysis.ui.recoverySlow, desc: t.analysis.ui.daysIrritation },
+    { label: t.analysis.ui.recoveryVerySlow, desc: t.analysis.ui.weekRecovery },
   ];
 
   // Recovery animation duration maps to selected speed
@@ -25,10 +25,10 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
   return (
     <LabCard>
       <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-        {t.diagnosis.ui.recoverySpeedLabel}
+        {t.analysis.ui.recoverySpeedLabel}
       </p>
       <p className="mb-4 text-xs text-muted-foreground">
-        {t.diagnosis.ui.calmAfterIrritation}
+        {t.analysis.ui.calmAfterIrritation}
       </p>
 
       <div className="flex flex-col items-center gap-5">
@@ -89,7 +89,7 @@ const RecoveryAnimation = ({ recoverySpeed, onChange }: RecoveryAnimationProps) 
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ duration: animDuration, repeat: Infinity, repeatDelay: 1 }}
             >
-              {recoverySpeed === 0 ? t.diagnosis.ui.quickRecovery : t.diagnosis.ui.recoveringCycle.replace("{s}", animDuration.toString())}
+              {recoverySpeed === 0 ? t.analysis.ui.quickRecovery : t.analysis.ui.recoveringCycle.replace("{s}", animDuration.toString())}
             </motion.span>
           </div>
         </div>

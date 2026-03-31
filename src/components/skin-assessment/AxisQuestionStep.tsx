@@ -29,7 +29,7 @@ interface AxisQuestionStepProps {
 }
 
 /**
- * Renders all questions for a single clinical axis.
+ * Renders all questions for a single professional axis.
  * Handles conditional injection and hideIf logic.
  */
 export function AxisQuestionStep({

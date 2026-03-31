@@ -1,5 +1,5 @@
-// Shared foundation questions for both Diagnosis and AI Skin Analysis flows.
-// Extracted from Diagnosis.tsx to avoid duplication.
+// Shared foundation questions for both Analysis and AI Skin Analysis flows.
+// Extracted from Analysis.tsx to avoid duplication.
 
 export interface FoundationOption {
   label: { en: string; de: string; ko: string };

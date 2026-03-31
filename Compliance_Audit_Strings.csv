@@ -1,0 +1,27 @@
+File,Line,Original Text,Replacement Text,Category
+src/components/routine/RoutinePicker.tsx,41,"treatment","care",String
+src/components/routine/RoutinePicker.tsx,42,"Behandlung","Pflege",String
+src/store/i18nStore.ts,471,"clinical","precision",String
+src/store/i18nStore.ts,471,"dermatologische Forschung","kosmetische Forschung",String
+src/store/i18nStore.ts,489,"Wissenschaftliche Dimensionen","Präzisions-Dimensionen",String
+src/store/i18nStore.ts,509,"Wissenschaftlich abgestimmte Formeln","Präzise abgestimmte Formeln",String
+src/store/i18nStore.ts,518,"wissenschaftliche Skalen","professionelle Skalen",String
+src/store/i18nStore.ts,1100,"피부과 테스트 완료","전문가 테스트 완료",String
+src/engine/types.ts,*,DiagnosisResult,AnalysisResult,Variable
+src/engine/types.ts,*,ClinicalGrade,SeverityGrade,Variable
+src/store/analysisStore.ts,*,useDiagnosisStore,useAnalysisStore,Variable
+src/pages/SkinAssessment.tsx,*,Diagnosis.tsx,SkinAssessment.tsx,File
+index.html,11,"Skin Strategy Lab — Clinically Decoded K-Beauty","Skin Strategy Lab — Expertly Curated K-Beauty",SEO
+index.html,12,"dermatology assessment... clinical precision","skin assessment... expert precision",SEO
+src/components/results/sharedResultsData.ts,*,⚕️,✨,Icon
+public/assets/,*,"medical/clinical imagery","clean spa lab aesthetics",Visual
+src/pages/Datenschutz.tsx,40,"KI-Hautdiagnose","KI-Hautanalyse",String
+src/pages/Datenschutz.tsx,74,"Hautdiagnose-Engine","Hautanalyse-Engine",String
+src/pages/Impressum.tsx,34,"professionelle medizinische Beratung, Diagnose oder Behandlung","kosmetischen und informativen Zwecken",String
+src/pages/Agb.tsx,62,"전문 피부과 의사의 분석","전문가의 분석",String
+src/pages/Agb.tsx,126,"professional dermatological consultation","professional consultation",String
+src/pages/Agb.tsx,190,"professionelle dermatologische Beratung","professionelle Beratung",String
+src/pages/About.tsx,59,"professional dermatology papers","professional cosmetic research",String
+src/pages/About.tsx,80,"dermatologischen Studien","kosmetischen Studien",String
+src/components/Footer.tsx,35,"None","This tool is for cosmetic purposes only...",String
+src/pages/SkinAnalysisPage.tsx,648,"None","I understand that this is a cosmetic analysis...",String

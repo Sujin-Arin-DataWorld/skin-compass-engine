@@ -4,7 +4,7 @@
  * Phase 6 Step 3 — In-app 4-week re-check reminder banner.
  *
  * States:
- *  none     — < 21 days since last diagnosis → renders nothing
+ *  none     — < 21 days since last analysis → renders nothing
  *  upcoming — 21–27 days → subtle gold banner
  *  due      — 28–59 days → prominent banner with CTA
  *  overdue  — ≥ 60 days  → amber urgent banner
@@ -104,7 +104,7 @@ export default function RecheckBanner() {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { data } = await (supabase as any)
-        .from("diagnosis_history")
+        .from("analysis_history")
         .select("diagnosed_at")
         .eq("user_id", user.id)
         .order("diagnosed_at", { ascending: false })
@@ -202,7 +202,7 @@ export default function RecheckBanner() {
           {/* CTA — only for due / overdue */}
           {(bannerState === "due" || bannerState === "overdue") && (
             <button
-              onClick={() => navigate("/diagnosis")}
+              onClick={() => navigate("/analysis")}
               style={{
                 flexShrink: 0,
                 fontSize: 11,

@@ -13,23 +13,23 @@
 import { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 import { useTheme } from 'next-themes';
 import { tokens } from '@/lib/designTokens';
 import DuelCard from '@/features/lab-selection/components/DuelCard';
-import type { FaceZone, ZoneDiagnosis, Product, PriceTier, RequiredIngredient } from '@/features/lab-selection/types';
-import type { DiagnosisResult, AxisKey } from '@/engine/types';
+import type { FaceZone, ZoneAssessment, Product, PriceTier, RequiredIngredient } from '@/features/lab-selection/types';
+import type { AnalysisResult, AxisKey } from '@/engine/types';
 import { CONCERN_TO_AXIS } from '@/engine/faceMapInference';
 import { AXIS_INGREDIENT_MAP } from '@/features/lab-selection/data/axisIngredientMap';
 import { scoreToSeverity } from '@/features/lab-selection/types';
-import type { SelectedZones } from '@/store/diagnosisStore';
+import type { SelectedZones } from '@/store/analysisStore';
 
 // ── Types & maps ───────────────────────────────────────────────────────────────
 
-type DiagnosisAxis = 'sebum' | 'hydration' | 'barrier' | 'sensitivity' | 'pores' | 'pigmentation' | 'aging' | 'texture';
+type AssessmentAxis = 'sebum' | 'hydration' | 'barrier' | 'sensitivity' | 'pores' | 'pigmentation' | 'aging' | 'texture';
 type LangKey = 'en' | 'de' | 'ko';
 
-const ENGINE_TO_LAB_AXIS: Partial<Record<AxisKey, DiagnosisAxis>> = {
+const ENGINE_TO_LAB_AXIS: Partial<Record<AxisKey, AssessmentAxis>> = {
   seb: 'sebum', hyd: 'hydration', bar: 'barrier', sen: 'sensitivity',
   acne: 'pores', pigment: 'pigmentation', aging: 'aging', texture: 'texture',
 };
@@ -40,14 +40,14 @@ const ZONE_ID_MAP: Record<string, FaceZone> = {
 };
 
 const ZONE_LABELS: Record<string, { en: string; de: string; ko: string }> = {
-  forehead:  { en: 'Forehead',  de: 'Stirn',       ko: '이마' },
-  eye_area:  { en: 'Eye Area',  de: 'Augenpartie',  ko: '눈가' },
-  nose:      { en: 'Nose',      de: 'Nase',         ko: '코' },
-  cheeks:    { en: 'Cheeks',    de: 'Wangen',       ko: '볼' },
-  mouth:     { en: 'Mouth',     de: 'Mund',         ko: '입가' },
-  jawline:   { en: 'Jawline',   de: 'Kiefer',       ko: '턱선' },
-  neck:      { en: 'Neck',      de: 'Hals',         ko: '목' },
-  whole_face:{ en: 'Face',      de: 'Gesicht',      ko: '얼굴' },
+  forehead: { en: 'Forehead', de: 'Stirn', ko: '이마' },
+  eye_area: { en: 'Eye Area', de: 'Augenpartie', ko: '눈가' },
+  nose: { en: 'Nose', de: 'Nase', ko: '코' },
+  cheeks: { en: 'Cheeks', de: 'Wangen', ko: '볼' },
+  mouth: { en: 'Mouth', de: 'Mund', ko: '입가' },
+  jawline: { en: 'Jawline', de: 'Kiefer', ko: '턱선' },
+  neck: { en: 'Neck', de: 'Hals', ko: '목' },
+  whole_face: { en: 'Face', de: 'Gesicht', ko: '얼굴' },
 };
 
 const CONCERN_AXIS_MAP: Record<string, AxisKey> = {
@@ -59,25 +59,25 @@ const CONCERN_AXIS_MAP: Record<string, AxisKey> = {
 // ── i18n ───────────────────────────────────────────────────────────────────────
 
 const C = {
-  zone_eyebrow:       { ko: '존 케어', de: 'ZONEN-PFLEGE', en: 'ZONE CARE' },
-  zone_title:         { ko: '이 부위에 집중하면 빠르게 개선돼요', de: 'Fokus auf diese Bereiche beschleunigt Ergebnisse', en: 'Focus here for faster results' },
-  zone_desc:          { ko: '기본 루틴은 전체 피부를 관리하지만, {zone} 부위는 추가 성분이 필요해요.', de: 'Ihre Basis-Routine pflegt die gesamte Haut, aber {zone} braucht spezielle Wirkstoffe.', en: 'Your basic routine covers overall skin, but {zone} needs specialized ingredients.' },
-  zone_urgent:        { ko: '긴급 관리 필요', de: 'Dringend', en: 'Urgent care' },
-  zone_moderate:      { ko: '보통 관리', de: 'Moderate Pflege', en: 'Moderate care' },
-  zone_sufficient:    { ko: '충분', de: 'Ausreichend', en: 'Sufficient' },
-  needs_attention:    { ko: '집중 관리 필요', de: 'AUFMERKSAMKEIT NÖTIG', en: 'NEEDS ATTENTION' },
-  moderate_header:    { ko: '보통 관리', de: 'MODERAT', en: 'MODERATE' },
-  zone_needs:         { ko: '필요: {ingredients}', de: 'Benötigt: {ingredients}', en: 'Needs: {ingredients}' },
+  zone_eyebrow: { ko: '존 케어', de: 'ZONEN-PFLEGE', en: 'ZONE CARE' },
+  zone_title: { ko: '이 부위에 집중하면 빠르게 개선돼요', de: 'Fokus auf diese Bereiche beschleunigt Ergebnisse', en: 'Focus here for faster results' },
+  zone_desc: { ko: '기본 루틴은 전체 피부를 관리하지만, {zone} 부위는 추가 성분이 필요해요.', de: 'Ihre Basis-Routine pflegt die gesamte Haut, aber {zone} braucht spezielle Wirkstoffe.', en: 'Your basic routine covers overall skin, but {zone} needs specialized ingredients.' },
+  zone_urgent: { ko: '긴급 관리 필요', de: 'Dringend', en: 'Urgent care' },
+  zone_moderate: { ko: '보통 관리', de: 'Moderate Pflege', en: 'Moderate care' },
+  zone_sufficient: { ko: '충분', de: 'Ausreichend', en: 'Sufficient' },
+  needs_attention: { ko: '집중 관리 필요', de: 'AUFMERKSAMKEIT NÖTIG', en: 'NEEDS ATTENTION' },
+  moderate_header: { ko: '보통 관리', de: 'MODERAT', en: 'MODERATE' },
+  zone_needs: { ko: '필요: {ingredients}', de: 'Benötigt: {ingredients}', en: 'Needs: {ingredients}' },
   zone_status_urgent: { ko: '기본 루틴에 없는 성분 — 추가 필요', de: 'Nicht in Basis-Routine — Ergänzung nötig', en: 'Not in basic routine — needs addition' },
-  zone_status_mod:    { ko: '기본 루틴으로 부분 관리 — 강화 추천', de: 'Teilweise abgedeckt — Verstärkung empfohlen', en: 'Partially covered — boost recommended' },
-  add_button:         { ko: '+ 추가', de: '+ Hinzufügen', en: '+ Add' },
-  collapse:           { ko: '접기', de: 'Zuklappen', en: 'Collapse' },
-  managed_title:      { ko: '기본 루틴으로 관리됨', de: 'Durch Basis-Routine abgedeckt', en: 'MANAGED BY BASIC ROUTINE' },
-  managed_desc:       { ko: '이 부위들은 기본 루틴으로 충분히 관리되고 있어요. 추가 제품이 필요하지 않습니다.', de: 'Diese Bereiche werden ausreichend durch Ihre Basisroutine abgedeckt. Keine zusätzlichen Produkte nötig.', en: 'These zones are sufficiently covered by your basic routine. No additional products needed.' },
-  managed_safe:       { ko: '{N}곳 안전 — 기본 루틴으로 충분', de: '{N} Zonen sicher — Basis-Routine reicht', en: '{N} zones safe — basic routine sufficient' },
-  why_zone_title:     { ko: '왜 부위별 케어가 필요한가요?', de: 'Warum braucht jede Zone eigene Pflege?', en: 'Why does each zone need its own care?' },
-  why_zone_body:      { ko: '얼굴의 각 부위는 피지선 밀도, 피부 두께, 자외선 노출량이 다릅니다. 이마의 피지선이 가장 많아서(단위면적당), 눈가는 피부가 가장 얇아서(0.5mm), 한 가지 제품으로는 모든 부위를 최적으로 관리할 수 없습니다.', de: 'Jeder Gesichtsbereich hat unterschiedliche Talgdrüsendichte, Hautdicke und UV-Exposition. Stirn hat die dichteste Talgdrüsenverteilung, Augenpartie hat die dünnste Haut (0,5 mm) — ein einziges Produkt kann nicht alle Bereiche optimal versorgen.', en: 'Each facial area has different sebaceous gland density, skin thickness, and UV exposure. The forehead has the highest gland density, the eye area the thinnest skin (0.5mm) — one product cannot optimally serve all zones.' },
-  why_zone_source:    { ko: 'Source: Journal of Dermatological Science · axisIngredientMap.ts 기반', de: 'Quelle: Journal of Dermatological Science', en: 'Source: Journal of Dermatological Science · axisIngredientMap.ts' },
+  zone_status_mod: { ko: '기본 루틴으로 부분 관리 — 강화 추천', de: 'Teilweise abgedeckt — Verstärkung empfohlen', en: 'Partially covered — boost recommended' },
+  add_button: { ko: '+ 추가', de: '+ Hinzufügen', en: '+ Add' },
+  collapse: { ko: '접기', de: 'Zuklappen', en: 'Collapse' },
+  managed_title: { ko: '기본 루틴으로 관리됨', de: 'Durch Basis-Routine abgedeckt', en: 'MANAGED BY BASIC ROUTINE' },
+  managed_desc: { ko: '이 부위들은 기본 루틴으로 충분히 관리되고 있어요. 추가 제품이 필요하지 않습니다.', de: 'Diese Bereiche werden ausreichend durch Ihre Basisroutine abgedeckt. Keine zusätzlichen Produkte nötig.', en: 'These zones are sufficiently covered by your basic routine. No additional products needed.' },
+  managed_safe: { ko: '{N}곳 안전 — 기본 루틴으로 충분', de: '{N} Zonen sicher — Basis-Routine reicht', en: '{N} zones safe — basic routine sufficient' },
+  why_zone_title: { ko: '왜 부위별 케어가 필요한가요?', de: 'Warum braucht jede Zone eigene Pflege?', en: 'Why does each zone need its own care?' },
+  why_zone_body: { ko: '얼굴의 각 부위는 피지선 밀도, 피부 두께, 자외선 노출량이 다릅니다. 이마의 피지선이 가장 많아서(단위면적당), 눈가는 피부가 가장 얇아서(0.5mm), 한 가지 제품으로는 모든 부위를 최적으로 관리할 수 없습니다.', de: 'Jeder Gesichtsbereich hat unterschiedliche Talgdrüsendichte, Hautdicke und UV-Exposition. Stirn hat die dichteste Talgdrüsenverteilung, Augenpartie hat die dünnste Haut (0,5 mm) — ein einziges Produkt kann nicht alle Bereiche optimal versorgen.', en: 'Each facial area has different sebaceous gland density, skin thickness, and UV exposure. The forehead has the highest gland density, the eye area the thinnest skin (0.5mm) — one product cannot optimally serve all zones.' },
+  why_zone_source: { ko: 'Source: Journal of Dermatological Science · axisIngredientMap.ts 기반', de: 'Quelle: Journal of Dermatological Science', en: 'Source: Journal of Dermatological Science · axisIngredientMap.ts' },
   barrier_emergency_warning: {
     ko: '장벽 응급 상태에서는 추가 제품을 권장하지 않습니다. 먼저 2주간 장벽 회복 루틴 단계를 따라주세요.',
     de: 'Keine zusätzlichen Produkte bei Barriere-Notfall empfohlen. Zuerst 2-Wochen-Routine-Schritte befolgen.',
@@ -105,13 +105,13 @@ function severityColor(score: number): string {
   return '#86868B';
 }
 
-// ── Bridge: diagnosisResult → ZoneDiagnosis[] (same as original) ───────────────
+// ── Bridge: analysisResult → ZoneAssessment[] (same as original) ───────────────
 
 function computeZoneAxisScores(
   zoneConcerns: string[],
   concernSeverity: Record<string, 1 | 2 | 3>,
-): Array<{ axis: DiagnosisAxis; score: number; severity: ReturnType<typeof scoreToSeverity> }> {
-  const scores: Partial<Record<DiagnosisAxis, number>> = {};
+): Array<{ axis: AssessmentAxis; score: number; severity: ReturnType<typeof scoreToSeverity> }> {
+  const scores: Partial<Record<AssessmentAxis, number>> = {};
   for (const concernId of zoneConcerns) {
     const engineAxis = CONCERN_TO_AXIS[concernId];
     if (!engineAxis) continue;
@@ -121,11 +121,11 @@ function computeZoneAxisScores(
     scores[labAxis] = Math.min(100, Math.round((scores[labAxis] ?? 0) + (sev / 3) * 100));
   }
   return Object.entries(scores).map(([axis, score]) => ({
-    axis: axis as DiagnosisAxis, score, severity: scoreToSeverity(score),
+    axis: axis as AssessmentAxis, score, severity: scoreToSeverity(score),
   }));
 }
 
-function inferProfile(axisScores: Array<{ axis: DiagnosisAxis; score: number }>) {
+function inferProfile(axisScores: Array<{ axis: AssessmentAxis; score: number }>) {
   const m = Object.fromEntries(axisScores.map(a => [a.axis, a.score]));
   const s = (k: string) => m[k] ?? 0;
   if (s('sebum') >= 60 || s('pores') >= 60) return 'oily_acne' as const;
@@ -137,7 +137,7 @@ function inferProfile(axisScores: Array<{ axis: DiagnosisAxis; score: number }>)
   return 'combination' as const;
 }
 
-function computeRequiredIngredients(zoneAxisScores: Array<{ axis: DiagnosisAxis; score: number; severity: string }>): RequiredIngredient[] {
+function computeRequiredIngredients(zoneAxisScores: Array<{ axis: AssessmentAxis; score: number; severity: string }>): RequiredIngredient[] {
   const map = new Map<string, RequiredIngredient>();
   for (const { axis, score, severity } of zoneAxisScores) {
     if (score <= 0) continue;
@@ -149,7 +149,7 @@ function computeRequiredIngredients(zoneAxisScores: Array<{ axis: DiagnosisAxis;
   return Array.from(map.values());
 }
 
-function diagnosisToZoneDiagnoses(result: DiagnosisResult, selectedZones: SelectedZones): ZoneDiagnosis[] {
+function analysisToZoneAssessments(result: AnalysisResult, selectedZones: SelectedZones): ZoneAssessment[] {
   const globalAxisScores = (Object.entries(result.axis_scores ?? {}) as [AxisKey, number][])
     .filter(([k]) => ENGINE_TO_LAB_AXIS[k] !== undefined)
     .map(([k, score]) => ({
@@ -160,7 +160,7 @@ function diagnosisToZoneDiagnoses(result: DiagnosisResult, selectedZones: Select
 
   const heatmap = result.zone_heatmap;
   if (heatmap && Object.keys(heatmap).length > 0) {
-    const out: ZoneDiagnosis[] = [];
+    const out: ZoneAssessment[] = [];
     for (const [zoneId, entry] of Object.entries(heatmap)) {
       if (!entry) continue;
       const faceZone = ZONE_ID_MAP[zoneId];
@@ -205,7 +205,7 @@ interface ZoneData {
   faceZone: FaceZone;
   zoneId: string;
   severity: number;
-  diagnosis: ZoneDiagnosis | null;
+  assessment: ZoneAssessment | null;
 }
 
 // ── Circular score ring ────────────────────────────────────────────────────────
@@ -250,10 +250,10 @@ interface ZoneCardProps {
 const ZoneCard = memo(function ZoneCard({
   zd, lang, isDark, tok, isExpanded, onToggle, selectedProduct, onProductSelect,
 }: ZoneCardProps) {
-  const { faceZone, severity, diagnosis } = zd;
+  const { faceZone, severity, assessment } = zd;
   const color = severityColor(severity);
   const label = ZONE_LABELS[faceZone]?.[lang] ?? faceZone;
-  const reqIngNames = diagnosis?.required_ingredients
+  const reqIngNames = assessment?.required_ingredients
     .filter(i => i.name_en !== 'HOLD_ALL_ACTIVES')
     .slice(0, 3)
     .map(i => i[lang === 'ko' ? 'name_kr' : 'name_en'] as string)
@@ -333,7 +333,7 @@ const ZoneCard = memo(function ZoneCard({
 
       {/* Inline accordion: DuelCard */}
       <AnimatePresence>
-        {isExpanded && diagnosis && (
+        {isExpanded && assessment && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1, transition: { height: { duration: 0.3 }, opacity: { duration: 0.25, delay: 0.05 } } }}
@@ -345,14 +345,14 @@ const ZoneCard = memo(function ZoneCard({
               padding: '0 clamp(14px, 2.5vw, 18px) clamp(14px, 2.5vw, 18px)',
             }}>
               {/* Education: ingredient explanations */}
-              {diagnosis.required_ingredients.length > 0 && (
+              {assessment.required_ingredients.length > 0 && (
                 <div style={{ paddingTop: 12, marginBottom: 12 }}>
                   <p style={{
                     fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary,
                     lineHeight: 1.6, margin: 0,
                     wordBreak: lang === 'ko' ? 'keep-all' : 'normal',
                   }}>
-                    {diagnosis.required_ingredients
+                    {assessment.required_ingredients
                       .filter(i => i.name_en !== 'HOLD_ALL_ACTIVES')
                       .slice(0, 3)
                       .map(i => {
@@ -372,9 +372,9 @@ const ZoneCard = memo(function ZoneCard({
               )}
 
               {/* Required ingredients as chips */}
-              {diagnosis.required_ingredients.filter(i => i.name_en !== 'HOLD_ALL_ACTIVES').length > 0 && (
+              {assessment.required_ingredients.filter(i => i.name_en !== 'HOLD_ALL_ACTIVES').length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 12 }}>
-                  {diagnosis.required_ingredients
+                  {assessment.required_ingredients
                     .filter(i => i.name_en !== 'HOLD_ALL_ACTIVES')
                     .slice(0, 6)
                     .map(ing => (
@@ -403,8 +403,8 @@ const ZoneCard = memo(function ZoneCard({
               {/* DuelCard */}
               <DuelCard
                 zone={faceZone}
-                matchedProfile={diagnosis.matched_profile}
-                requiredIngredients={diagnosis.required_ingredients}
+                matchedProfile={assessment.matched_profile}
+                requiredIngredients={assessment.required_ingredients}
                 onProductSelect={onProductSelect}
                 selectedProductId={selectedProduct?.id ?? null}
               />
@@ -435,7 +435,7 @@ function SectionHeader({ label, color }: { label: string; color: string }) {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 interface SlideLabSpecialCareProps {
-  result: DiagnosisResult;
+  result: AnalysisResult;
   onSpecialCareUpdate?: (picks: { zone: FaceZone; product: Product }[]) => void;
   onGoToMacro?: () => void;
 }
@@ -451,15 +451,15 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
 
-  const selectedZones = useDiagnosisStore(s => s.selectedZones);
-  const storePicks = useDiagnosisStore(s => s.specialCarePicks);
-  const setStorePick = useDiagnosisStore(s => s.setSpecialCarePick);
+  const selectedZones = useAnalysisStore(s => s.selectedZones);
+  const storePicks = useAnalysisStore(s => s.specialCarePicks);
+  const setStorePick = useAnalysisStore(s => s.setSpecialCarePick);
 
   const isBarrierEmergency = result.active_flags?.includes('BARRIER_EMERGENCY') ?? false;
 
-  // ── Zone diagnosis (bridge logic) ──────────────────────────────────────────
+  // ── Zone assessment (bridge logic) ──────────────────────────────────────────
   const zoneDiagnoses = useMemo(
-    () => diagnosisToZoneDiagnoses(result, selectedZones),
+    () => analysisToZoneAssessments(result, selectedZones),
     [result, selectedZones],
   );
 
@@ -495,13 +495,13 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
         faceZone,
         zoneId,
         severity,
-        diagnosis: zoneDiagnoses.find(d => d.zone === faceZone) ?? null,
+        assessment: zoneDiagnoses.find(d => d.zone === faceZone) ?? null,
       }))
       .sort((a, b) => b.severity - a.severity);
   }, [result, selectedZones, zoneDiagnoses]);
 
-  const urgentZones    = useMemo(() => zoneDataList.filter(z => z.severity >= 70), [zoneDataList]);
-  const moderateZones  = useMemo(() => zoneDataList.filter(z => z.severity >= 30 && z.severity < 70), [zoneDataList]);
+  const urgentZones = useMemo(() => zoneDataList.filter(z => z.severity >= 70), [zoneDataList]);
+  const moderateZones = useMemo(() => zoneDataList.filter(z => z.severity >= 30 && z.severity < 70), [zoneDataList]);
   const sufficientZones = useMemo(() => zoneDataList.filter(z => z.severity < 30), [zoneDataList]);
 
   const topZoneName = zoneDataList[0]
@@ -599,7 +599,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
           }}>
             {lang === 'ko' ? '지금은 피부가 쉴 시간입니다'
               : lang === 'de' ? 'Zonenpflege pausiert'
-              : 'Zone Care Paused'}
+                : 'Zone Care Paused'}
           </h2>
 
           <p style={{
@@ -609,8 +609,8 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
             {lang === 'ko'
               ? '장벽이 무너진 상태에서 부위별 액티브 성분(비타민C, AHA/BHA 등)을 추가하면 피부에 독이 되어 미세 염증을 악화시킬 수 있습니다. 2주 동안은 장벽 회복 루틴에만 온전히 집중해 주세요.'
               : lang === 'de'
-              ? 'Aktive Inhaltsstoffe auf einzelne Zonen aufzutragen, wenn Ihre Hautbarriere beschädigt ist, kann zu starken Entzündungen führen. Konzentrieren Sie sich 2 Wochen lang ausschließlich auf das Barriere-Regenerationsprotokoll.'
-              : 'Applying active ingredients to specific zones when your barrier is broken can cause severe inflammation. Please focus entirely on the 2-week barrier recovery routine.'}
+                ? 'Aktive Inhaltsstoffe auf einzelne Zonen aufzutragen, wenn Ihre Hautbarriere beschädigt ist, kann zu starken Entzündungen führen. Konzentrieren Sie sich 2 Wochen lang ausschließlich auf das Barriere-Regenerationsprotokoll.'
+                : 'Applying active ingredients to specific zones when your barrier is broken can cause severe inflammation. Please focus entirely on the 2-week barrier recovery routine.'}
           </p>
 
           <motion.button
@@ -627,7 +627,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
           >
             {lang === 'ko' ? '내 회복 루틴으로 돌아가기 →'
               : lang === 'de' ? 'Zurück zum Wiederherstellungsprotokoll →'
-              : 'Return to Recovery Routine →'}
+                : 'Return to Recovery Routine →'}
           </motion.button>
         </motion.div>
       </div>

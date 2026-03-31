@@ -1,10 +1,10 @@
 /**
  * routineEngineV5.ts
  *
- * V5 Routine Engine — takes DiagnosisResult from skinVectorEngineV5 and builds
+ * V5 Routine Engine — takes AnalysisResult from skinVectorEngineV5 and builds
  * the personalized routine + product bundle with projected improvement timelines.
  *
- * Clinical Hierarchy (strict priority — DO NOT CHANGE):
+ * Priority Hierarchy (strict priority — DO NOT CHANGE):
  *   1. Barrier Repair (SOS)     — BARRIER_EMERGENCY flag OR bar ≥ 70: pause all actives
  *   2. Intensive Hydration      — hyd ≥ 60
  *   3. Problem Skin             — acne OR texture ≥ 60, ONLY when bar < 50
@@ -13,7 +13,7 @@
  * Tier Differentiation:
  *   Entry   → minimalist (3-step: cleanser + serum + moisturiser)
  *   Full    → committed  (5-step: + toner + SPF)
- *   Premium → advanced   (5-step + clinical device, gated behind barrier recovery)
+ *   Premium → advanced   (5-step + professional device, gated behind barrier recovery)
  *
  * Device Gating (Premium only):
  *   bar ≥ 70 → DEVICE_GATE: ACTIVE  (ships month 2, locked until bar < 50)
@@ -37,8 +37,8 @@ import {
   findProductsForSlot,
   getProductById,
 } from "@/engine/productBridge";
-import type { ImplicitFlags, AxisResponses } from "@/store/diagnosisStore";
-import type { AxisKey, DiagnosisResult, Product, Tier, SkinVector } from "@/engine/types";
+import type { ImplicitFlags, AxisResponses } from "@/store/analysisStore";
+import type { AxisKey, AnalysisResult, Product, Tier, SkinVector } from "@/engine/types";
 import { AXIS_KEYS } from "@/engine/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -57,10 +57,10 @@ import { AXIS_KEYS } from "@/engine/types";
 
 // Barrier-safe product IDs in the real DB
 const BARRIER_OVERRIDE_IDS = {
-  cleanser_oily:  'KR_madeca_md_cleanser',
-  cleanser_dry:   'KR_aestura_atobarrier_cleanser',
-  serum:          'KR_aestura_atobarrier_serum',     // Ceramide 5% + Panthenol 3%
-  moisturizer:    'KR_aestura_atobarrier_cream',     // Triple ceramide
+  cleanser_oily: 'KR_madeca_md_cleanser',
+  cleanser_dry: 'KR_aestura_atobarrier_cleanser',
+  serum: 'KR_aestura_atobarrier_serum',     // Ceramide 5% + Panthenol 3%
+  moisturizer: 'KR_aestura_atobarrier_cream',     // Triple ceramide
 };
 
 function getBarrierOverride(key: keyof typeof BARRIER_OVERRIDE_IDS): RealProduct | null {
@@ -215,7 +215,7 @@ interface SeasonalGuidance {
 }
 
 export function computeSeasonalGuidance(
-  scores: DiagnosisResult["axis_scores"],
+  scores: AnalysisResult["axis_scores"],
   foundation: { seasonal_change?: number; texture_pref?: number },
   latitude: number = 50,
 ): SeasonalGuidance {
@@ -258,19 +258,27 @@ export function computeSeasonalGuidance(
     currentSeason,
     moisturizerTexture,
     cleanserNote: isWinter
-      ? { en: "In winter, use a cream or milk cleanser to avoid stripping moisture",
-          de: "Im Winter eignet sich eine Reinigungsmilch, um die Feuchtigkeit zu erhalten",
-          ko: "겨울에는 수분을 빼앗기지 않는 밀크/크림 클렌저를 추천해요" }
-      : { en: "In summer, a gel or foam cleanser effectively removes excess oil and sweat",
-          de: "Im Sommer entfernt ein Gel- oder Schaumreiniger überschüssiges Öl und Schweiß",
-          ko: "여름에는 피지와 땀을 깔끔하게 제거하는 젤/폼 클렌저를 추천해요" },
+      ? {
+        en: "In winter, use a cream or milk cleanser to avoid stripping moisture",
+        de: "Im Winter eignet sich eine Reinigungsmilch, um die Feuchtigkeit zu erhalten",
+        ko: "겨울에는 수분을 빼앗기지 않는 밀크/크림 클렌저를 추천해요"
+      }
+      : {
+        en: "In summer, a gel or foam cleanser effectively removes excess oil and sweat",
+        de: "Im Sommer entfernt ein Gel- oder Schaumreiniger überschüssiges Öl und Schweiß",
+        ko: "여름에는 피지와 땀을 깔끔하게 제거하는 젤/폼 클렌저를 추천해요"
+      },
     spfNote: (latitude >= 45 && isWinter)
-      ? { en: "At your latitude, winter UVB is minimal — SPF 15-30 is sufficient. Focus on barrier protection.",
-          de: "In Ihrem Breitengrad ist die Winter-UVB-Strahlung gering — LSF 15-30 reicht. Fokus auf Barriereschutz.",
-          ko: "거주 위도에서는 겨울 UVB가 적어요 — SPF 15-30이면 충분합니다. 장벽 보호에 집중하세요." }
-      : { en: "Daily SPF 30+ recommended year-round at your location",
-          de: "Täglicher LSF 30+ wird ganzjährig an Ihrem Standort empfohlen",
-          ko: "거주 지역에서는 연중 SPF 30+ 매일 사용을 권장합니다" },
+      ? {
+        en: "At your latitude, winter UVB is minimal — SPF 15-30 is sufficient. Focus on barrier protection.",
+        de: "In Ihrem Breitengrad ist die Winter-UVB-Strahlung gering — LSF 15-30 reicht. Fokus auf Barriereschutz.",
+        ko: "거주 위도에서는 겨울 UVB가 적어요 — SPF 15-30이면 충분합니다. 장벽 보호에 집중하세요."
+      }
+      : {
+        en: "Daily SPF 30+ recommended year-round at your location",
+        de: "Täglicher LSF 30+ wird ganzjährig an Ihrem Standort empfohlen",
+        ko: "거주 지역에서는 연중 SPF 30+ 매일 사용을 권장합니다"
+      },
   };
 }
 
@@ -294,8 +302,8 @@ export function determineSkinimalismOverride(
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface AxisProjection {
-  currentScore:   number;
-  targetScore4w:  number;
+  currentScore: number;
+  targetScore4w: number;
   targetScore12w: number;
 }
 
@@ -303,7 +311,7 @@ export type ProjectedImprovement = Record<AxisKey, AxisProjection>;
 
 export interface DeviceGateInfo {
   /** ACTIVE = gated (barrier emergency); CLEARED = device available now */
-  status:  "ACTIVE" | "CLEARED";
+  status: "ACTIVE" | "CLEARED";
   /** Human-readable gate display string for debug / UI */
   display: string;
 }
@@ -314,7 +322,7 @@ export interface DeviceGateInfo {
  */
 export type RoutineOutputV5 = RoutineOutput & {
   projected_improvement: ProjectedImprovement;
-  deviceGate:            DeviceGateInfo | null;
+  deviceGate: DeviceGateInfo | null;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -322,15 +330,15 @@ export type RoutineOutputV5 = RoutineOutput & {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const BASE_RATES: Record<AxisKey, number> = {
-  bar:              0.25,   // responds fast to targeted barrier protocol
-  hyd:              0.22,
-  seb:              0.18,
-  sen:              0.20,
-  acne:             0.15,
-  texture:          0.12,
-  pigment:          0.08,   // slowest responder
-  aging:            0.10,
-  ox:               0.15,
+  bar: 0.25,   // responds fast to targeted barrier protocol
+  hyd: 0.22,
+  seb: 0.18,
+  sen: 0.20,
+  acne: 0.15,
+  texture: 0.12,
+  pigment: 0.08,   // slowest responder
+  aging: 0.10,
+  ox: 0.15,
   makeup_stability: 0.12,
 };
 
@@ -339,12 +347,12 @@ const BASE_RATES: Record<AxisKey, number> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function computeProjectedImprovement(
-  scores: DiagnosisResult["axis_scores"],
-  flags:  string[],
-  tier:   Tier,
+  scores: AnalysisResult["axis_scores"],
+  flags: string[],
+  tier: Tier,
 ): ProjectedImprovement {
-  const hasBarrierEmergency  = flags.includes("BARRIER_EMERGENCY");
-  const isPremiumWithDevice  = tier === "Premium" && !hasBarrierEmergency;
+  const hasBarrierEmergency = flags.includes("BARRIER_EMERGENCY");
+  const isPremiumWithDevice = tier === "Premium" && !hasBarrierEmergency;
 
   const result = {} as ProjectedImprovement;
 
@@ -357,12 +365,12 @@ function computeProjectedImprovement(
     // Premium device amplifies aging and texture axes
     if (isPremiumWithDevice && (axis === "aging" || axis === "texture")) rate4w *= 1.4;
 
-    const rate12w  = Math.min(0.95, rate4w * 2.2);   // diminishing returns, cap at 95%
-    const current  = scores[axis] ?? 0;
+    const rate12w = Math.min(0.95, rate4w * 2.2);   // diminishing returns, cap at 95%
+    const current = scores[axis] ?? 0;
 
     result[axis] = {
-      currentScore:   Math.round(current),
-      targetScore4w:  Math.max(5, Math.round(current * (1 - rate4w))),
+      currentScore: Math.round(current),
+      targetScore4w: Math.max(5, Math.round(current * (1 - rate4w))),
       targetScore12w: Math.max(3, Math.round(current * (1 - rate12w))),
     };
   }
@@ -375,13 +383,13 @@ function computeProjectedImprovement(
 // ─────────────────────────────────────────────────────────────────────────────
 
 function computeDeviceGate(
-  scores: DiagnosisResult["axis_scores"],
-  tier:   Tier,
+  scores: AnalysisResult["axis_scores"],
+  tier: Tier,
 ): DeviceGateInfo | null {
   if (tier !== "Premium") return null;
 
-  const bar    = Math.round(scores.bar    ?? 0);
-  const sen    = Math.round(scores.sen    ?? 0);
+  const bar = Math.round(scores.bar ?? 0);
+  const sen = Math.round(scores.sen ?? 0);
   const status: "ACTIVE" | "CLEARED" = bar >= 70 ? "ACTIVE" : "CLEARED";
 
   return {
@@ -394,21 +402,21 @@ function computeDeviceGate(
 // V5 BaseType derivation  (hyd is severity: high = dehydrated)
 // ─────────────────────────────────────────────────────────────────────────────
 
-function deriveBaseTypeV5(scores: DiagnosisResult["axis_scores"]): BaseType {
+function deriveBaseTypeV5(scores: AnalysisResult["axis_scores"]): BaseType {
   const { seb, hyd } = scores;
   if (seb > 60 && hyd > 50) return "combination-dehydrated-oily";
-  if (seb > 60)              return "oily";
-  if (hyd > 50)              return "dry";
+  if (seb > 60) return "oily";
+  if (hyd > 50) return "dry";
   return "normal";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// V5 TargetTrouble — Clinical Hierarchy (strict order)
+// V5 TargetTrouble — Priority Hierarchy (strict order)
 // ─────────────────────────────────────────────────────────────────────────────
 
 function deriveTargetTroubleV5(
-  scores: DiagnosisResult["axis_scores"],
-  flags:  string[],
+  scores: AnalysisResult["axis_scores"],
+  flags: string[],
 ): TargetTrouble {
   const { bar, hyd, sen, acne, texture, pigment, aging } = scores;
 
@@ -433,19 +441,19 @@ function deriveTargetTroubleV5(
 // ─────────────────────────────────────────────────────────────────────────────
 
 function toV4SkinVector(
-  scores: DiagnosisResult["axis_scores"],
-  flags:  string[],
+  scores: AnalysisResult["axis_scores"],
+  flags: string[],
 ): SkinVector {
   return {
-    sebum:       scores.seb,
-    hydration:   100 - scores.hyd,   // V5 hyd inverted: high = dehydrated
-    pores:       scores.texture,      // V5 texture → V4 pores (congestion proxy)
-    texture:     scores.acne,         // V5 acne → V4 texture (breakout/lesion proxy)
+    sebum: scores.seb,
+    hydration: 100 - scores.hyd,   // V5 hyd inverted: high = dehydrated
+    pores: scores.texture,      // V5 texture → V4 pores (congestion proxy)
+    texture: scores.acne,         // V5 acne → V4 texture (breakout/lesion proxy)
     sensitivity: scores.sen,
-    aging:       scores.aging,
-    pigment:     scores.pigment,
-    barrier:     scores.bar,
-    atopy:       flags.includes("ATOPY") ? 85 : 5,
+    aging: scores.aging,
+    pigment: scores.pigment,
+    barrier: scores.bar,
+    atopy: flags.includes("ATOPY") ? 85 : 5,
   };
 }
 
@@ -453,32 +461,32 @@ function toV4ImplicitFlags(
   implicitFlags: { atopyFlag: boolean },
 ): ImplicitFlags {
   return {
-    atopyFlag:               implicitFlags.atopyFlag,
+    atopyFlag: implicitFlags.atopyFlag,
     likelyHormonalCycleUser: false,
-    likelyShaver:            false,
+    likelyShaver: false,
   };
 }
 
 const EMPTY_AXIS_RESPONSES: AxisResponses = {};
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RealProduct → DiagnosisResult.product_bundle Product conversion
+// RealProduct → AnalysisResult.product_bundle Product conversion
 // ─────────────────────────────────────────────────────────────────────────────
 
 function realToProduct(rp: RealProduct, phase: string): Product {
   return {
-    id:              rp.id,
-    name:            { en: rp.name.en, de: rp.name.de },
-    brand:           rp.brand,
+    id: rp.id,
+    name: { en: rp.name.en, de: rp.name.de },
+    brand: rp.brand,
     phase,
-    type:            rp.routine_slot,
-    price_eur:       rp.price_eur,
-    tier:            ["Full", "Premium"],
-    shopify_handle:  rp.id,
+    type: rp.routine_slot,
+    price_eur: rp.price_eur,
+    tier: ["Full", "Premium"],
+    shopify_handle: rp.id,
     key_ingredients: rp.key_ingredients,
-    target_axes:     [],
-    for_skin:        rp.for_skin,
-    texture_feel:    rp.texture_type ?? undefined,
+    target_axes: [],
+    for_skin: rp.for_skin,
+    texture_feel: rp.texture_type ?? undefined,
   };
 }
 
@@ -517,12 +525,12 @@ function routineLevelToPhaseMap(
  * are enforced identically.
  */
 export function buildRoutineV5(
-  result:        DiagnosisResult,
+  result: AnalysisResult,
   implicitFlags: ImplicitFlags,
-  tier:          Tier,
+  tier: Tier,
 ): RoutineOutputV5 {
   const scores = result.axis_scores;
-  const flags  = result.active_flags;
+  const flags = result.active_flags;
 
   // ── V4 routine (catalog + SOS rescue) ───────────────────────────────────
   const v4 = buildRoutine(
@@ -532,18 +540,18 @@ export function buildRoutineV5(
   );
 
   // ── V5 overrides ─────────────────────────────────────────────────────────
-  const baseType      = deriveBaseTypeV5(scores);
+  const baseType = deriveBaseTypeV5(scores);
   const targetTrouble = deriveTargetTroubleV5(scores, flags);
-  const deviceGate    = computeDeviceGate(scores, tier);
+  const deviceGate = computeDeviceGate(scores, tier);
 
   // Device gate blocks the advanced routine tier
-  const deviceGated    = deviceGate?.status === "ACTIVE";
+  const deviceGated = deviceGate?.status === "ACTIVE";
   const advancedCaution: RoutineOutput["advancedCaution"] = deviceGated
     ? {
-        en: `Device therapy is paused. Barrier score (${Math.round(scores.bar)}) must drop below 50 before EMS / LED activation. Follow the 5-step repair protocol for 4–6 weeks before re-assessing.`,
-        de: `Geräteanwendung ist pausiert. Der Barriere-Wert (${Math.round(scores.bar)}) muss unter 50 fallen, bevor EMS / LED aktiviert werden kann. Folgen Sie 4–6 Wochen dem 5-Schritt-Reparaturprotokoll.`,
-        ko: `기기 테라피가 일시 중단되었습니다. 배리어 점수(${Math.round(scores.bar)})가 50 이하로 내려가야 EMS / LED를 활성화할 수 있습니다. 4–6주간 5단계 회복 루틴을 따르세요.`,
-      }
+      en: `Device therapy is paused. Barrier score (${Math.round(scores.bar)}) must drop below 50 before EMS / LED activation. Follow the 5-step repair protocol for 4–6 weeks before re-assessing.`,
+      de: `Geräteanwendung ist pausiert. Der Barriere-Wert (${Math.round(scores.bar)}) muss unter 50 fallen, bevor EMS / LED aktiviert werden kann. Folgen Sie 4–6 Wochen dem 5-Schritt-Reparaturprotokoll.`,
+      ko: `기기 테라피가 일시 중단되었습니다. 배리어 점수(${Math.round(scores.bar)})가 50 이하로 내려가야 EMS / LED를 활성화할 수 있습니다. 4–6주간 5단계 회복 루틴을 따르세요.`,
+    }
     : v4.advancedCaution;
 
   // ── Projected improvement ─────────────────────────────────────────────────
@@ -566,10 +574,10 @@ export function buildRoutineV5(
         : v4.routines.committed,
       advanced: (tier === "Premium" && !deviceGated)
         ? (v4.routines.advanced
-            ? (hasBarrierEmergency
-                ? getBarrierRecoveryRoutine(v4.routines.advanced, baseType)
-                : v4.routines.advanced)
-            : null)
+          ? (hasBarrierEmergency
+            ? getBarrierRecoveryRoutine(v4.routines.advanced, baseType)
+            : v4.routines.advanced)
+          : null)
         : null,
     },
     // V5 additive fields
@@ -579,7 +587,7 @@ export function buildRoutineV5(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// buildProductBundleV5 — tier-appropriate product_bundle for DiagnosisResult
+// buildProductBundleV5 — tier-appropriate product_bundle for AnalysisResult
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -630,12 +638,12 @@ const TIER_STEP_LIMITS: Record<Tier, number> = {
 /**
  * buildProductBundleV5
  *
- * Returns the product_bundle Record<string, Product[]> for DiagnosisResult.
+ * Returns the product_bundle Record<string, Product[]> for AnalysisResult.
  */
 export function buildProductBundleV5(
-  result:        DiagnosisResult,
+  result: AnalysisResult,
   implicitFlags: ImplicitFlags,
-  tier:          Tier,
+  tier: Tier,
 ): Record<string, Product[]> {
   const routine = buildRoutineV5(result, implicitFlags, tier);
 

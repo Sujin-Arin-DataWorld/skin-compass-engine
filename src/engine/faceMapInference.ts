@@ -1,5 +1,5 @@
 // src/engine/faceMapInference.ts
-// Extracts maximum diagnostic data from face-map severity chips
+// Extracts maximum assessment data from face-map severity chips
 // BEFORE asking any follow-up questions.
 
 import { AXIS_KEYS } from "@/engine/types";

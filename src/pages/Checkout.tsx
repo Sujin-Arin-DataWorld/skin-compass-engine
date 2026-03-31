@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle, Lock, Unlock, ArrowLeft } from "lucide-react";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 import Navbar from "@/components/Navbar";
 import SilkBackground from "@/components/SilkBackground";
 import type { Tier } from "@/engine/types";
@@ -43,7 +43,7 @@ const PLAN_DETAILS: Record<Tier, { price: string; includes: string[]; color: str
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const storeTier = useDiagnosisStore((s) => s.selectedTier);
+  const storeTier = useAnalysisStore((s) => s.selectedTier);
 
   // Accept tier from navigation state (set by startProtocol) or fall back to store
   const tier: Tier = (location.state as { tier?: Tier })?.tier ?? storeTier;
@@ -142,7 +142,7 @@ const Checkout = () => {
                 <p className="text-xs" style={{ color: "#D1D1D1", lineHeight: 1.6 }}>
                   {deviceLocked
                     ? "Your barrier score is still building. The EMS/LED device ships once barrier stability is confirmed — this protects against device-induced sensitisation during the repair phase."
-                    : "Your barrier score qualifies for immediate device access. The clinical device ships with your Month 1 order."}
+                    : "Your barrier score qualifies for immediate device access. The professional device ships with your Month 1 order."}
                 </p>
                 {deviceLocked && (
                   <p

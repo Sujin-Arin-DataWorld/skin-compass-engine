@@ -59,19 +59,19 @@ const SkinZoomSelector = ({ selected, onSelect }: SkinZoomSelectorProps) => {
   const t = language === "de" ? translations.de : translations.en;
 
   const PATCHES: SkinPatch[] = [
-    { id: "smooth", label: t.diagnosis.ui.textureSmooth, description: t.diagnosis.ui.textureSmoothDesc, pattern: "smooth", severity: 0 },
-    { id: "visible_pores", label: t.diagnosis.ui.texturePores, description: t.diagnosis.ui.texturePoresDesc, pattern: "pores", severity: 1 },
-    { id: "oxidised", label: t.diagnosis.ui.textureOxidised, description: t.diagnosis.ui.textureOxidisedDesc, pattern: "oxidised", severity: 2 },
-    { id: "rough", label: t.diagnosis.ui.textureRough, description: t.diagnosis.ui.textureRoughDesc, pattern: "rough", severity: 3 },
+    { id: "smooth", label: t.analysis.ui.textureSmooth, description: t.analysis.ui.textureSmoothDesc, pattern: "smooth", severity: 0 },
+    { id: "visible_pores", label: t.analysis.ui.texturePores, description: t.analysis.ui.texturePoresDesc, pattern: "pores", severity: 1 },
+    { id: "oxidised", label: t.analysis.ui.textureOxidised, description: t.analysis.ui.textureOxidisedDesc, pattern: "oxidised", severity: 2 },
+    { id: "rough", label: t.analysis.ui.textureRough, description: t.analysis.ui.textureRoughDesc, pattern: "rough", severity: 3 },
   ];
 
   return (
     <LabCard>
       <p className="mb-1 text-xs font-medium uppercase tracking-widest text-muted-foreground">
-        {t.diagnosis.ui.skinSurfaceAnalysis}
+        {t.analysis.ui.skinSurfaceAnalysis}
       </p>
       <p className="mb-5 text-sm text-foreground">
-        {t.diagnosis.ui.whichTexture}
+        {t.analysis.ui.whichTexture}
       </p>
 
       <div className="grid grid-cols-2 gap-3">

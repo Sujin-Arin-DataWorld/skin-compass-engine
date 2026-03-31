@@ -24,7 +24,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { useRoutineStore } from '@/store/useRoutineStore';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
@@ -57,41 +57,41 @@ function getScoreTier(h: number): 'excellent' | 'good' | 'attention' | 'critical
 // Status colors — ONLY for ring gradient, thin borders, text glow
 const TIER_ACCENT: Record<string, string> = {
   excellent: '#4ECDC4',
-  good:      '#5E8B68',
+  good: '#5E8B68',
   attention: '#FFAB4C',
-  critical:  '#FF6B6B',
+  critical: '#FF6B6B',
 };
 
 const TIER_LABELS: Record<string, Record<Lang, string>> = {
   excellent: { ko: '우수', en: 'Excellent', de: 'Ausgezeichnet' },
-  good:      { ko: '양호', en: 'Good', de: 'Gut' },
+  good: { ko: '양호', en: 'Good', de: 'Gut' },
   attention: { ko: '관리 필요', en: 'Needs Care', de: 'Pflegebedarf' },
-  critical:  { ko: '집중 케어', en: 'Urgent Care', de: 'Intensive Pflege' },
+  critical: { ko: '집중 케어', en: 'Urgent Care', de: 'Intensive Pflege' },
 };
 
 const AXIS_LABELS: Record<SkinAxis, Record<Lang, string>> = {
-  seb:                { ko: '유분 밸런스', en: 'Oil Balance', de: 'Öl-Balance' },
-  hyd:                { ko: '수분도', en: 'Hydration', de: 'Feuchtigkeit' },
-  bar:                { ko: '피부 장벽', en: 'Skin Barrier', de: 'Hautbarriere' },
-  sen:                { ko: '민감도', en: 'Sensitivity', de: 'Empfindlichkeit' },
-  acne:               { ko: '트러블', en: 'Breakout Control', de: 'Unreinheiten' },
-  pigment:            { ko: '톤 균일도', en: 'Tone Evenness', de: 'Ton-Gleichmäßigkeit' },
-  texture:            { ko: '피부결', en: 'Texture', de: 'Hauttextur' },
-  aging:              { ko: '탄력', en: 'Firmness', de: 'Straffheit' },
-  ox:                 { ko: '환경 방어', en: 'Env. Shield', de: 'Umweltschutz' },
-  makeup_stability:   { ko: '화장 지속', en: 'Makeup Wear', de: 'Make-up-Halt' },
+  seb: { ko: '유분 밸런스', en: 'Oil Balance', de: 'Öl-Balance' },
+  hyd: { ko: '수분도', en: 'Hydration', de: 'Feuchtigkeit' },
+  bar: { ko: '피부 장벽', en: 'Skin Barrier', de: 'Hautbarriere' },
+  sen: { ko: '민감도', en: 'Sensitivity', de: 'Empfindlichkeit' },
+  acne: { ko: '트러블', en: 'Breakout Control', de: 'Unreinheiten' },
+  pigment: { ko: '톤 균일도', en: 'Tone Evenness', de: 'Ton-Gleichmäßigkeit' },
+  texture: { ko: '피부결', en: 'Texture', de: 'Hauttextur' },
+  aging: { ko: '탄력', en: 'Firmness', de: 'Straffheit' },
+  ox: { ko: '환경 방어', en: 'Env. Shield', de: 'Umweltschutz' },
+  makeup_stability: { ko: '화장 지속', en: 'Makeup Wear', de: 'Make-up-Halt' },
 };
 
 const AXIS_INSIGHTS: Record<SkinAxis, Record<Lang, { text: string; ingredients: string[] }>> = {
-  seb:  { ko: { text: 'T존 유분기가 높아요. 밸런싱 케어가 도움됩니다.', ingredients: ['나이아신아마이드', '살리실산', '그린티'] }, en: { text: 'T-zone tends to be oily. Balancing care helps.', ingredients: ['Niacinamide', 'Salicylic Acid', 'Green Tea'] }, de: { text: 'T-Zone neigt zu Öl. Ausgleichende Pflege hilft.', ingredients: ['Niacinamid', 'Salicylsäure', 'Grüntee'] } },
-  hyd:  { ko: { text: '수분 보유력이 낮아요. 히알루론산 기반 제품을 추천합니다.', ingredients: ['히알루론산', '세라마이드', '판테놀'] }, en: { text: 'Moisture retention is low. Hyaluronic acid recommended.', ingredients: ['Hyaluronic Acid', 'Ceramides', 'Panthenol'] }, de: { text: 'Feuchtigkeitsretention niedrig. Hyaluronsäure empfohlen.', ingredients: ['Hyaluronsäure', 'Ceramide', 'Panthenol'] } },
-  bar:  { ko: { text: '장벽이 약해져 있어요. 세라마이드 집중 보강이 필요합니다.', ingredients: ['세라마이드', '콜레스테롤', '지방산'] }, en: { text: 'Barrier is weakened. Ceramide reinforcement needed.', ingredients: ['Ceramides', 'Cholesterol', 'Fatty Acids'] }, de: { text: 'Barriere geschwächt. Ceramid-Verstärkung nötig.', ingredients: ['Ceramide', 'Cholesterin', 'Fettsäuren'] } },
-  sen:  { ko: { text: '자극에 민감한 상태예요. 저자극 제품을 사용하세요.', ingredients: ['시카', '알란토인', '마데카소사이드'] }, en: { text: 'Sensitive to stimuli. Use gentle products.', ingredients: ['Centella', 'Allantoin', 'Madecassoside'] }, de: { text: 'Empfindlich gegen Reize. Sanfte Produkte nutzen.', ingredients: ['Centella', 'Allantoin', 'Madecassosid'] } },
+  seb: { ko: { text: 'T존 유분기가 높아요. 밸런싱 케어가 도움됩니다.', ingredients: ['나이아신아마이드', '살리실산', '그린티'] }, en: { text: 'T-zone tends to be oily. Balancing care helps.', ingredients: ['Niacinamide', 'Salicylic Acid', 'Green Tea'] }, de: { text: 'T-Zone neigt zu Öl. Ausgleichende Pflege hilft.', ingredients: ['Niacinamid', 'Salicylsäure', 'Grüntee'] } },
+  hyd: { ko: { text: '수분 보유력이 낮아요. 히알루론산 기반 제품을 추천합니다.', ingredients: ['히알루론산', '세라마이드', '판테놀'] }, en: { text: 'Moisture retention is low. Hyaluronic acid recommended.', ingredients: ['Hyaluronic Acid', 'Ceramides', 'Panthenol'] }, de: { text: 'Feuchtigkeitsretention niedrig. Hyaluronsäure empfohlen.', ingredients: ['Hyaluronsäure', 'Ceramide', 'Panthenol'] } },
+  bar: { ko: { text: '장벽이 약해져 있어요. 세라마이드 집중 보강이 필요합니다.', ingredients: ['세라마이드', '콜레스테롤', '지방산'] }, en: { text: 'Barrier is weakened. Ceramide reinforcement needed.', ingredients: ['Ceramides', 'Cholesterol', 'Fatty Acids'] }, de: { text: 'Barriere geschwächt. Ceramid-Verstärkung nötig.', ingredients: ['Ceramide', 'Cholesterin', 'Fettsäuren'] } },
+  sen: { ko: { text: '자극에 민감한 상태예요. 저자극 제품을 사용하세요.', ingredients: ['시카', '알란토인', '마데카소사이드'] }, en: { text: 'Sensitive to stimuli. Use gentle products.', ingredients: ['Centella', 'Allantoin', 'Madecassoside'] }, de: { text: 'Empfindlich gegen Reize. Sanfte Produkte nutzen.', ingredients: ['Centella', 'Allantoin', 'Madecassosid'] } },
   acne: { ko: { text: '트러블이 잦아요. 진정 + 각질 케어를 병행하세요.', ingredients: ['티트리', 'BHA', '아젤라산'] }, en: { text: 'Breakouts occur easily. Combine calming + exfoliation.', ingredients: ['Tea Tree', 'BHA', 'Azelaic Acid'] }, de: { text: 'Unreinheiten häufig. Beruhigung + Peeling kombinieren.', ingredients: ['Teebaum', 'BHA', 'Azelainsäure'] } },
   pigment: { ko: { text: '색소 침착이 보여요. 브라이트닝 케어를 추천합니다.', ingredients: ['비타민C', '나이아신아마이드', '알부틴'] }, en: { text: 'Pigmentation visible. Brightening care recommended.', ingredients: ['Vitamin C', 'Niacinamide', 'Arbutin'] }, de: { text: 'Pigmentierung sichtbar. Aufhellende Pflege empfohlen.', ingredients: ['Vitamin C', 'Niacinamid', 'Arbutin'] } },
   texture: { ko: { text: '피부결이 거칠어요. 부드러운 각질 제거를 추천합니다.', ingredients: ['AHA', 'PHA', '효소 클렌저'] }, en: { text: 'Texture is rough. Gentle exfoliation recommended.', ingredients: ['AHA', 'PHA', 'Enzyme Cleanser'] }, de: { text: 'Hauttextur rau. Sanftes Peeling empfohlen.', ingredients: ['AHA', 'PHA', 'Enzymreiniger'] } },
   aging: { ko: { text: '탄력 저하가 시작됐어요. 콜라겐 부스팅이 효과적입니다.', ingredients: ['레티놀', '펩타이드', '콜라겐'] }, en: { text: 'Firmness decreasing. Collagen boosting effective.', ingredients: ['Retinol', 'Peptides', 'Collagen'] }, de: { text: 'Straffheit nimmt ab. Kollagen-Boosting effektiv.', ingredients: ['Retinol', 'Peptide', 'Kollagen'] } },
-  ox:   { ko: { text: '환경 스트레스에 노출돼 있어요. 항산화 케어를 강화하세요.', ingredients: ['비타민C', '비타민E', '페룰산'] }, en: { text: 'Exposed to environmental stress. Boost antioxidants.', ingredients: ['Vitamin C', 'Vitamin E', 'Ferulic Acid'] }, de: { text: 'Umweltstress ausgesetzt. Antioxidative Pflege verstärken.', ingredients: ['Vitamin C', 'Vitamin E', 'Ferulasäure'] } },
+  ox: { ko: { text: '환경 스트레스에 노출돼 있어요. 항산화 케어를 강화하세요.', ingredients: ['비타민C', '비타민E', '페룰산'] }, en: { text: 'Exposed to environmental stress. Boost antioxidants.', ingredients: ['Vitamin C', 'Vitamin E', 'Ferulic Acid'] }, de: { text: 'Umweltstress ausgesetzt. Antioxidative Pflege verstärken.', ingredients: ['Vitamin C', 'Vitamin E', 'Ferulasäure'] } },
   makeup_stability: { ko: { text: '메이크업이 쉽게 무너져요. 수분-유분 밸런스가 핵심입니다.', ingredients: ['프라이머 에센스', '수분크림', '세팅 미스트'] }, en: { text: 'Makeup fades easily. Oil-moisture balance is key.', ingredients: ['Primer Essence', 'Moisturizer', 'Setting Mist'] }, de: { text: 'Make-up verblasst leicht. Öl-Feuchtigkeits-Balance ist entscheidend.', ingredients: ['Primer-Essenz', 'Feuchtigkeitscreme', 'Setting-Spray'] } },
 };
 
@@ -122,9 +122,9 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
   const gradientId = `ring-gradient-${tier}`;
   const gradients: Record<string, [string, string]> = {
     excellent: ['#4ECDC4', '#2BAE66'],
-    good:      ['#5E8B68', '#8FC49F'],
+    good: ['#5E8B68', '#8FC49F'],
     attention: ['#FFAB4C', '#FF8F1F'],
-    critical:  ['#FF6B6B', '#FF4444'],
+    critical: ['#FF6B6B', '#FF4444'],
   };
   const [g1, g2] = gradients[tier];
 
@@ -343,7 +343,7 @@ function NoAnalysisCTA({ lang }: { lang: Lang }) {
             : 'AI analyzes your skin in 30 seconds'}
       </p>
       <button
-        onClick={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
+        onClick={() => { useAnalysisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
         style={{
           display: 'inline-block',
           padding: '10px 24px', borderRadius: 12,
@@ -1064,7 +1064,7 @@ export default function Profile() {
               activeProfile={activeProfile}
               userName={userName}
               lang={lang}
-              onReanalyze={() => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
+              onReanalyze={() => { useAnalysisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
             />
 
             {activeProfile && (
@@ -1153,7 +1153,7 @@ export default function Profile() {
             };
             const flags = { atopyFlag: false, likelyHormonalCycleUser: false, likelyShaver: false };
             tempResult.product_bundle = buildProductBundleV5(tempResult, flags, engineTier);
-            useDiagnosisStore.getState().setResult(tempResult);
+            useAnalysisStore.getState().setResult(tempResult);
           }
           navigate('/results');
         }}

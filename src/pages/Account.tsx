@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import DiagnosisHistoryPage from "@/pages/DiagnosisHistoryPage";
+import AnalysisHistoryPage from "@/pages/AnalysisHistoryPage";
 import { useI18nStore } from "@/store/i18nStore";
 import AccountLayout, { type TabId } from "@/components/AccountLayout";
 import ProfilePage from "@/pages/ProfilePage";
@@ -104,7 +104,7 @@ export default function Account() {
 
     const CONTENT: Record<TabId, ReactNode> = {
         profile: <ProfilePage de={de} />,
-        history: <DiagnosisHistoryPage de={de} />,
+        history: <AnalysisHistoryPage de={de} />,
         orders: <OrdersPage de={de} />,
         wishlist: <WishlistGrid de={de} />,
         address: <AddressManager de={de} />,

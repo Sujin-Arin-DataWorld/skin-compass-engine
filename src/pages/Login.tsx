@@ -16,7 +16,7 @@ const LOGIN_I18N = {
     en: {
         title: "Secure Access",
         titleSignup: "Create Account",
-        subtitle: "Your 10-Axis Skin Strategy is a clinical asset. Sign in to secure your precision data and unlock your personalized formula. Unsaved data will be lost.",
+        subtitle: "Your 10-Axis Skin Strategy is a professional asset. Sign in to secure your precision data and unlock your personalized formula. Unsaved data will be lost.",
         subtitleSignup: "Create your Skin Strategy Lab account.",
         tabLogin: "Sign In",
         tabSignup: "Register",
@@ -79,7 +79,7 @@ const LOGIN_I18N = {
     ko: {
         title: "안전한 접근",
         titleSignup: "계정 만들기",
-        subtitle: "10축 피부 전략은 임상적 자산입니다. 로그인하여 정밀 데이터를 보호하고 맞춤 포뮬러를 확인하세요. 저장되지 않은 데이터는 사라집니다.",
+        subtitle: "10축 피부 전략은 전문적인적 자산입니다. 로그인하여 정밀 데이터를 보호하고 맞춤 포뮬러를 확인하세요. 저장되지 않은 데이터는 사라집니다.",
         subtitleSignup: "Skin Strategy Lab 계정을 만드세요.",
         tabLogin: "로그인",
         tabSignup: "회원가입",

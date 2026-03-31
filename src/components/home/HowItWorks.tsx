@@ -121,10 +121,10 @@ function useCountUp(target: number, isInView: boolean) {
 
 // ─── Floating animation config ───────────────────────────────────────────────
 
-const FLOAT_BACK  = { y: [0, -9, 0], transition: { repeat: Infinity, duration: 4,   ease: 'easeInOut' as const } };
-const FLOAT_FRONT = { y: [0,  9, 0], transition: { repeat: Infinity, duration: 5,   ease: 'easeInOut' as const } };
-const FLOAT_BG    = { y: [0, -6, 0], transition: { repeat: Infinity, duration: 4.5, ease: 'easeInOut' as const } };
-const FLOAT_PHONE = { y: [0,  8, 0], transition: { repeat: Infinity, duration: 5.5, ease: 'easeInOut' as const } };
+const FLOAT_BACK = { y: [0, -9, 0], transition: { repeat: Infinity, duration: 4, ease: 'easeInOut' as const } };
+const FLOAT_FRONT = { y: [0, 9, 0], transition: { repeat: Infinity, duration: 5, ease: 'easeInOut' as const } };
+const FLOAT_BG = { y: [0, -6, 0], transition: { repeat: Infinity, duration: 4.5, ease: 'easeInOut' as const } };
+const FLOAT_PHONE = { y: [0, 8, 0], transition: { repeat: Infinity, duration: 5.5, ease: 'easeInOut' as const } };
 
 // ─── StepLabel ────────────────────────────────────────────────────────────────
 
@@ -397,8 +397,8 @@ export const HowItWorks = ({ lang }: HowItWorksProps) => {
 
   const headingText =
     lang === 'ko' ? '어떻게 작동하나요?' :
-    lang === 'de' ? 'Wie es funktioniert' :
-    'How it works';
+      lang === 'de' ? 'Wie es funktioniert' :
+        'How it works';
 
   return (
     <section
@@ -465,10 +465,10 @@ export const HowItWorks = ({ lang }: HowItWorksProps) => {
           className="text-[11px] text-neutral-400 tracking-wide mt-24 mb-8 max-w-2xl mx-auto text-center font-light leading-relaxed opacity-70"
         >
           {lang === 'ko'
-            ? '* 안내: AI 피부 분석은 오직 미용 목적으로만 제공됩니다. 이는 의학적 진단이 아니며, 피부과 전문의의 상담을 대체하지 않습니다.'
+            ? '* 안내: 본 스킨 매핑 결과는 오직 미용 및 피부 관리 정보 목적으로만 참고용으로 제공됩니다. 이는 의학적 평가이나 진단을 대체하지 않으며, 특정 질환에 대해서는 피부과 전문의 상담을 권장합니다.'
             : lang === 'de'
-              ? '* Hinweis: Die KI-Hautanalyse dient ausschließlich kosmetischen Zwecken. Sie stellt keine medizinische Diagnose dar und ersetzt nicht die Beratung durch einen Dermatologen.'
-              : '* Note: The AI skin analysis is for cosmetic purposes only. It does not constitute a medical diagnosis and does not replace consultation with a dermatologist.'
+              ? '* Hinweis: Das KI-Gesichtsmapping dient ausschließlich informativen und kosmetischen Pflegezwecken. Es ist kein Ersatz für professionelle medizinische Beratung oder Diagnose.'
+              : '* Note: The AI skin mapping is provided for cosmetic information purposes only. It does not replace professional medical consultation or analysis.'
           }
         </div>
 

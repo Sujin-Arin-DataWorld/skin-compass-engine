@@ -1,11 +1,11 @@
 /**
- * DiagnosisHistoryPage
+ * AnalysisHistoryPage
  * Rendered when ?tab=history inside /account.
  *
  * Sections:
  *  1. Progression LineChart with toggleable axis legend + 90-day re-analyze CTA
  *  2. Comparison overlay — triggered when exactly 2 diagnoses are checked
- *  3. Diagnosis archive — expandable cards with full RadarChart + products
+ *  3. Analysis archive — expandable cards with full RadarChart + products
  *  4. Empty state for new users
  */
 import { useState, useMemo } from "react";
@@ -17,7 +17,7 @@ import {
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
 } from "recharts";
 import { ChevronDown, ChevronUp, X, FlaskConical } from "lucide-react";
-import { useDiagnosis, type DiagnosisRecord } from "@/hooks/useDiagnosis";
+import { useAnalysis, type AnalysisRecord } from "@/hooks/useSkinAnalysis";
 import { RADAR_AXES, AXIS_LABELS, AXIS_LABELS_DE, type AxisKey } from "@/engine/types";
 
 // ── Design tokens ─────────────────────────────────────────────────────────────
@@ -219,11 +219,11 @@ function EmptyState({ de }: { de: boolean }) {
             }}>
                 {de
                     ? "Starten Sie Ihre wissenschaftliche Analyse, um die Daten Ihrer Haut freizuschalten."
-                    : "Start your scientific diagnosis to unlock your skin's data."
+                    : "Start your scientific analysis to unlock your skin's data."
                 }
             </p>
             <Link
-                to="/diagnosis"
+                to="/skin-assessment"
                 className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-80"
                 style={{ background: GOLD, color: "#F5F5F7" }}
             >
@@ -234,8 +234,8 @@ function EmptyState({ de }: { de: boolean }) {
     );
 }
 
-// ── DiagnosisCard ─────────────────────────────────────────────────────────────
-function DiagnosisCard({
+// ── AnalysisCard ─────────────────────────────────────────────────────────────
+function AnalysisCard({
     record,
     de,
     isExpanded,
@@ -245,7 +245,7 @@ function DiagnosisCard({
     compareDisabled,
     axisLabels,
 }: {
-    record: DiagnosisRecord;
+    record: AnalysisRecord;
     de: boolean;
     isExpanded: boolean;
     onToggle: () => void;
@@ -446,8 +446,8 @@ function DiagnosisCard({
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
-export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
-    const { history, loading } = useDiagnosis();
+export default function AnalysisHistoryPage({ de }: { de: boolean }) {
+    const { history, loading } = useAnalysis();
     const axisLabels = de ? AXIS_LABELS_DE : AXIS_LABELS;
 
     // UI state
@@ -546,7 +546,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
                     <SectionHead>{de ? "Hautprogress" : "Skin Progress"}</SectionHead>
                     {showReanalyze && (
                         <Link
-                            to="/diagnosis"
+                            to="/analysis"
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-opacity hover:opacity-80 flex-shrink-0"
                             style={{
                                 background: GOLD,
@@ -572,7 +572,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
                             <p style={{ fontSize: "0.8125rem", color: BRONZE, lineHeight: 1.6 }}>
                                 {de
                                     ? "Führen Sie eine weitere Analyse durch, um Ihren Fortschritt zu sehen."
-                                    : "Complete one more diagnosis to see your progress over time."}
+                                    : "Complete one more analysis to see your progress over time."}
                             </p>
                         </div>
                     ) : (
@@ -741,7 +741,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
                 )}
             </AnimatePresence>
 
-            {/* ── 3. Diagnosis Archive ─────────────────────────────────── */}
+            {/* ── 3. Analysis Archive ─────────────────────────────────── */}
             <section>
                 <div className="flex items-center justify-between mb-3">
                     <SectionHead>{de ? "Analyse-Archiv" : "Analysis Archive"}</SectionHead>
@@ -758,7 +758,7 @@ export default function DiagnosisHistoryPage({ de }: { de: boolean }) {
 
                 <div className="space-y-3">
                     {history.map((record) => (
-                        <DiagnosisCard
+                        <AnalysisCard
                             key={record.id}
                             record={record}
                             de={de}

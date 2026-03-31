@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { HeroCtaButtons } from '@/components/hero/HeroCtaButtons';
 import { SLIDE1_COPY, type HeroLang } from '@/constants/hero-copy';
-import { useDiagnosisStore } from '@/store/diagnosisStore';
+import { useAnalysisStore } from '@/store/analysisStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -69,9 +69,8 @@ function HeroTextBlock({ copy, lang, item, isDesktop, onPrimary, onSecondary }: 
       {/* Brand Label */}
       <motion.p
         variants={item}
-        className={`tracking-[0.3em] uppercase font-medium notranslate ${
-          isDesktop ? 'text-[12px] mb-4' : 'text-[11px] mb-3'
-        }`}
+        className={`tracking-[0.3em] uppercase font-medium notranslate ${isDesktop ? 'text-[12px] mb-4' : 'text-[11px] mb-3'
+          }`}
         style={{
           color: 'var(--ssl-accent)',
           fontFamily: 'var(--font-sans)',
@@ -85,11 +84,10 @@ function HeroTextBlock({ copy, lang, item, isDesktop, onPrimary, onSecondary }: 
       {/* Headline */}
       <motion.h1
         variants={item}
-        className={`text-white leading-[1.15] font-light ${
-          isDesktop
-            ? 'text-5xl lg:text-6xl mb-5'
-            : 'text-[27px] sm:text-[34px] mb-3'
-        }`}
+        className={`text-white leading-[1.15] font-light ${isDesktop
+          ? 'text-5xl lg:text-6xl mb-5'
+          : 'text-[27px] sm:text-[34px] mb-3'
+          }`}
         style={{
           fontFamily: 'var(--font-display)',
           ...(isDesktop && {
@@ -111,11 +109,10 @@ function HeroTextBlock({ copy, lang, item, isDesktop, onPrimary, onSecondary }: 
       {/* Subtext */}
       <motion.p
         variants={item}
-        className={`text-white/85 leading-relaxed max-w-lg font-light tracking-wide ${
-          isDesktop
-            ? 'text-[19px] mb-10'
-            : 'text-[14px] sm:text-[15px] mb-6'
-        }`}
+        className={`text-white/85 leading-relaxed max-w-lg font-light tracking-wide ${isDesktop
+          ? 'text-[19px] mb-10'
+          : 'text-[14px] sm:text-[15px] mb-6'
+          }`}
         style={{
           fontFamily: '"Inter", var(--font-sans)',
           ...(isDesktop && {
@@ -158,8 +155,8 @@ export const LandingHero = ({ lang }: LandingHeroProps) => {
   const prefersReduced = useReducedMotion();
   const item = prefersReduced ? noMotionItem : itemV;
 
-  const onPrimary = () => { useDiagnosisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); };
-  const onSecondary = () => { useDiagnosisStore.getState().reset(); navigate('/diagnosis'); };
+  const onPrimary = () => { useAnalysisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); };
+  const onSecondary = () => { useAnalysisStore.getState().reset(); navigate('/analysis'); };
 
   return (
     <section className="relative w-full overflow-hidden" aria-label="Hero">

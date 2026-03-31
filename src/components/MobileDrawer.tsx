@@ -123,8 +123,8 @@ export default function MobileDrawer() {
                 {language === "ko" ? "스킨 랩" : language === "de" ? "Skin Lab" : "Skin Lab"}
               </p>
               {([
-                { Icon: Microscope, label: p1.nav.hautAnalyse, href: "/diagnosis" },
-                { Icon: Layers, label: p1.nav.routinenSets, href: "/diagnosis" },
+                { Icon: Microscope, label: p1.nav.hautAnalyse, href: "/skin-assessment" },
+                { Icon: Layers, label: p1.nav.routinenSets, href: "/analysis" },
               ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
                 <Link key={label} to={href}
                   className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -142,9 +142,9 @@ export default function MobileDrawer() {
                 {language === "ko" ? "쇼핑" : language === "de" ? "Shop" : "Shop"}
               </p>
               {([
-                { Icon: Trophy, label: p1.nav.bestseller, href: "/diagnosis" },
-                { Icon: Target, label: p1.nav.hautbeduerfnisse, href: "/diagnosis" },
-                { Icon: Sparkles, label: p1.nav.kMaskLab, href: "/diagnosis" },
+                { Icon: Trophy, label: p1.nav.bestseller, href: "/analysis" },
+                { Icon: Target, label: p1.nav.hautbeduerfnisse, href: "/analysis" },
+                { Icon: Sparkles, label: p1.nav.kMaskLab, href: "/analysis" },
               ] as { Icon: React.ElementType; label: string; href: string }[]).map(({ Icon, label, href }) => (
                 <Link key={label} to={href}
                   className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
@@ -161,7 +161,7 @@ export default function MobileDrawer() {
               <p className="px-6 mt-3 mb-1 text-[0.58rem] font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--ssl-accent)' }}>
                 {language === "ko" ? "지식" : language === "de" ? "Wissen" : "Knowledge"}
               </p>
-              <Link to="/diagnosis"
+              <Link to="/analysis"
                 className="flex items-center gap-4 px-6 py-4 text-gray-800 dark:text-gray-200 hover:bg-stone-50 dark:hover:bg-white/[0.04] transition-colors group"
                 style={navFont}
               >

@@ -38,8 +38,8 @@ const TX: Record<string, Record<Lang, string>> = {
   },
   'desc.pro': {
     ko: '에스테틱급 홈케어. 풀 루틴에 LED/갈바닉 디바이스가 더해져요.',
-    en: 'Aesthetic-grade home care. Complete routine plus LED or galvanic device treatment.',
-    de: 'Ästhetik-Pflege für Zuhause. Komplette Routine plus LED- oder Galvanik-Behandlung.',
+    en: 'Aesthetic-grade home care. Complete routine plus LED or galvanic device care.',
+    de: 'Ästhetik-Pflege für Zuhause. Komplette Routine plus LED- oder Galvanik-Pflege.',
   },
   spfNote: {
     ko: '☀️ SPF 자외선 차단 자동 포함',

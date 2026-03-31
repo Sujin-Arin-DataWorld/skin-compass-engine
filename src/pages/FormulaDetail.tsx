@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, Check } from "lucide-react";
-import { useDiagnosisStore } from "@/store/diagnosisStore";
+import { useAnalysisStore } from "@/store/analysisStore";
 import { useProductStore } from "@/store/productStore";
 import { useCartStore } from "@/store/cartStore";
 import { AXIS_LABELS, Product } from "@/engine/types";
@@ -11,14 +11,15 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SilkBackground from "@/components/SilkBackground";
 import CompatibilityBadge from "@/components/product/CompatibilityBadge";
+import { formatGrundpreis } from "@/utils/priceUtils";
 
 const PHASE_META: Record<string, { icon: string; name: string; desc: string }> = {
     "1": { icon: "💧", name: "Cleanse", desc: "Remove impurities without disrupting barrier integrity." },
-    "2": { icon: "🌿", name: "Prep", desc: "Rebuild and reinforce the skin's moisture barrier." },
-    "3": { icon: "🔬", name: "Treat", desc: "Address primary concerns with active ingredients." },
-    "4": { icon: "🛡", name: "Seal", desc: "Lock in moisture and create a protective film." },
+    "2": { icon: "🌿", name: "Prep",    desc: "Rebuild and reinforce the skin's moisture barrier." },
+    "3": { icon: "🔬", name: "Target",  desc: "Address primary concerns with active ingredients." },
+    "4": { icon: "🛡", name: "Seal",    desc: "Lock in moisture and create a protective film." },
     "5": { icon: "☀️", name: "Protect", desc: "UV protection — always the final step." },
-    "Device": { icon: "✨", name: "Device", desc: "Clinical device to amplify protocol results." },
+    "Device": { icon: "✨", name: "Device", desc: "Professional device to amplify protocol results." },
 };
 
 // Normalize phase strings like "Phase1", "Phase 1", "Phase2A", "Phase3_Acne", "Device" → key for PHASE_META
@@ -33,7 +34,7 @@ function getPhaseKey(phase: string): string {
 export default function FormulaDetail() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { result } = useDiagnosisStore();
+    const { result } = useAnalysisStore();
     const { products } = useProductStore();
     const { addItem, items } = useCartStore();
     const [added, setAdded] = useState(false);
@@ -61,6 +62,8 @@ export default function FormulaDetail() {
     const phaseMeta = PHASE_META[getPhaseKey(product.phase)] ?? PHASE_META["1"];
 
     const effectivePrice = product.price ?? product.price_eur;
+    // @ts-expect-error Volume might not be typed on the lean product interface
+    const basicPriceText = formatGrundpreis(effectivePrice, product.volume_ml);
 
     // Find lowest scoring axis this product targets
     const lowestTarget = product.target_axes.length > 0
@@ -112,7 +115,14 @@ export default function FormulaDetail() {
                     <div className="px-6 pb-6 border-t border-border/50">
                         <p className="text-xs font-bold tracking-[0.2em] uppercase text-primary mt-4 mb-1">{product.brand}</p>
                         <h1 className="font-display text-2xl md:text-3xl font-light text-foreground mb-1">{product.name.en}</h1>
-                        <p className="text-foreground/60 text-sm mb-4">{product.type} · €{effectivePrice}</p>
+                        <div className="text-foreground/60 text-sm mb-4">
+                            {product.type} · €{effectivePrice}
+                            {basicPriceText && (
+                                <span className="block text-[11px] text-muted-foreground mt-0.5 whitespace-nowrap">
+                                    {basicPriceText}
+                                </span>
+                            )}
+                        </div>
                         <p className="text-[#1A1A1A] dark:text-gray-300 text-sm leading-relaxed mb-6 font-medium">{product.description?.en || phaseMeta.desc}</p>
 
                         {/* Buy Button Action */}
@@ -181,7 +191,7 @@ export default function FormulaDetail() {
                         </div>
                         {product.vectorImpact && Object.keys(product.vectorImpact).length > 0 ? (
                             <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">
-                                Based on your {lowestScore} {AXIS_LABELS[lowestTarget]} score, this product is mapped to shift this vector by <strong className="text-primary">{(product.vectorImpact[lowestTarget] ?? 0) > 0 ? '+' : ''}{product.vectorImpact[lowestTarget] ?? 0} points</strong>. The key ingredients precisely trigger the mechanisms required for this clinical improvement.
+                                Based on your {lowestScore} {AXIS_LABELS[lowestTarget]} score, this product is mapped to shift this vector by <strong className="text-primary">{(product.vectorImpact[lowestTarget] ?? 0) > 0 ? '+' : ''}{product.vectorImpact[lowestTarget] ?? 0} points</strong>. The key ingredients precisely trigger the mechanisms required for this professional improvement.
                             </p>
                         ) : (
                             <p className="text-sm text-[#1A1A1A] dark:text-gray-300 leading-relaxed font-medium">

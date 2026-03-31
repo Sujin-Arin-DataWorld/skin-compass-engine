@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { OptionDef, LocalizedText, Lang } from "@/engine/questionRoutingV5";
-import { TermTip } from "@/components/diagnosis/TermTip";
+import { TermTip } from "@/components/skin-assessment/TermTip";
 
 function getText(t: LocalizedText, lang: Lang): string {
   return t[lang] ?? t.en;

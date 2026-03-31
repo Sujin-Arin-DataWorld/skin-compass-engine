@@ -365,7 +365,8 @@ export default function AnalysisResults({
       const resizedImage = capturedImage ? await compressImageBase64(capturedImage, 600, 0.6) : null;
       localStorage.setItem('ssl_pending_analysis', JSON.stringify({
         scores, analysisId, hasLifestyle, timestamp: Date.now(),
-        capturedImage: resizedImage
+        capturedImage: resizedImage,
+        reasons: apiReasons ?? null,
       }));
     } catch(e) { console.warn('[GoogleAuth] Backup fail:', e); }
     const { loginWithGoogle } = useAuthStore.getState();

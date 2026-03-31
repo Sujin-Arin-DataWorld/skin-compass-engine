@@ -143,13 +143,14 @@ export default function SkinAnalysisPage() {
         hasLifestyle: boolean;
         timestamp: number;
         capturedImage?: string | null;
+        reasons?: Record<string, string> | null;
       };
       // TTL guard: only restore if saved within the last 30 minutes
       if (Date.now() - (pending.timestamp || 0) > 30 * 60 * 1000) {
         localStorage.removeItem('ssl_pending_analysis');
         return;
       }
-      setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId);
+      setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId, pending.reasons ?? null);
       if (pending.capturedImage) {
         setCapturedImage(pending.capturedImage);
       }

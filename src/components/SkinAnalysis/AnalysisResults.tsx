@@ -1,7 +1,7 @@
 // Part B — AnalysisResults.tsx (Apple + Forest Design System, Dark Mode Only)
 // Production-ready component: Hero + Top3 Severity + 7-axis Accordion + Products + Feedback
 
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -277,7 +277,8 @@ export default function AnalysisResults({
   const resetAnalysis = useSkinAnalysisStore((s) => s.resetAnalysis);
   const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
 
-  const [pendingAction, setPendingAction] = useState<'save' | 'masterplan' | null>(null);
+  const [pendingAction, setPendingAction] = useState<'save' | 'masterplan' | 'routine' | null>(null);
+  const [pendingTierId, setPendingTierId] = useState<string | null>(null);
   const apiReasons = useSkinAnalysisStore((s) => s.reasons);
   const hasLifestyle = lifestyleAnswers !== null;
   const setResult = useAnalysisStore((s) => s.setResult);
@@ -356,10 +357,18 @@ export default function AnalysisResults({
   }, [scores, setResult, navigate]);
 
   const handlePickerConfirm = useCallback((tierId: string) => {
+    if (!isLoggedIn) {
+      // Not logged in → close picker, remember the selected tier, show auth modal
+      closePicker();
+      setPendingTierId(tierId);
+      setPendingAction('routine');
+      setShowAuthModal(true);
+      return;
+    }
     closePicker();
     setSelectedTier(tierId as 'essential' | 'complete' | 'pro');
     handleNavigateToLab(tierId);
-  }, [closePicker, setSelectedTier, handleNavigateToLab]);
+  }, [isLoggedIn, closePicker, setSelectedTier, handleNavigateToLab]);
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const saveAnalysisResult = useSkinProfileStore((s) => s.saveAnalysisResult);
@@ -372,22 +381,23 @@ export default function AnalysisResults({
         capturedImage: resizedImage,
         reasons: apiReasons ?? null,
       }));
+
+      // Save the user's intent so we can auto-resume after Google redirect return
+      if (pendingAction) {
+        sessionStorage.setItem('ssl_oauth_intent', JSON.stringify({
+          action: pendingAction,
+          tierId: pendingTierId,
+        }));
+      }
     } catch (e) { console.warn('[GoogleAuth] Backup fail:', e); }
     const { loginWithGoogle } = useAuthStore.getState();
     await loginWithGoogle('/skin-analysis?action=oauth_return');
-  }, [capturedImage, scores, analysisId, hasLifestyle]);
+  }, [capturedImage, scores, analysisId, hasLifestyle, apiReasons, pendingAction, pendingTierId]);
 
-  const handleSave = useCallback(async () => {
+  // ── doSave: actual DB save logic — does NOT check isLoggedIn (avoids stale closure) ──
+  // Instead, it directly checks supabase.auth.getUser() for a live session.
+  const doSave = useCallback(async () => {
     if (saveStatus === 'saved' || saveStatus === 'saving') return;
-
-    // Not logged in → display AuthModal instead of redirecting
-    if (!isLoggedIn) {
-      setPendingAction('save');
-      setShowAuthModal(true);
-      return;
-    }
-
-    // Logged in → save via useSkinProfileStore to user_skin_profiles
     setSaveStatus('saving');
     try {
       const { supabase } = await import('@/integrations/supabase/client');
@@ -461,7 +471,44 @@ export default function AnalysisResults({
       }
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
-  }, [saveStatus, isLoggedIn, scores, hasLifestyle, lang, saveAnalysisResult]);
+  }, [saveStatus, scores, hasLifestyle, lang, saveAnalysisResult]);
+
+  // ── handleSave: button handler — gates on isLoggedIn for the initial click ──
+  const handleSave = useCallback(async () => {
+    if (saveStatus === 'saved' || saveStatus === 'saving') return;
+    if (!isLoggedIn) {
+      setPendingAction('save');
+      setShowAuthModal(true);
+      return;
+    }
+    doSave();
+  }, [saveStatus, isLoggedIn, doSave]);
+
+  // ── Auto-Resume: after Google OAuth redirect, read saved intent and execute ──
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const intentStr = sessionStorage.getItem('ssl_oauth_intent');
+    if (!intentStr || saveStatus !== 'idle') return;
+    sessionStorage.removeItem('ssl_oauth_intent'); // one-shot: prevent infinite re-fire
+    try {
+      const intent = JSON.parse(intentStr) as { action: string; tierId?: string };
+      // Delay slightly so the restored UI is fully rendered before triggering actions
+      setTimeout(() => {
+        if (intent.action === 'save') {
+          doSave();
+        } else if (intent.action === 'masterplan') {
+          doSave(); // save first, then open picker
+          openPicker();
+        } else if (intent.action === 'routine' && intent.tierId) {
+          doSave();
+          setSelectedTier(intent.tierId as 'essential' | 'complete' | 'pro');
+          handleNavigateToLab(intent.tierId);
+        }
+      }, 400);
+    } catch (e) {
+      console.error('[AutoResume] Failed to parse oauth intent:', e);
+    }
+  }, [isLoggedIn, saveStatus, doSave, openPicker, setSelectedTier, handleNavigateToLab]);
 
   const resetAnalysisStore = useAnalysisStore((s) => s.reset);
 
@@ -782,11 +829,17 @@ export default function AnalysisResults({
         onClose={() => setShowAuthModal(false)}
         onSuccess={() => {
           setShowAuthModal(false);
-          // Auto-trigger save now that we are logged in
-          handleSave();
-          // If the user's intent was to view the masterplan, proceed with opening the picker
+          // Auto-trigger save now that we are logged in — use doSave (not handleSave)
+          // because handleSave's closure still has the stale isLoggedIn=false from before login.
+          doSave();
+          // Resume the user's original intent after login
           if (pendingAction === 'masterplan') {
             openPicker();
+          } else if (pendingAction === 'routine' && pendingTierId) {
+            // User picked a tier in RoutinePicker but wasn't logged in → resume
+            setSelectedTier(pendingTierId as 'essential' | 'complete' | 'pro');
+            handleNavigateToLab(pendingTierId);
+            setPendingTierId(null);
           }
           setPendingAction(null);
         }}

@@ -33,29 +33,51 @@ export default function AuthCallback() {
       if (resolved) return;
       resolved = true;
 
-      // Sync any pending guest analysis to Supabase now that user is authenticated
-      const pending = getPendingAnalysis();
-      if (pending) {
+      // ── Schema Router: V5 AI camera data vs. legacy assessment data ──────
+      // handleGoogleAuth (AnalysisResults.tsx) saves { scores, analysisId, ... }
+      // savePendingAnalysis (analysisPersistence.ts) saves { fullResult, axisScores, ... }
+      // We must NOT clear V5 data — SkinAnalysisPage's useEffect restores it.
+      const rawPendingStr = (() => {
+        try { return localStorage.getItem('ssl_pending_analysis'); } catch { return null; }
+      })();
+
+      if (rawPendingStr) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data: { user } } = await (supabase as any).auth.getUser();
-          if (user) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            await (supabase as any)
-              .from("analysis_history")
-              .insert({
-                user_id: user.id,
-                radar_data: pending.axisScores,
-                skin_tier: pending.skinTier,
-                recommended_products: pending.recommendedProducts,
-              });
+          const parsed = JSON.parse(rawPendingStr);
+
+          if (parsed.scores && parsed.analysisId !== undefined) {
+            // V5 AI Camera data → bypass (SkinAnalysisPage will restore it)
+            console.log("[AuthCallback] V5 AI Analysis data detected. Bypassing legacy clear.");
+          } else {
+            // Legacy assessment data → process and clear
+            const pending = getPendingAnalysis();
+            if (pending) {
+              try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: { user } } = await (supabase as any).auth.getUser();
+                if (user) {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  await (supabase as any)
+                    .from("analysis_history")
+                    .insert({
+                      user_id: user.id,
+                      radar_data: pending.axisScores,
+                      skin_tier: pending.skinTier,
+                      recommended_products: pending.recommendedProducts,
+                    });
+                }
+                if (pending.fullResult) {
+                  useAnalysisStore.getState().setResult(pending.fullResult);
+                }
+              } catch (syncErr) {
+                console.warn("[AuthCallback] pending analysis sync failed (non-fatal):", syncErr);
+              }
+              clearPendingAnalysis();
+            }
           }
-          // Restore result to Zustand store so Results.tsx renders immediately
-          useAnalysisStore.getState().setResult(pending.fullResult);
+        } catch (parseErr) {
+          console.warn("[AuthCallback] JSON parse failed:", parseErr);
           clearPendingAnalysis();
-        } catch (syncErr) {
-          console.warn("[AuthCallback] pending analysis sync failed (non-fatal):", syncErr);
-          // Non-fatal — Results.tsx will still restore from localStorage
         }
       }
 

@@ -372,7 +372,7 @@ const ResultsPage = () => {
             if (info.offset.x < -60) goTo(current + 1);
             if (info.offset.x > 60) goTo(current - 1);
           }}
-          className="absolute inset-0 flex flex-col pt-[82px] pb-[90px]"
+          className="absolute inset-0 flex flex-col pt-[112px] pb-[90px]"
           style={{ willChange: "transform" }}
         >
           {slides[current]}

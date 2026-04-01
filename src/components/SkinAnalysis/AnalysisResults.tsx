@@ -276,6 +276,8 @@ export default function AnalysisResults({
   const { isLoggedIn } = useAuthStore();
   const resetAnalysis = useSkinAnalysisStore((s) => s.resetAnalysis);
   const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
+
+  const [pendingAction, setPendingAction] = useState<'save' | 'masterplan' | null>(null);
   const apiReasons = useSkinAnalysisStore((s) => s.reasons);
   const hasLifestyle = lifestyleAnswers !== null;
   const setResult = useAnalysisStore((s) => s.setResult);
@@ -380,6 +382,7 @@ export default function AnalysisResults({
 
     // Not logged in → display AuthModal instead of redirecting
     if (!isLoggedIn) {
+      setPendingAction('save');
       setShowAuthModal(true);
       return;
     }
@@ -392,6 +395,7 @@ export default function AnalysisResults({
 
       if (authError || !user) {
         console.warn('[Save] Session expired:', authError?.message);
+        setPendingAction('save');
         setShowAuthModal(true);
         setSaveStatus('idle');
         return;
@@ -446,6 +450,7 @@ export default function AnalysisResults({
       setSaveStatus('error');
       const errMsg = err instanceof Error ? err.message : '';
       if (errMsg.includes('JWT') || errMsg.includes('auth') || errMsg.includes('authenticated')) {
+        setPendingAction('save');
         setShowAuthModal(true);
       } else {
         toast.error(
@@ -666,7 +671,14 @@ export default function AnalysisResults({
         {/* ── SECTION 4: Masterplan CTA ─────────────────────────────────────── */}
         <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="mt-10 mb-2">
           <motion.button
-            onClick={openPicker}
+            onClick={() => {
+              if (!isLoggedIn) {
+                setPendingAction('masterplan');
+                setShowAuthModal(true);
+              } else {
+                openPicker();
+              }
+            }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full rounded-2xl py-5 flex flex-col items-center justify-center gap-2 transition-all"
@@ -772,6 +784,11 @@ export default function AnalysisResults({
           setShowAuthModal(false);
           // Auto-trigger save now that we are logged in
           handleSave();
+          // If the user's intent was to view the masterplan, proceed with opening the picker
+          if (pendingAction === 'masterplan') {
+            openPicker();
+          }
+          setPendingAction(null);
         }}
         onGoogleClick={handleGoogleAuth}
       />

@@ -463,7 +463,7 @@ export default function SkinAnalysisPage() {
                   {language === 'ko' ? '\uc0dd\ud65c \uc2b5\uad00 \uc124\ubb38' : language === 'de' ? 'Lebensstil-Fragen' : 'Lifestyle Survey'}
                 </p>
                 <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: tok.textSecondary }}>
-                  {language === 'ko' ? '5\uac1c \uc9c8\ubb38 \u00b7 \uc57d 30\ucd08' : language === 'de' ? '5 Fragen \u00b7 ca. 30 Sek.' : '5 quick questions \u00b7 approx. 30 sec'}
+                  {language === 'ko' ? '8\uac1c \uc9c8\ubb38 \u00b7 \uc57d 30\ucd08' : language === 'de' ? '8 Fragen \u00b7 ca. 30 Sek.' : '8 quick questions \u00b7 approx. 30 sec'}
                 </p>
               </div>
             </div>

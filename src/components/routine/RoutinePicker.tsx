@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, X } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { ROUTINE_TIERS } from '@/constants/routineTiers';
 import type { RoutineTierId, RoutineTier } from '@/types/routine';
@@ -265,6 +265,14 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
             initial="hidden"
             animate="visible"
             exit="exit"
+            drag="y"
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.6 }}
+            onDragEnd={(_e, info) => {
+              if (info.offset.y > 100 || info.velocity.y > 300) {
+                onClose();
+              }
+            }}
             style={{
               position: 'fixed',
               bottom: 0,
@@ -277,6 +285,7 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
               borderRadius: '20px 20px 0 0',
               zIndex: 9999,
               paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+              touchAction: 'pan-x',
             }}
           >
             {/* Handle bar */}
@@ -290,7 +299,26 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
             </div>
 
             {/* Header */}
-            <div style={{ textAlign: 'center', paddingInline: 24, marginBottom: 20 }}>
+            <div style={{ textAlign: 'center', paddingInline: 24, marginBottom: 20, position: 'relative' }}>
+              <button
+                onClick={onClose}
+                style={{
+                  position: 'absolute',
+                  top: -12,
+                  right: 12,
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#9CA3AF',
+                  padding: '8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                }}
+              >
+                <X size={20} />
+              </button>
               <h2 style={{
                 fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
                 fontSize: 18,

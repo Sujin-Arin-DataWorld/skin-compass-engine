@@ -103,7 +103,7 @@ export default function BiometricConsentModal({ isOpen, onAccept, onCancel }: Ph
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
-            className="relative w-full max-w-[440px] rounded-3xl p-6 md:p-8 flex flex-col shadow-2xl"
+            className="relative w-full max-w-[440px] max-h-[85dvh] overflow-y-auto overscroll-contain rounded-3xl p-6 md:p-8 flex flex-col shadow-2xl"
             style={{
               background: glassTok.card.background,
               backdropFilter: glassTok.card.backdropFilter,

@@ -32,8 +32,9 @@ const CAMERA_PROMPT = {
       '메이크업 없는 맨얼굴이 가장 정확합니다',
       '정면을 바라보고 얼굴 전체가 보이게 해주세요',
     ],
-    cta: '카메라 시작',
+    cta: 'AI 분석 시작',
     disclaimer: '촬영 후 사진은 분석 직후 삭제됩니다.',
+    stepLabel: 'Step 2/2 · AI 카메라 분석',
   },
   en: {
     title: 'Camera Ready',
@@ -43,8 +44,9 @@ const CAMERA_PROMPT = {
       'Bare skin without makeup gives the best results',
       'Look straight ahead with your full face visible',
     ],
-    cta: 'Start Camera',
+    cta: 'Start AI Analysis',
     disclaimer: 'Your photo is deleted immediately after analysis.',
+    stepLabel: 'Step 2/2 · AI Camera Analysis',
   },
   de: {
     title: 'Kamera bereit',
@@ -54,8 +56,9 @@ const CAMERA_PROMPT = {
       'Ungeschminkte Haut liefert die besten Ergebnisse',
       'Schauen Sie geradeaus, das gesamte Gesicht sichtbar',
     ],
-    cta: 'Kamera starten',
+    cta: 'KI-Analyse starten',
     disclaimer: 'Ihr Foto wird sofort nach der Analyse gelöscht.',
+    stepLabel: 'Step 2/2 · KI-Kamera-Analyse',
   },
 } as const;
 
@@ -431,23 +434,68 @@ export default function SkinAnalysisPage() {
             {t.skinAnalysis.subheading}
           </p>
 
-          {/* Axis chips */}
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
-            {t.skinAnalysis.axisLabels.map((label: string) => (
-              <span
-                key={label}
-                className="rounded-full px-3 py-1"
+          {/* 2-Step Flow Preview */}
+          <div
+            className="w-full mb-8 text-left"
+            style={{
+              background: tok.accentBg,
+              border: `1px solid ${tok.border}`,
+              borderRadius: '16px',
+              padding: '16px 20px',
+            }}
+          >
+            {/* Step 1 */}
+            <div className="flex items-start gap-3">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
                 style={{
-                  background: tok.accentBg,
-                  border: `1px solid ${tok.border}`,
+                  background: tok.accent,
+                  color: '#fff',
                   fontFamily: 'var(--font-sans)',
-                  fontSize: '12px',
-                  color: tok.textSecondary,
+                  fontSize: '13px',
+                  fontWeight: 600,
                 }}
               >
-                {label}
-              </span>
-            ))}
+                1
+              </div>
+              <div>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500, color: tok.text, marginBottom: '2px' }}>
+                  {language === 'ko' ? '\uc0dd\ud65c \uc2b5\uad00 \uc124\ubb38' : language === 'de' ? 'Lebensstil-Fragen' : 'Lifestyle Survey'}
+                </p>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: tok.textSecondary }}>
+                  {language === 'ko' ? '5\uac1c \uc9c8\ubb38 \u00b7 \uc57d 30\ucd08' : language === 'de' ? '5 Fragen \u00b7 ca. 30 Sek.' : '5 quick questions \u00b7 approx. 30 sec'}
+                </p>
+              </div>
+            </div>
+            {/* Connector */}
+            <div
+              className="ml-[13px] my-1.5"
+              style={{ width: '1px', height: '16px', background: tok.border }}
+            />
+            {/* Step 2 */}
+            <div className="flex items-start gap-3">
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                style={{
+                  background: 'transparent',
+                  border: `1.5px solid ${tok.accent}`,
+                  color: tok.accent,
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                }}
+              >
+                2
+              </div>
+              <div>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500, color: tok.text, marginBottom: '2px' }}>
+                  {language === 'ko' ? 'AI \uce74\uba54\ub77c \ubd84\uc11d' : language === 'de' ? 'KI-Kamera-Analyse' : 'AI Camera Analysis'}
+                </p>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: tok.textSecondary }}>
+                  {language === 'ko' ? '\uc0ac\uc9c4 1\uc7a5 \u00b7 \uc57d 30\ucd08' : language === 'de' ? '1 Foto \u00b7 ca. 30 Sek.' : 'Photo 1 shot \u00b7 approx. 30 sec'}
+                </p>
+              </div>
+            </div>
           </div>
 
           <button
@@ -599,6 +647,16 @@ export default function SkinAnalysisPage() {
                   transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className="text-center max-w-sm w-full"
                 >
+                  {/* Step indicator */}
+                  <div className="mb-6">
+                    <div className="flex gap-1.5 mb-2">
+                      <div className="h-1 rounded-full flex-1" style={{ background: tok.accent }} />
+                      <div className="h-1 rounded-full flex-1" style={{ background: tok.accent }} />
+                    </div>
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', letterSpacing: '0.08em', color: tok.textTertiary }}>
+                      {cp.stepLabel}
+                    </p>
+                  </div>
                   {/* Sun icon */}
                   <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}

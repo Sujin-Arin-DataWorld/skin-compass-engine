@@ -415,7 +415,7 @@ export const translations = {
             badge: "AI Skin Analysis",
             heading: "60-Second AI Skin Analysis",
             subheading: "Take a photo and our AI will analyze 10 skin axes\nand suggest personalized solutions.",
-            startCamera: "Start Camera →",
+            startCamera: "Start Analysis →",
             privacyNote: "Photos are never stored on our servers. They are instantly and permanently deleted after AI analysis to ensure complete privacy.",
             axisLabels: ["Sebum", "Hydration", "Barrier", "Sensitivity", "Acne", "Pigment", "Texture", "Aging", "Oxidation", "Makeup Hold"],
             loadingSteps: [
@@ -798,7 +798,7 @@ export const translations = {
             badge: "KI-Hautanalyse",
             heading: "60-Sekunden KI-Hautanalyse",
             subheading: "Machen Sie ein Foto und unsere KI analysiert 10 Hautdimensionen\nund schlägt personalisierte Lösungen vor.",
-            startCamera: "Kamera starten →",
+            startCamera: "Analyse starten →",
             privacyNote: "Fotos werden niemals auf unseren Servern gespeichert. Sie werden nach der KI-Analyse sofort dauerhaft gelöscht, um Ihre Privatsphäre zu schützen.",
             axisLabels: ["Hautöl", "Feuchtigkeit", "Barriere", "Empfindlichkeit", "Akne", "Pigment", "Textur", "Alterung", "Oxidation", "Make-up-Halt"],
             loadingSteps: [
@@ -886,7 +886,7 @@ export const translations = {
             badge: "AI 피부 분석",
             heading: "60초 AI\n피부 분석",
             subheading: "사진 한 장으로 10가지 피부 축을 분석하고\n맞춤 솔루션을 제안합니다.",
-            startCamera: "카메라 시작 →",
+            startCamera: "피부 분석 시작 →",
             privacyNote: "사진은 서버에 절대 저장되지 않으며, AI 분석 즉시 영구 파기되어 개인정보가 철저히 보호됩니다.",
             axisLabels: ["피지", "수분", "장벽", "민감도", "여드름", "색소", "텍스처", "노화", "산화", "메이크업 지속력"],
             loadingSteps: [

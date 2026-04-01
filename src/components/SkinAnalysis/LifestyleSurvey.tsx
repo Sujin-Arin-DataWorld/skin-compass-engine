@@ -114,6 +114,17 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
           <ArrowLeft size={18} />
         </button>
 
+        {/* Step 1/2 indicator */}
+        <div className="absolute top-5 left-0 right-0 px-16">
+          <div className="flex gap-1.5 mb-1.5">
+            <div className="h-1 rounded-full flex-1" style={{ background: tok.accent }} />
+            <div className="h-1 rounded-full flex-1" style={{ background: tok.border }} />
+          </div>
+          <p className="text-center" style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', letterSpacing: '0.08em', color: tok.textTertiary }}>
+            {lang === 'ko' ? 'Step 1/2 \u00b7 \uc0dd\ud65c \uc2b5\uad00 \uc124\ubb38' : lang === 'de' ? 'Step 1/2 \u00b7 Lebensstil-Fragen' : 'Step 1/2 \u00b7 Lifestyle Survey'}
+          </p>
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -261,6 +272,16 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
           >
             {currentIndex + 1} / {TOTAL_STEPS}
           </p>
+          <p
+            style={{
+              fontSize: '10px',
+              color: tok.textTertiary,
+              fontFamily: 'var(--font-sans)',
+              letterSpacing: '0.06em',
+            }}
+          >
+            Step 1/2
+          </p>
         </div>
       </div>
 
@@ -329,7 +350,7 @@ export default function LifestyleSurvey({ onComplete, onClose }: LifestyleSurvey
                     cursor: answers.climate ? 'pointer' : 'default',
                   }}
                 >
-                  {lang === 'ko' ? '카메라 촬영으로 →' : lang === 'de' ? 'Weiter zur Kamera →' : 'Continue to Camera →'}
+                  {lang === 'ko' ? 'AI 분석으로 →' : lang === 'de' ? 'Weiter zur Analyse →' : 'Continue to Analysis →'}
                 </button>
               </div>
             ) : q ? (

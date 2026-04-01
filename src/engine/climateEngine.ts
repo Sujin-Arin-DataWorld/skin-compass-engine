@@ -93,17 +93,72 @@ export async function fetchCitySuggestions(
   query: string,
   lang: string = "en"
 ): Promise<GeoSuggestion[]> {
-  if (!query || query.trim().length < 2) return [];
+  const trimmed = query.trim();
+  if (!trimmed || trimmed.length < 2) return [];
 
-  const isPostal = looksLikePostalCode(query);
-  // Postal codes may match fewer results — increase count to improve hit rate
+  const hasDigits = /\d/.test(trimmed);
+
+  // 1) Handle postal code / mixed queries using Nominatim fallback
+  // Open-Meteo Geocoding does NOT support postal-code based searches natively.
+  if (hasDigits) {
+    console.log(`[climateEngine] geocoding postal/mixed query using Nominatim →`, trimmed);
+    try {
+      // Free Nominatim API requires User-Agent header
+      const nomUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(trimmed)}&format=json&addressdetails=1&limit=5&accept-language=${lang}`;
+      const nomRes = await fetch(nomUrl, {
+        headers: { "User-Agent": "skin-compass-engine/1.0 (contact@skinstrategylab.de)" }
+      });
+      
+      if (nomRes.ok) {
+        const nomData = await nomRes.json();
+        if (Array.isArray(nomData) && nomData.length > 0) {
+          const suggestions = nomData.map((item: any) => {
+            let cityName = item.address?.city || item.address?.town || item.address?.village || item.name;
+            return {
+              id: item.place_id,
+              name: cityName,
+              country: item.address?.country || "",
+              country_code: (item.address?.country_code || "").toUpperCase(),
+              admin1: item.address?.state || "",
+              latitude: parseFloat(item.lat),
+              longitude: parseFloat(item.lon),
+            };
+          }).filter((s) => s.name && !/^\d+$/.test(s.name)); // Filter out boundaries with numerical names
+
+          // Deduplicate based on latitude/longitude (Nominatim sometimes returns duplicates for same region)
+          const unique: GeoSuggestion[] = [];
+          for (const s of suggestions) {
+            if (!unique.some(u => Math.abs(u.latitude - s.latitude) < 0.05 && u.name === s.name)) {
+              unique.push(s);
+            }
+          }
+          
+          if (unique.length > 0) {
+            return unique;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[climateEngine] Nominatim fallback failed:", err);
+    }
+    
+    // If Nominatim fails or returns empty, strip numbers completely and try Open-Meteo as a fallback
+    // e.g. "60486, Frankfurt" -> "Frankfurt"
+    const strOnly = trimmed.replace(/[\d\-\,]/g, "").trim();
+    if (strOnly.length >= 2) {
+      console.log(`[climateEngine] Stripped numbers, falling back to pure Open-Meteo query →`, strOnly);
+      return fetchCitySuggestions(strOnly, lang); // Recursive call without digits
+    }
+  }
+
+  // 2) Default Open-Meteo path for pure city names (fast, fuzzy matching, and population-sorted)
+  const isPostal = looksLikePostalCode(trimmed);
   const count = isPostal ? 20 : 15;
-
   const url =
     `${GEO_BASE}/v1/search` +
-    `?name=${encodeURIComponent(query.trim())}&count=${count}&language=${lang}&format=json`;
+    `?name=${encodeURIComponent(trimmed)}&count=${count}&language=${lang}&format=json`;
 
-  console.log(`[climateEngine] geocoding URL (postal=${isPostal}) →`, url);
+  console.log(`[climateEngine] geocoding URL (Open-Meteo) →`, url);
 
   try {
     const res = await fetch(url);

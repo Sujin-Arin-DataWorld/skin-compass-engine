@@ -372,6 +372,7 @@ export default function SkinAnalysisPage() {
   // ── Idle screen ───────────────────────────────────────────────────────────
   if (currentStep === 'idle') {
     return (
+      <>
       <div
         className="min-h-dvh flex flex-col items-center justify-center px-6 pb-24 transition-colors duration-300"
         style={{ background: tok.bg, color: tok.text }}
@@ -450,7 +451,14 @@ export default function SkinAnalysisPage() {
           </div>
 
           <button
-            onClick={() => setStep('survey')}
+            onClick={() => {
+              const hasConsent = localStorage.getItem('biometric_consent') === 'true';
+              if (!hasConsent) {
+                setShowBiometricModal(true);
+              } else {
+                setStep('survey');
+              }
+            }}
             className="w-full rounded-2xl py-4 text-center transition-all active:scale-[0.98]"
             style={{
               background: ctaTok.background,
@@ -477,6 +485,25 @@ export default function SkinAnalysisPage() {
           </p>
         </motion.div>
       </div>
+
+      {/* Biometric Consent Modal — renders as overlay on top of idle screen */}
+      <BiometricConsentModal
+        isOpen={showBiometricModal}
+        onAccept={async () => {
+          setShowBiometricModal(false);
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+            });
+            stream.getTracks().forEach((track) => track.stop());
+            setStep('survey');
+          } catch {
+            setError(t.camera.permissionNeeded);
+          }
+        }}
+        onCancel={() => setShowBiometricModal(false)}
+      />
+      </>
     );
   }
 

@@ -91,7 +91,7 @@ export default function BiometricConsentModal({ isOpen, onAccept, onCancel }: Ph
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 pb-20 md:pb-0">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -120,15 +120,14 @@ export default function BiometricConsentModal({ isOpen, onAccept, onCancel }: Ph
               <X size={16} />
             </button>
 
-            {/* Icon header */}
-            <div 
-              className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
-              style={{ background: isDark ? "rgba(74, 158, 104, 0.15)" : "rgba(74, 158, 104, 0.1)", border: `1px solid rgba(74, 158, 104, 0.3)` }}
-            >
-              <Shield size={22} color="#4A9E68" />
-            </div>
-
-            <div className="flex items-center gap-3 mb-3">
+            {/* Header: Icon and Badge in one row */}
+            <div className="flex items-center gap-3 mb-4">
+              <div 
+                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: isDark ? "rgba(74, 158, 104, 0.15)" : "rgba(74, 158, 104, 0.1)", border: `1px solid rgba(74, 158, 104, 0.3)` }}
+              >
+                <Shield size={20} color="#4A9E68" />
+              </div>
               <span 
                 className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-sm"
                 style={{ 
@@ -142,21 +141,21 @@ export default function BiometricConsentModal({ isOpen, onAccept, onCancel }: Ph
             </div>
 
             <h2 
-              className="text-xl md:text-2xl font-light mb-3"
+              className="text-xl md:text-2xl font-light mb-2"
               style={{ fontFamily: "var(--font-display)", color: tok.text }}
             >
               {content.title}
             </h2>
             
-            <p className="text-sm mb-6 pb-6 border-b" style={{ fontFamily: "var(--font-sans)", color: tok.textSecondary, borderBottomColor: tok.border, lineHeight: 1.6 }}>
+            <p className="text-sm mb-5 pb-5 border-b" style={{ fontFamily: "var(--font-sans)", color: tok.textSecondary, borderBottomColor: tok.border, lineHeight: 1.5 }}>
               {content.intro}
             </p>
 
             {/* Bullets */}
-            <div className="space-y-4 mb-8">
+            <div className="space-y-3 mb-6">
               {content.bullets.map((bullet, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <div className="shrink-0 mt-1 w-1.5 h-1.5 rounded-full" style={{ background: tok.accent }} />
+                  <div className="shrink-0 mt-1.5 w-1.5 h-1.5 rounded-full" style={{ background: tok.accent }} />
                   <p style={{ fontFamily: "var(--font-sans)", fontSize: "13px", color: tok.textSecondary, lineHeight: 1.5 }}>
                     {bullet}
                   </p>
@@ -165,7 +164,7 @@ export default function BiometricConsentModal({ isOpen, onAccept, onCancel }: Ph
             </div>
 
             {/* Checkboxes */}
-            <div className="space-y-4 mb-8 bg-black/5 dark:bg-black/20 rounded-xl p-4 border border-black/5 dark:border-white/5">
+            <div className="space-y-3 mb-6 bg-black/5 dark:bg-black/20 rounded-xl p-4 border border-black/5 dark:border-white/5">
               <label className="flex items-start gap-3 cursor-pointer group select-none">
                 <input
                   type="checkbox"

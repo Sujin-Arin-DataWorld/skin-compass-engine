@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
+import { supabase } from "@/integrations/supabase/client";
 import { X, MailCheck } from "lucide-react";
 
 type Lang = "en" | "de" | "ko";
@@ -194,6 +195,14 @@ export default function AuthModal({ isOpen, onClose, onSuccess, onGoogleClick }:
     const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
     const [authError, setAuthError] = useState("");
     const [emailSent, setEmailSent] = useState(false);
+    const [isPopupFlow, setIsPopupFlow] = useState(false);
+    const successCalledRef = useRef(false);
+
+    // Reset guard when modal opens/closes
+    useEffect(() => {
+        if (isOpen) { successCalledRef.current = false; }
+        else { setIsPopupFlow(false); }
+    }, [isOpen]);
 
     const { register: loginReg, handleSubmit: handleLogin, formState: { errors: loginEx, isSubmitting: isSubmittingLog } } = useForm<LoginValues>({
         resolver: zodResolver(loginSchema),
@@ -207,7 +216,10 @@ export default function AuthModal({ isOpen, onClose, onSuccess, onGoogleClick }:
         setAuthError("");
         const success = await login(values.email, values.password);
         if (!success) setAuthError(lp.authError);
-        else onSuccess();
+        else {
+            successCalledRef.current = true;
+            onSuccess();
+        }
     };
 
     const onSignupSubmit = async (values: SignupValues) => {
@@ -221,8 +233,69 @@ export default function AuthModal({ isOpen, onClose, onSuccess, onGoogleClick }:
 
         if (error) { setAuthError(error); return; }
         if (needsEmailConfirmation) setEmailSent(true);
-        else onSuccess();
+        else {
+            successCalledRef.current = true;
+            onSuccess();
+        }
     };
+
+    // ── Google OAuth Popup Flow ─────────────────────────────────────────
+    // Opens a blank popup IMMEDIATELY on click (prevents popup blockers),
+    // then asynchronously gets the Google OAuth URL and injects it.
+    const handleGooglePopup = useCallback(async () => {
+        // Step 1: Open blank popup synchronously on user gesture
+        const w = 500, h = 620;
+        const left = Math.max(0, (window.screen.width - w) / 2);
+        const top = Math.max(0, (window.screen.height - h) / 2);
+        const popup = window.open(
+            'about:blank',
+            'ssl-google-login',
+            `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`
+        );
+
+        if (!popup || popup.closed) {
+            // Popup was blocked → fall back to redirect flow
+            console.warn('[AuthModal] Popup blocked, falling back to redirect');
+            onGoogleClick();
+            return;
+        }
+
+        setIsPopupFlow(true);
+
+        try {
+            // Step 2: Get OAuth URL and inject into popup
+            const { loginWithGooglePopup } = useAuthStore.getState();
+            await loginWithGooglePopup(popup);
+        } catch (err) {
+            console.error('[AuthModal] Google popup flow failed:', err);
+            popup.close();
+            setIsPopupFlow(false);
+            // Fallback to redirect
+            onGoogleClick();
+        }
+    }, [onGoogleClick]);
+
+    // ── Listen for popup auth completion ─────────────────────────────────
+    // When the popup completes Google OAuth, the session is stored in
+    // localStorage. Supabase's cross-tab sync fires SIGNED_IN in the
+    // parent window. We only listen during an active popup flow to avoid
+    // interfering with email/password login.
+    useEffect(() => {
+        if (!isOpen || !isPopupFlow) return;
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (event, session) => {
+                if (event === 'SIGNED_IN' && session && !successCalledRef.current) {
+                    console.log('[AuthModal] Popup SIGNED_IN detected → triggering onSuccess');
+                    successCalledRef.current = true;
+                    setIsPopupFlow(false);
+                    onSuccess();
+                }
+            }
+        );
+
+        return () => subscription.unsubscribe();
+    }, [isOpen, isPopupFlow, onSuccess]);
 
     return (
         <AnimatePresence>
@@ -280,7 +353,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, onGoogleClick }:
 
                                 {activeTab === "login" ? (
                                     <form onSubmit={handleLogin(onLoginSubmit)} className="space-y-4">
-                                        <GoogleButton label={lp.google} onClick={onGoogleClick} />
+                                        <GoogleButton label={lp.google} onClick={handleGooglePopup} />
                                         <Divider label={lp.orEmail} />
                                         
                                         {authError && (
@@ -305,7 +378,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, onGoogleClick }:
                                     </form>
                                 ) : (
                                     <form onSubmit={handleSignup(onSignupSubmit)} className="space-y-4">
-                                        <GoogleButton label={lp.google} onClick={onGoogleClick} />
+                                        <GoogleButton label={lp.google} onClick={handleGooglePopup} />
                                         <Divider label={lp.orEmail} />
                                         
                                         {authError && (

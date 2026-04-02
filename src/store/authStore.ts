@@ -35,6 +35,7 @@ interface AuthState {
     signup: (data: { firstName: string; lastName: string; email: string; password: string }) => Promise<{ error: string | null; needsEmailConfirmation: boolean }>;
     login: (email: string, password: string) => Promise<boolean>;
     loginWithGoogle: (redirectPath?: string) => Promise<void>;
+    loginWithGooglePopup: (popup: Window) => Promise<void>;
     logout: () => Promise<void>;
 
     // Local-only sync target — useProfile hook writes to DB first, then calls this
@@ -118,6 +119,27 @@ export const useAuthStore = create<AuthState>()(
                         },
                     },
                 });
+            },
+
+            // Popup-based Google OAuth: opens login in a popup window
+            // so the parent page is never navigated away.
+            loginWithGooglePopup: async (popup: Window) => {
+                const { data, error } = await supabase.auth.signInWithOAuth({
+                    provider: "google",
+                    options: {
+                        skipBrowserRedirect: true,
+                        redirectTo: `${window.location.origin}/auth/callback?popup=true`,
+                        queryParams: {
+                            prompt: "select_account",
+                            access_type: "offline",
+                        },
+                    },
+                });
+                if (error || !data?.url) {
+                    popup.close();
+                    throw error || new Error('No OAuth URL returned');
+                }
+                popup.location.href = data.url;
             },
 
             logout: async () => {

@@ -91,13 +91,27 @@ export default function AuthCallback() {
     //    App.tsx also has an onAuthStateChange listener that calls setSession()
     //    (updates Zustand isLoggedIn) BEFORE this handler fires because App.tsx
     //    registers its listener first on mount.
+    //
+    // ── Popup mode: if opened via AuthModal's popup flow, close self after auth ──
+    const isPopup = searchParams.get('popup') === 'true' || !!window.opener;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
+        if (isPopup) {
+          // Session is established and persisted to localStorage.
+          // The parent window's onAuthStateChange will detect SIGNED_IN
+          // and trigger the save flow. Close this popup after a short
+          // delay to ensure localStorage is flushed.
+          console.log('[AuthCallback] Popup mode — closing after auth');
+          setTimeout(() => window.close(), 300);
+          return;
+        }
         go().catch(err => {
           console.error("[AuthCallback] go() failed:", err);
           setError("Authentication error. Please try again.");
         });
       } else if (event === "SIGNED_OUT" && !resolved) {
+        if (isPopup) { window.close(); return; }
         navigate("/login?error=auth_cancelled", { replace: true });
       }
     });

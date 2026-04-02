@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useI18nStore } from '@/store/i18nStore';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 
 type Lang = 'ko' | 'en' | 'de';
 
@@ -249,16 +250,24 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
     }
   }, [hasSelection, photoStorage, aiTraining, onSubmit, onClose]);
 
-  // Anonymous user: Google OAuth signup
   const handleAnonSignup = useCallback(async () => {
     setSubmitting(true);
+    const w = 500, h = 620;
+    const left = Math.max(0, (window.screen.width - w) / 2);
+    const top = Math.max(0, (window.screen.height - h) / 2);
+    const popup = window.open('about:blank', 'ssl-google-login', `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+
     try {
-      await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: `${window.location.origin}/skin-analysis` },
-      });
+      if (!popup || popup.closed) throw new Error('Popup blocked');
+      const { loginWithGooglePopup } = useAuthStore.getState();
+      await loginWithGooglePopup(popup);
+
+      // The global onAuthStateChange in App.tsx handles the session sync.
+      // Once signed in, isAuthenticated prop will update via parent (FeedbackWidget).
+      setSubmitting(false);
     } catch (err) {
-      console.error('[AiTrainingConsent] OAuth error:', err);
+      console.error('[AiTrainingConsent] OAuth popup error:', err);
+      if (popup) popup.close();
       setSubmitting(false);
     }
   }, []);

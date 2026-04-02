@@ -135,6 +135,22 @@ function AppInner() {
   const [gdprLoading, setGdprLoading] = useState(false);
 
   useEffect(() => {
+    // ── POPUP FALLBACK: If Supabase redirects here instead of /auth/callback ──
+    const searchParams = new URLSearchParams(window.location.search);
+    const isPopup = searchParams.get('popup') === 'true' || !!window.opener;
+    if (isPopup) {
+      console.log("[App] Running in popup window, closing self...");
+      supabase.auth.getSession().then(() => {
+        setTimeout(() => window.close(), 300);
+      });
+      supabase.auth.onAuthStateChange((event) => {
+        if (event === 'SIGNED_IN') {
+           setTimeout(() => window.close(), 300);
+        }
+      });
+      return;
+    }
+
     // Sync persisted state with the actual Supabase session on mount
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session?.user ?? null);

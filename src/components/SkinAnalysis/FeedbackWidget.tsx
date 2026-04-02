@@ -15,11 +15,13 @@ import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useI18nStore } from '@/store/i18nStore';
 import { supabase } from '@/integrations/supabase/client';
 import AiTrainingConsentModal from './AiTrainingConsentModal';
+import { useAuthStore } from '@/store/authStore';
 
 type Lang = 'ko' | 'en' | 'de';
 type Step = 'hook' | 'correction' | 'success' | 'hidden';
 
 // ── Zone chips (Question A: "Which area did we miss?") ──────────────────────
+// ... (Keep existing definitions) ...
 const ZONE_CHIPS = [
   { id: 'forehead', ko: '이마', en: 'Forehead', de: 'Stirn' },
   { id: 'cheeks', ko: '볼', en: 'Cheeks', de: 'Wangen' },
@@ -114,9 +116,9 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
   const setTrainingConsentGiven = useSkinAnalysisStore((s) => s.setTrainingConsentGiven);
   const capturedImageBase64 = useSkinAnalysisStore((s) => s.capturedImageBase64);
 
+  const isAuthenticated = useAuthStore((s) => s.isLoggedIn);
   const [step, setStep] = useState<Step>('hook');
   const [showConsentModal, setShowConsentModal] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [selectedZones, setSelectedZones] = useState<Set<ZoneId>>(new Set());
   const [selectedConditions, setSelectedConditions] = useState<Set<ConditionId>>(new Set());
   const [comment, setComment] = useState('');
@@ -128,13 +130,6 @@ export default function FeedbackWidget({ analysisId }: FeedbackWidgetProps) {
     return () => {
       if (autoCloseTimer.current) clearTimeout(autoCloseTimer.current);
     };
-  }, []);
-
-  // Check auth status for consent modal eligibility
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setIsAuthenticated(!!user);
-    });
   }, []);
 
   // ── Toggle helpers ──────────────────────────────────────────────────────────

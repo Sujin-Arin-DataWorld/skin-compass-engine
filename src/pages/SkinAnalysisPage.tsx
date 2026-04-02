@@ -19,7 +19,7 @@ import { useI18nStore, translations } from '@/store/i18nStore';
 import { safeSessionStorage } from '@/utils/safeStorage';
 import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
 import type { SkinAxisScores as ProfileAxisScores, SkinType, SkinConcern } from '@/types/skinProfile';
-import type { SkinAxisScores } from '@/types/skinAnalysis';
+import type { SkinAxisScores, ScoreSource } from '@/types/skinAnalysis';
 
 // ── Multilingual meta for /skin-analysis ────────────────────────────────────
 // ── Camera soft prompt i18n ──────────────────────────────────────────────────
@@ -134,13 +134,16 @@ export default function SkinAnalysisPage() {
   // Language is managed by the global i18nStore.
   // The previous hostname-based override was breaking user language preferences.
 
-  // ── Restore pending analysis after login redirect ─────────────────────────
-  // Data is stored in localStorage (not sessionStorage) so it survives
-  // cross-tab OAuth flows (Firefox Multi-Account Containers, popup blockers).
-  useEffect(() => {
+  // ── Synchronous restore: pending analysis after Google OAuth redirect ─────
+  // CRITICAL: This MUST run synchronously during initialization (not in useEffect)
+  // so that currentStep='result' BEFORE the first render. Otherwise the component
+  // renders the idle screen (currentStep='idle') and the user sees a flash or
+  // gets stuck on the wrong screen.
+  const [isRestoring] = useState(() => {
+    if (typeof window === 'undefined') return false;
     let raw: string | null = null;
-    try { raw = localStorage.getItem('ssl_pending_analysis'); } catch { return; }
-    if (!raw) return;
+    try { raw = localStorage.getItem('ssl_pending_analysis'); } catch { return false; }
+    if (!raw) return false;
     try {
       const pending = JSON.parse(raw) as {
         scores: SkinAxisScores;
@@ -153,70 +156,87 @@ export default function SkinAnalysisPage() {
       // TTL guard: only restore if saved within the last 30 minutes
       if (Date.now() - (pending.timestamp || 0) > 30 * 60 * 1000) {
         localStorage.removeItem('ssl_pending_analysis');
-        return;
+        return false;
       }
-      setAnalysisResult(pending.scores, 'ai_photo_analysis', pending.analysisId, pending.reasons ?? null);
-      if (pending.capturedImage) {
-        setCapturedImage(pending.capturedImage);
-      }
+      // Hydrate the Zustand store synchronously — sets currentStep='result'
+      useSkinAnalysisStore.setState({
+        scores: pending.scores,
+        reasons: pending.reasons ?? null,
+        scoreSource: 'ai_photo_analysis' as ScoreSource,
+        analysisId: pending.analysisId ?? null,
+        currentStep: 'result',
+        errorMessage: null,
+        capturedImageBase64: pending.capturedImage ?? null,
+        analysisHistory: [
+          { date: new Date().toISOString(), scores: pending.scores, source: 'ai_photo_analysis' as ScoreSource },
+          ...(useSkinAnalysisStore.getState().analysisHistory || []),
+        ].slice(0, 20),
+      });
       localStorage.removeItem('ssl_pending_analysis');
-
-      // Show success toast after restore
-      const restoreMsg = language === 'ko' ? '분석 결과가 안전하게 복원되었어요'
-        : language === 'de' ? 'Analyseergebnisse sicher wiederhergestellt'
-          : 'Analysis results safely restored';
-
-      // Delay slightly so SkinAnalysisPage has rendered the result view
-      setTimeout(() => {
-        toast.success(restoreMsg, {
-          style: {
-            background: 'rgba(36, 43, 61, 0.95)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid #333A4D',
-            color: '#F0EDE8',
-            borderRadius: '12px',
-            padding: '16px 20px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-            fontFamily: "'SUIT', sans-serif"
-          },
-          icon: <CheckCircle2 size={18} color="#C9A96E" fill="#1A1F2E" />,
-          duration: 3000,
-        });
-      }, 600);
-
-      // Non-blocking DB save
-      (async () => {
-        try {
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
-          const profileScores: ProfileAxisScores = {
-            seb: pending.scores.seb,
-            hyd: pending.scores.hyd,
-            bar: pending.scores.bar,
-            sen: pending.scores.sen,
-            acne: pending.scores.acne,
-            pigment: pending.scores.pigment,
-            texture: pending.scores.texture,
-            aging: pending.scores.aging,
-            ox: pending.scores.ox,
-            makeup_stability: pending.scores.makeup_stability,
-          };
-          await useSkinProfileStore.getState().saveAnalysisResult({
-            userId: user.id,
-            scores: profileScores,
-            skinType: deriveSkinType(pending.scores),
-            primaryConcerns: derivePrimaryConcerns(pending.scores),
-            analysisMethod: 'camera',
-            confidenceScore: pending.hasLifestyle ? 0.92 : 0.75,
-          });
-        } catch (e) {
-          console.warn('[SkinAnalysis] Post-login save failed (non-fatal):', e);
-        }
-      })();
+      return true; // restored successfully
     } catch (e) {
       console.warn('[SkinAnalysis] Failed to restore pending analysis:', e);
+      return false;
     }
-  }, [setAnalysisResult]);
+  });
+
+  // Post-restore side effects: toast + DB save (non-blocking, runs after render)
+  useEffect(() => {
+    if (!isRestoring) return;
+    // Show success toast
+    const restoreMsg = language === 'ko' ? '분석 결과가 안전하게 복원되었어요'
+      : language === 'de' ? 'Analyseergebnisse sicher wiederhergestellt'
+        : 'Analysis results safely restored';
+    setTimeout(() => {
+      toast.success(restoreMsg, {
+        style: {
+          background: 'rgba(36, 43, 61, 0.95)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid #333A4D',
+          color: '#F0EDE8',
+          borderRadius: '12px',
+          padding: '16px 20px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          fontFamily: "'SUIT', sans-serif"
+        },
+        icon: <CheckCircle2 size={18} color="#C9A96E" fill="#1A1F2E" />,
+        duration: 3000,
+      });
+    }, 600);
+
+    // Non-blocking DB save
+    (async () => {
+      try {
+        const currentScores = useSkinAnalysisStore.getState().scores;
+        if (!currentScores) return;
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const profileScores: ProfileAxisScores = {
+          seb: currentScores.seb,
+          hyd: currentScores.hyd,
+          bar: currentScores.bar,
+          sen: currentScores.sen,
+          acne: currentScores.acne,
+          pigment: currentScores.pigment,
+          texture: currentScores.texture,
+          aging: currentScores.aging,
+          ox: currentScores.ox,
+          makeup_stability: currentScores.makeup_stability,
+        };
+        const hasLifestyle = useSkinAnalysisStore.getState().lifestyleAnswers !== null;
+        await useSkinProfileStore.getState().saveAnalysisResult({
+          userId: user.id,
+          scores: profileScores,
+          skinType: deriveSkinType(currentScores),
+          primaryConcerns: derivePrimaryConcerns(currentScores),
+          analysisMethod: 'camera',
+          confidenceScore: hasLifestyle ? 0.92 : 0.75,
+        });
+      } catch (e) {
+        console.warn('[SkinAnalysis] Post-login save failed (non-fatal):', e);
+      }
+    })();
+  }, [isRestoring]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Dynamic Meta Tags for Social Sharing ──────────────────────────────────
   useEffect(() => {
@@ -373,7 +393,9 @@ export default function SkinAnalysisPage() {
   }, [resetAnalysis, setStep]);
 
   // ── Idle screen ───────────────────────────────────────────────────────────
-  if (currentStep === 'idle') {
+  // Guard: if we just restored from localStorage (Google OAuth return),
+  // skip the idle screen even if IndexedDB hydration hasn't caught up yet.
+  if (currentStep === 'idle' && !isRestoring) {
     return (
       <>
       <div

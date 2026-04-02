@@ -29,14 +29,40 @@ export default function AuthCallback() {
   useEffect(() => {
     let resolved = false;
 
+    // ── Popup detection: must be checked BEFORE any navigation logic ──────
+    const isPopup = searchParams.get('popup') === 'true' || !!window.opener;
+
+    // If this is a popup window, skip ALL navigation logic.
+    // Just wait for auth to complete and close.
+    if (isPopup) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
+          console.log('[AuthCallback] Popup mode — closing after auth');
+          setTimeout(() => window.close(), 300);
+        } else if (event === "SIGNED_OUT") {
+          window.close();
+        }
+      });
+      // Also handle already-existing session (PKCE completed before effect ran)
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          console.log('[AuthCallback] Popup mode — session already exists, closing');
+          setTimeout(() => window.close(), 300);
+        }
+      });
+      const timer = setTimeout(() => {
+        // If popup hasn't closed in 15s, something went wrong — close anyway
+        try { window.close(); } catch { /* safe */ }
+      }, 15_000);
+      return () => { subscription.unsubscribe(); clearTimeout(timer); };
+    }
+
+    // ── Normal (non-popup) flow below ──────────────────────────────────────
     const go = async () => {
       if (resolved) return;
       resolved = true;
 
       // ── Schema Router: V5 AI camera data vs. legacy assessment data ──────
-      // handleGoogleAuth (AnalysisResults.tsx) saves { scores, analysisId, ... }
-      // savePendingAnalysis (analysisPersistence.ts) saves { fullResult, axisScores, ... }
-      // We must NOT clear V5 data — SkinAnalysisPage's useEffect restores it.
       const rawPendingStr = (() => {
         try { return localStorage.getItem('ssl_pending_analysis'); } catch { return null; }
       })();
@@ -88,30 +114,13 @@ export default function AuthCallback() {
     };
 
     // 1. Listen for Supabase auth state — fires when PKCE code exchange completes.
-    //    App.tsx also has an onAuthStateChange listener that calls setSession()
-    //    (updates Zustand isLoggedIn) BEFORE this handler fires because App.tsx
-    //    registers its listener first on mount.
-    //
-    // ── Popup mode: if opened via AuthModal's popup flow, close self after auth ──
-    const isPopup = searchParams.get('popup') === 'true' || !!window.opener;
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
-        if (isPopup) {
-          // Session is established and persisted to localStorage.
-          // The parent window's onAuthStateChange will detect SIGNED_IN
-          // and trigger the save flow. Close this popup after a short
-          // delay to ensure localStorage is flushed.
-          console.log('[AuthCallback] Popup mode — closing after auth');
-          setTimeout(() => window.close(), 300);
-          return;
-        }
         go().catch(err => {
           console.error("[AuthCallback] go() failed:", err);
           setError("Authentication error. Please try again.");
         });
       } else if (event === "SIGNED_OUT" && !resolved) {
-        if (isPopup) { window.close(); return; }
         navigate("/login?error=auth_cancelled", { replace: true });
       }
     });

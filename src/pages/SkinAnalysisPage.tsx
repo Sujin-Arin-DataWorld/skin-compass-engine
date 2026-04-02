@@ -125,6 +125,10 @@ export default function SkinAnalysisPage() {
   // ── Deduplication guard: prevent double-save on React remount ────────────
   const hasSavedRef = useRef(false);
   useEffect(() => { hasSavedRef.current = false; }, [analysisId]);
+
+  // ── OAuth restore marker: survives re-renders and IndexedDB hydration ─────
+  // Unlike useState(isRestoring), useRef persists across the hydration cycle.
+  const restoredFromPendingRef = useRef(false);
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
   const ctaTok = ctaTokens(isDark);
@@ -173,6 +177,7 @@ export default function SkinAnalysisPage() {
         ].slice(0, 20),
       });
       localStorage.removeItem('ssl_pending_analysis');
+      restoredFromPendingRef.current = true; // mark: protect against hydration overwrite
       return true; // restored successfully
     } catch (e) {
       console.warn('[SkinAnalysis] Failed to restore pending analysis:', e);
@@ -286,14 +291,29 @@ export default function SkinAnalysisPage() {
 
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
-      if (currentStep === 'result') {
+      if (currentStep === 'result' && !restoredFromPendingRef.current) {
         // User pressed back from results → reset to idle
+        // BUT skip if we just restored from OAuth (prevents accidental reset)
         resetAnalysis();
       }
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, [currentStep, resetAnalysis]);
+
+  // ── Hydration recovery: if IndexedDB overwrites currentStep back to 'idle'
+  // after our synchronous restore, force it back to 'result' ────────────────
+  useEffect(() => {
+    if (restoredFromPendingRef.current && currentStep === 'idle' && scores) {
+      console.log('[SkinAnalysis] Hydration overwrote restore — forcing result step');
+      setStep('result');
+    }
+    // Auto-clear the marker after 3 seconds (hydration window closed)
+    if (restoredFromPendingRef.current) {
+      const t = setTimeout(() => { restoredFromPendingRef.current = false; }, 3000);
+      return () => clearTimeout(t);
+    }
+  }, [currentStep, scores, setStep]);
 
   // ── Sprint 3.3: Analyzing timeout (60s) — prevent infinite loading ─────────
   useEffect(() => {
@@ -395,7 +415,7 @@ export default function SkinAnalysisPage() {
   // ── Idle screen ───────────────────────────────────────────────────────────
   // Guard: if we just restored from localStorage (Google OAuth return),
   // skip the idle screen even if IndexedDB hydration hasn't caught up yet.
-  if (currentStep === 'idle' && !isRestoring) {
+  if (currentStep === 'idle' && !isRestoring && !restoredFromPendingRef.current) {
     return (
       <>
       <div

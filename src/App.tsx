@@ -143,12 +143,12 @@ function AppInner() {
       supabase.auth.getSession().then(() => {
         setTimeout(() => window.close(), 300);
       });
-      supabase.auth.onAuthStateChange((event) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
         if (event === 'SIGNED_IN') {
            setTimeout(() => window.close(), 300);
         }
       });
-      return;
+      return () => subscription.unsubscribe();
     }
 
     // Sync persisted state with the actual Supabase session on mount

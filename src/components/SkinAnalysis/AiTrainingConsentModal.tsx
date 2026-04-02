@@ -252,13 +252,29 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
 
   const handleAnonSignup = useCallback(async () => {
     setSubmitting(true);
+
+    // Try popup first (works on desktop)
     const w = 500, h = 620;
     const left = Math.max(0, (window.screen.width - w) / 2);
     const top = Math.max(0, (window.screen.height - h) / 2);
     const popup = window.open('about:blank', 'ssl-google-login', `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`);
 
+    if (!popup || popup.closed) {
+      // Popup blocked (common on iOS Safari) → fall back to redirect flow
+      console.warn('[AiTrainingConsent] Popup blocked, falling back to redirect');
+      try {
+        await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: `${window.location.origin}/auth/callback` },
+        });
+      } catch (err) {
+        console.error('[AiTrainingConsent] Redirect OAuth error:', err);
+        setSubmitting(false);
+      }
+      return;
+    }
+
     try {
-      if (!popup || popup.closed) throw new Error('Popup blocked');
       const { loginWithGooglePopup } = useAuthStore.getState();
       await loginWithGooglePopup(popup);
 
@@ -267,7 +283,7 @@ export default function AiTrainingConsentModal({ isOpen, onClose, onSubmit, hasI
       setSubmitting(false);
     } catch (err) {
       console.error('[AiTrainingConsent] OAuth popup error:', err);
-      if (popup) popup.close();
+      popup.close();
       setSubmitting(false);
     }
   }, []);

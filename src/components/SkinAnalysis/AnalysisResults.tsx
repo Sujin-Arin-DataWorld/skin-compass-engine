@@ -524,7 +524,7 @@ export default function AnalysisResults({
   // RENDER
   // ═══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-dvh w-full overflow-y-auto pb-32" style={{ background: '#0A0A0A', color: '#F5F5F7', overscrollBehavior: 'contain', touchAction: 'pan-y' }}>
+    <div className="min-h-dvh w-full overflow-y-auto pb-32" style={{ background: '#0A0A0A', color: '#F5F5F7' }}>
 
       {/* ── SECTION 1: Photo Hero + Overall Score ──────────────────────────── */}
       <div className="relative w-full" style={{ minHeight: capturedImage ? '380px' : '200px' }}>

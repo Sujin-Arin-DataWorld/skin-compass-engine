@@ -25,58 +25,69 @@ const SlideNav = ({ current, total, labels, onPrev, onNext, onGoTo }: SlideNavPr
 
   return (
     <>
-      {/* Top text navigation bar — below green progress line */}
+      {/* 2025 Segmented Pill Navigation */}
       <div style={{
         position: 'absolute',
-        top: 64, // BUG-4 FIX: navbar is 64px (4rem), not 57px. Was causing 6px overlap.
+        top: 64,
         left: 0,
         right: 0,
         zIndex: 40,
         display: 'flex',
         justifyContent: 'center',
-        gap: 'clamp(16px, 4vw, 32px)',
-        padding: '4px 0',
-        borderBottom: `1px solid ${tok.border}`,
+        padding: '6px 16px',
         background: isDark ? 'rgba(10,10,10,0.78)' : 'rgba(250,250,248,0.78)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
+        borderBottom: `1px solid ${tok.border}`,
       }}>
-        {Array.from({ length: total }).map((_, i) => {
-          const isActive = i === current;
-          return (
-            <button
-              key={i}
-              onClick={() => onGoTo(i)}
-              style={{
-                fontSize: 'clamp(0.75rem, 1vw, 0.875rem)',
-                fontWeight: 500,
-                color: isActive ? tok.accent : tok.textTertiary,
-                background: isActive ? (isDark ? 'rgba(45,107,74,0.08)' : 'rgba(94,139,104,0.06)') : 'transparent',
-                padding: '6px 12px',
-                borderRadius: 8,
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.15s cubic-bezier(0.22, 1, 0.36, 1)',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.color = tok.text;
-                  e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.color = tok.textTertiary;
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-              aria-label={labels[i]}
-            >
-              {labels[i]}
-            </button>
-          );
-        })}
+        <div style={{
+          display: 'flex',
+          background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+          borderRadius: 12,
+          padding: 3,
+          gap: 2,
+          border: `1px solid ${tok.border}`,
+        }}>
+          {Array.from({ length: total }).map((_, i) => {
+            const isActive = i === current;
+            return (
+              <button
+                key={i}
+                onClick={() => onGoTo(i)}
+                style={{
+                  fontSize: 'clamp(0.75rem, 1vw, 0.875rem)',
+                  fontWeight: isActive ? 600 : 500,
+                  color: isActive ? (isDark ? '#F5F5F7' : '#1B2838') : tok.textTertiary,
+                  background: isActive
+                    ? (isDark ? 'rgba(74,158,104,0.12)' : 'rgba(94,139,104,0.10)')
+                    : 'transparent',
+                  padding: '6px 16px',
+                  borderRadius: 10,
+                  border: isActive ? `1px solid ${tok.accent}25` : '1px solid transparent',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = tok.text;
+                    e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = tok.textTertiary;
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+                aria-label={labels[i]}
+                aria-current={isActive ? 'step' : undefined}
+              >
+                {labels[i]}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Arrow buttons (desktop only) — keep these */}

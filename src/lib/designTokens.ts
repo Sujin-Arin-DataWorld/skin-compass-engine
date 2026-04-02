@@ -472,3 +472,47 @@ export const cssVarsDark = `
   --ssl-text-tertiary: ${brand.dark.textTertiary};
   --ssl-border: ${brand.dark.border};
 `;
+
+
+// ── TIER GRADIENTS (2025 Redesign — Gradient Score Rings) ────────────────────
+
+export type ScoreTier = 'excellent' | 'good' | 'attention' | 'critical';
+
+export const tierGradients: Record<ScoreTier, { color: string; gradient: [string, string] }> = {
+  excellent: { color: '#4ECDC4', gradient: ['#4ECDC4', '#2BAE66'] },
+  good:      { color: '#5E8B68', gradient: ['#5E8B68', '#8FC49F'] },
+  attention: { color: '#C9A96E', gradient: ['#C9A96E', '#E8D5A3'] },
+  critical:  { color: '#E8A87C', gradient: ['#E8A87C', '#CF6679'] },
+};
+
+
+// ── CTA GLOW (2025 Redesign — Premium Button Glow Shadows) ──────────────────
+
+export const ctaGlow = {
+  light: '0 8px 24px rgba(94,139,104,0.3)',
+  dark: '0 8px 24px rgba(74,158,104,0.25)',
+} as const;
+
+export function ctaGlowToken(isDark: boolean) {
+  return isDark ? ctaGlow.dark : ctaGlow.light;
+}
+
+
+// ── GLASS CARD HOVER (2025 Redesign — Hoverable Glass Cards) ────────────────
+
+export const glassCardHover = {
+  light: {
+    hoverBg: 'rgba(255,255,255,0.85)',
+    hoverTransform: 'translateY(-2px)',
+    hoverShadow: '0 12px 40px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)',
+  },
+  dark: {
+    hoverBg: 'rgba(28,28,30,0.70)',
+    hoverTransform: 'translateY(-2px)',
+    hoverShadow: '0 12px 40px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3)',
+  },
+} as const;
+
+export function glassCardHoverTokens(isDark: boolean) {
+  return isDark ? glassCardHover.dark : glassCardHover.light;
+}

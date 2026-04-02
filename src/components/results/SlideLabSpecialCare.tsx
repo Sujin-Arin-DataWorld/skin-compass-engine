@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAnalysisStore } from '@/store/analysisStore';
 import { useTheme } from 'next-themes';
-import { tokens } from '@/lib/designTokens';
+import { tokens, tierGradients } from '@/lib/designTokens';
 import DuelCard from '@/features/lab-selection/components/DuelCard';
 import type { FaceZone, ZoneAssessment, Product, PriceTier, RequiredIngredient } from '@/features/lab-selection/types';
 import type { AnalysisResult, AxisKey } from '@/engine/types';
@@ -208,25 +208,34 @@ interface ZoneData {
   assessment: ZoneAssessment | null;
 }
 
-// ── Circular score ring ────────────────────────────────────────────────────────
+// ── 2025 Gradient score ring ────────────────────────────────────────────────
 
 function CircularScore({ score, size = 52 }: { score: number; size?: number }) {
-  const healthScore = 100 - score; // score is raw severity from engine
+  const healthScore = 100 - score;
   const r = (size - 7) / 2;
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - Math.min(100, Math.max(0, healthScore)) / 100);
-  const color = severityColor(score); // color follows severity (red = urgent)
+  const tier = healthScore < 30 ? 'critical' : healthScore < 70 ? 'attention' : healthScore < 80 ? 'good' : 'excellent';
+  const { gradient } = tierGradients[tier];
+  const gradId = `lab-ring-${score}-${size}`;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', flexShrink: 0, overflow: 'visible' }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} opacity={0.15} />
-      <motion.circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3} strokeLinecap="round"
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={gradient[0]} />
+          <stop offset="100%" stopColor={gradient[1]} />
+        </linearGradient>
+      </defs>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={3} opacity={0.15} />
+      <motion.circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={3} strokeLinecap="round"
         strokeDasharray={circ}
         initial={{ strokeDashoffset: circ }}
         animate={{ strokeDashoffset: offset }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
       />
       <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central"
-        fontSize={size * 0.28} fontWeight={700} fill={color}
+        fontSize={size * 0.28} fontWeight={700} fill={severityColor(score)}
+        fontFamily="'Fraunces', serif"
         transform={`rotate(90, ${size / 2}, ${size / 2})`}>
         {Math.round(healthScore)}
       </text>

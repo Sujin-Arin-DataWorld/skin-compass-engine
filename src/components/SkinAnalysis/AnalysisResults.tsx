@@ -1,18 +1,21 @@
-// Part B — AnalysisResults.tsx (Apple + Forest Design System, Dark Mode Only)
+// Part B — AnalysisResults.tsx (2025 UI/UX Redesign — Apple + Forest + Glassmorphism)
 // Production-ready component: Hero + Top3 Severity + 7-axis Accordion + Products + Feedback
+// Supports both Dark & Light modes via tokens(isDark)
 
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { RotateCcw, Save, ChevronRight, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { useSkinProfileStore } from '@/store/useSkinProfileStore';
 import { useAnalysisStore } from '@/store/analysisStore';
 import { useRoutineStore } from '@/store/useRoutineStore';
-import { brand, glass } from '@/lib/designTokens';
+import { tokens, glassTokens, ctaTokens, ctaGlowToken, tierGradients } from '@/lib/designTokens';
+import type { ScoreTier } from '@/lib/designTokens';
 import FeedbackWidget from './FeedbackWidget';
 import RoutinePicker from '@/components/routine/RoutinePicker';
 import AuthModal from '@/components/ui/AuthModal';
@@ -25,10 +28,6 @@ import type { SkinAxisScores } from '@/types/skinAnalysis';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_LABELS_KO } from '@/engine/types';
 import type { AxisKey, AxisScores, AxisSeverity } from '@/engine/types';
 import { mergeReasonsWithFallback } from '@/lib/skinAnalysisFallback';
-
-// ── Dark-only tokens (Apple + Forest) ──────────────────────────────────────
-const T = brand.dark;
-const G = glass.card.dark;
 
 // ── Axis direction mapping ─────────────────────────────────────────────────
 // V5 engine: hyd = dehydration severity, bar = barrier damage → high = bad
@@ -52,8 +51,6 @@ function getOverallScore(scores: SkinAxisScores): number {
 }
 
 // ── Score tier system ──────────────────────────────────────────────────────
-type ScoreTier = 'excellent' | 'good' | 'attention' | 'critical';
-
 function getScoreTier(score: number): ScoreTier {
   if (score >= 80) return 'excellent';
   if (score >= 65) return 'good';
@@ -61,11 +58,12 @@ function getScoreTier(score: number): ScoreTier {
   return 'critical';
 }
 
+// 2025 Redesign: colors via tierGradients from designTokens
 const TIER_COLORS: Record<ScoreTier, string> = {
-  excellent: '#4ECDC4',  // Neon mint
-  good: '#8a9a7b',  // Sage
-  attention: '#c4a265',  // Gold
-  critical: '#E8A87C',  // Muted coral
+  excellent: tierGradients.excellent.color,
+  good: tierGradients.good.color,
+  attention: tierGradients.attention.color,
+  critical: tierGradients.critical.color,
 };
 
 const TIER_MESSAGES: Record<ScoreTier, Record<string, string>> = {
@@ -121,44 +119,52 @@ const TX = {
   precisionDesc: { ko: 'AI 사진 + 생활습관 통합 분석', en: 'AI Photo + Lifestyle Integrated', de: 'KI-Foto + Lebensstil-Analyse' },
 };
 
-// ── Circular Score Ring ────────────────────────────────────────────────────
-function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
-  const r = (size - 12) / 2;
+// ── 2025 Gradient Score Ring ───────────────────────────────────────────────
+function ScoreRing({ score, size = 160, isDark = true }: { score: number; size?: number; isDark?: boolean }) {
+  const r = (size - 14) / 2;
   const cx = size / 2;
   const cy = size / 2;
   const circumference = 2 * Math.PI * r;
-  const offset = circumference - (score / 100) * circumference;
+  const progress = (score / 100) * circumference;
   const tier = getScoreTier(score);
-  const color = TIER_COLORS[tier];
+  const { gradient } = tierGradients[tier];
+  const gradId = `score-grad-${tier}-${size}`;
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5" />
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor={gradient[0]} />
+          <stop offset="100%" stopColor={gradient[1]} />
+        </linearGradient>
+      </defs>
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} strokeWidth="6" />
       <motion.circle
         cx={cx} cy={cy} r={r}
         fill="none"
-        stroke={color}
-        strokeWidth="5"
+        stroke={`url(#${gradId})`}
+        strokeWidth="6"
         strokeLinecap="round"
         strokeDasharray={circumference}
+        strokeDashoffset={circumference - progress}
         initial={{ strokeDashoffset: circumference }}
-        animate={{ strokeDashoffset: offset }}
+        animate={{ strokeDashoffset: circumference - progress }}
         transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
-        style={{ transformOrigin: `${cx}px ${cy}px`, transform: 'rotate(-90deg)' }}
+        style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
       />
       <text
-        x={cx} y={cy - 4}
+        x={cx} y={cy - 6}
         textAnchor="middle"
         dominantBaseline="central"
-        style={{ fontSize: size * 0.28, fontFamily: 'var(--font-numeric)', fontWeight: 700, fill: '#F5F5F7' }}
+        style={{ fontSize: size * 0.32, fontFamily: "'Fraunces', serif", fontWeight: 700, fill: isDark ? '#F5F5F7' : '#1B2838' }}
       >
         {score}
       </text>
       <text
-        x={cx} y={cy + size * 0.15}
+        x={cx} y={cy + size * 0.16}
         textAnchor="middle"
         dominantBaseline="central"
-        style={{ fontSize: size * 0.09, fontFamily: 'var(--font-sans)', fontWeight: 400, fill: '#86868B' }}
+        style={{ fontSize: size * 0.09, fontFamily: 'var(--font-sans)', fontWeight: 400, fill: isDark ? '#86868B' : '#9CA3AF' }}
       >
         /100
       </text>
@@ -167,52 +173,67 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
 }
 
 
-// ── Accordion Axis Row ─────────────────────────────────────────────────────
-function AxisAccordion({ healthScore, label, badge, badgeColor, reason }: {
+// ── 2025 Accordion Axis Row (Glass Card + Hover Lift) ──────────────────────
+function AxisAccordion({ healthScore, label, badge, badgeColor, reason, isDark = true }: {
   healthScore: number; label: string;
-  badge: string; badgeColor: string; reason: string;
+  badge: string; badgeColor: string; reason: string; isDark?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const tok = tokens(isDark);
+  const glassTok = glassTokens(isDark);
 
   return (
     <motion.div
       className="rounded-xl overflow-hidden"
-      style={{ background: G.background, ...{ backdropFilter: G.backdropFilter, WebkitBackdropFilter: G.WebkitBackdropFilter }, border: G.border }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: glassTok.card.background,
+        backdropFilter: glassTok.card.backdropFilter,
+        WebkitBackdropFilter: glassTok.card.backdropFilter,
+        border: glassTok.card.border,
+        boxShadow: glassTok.card.boxShadow,
+        transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
+        transform: hovered ? 'translateY(-1px)' : 'none',
+      }}
     >
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center gap-3 px-4 py-3 transition-all"
-        style={{ minHeight: '48px' }}
+        style={{ minHeight: '48px', background: 'transparent', border: 'none', cursor: 'pointer' }}
+        aria-expanded={open}
+        aria-label={`${label} — ${badge}`}
       >
-        <span className="flex-1 text-left" style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: '#F5F5F7' }}>
+        <span className="flex-1 text-left" style={{ fontSize: '14px', fontFamily: 'var(--font-sans)', fontWeight: 500, color: tok.text }}>
           {label}
         </span>
 
-        {/* Progress bar — proportional to healthScore */}
-        <div className="w-20 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        {/* Progress bar */}
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: tok.border, width: 80 }}>
           <motion.div
             className="h-full rounded-full"
             style={{ backgroundColor: badgeColor }}
             initial={{ width: 0 }}
-            animate={{ width: `${Math.max(healthScore, 4)}%` }}
+            animate={{ width: `${Math.max(healthScore, 3)}%` }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
 
-        <span style={{ fontSize: '15px', fontFamily: 'var(--font-numeric)', fontWeight: 700, color: '#F5F5F7', width: '28px', textAlign: 'right' }}>
+        <span style={{ fontSize: '16px', fontFamily: "'Fraunces', serif", fontWeight: 700, color: tok.text, width: '28px', textAlign: 'right' }}>
           {healthScore}
         </span>
 
-        {/* Badge */}
+        {/* Tier Badge */}
         <span
           className="rounded-full px-2 py-0.5 whitespace-nowrap notranslate"
           translate="no"
           style={{
-            fontSize: '10px',
+            fontSize: '11px',
             fontFamily: 'var(--font-sans)',
             fontWeight: 600,
             color: badgeColor,
-            background: `${badgeColor}15`,
+            background: `${badgeColor}18`,
             border: `1px solid ${badgeColor}30`,
           }}
         >
@@ -220,7 +241,7 @@ function AxisAccordion({ healthScore, label, badge, badgeColor, reason }: {
         </span>
 
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown size={14} style={{ color: '#86868B' }} />
+          <ChevronDown size={14} style={{ color: tok.textSecondary }} />
         </motion.div>
       </button>
 
@@ -233,9 +254,9 @@ function AxisAccordion({ healthScore, label, badge, badgeColor, reason }: {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4">
+            <div className="px-4 pb-4" style={{ borderTop: `1px solid ${tok.border}`, paddingTop: 10 }}>
               {reason && (
-                <p style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', lineHeight: 1.6 }}>
+                <p style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: tok.textSecondary, lineHeight: 1.6 }}>
                   {reason}
                 </p>
               )}
@@ -274,6 +295,11 @@ export default function AnalysisResults({
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { language } = useI18nStore();
   const { isLoggedIn } = useAuthStore();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tok = tokens(isDark);
+  const glassTok = glassTokens(isDark);
+  const ctaTok = ctaTokens(isDark);
   const resetAnalysis = useSkinAnalysisStore((s) => s.resetAnalysis);
   const lifestyleAnswers = useSkinAnalysisStore((s) => s.lifestyleAnswers);
 
@@ -524,7 +550,7 @@ export default function AnalysisResults({
   // RENDER
   // ═══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-dvh w-full overflow-y-auto pb-32" style={{ background: '#0A0A0A', color: '#F5F5F7' }}>
+    <div className="min-h-dvh w-full overflow-y-auto pb-32" style={{ background: tok.bg, color: tok.text }}>
 
       {/* ── SECTION 1: Photo Hero + Overall Score ──────────────────────────── */}
       <div className="relative w-full" style={{ minHeight: capturedImage ? '380px' : '200px' }}>
@@ -537,15 +563,15 @@ export default function AnalysisResults({
             style={{ transform: 'scaleX(-1)', filter: 'brightness(0.7)' }}
           />
         )}
-        {/* Dark gradient overlay */}
+        {/* Gradient overlay */}
         <div
           className="absolute inset-0"
-          style={{ background: 'linear-gradient(to bottom, transparent 20%, rgba(10,10,10,0.6) 50%, #0A0A0A 100%)' }}
+          style={{ background: `linear-gradient(to bottom, transparent 20%, ${isDark ? 'rgba(10,10,10,0.6)' : 'rgba(250,250,248,0.6)'} 50%, ${tok.bg} 100%)` }}
         />
 
         {/* Score overlay */}
         <div className="relative z-10 flex flex-col items-center justify-end h-full px-6 pb-8" style={{ minHeight: capturedImage ? '380px' : '200px' }}>
-          {/* Phase 1 AI Transparency Badge */}
+          {/* AI Transparency Badge */}
           <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible" className="mb-4">
             <AiGeneratedBadge />
           </motion.div>
@@ -555,34 +581,38 @@ export default function AnalysisResults({
             <motion.div
               custom={0} variants={fadeUp} initial="hidden" animate="visible"
               className="mb-4 rounded-full px-4 py-1.5 flex items-center gap-2"
-              style={{ background: 'rgba(74,158,104,0.12)', border: '1px solid rgba(74,158,104,0.25)' }}
+              style={{ background: `${tok.accent}14`, border: `1px solid ${tok.accent}25` }}
             >
               <span style={{ fontSize: '14px' }}>🔬</span>
-              <span style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', fontWeight: 600, color: '#4A9E68', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', fontWeight: 600, color: tok.accent, letterSpacing: '0.05em' }}>
                 {TX.precision[lang]}
               </span>
             </motion.div>
           )}
 
-          {/* Glassmorphism score card */}
+          {/* 2025 Glassmorphism score card */}
           <motion.div
             custom={1} variants={fadeUp} initial="hidden" animate="visible"
-            className="w-full max-w-sm rounded-3xl p-6 flex flex-col items-center"
+            className="w-full max-w-sm rounded-3xl flex flex-col items-center"
             style={{
-              background: 'rgba(28,28,30,0.55)',
-              backdropFilter: 'blur(20px) saturate(1.2)',
-              WebkitBackdropFilter: 'blur(20px) saturate(1.2)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              boxShadow: '0 8px 40px rgba(0,0,0,0.3)',
+              padding: '2rem 1.5rem',
+              background: glassTok.card.background,
+              backdropFilter: glassTok.card.backdropFilter,
+              WebkitBackdropFilter: glassTok.card.backdropFilter,
+              border: glassTok.card.border,
+              boxShadow: isDark ? '0 8px 40px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)',
             }}
           >
-            <p style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', color: '#86868B', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>
+            <p style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', color: tok.textSecondary, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '16px', fontWeight: 600 }}>
               {TX.overallLabel[lang]}
             </p>
 
-            <ScoreRing score={overallScore} size={130} />
+            <ScoreRing score={overallScore} size={160} isDark={isDark} />
 
-            <p className="mt-3 text-center" style={{ fontSize: '14px', fontFamily: 'var(--font-sans)', color: TIER_COLORS[tier], fontWeight: 500 }}>
+            <p className="mt-4 text-center" style={{
+              fontSize: '16px', fontFamily: "'Plus Jakarta Sans', var(--font-sans)", color: tok.text,
+              fontWeight: 500, lineHeight: 1.5, maxWidth: 360, margin: '16px auto 0',
+            }}>
               {TIER_MESSAGES[tier][lang]}
             </p>
 
@@ -596,12 +626,12 @@ export default function AnalysisResults({
                     key={key}
                     className="rounded-full px-3 py-1"
                     style={{
-                      fontSize: '11px',
+                      fontSize: '12px',
                       fontFamily: 'var(--font-sans)',
-                      fontWeight: 600,
+                      fontWeight: 500,
                       color,
-                      background: `${color}12`,
-                      border: `1px solid ${color}30`,
+                      background: `${color}14`,
+                      border: `1px solid ${color}28`,
                     }}
                   >
                     {getAxisLabel(key, lang)} {healthScore}
@@ -616,9 +646,9 @@ export default function AnalysisResults({
       {/* ── Content ─────────────────────────────────────────────────────────── */}
       <div className="mx-auto max-w-md px-4">
 
-        {/* ── SECTION 2: Top 3 Priority Cards ──────────────────────────────── */}
+        {/* ── SECTION 2: Top 3 Priority Cards (2025 Hoverable Glass) ────────── */}
         <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible" className="mt-8">
-          <p className="mb-4" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <p className="mb-4" style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', fontWeight: 600, color: tok.textSecondary, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
             {TX.topConcerns[lang]}
           </p>
           <div className="flex flex-col gap-3">
@@ -635,55 +665,58 @@ export default function AnalysisResults({
                   variants={fadeUp}
                   initial="hidden"
                   animate="visible"
-                  className="rounded-2xl p-4"
+                  className="rounded-2xl"
+                  whileHover={{ y: -2 }}
                   style={{
-                    background: G.background,
-                    backdropFilter: G.backdropFilter,
-                    WebkitBackdropFilter: G.WebkitBackdropFilter,
-                    border: G.border,
-                    boxShadow: G.boxShadow,
+                    padding: '1rem 1.25rem',
+                    background: glassTok.card.background,
+                    backdropFilter: glassTok.card.backdropFilter,
+                    WebkitBackdropFilter: glassTok.card.backdropFilter,
+                    border: glassTok.card.border,
+                    boxShadow: glassTok.card.boxShadow,
+                    transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
                   }}
                 >
                   {/* Header */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span style={{ fontSize: '15px', fontFamily: 'var(--font-sans)', fontWeight: 600, color: '#F5F5F7' }}>
+                      <span style={{ fontSize: '16px', fontFamily: 'var(--font-sans)', fontWeight: 700, color: tok.text }}>
                         {label}
                       </span>
                       <span
                         className="rounded-full px-2.5 py-0.5 notranslate"
                         translate="no"
                         style={{
-                          fontSize: '10px',
+                          fontSize: '11px',
                           fontFamily: 'var(--font-sans)',
                           fontWeight: 600,
                           color: badgeColor,
-                          background: `${badgeColor}15`,
+                          background: `${badgeColor}18`,
                           border: `1px solid ${badgeColor}30`,
                         }}
                       >
                         {TIER_LABELS[cardTier][lang]}
                       </span>
                     </div>
-                    <span style={{ fontSize: '22px', fontFamily: 'var(--font-numeric)', fontWeight: 700, color: badgeColor }}>
+                    <span style={{ fontSize: '28px', fontFamily: "'Fraunces', serif", fontWeight: 700, color: badgeColor, lineHeight: 1 }}>
                       {healthScore}
                     </span>
                   </div>
 
-                  {/* Progress bar — proportional to healthScore */}
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  {/* Progress bar */}
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: tok.border }}>
                     <motion.div
                       className="h-full rounded-full"
                       style={{ backgroundColor: badgeColor }}
                       initial={{ width: 0 }}
-                      animate={{ width: `${Math.max(healthScore, 4)}%` }}
-                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
+                      animate={{ width: `${Math.max(healthScore, 3)}%` }}
+                      transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.3 }}
                     />
                   </div>
 
                   {/* AI Reason */}
                   {reason && (
-                    <p className="mt-3" style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: '#86868B', lineHeight: 1.6 }}>
+                    <p className="mt-3" style={{ fontSize: '13px', fontFamily: 'var(--font-sans)', color: tok.textSecondary, lineHeight: 1.6 }}>
                       {reason}
                     </p>
                   )}
@@ -693,9 +726,9 @@ export default function AnalysisResults({
           </div>
         </motion.div>
 
-        {/* ── SECTION 3: Remaining 7 Axes (Accordion) ──────────────────────── */}
+        {/* ── SECTION 3: Remaining 7 Axes (2025 Accordion) ──────────────────── */}
         <motion.div custom={6} variants={fadeUp} initial="hidden" animate="visible" className="mt-8">
-          <p className="mb-4" style={{ fontSize: '12px', fontFamily: 'var(--font-sans)', color: '#86868B', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <p className="mb-4" style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', fontWeight: 600, color: tok.textSecondary, letterSpacing: '0.18em', textTransform: 'uppercase' }}>
             {TX.allAxes[lang]}
           </p>
           <div className="flex flex-col gap-2">
@@ -709,13 +742,14 @@ export default function AnalysisResults({
                   badge={TIER_LABELS[accTier][lang]}
                   badgeColor={TIER_COLORS[accTier]}
                   reason={reasons[key] ?? ''}
+                  isDark={isDark}
                 />
               );
             })}
           </div>
         </motion.div>
 
-        {/* ── SECTION 4: Masterplan CTA ─────────────────────────────────────── */}
+        {/* ── SECTION 4: Masterplan CTA (2025 Gradient + Glow) ─────────────── */}
         <motion.div custom={7} variants={fadeUp} initial="hidden" animate="visible" className="mt-10 mb-2">
           <motion.button
             onClick={() => {
@@ -726,21 +760,24 @@ export default function AnalysisResults({
                 openPicker();
               }
             }}
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, y: -1 }}
             whileTap={{ scale: 0.98 }}
             className="w-full rounded-2xl py-5 flex flex-col items-center justify-center gap-2 transition-all"
+            aria-label={TX.masterplan[lang]}
             style={{
-              background: 'linear-gradient(135deg, rgba(138,154,123,0.15) 0%, rgba(74,158,104,0.12) 100%)',
-              border: '1px solid rgba(138,154,123,0.3)',
-              boxShadow: '0 0 40px rgba(138,154,123,0.08), inset 0 1px 0 rgba(255,255,255,0.04)',
+              background: isDark
+                ? 'linear-gradient(135deg, rgba(74,158,104,0.12) 0%, rgba(45,107,74,0.08) 100%)'
+                : 'linear-gradient(135deg, rgba(94,139,104,0.08) 0%, rgba(61,107,74,0.05) 100%)',
+              border: `1px solid ${tok.accent}30`,
+              boxShadow: `0 0 40px ${tok.accent}08, inset 0 1px 0 rgba(255,255,255,0.04)`,
               backdropFilter: 'blur(12px)',
             }}
           >
             <span style={{
-              fontSize: '15px',
+              fontSize: '16px',
               fontFamily: 'var(--font-sans)',
               fontWeight: 600,
-              color: '#8a9a7b',
+              color: tok.accent,
               lineHeight: 1.4,
               textAlign: 'center',
             }}>
@@ -749,8 +786,8 @@ export default function AnalysisResults({
             <span style={{
               fontSize: '12px',
               fontFamily: 'var(--font-sans)',
-              color: 'rgba(138,154,123,0.6)',
-              letterSpacing: '0.05em',
+              color: `${tok.accent}88`,
+              letterSpacing: '0.04em',
             }}>
               {lang === 'ko' ? '3단계 / 5단계 / 기기 포함 프로토콜'
                 : lang === 'de' ? '3-Stufen / 5-Stufen / Geräte-Protokoll'
@@ -759,17 +796,30 @@ export default function AnalysisResults({
           </motion.button>
         </motion.div>
 
-        {/* ── Phase 1: Medical Disclaimer ───────────────────────────────────── */}
-        <motion.div custom={7.5} variants={fadeUp} initial="hidden" animate="visible" className="mt-8 rounded-2xl overflow-hidden shadow-lg">
-          <MedicalDisclaimer />
+        {/* ── Medical Disclaimer ────────────────────────────────────────────── */}
+        <motion.div custom={7.5} variants={fadeUp} initial="hidden" animate="visible" className="mt-8 rounded-2xl overflow-hidden">
+          <div style={{
+            background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+            border: `1px solid ${tok.border}`, borderRadius: 16,
+            padding: '1rem 1.25rem',
+          }}>
+            <MedicalDisclaimer />
+          </div>
         </motion.div>
 
-        {/* ── SECTION 5: Action Buttons ─────────────────────────────────────── */}
+        {/* ── SECTION 5: Action Buttons (2025 Premium) ──────────────────────── */}
         <motion.div custom={8} variants={fadeUp} initial="hidden" animate="visible" className="mt-6 flex gap-3">
           <button
             onClick={handleRetake}
-            className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', color: '#86868B', fontFamily: 'var(--font-sans)', fontSize: '14px' }}
+            className="flex-1 rounded-2xl py-3.5 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            aria-label={TX.retake[lang]}
+            style={{
+              background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+              border: `1px solid ${tok.border}`,
+              backdropFilter: 'blur(12px)',
+              color: tok.textSecondary,
+              fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500,
+            }}
           >
             <RotateCcw size={14} />
             {TX.retake[lang]}
@@ -777,24 +827,25 @@ export default function AnalysisResults({
           <button
             onClick={handleSave}
             disabled={saveStatus === 'saving' || saveStatus === 'saved'}
-            className="flex-1 rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            className="flex-1 rounded-2xl py-3.5 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            aria-label={saveStatus === 'saved' ? TX.saved[lang] : TX.save[lang]}
             style={{
               background:
-                saveStatus === 'saved' ? 'rgba(138,154,123,0.15)' :
+                saveStatus === 'saved' ? ctaTok.background :
                   saveStatus === 'error' ? 'rgba(232,168,124,0.10)' :
-                    'rgba(255,255,255,0.03)',
+                    ctaTok.background,
               border:
-                saveStatus === 'saved' ? '1px solid rgba(138,154,123,0.4)' :
+                saveStatus === 'saved' ? 'none' :
                   saveStatus === 'error' ? '1px solid rgba(232,168,124,0.35)' :
-                    '1px solid rgba(255,255,255,0.06)',
-              backdropFilter: 'blur(12px)',
+                    'none',
               color:
-                saveStatus === 'saved' ? '#8a9a7b' :
+                saveStatus === 'saved' ? '#F5F5F7' :
                   saveStatus === 'error' ? '#E8A87C' :
-                    isLoggedIn ? '#F5F5F7' : '#c4a265',
+                    '#F5F5F7',
               fontFamily: 'var(--font-sans)', fontSize: '14px',
+              fontWeight: 600,
               opacity: saveStatus === 'saving' ? 0.6 : 1,
-              fontWeight: saveStatus === 'idle' && isLoggedIn ? 600 : 400,
+              boxShadow: saveStatus === 'error' ? 'none' : ctaGlowToken(isDark),
             }}
           >
             <Save size={14} />

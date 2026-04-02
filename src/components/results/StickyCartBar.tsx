@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useI18nStore } from '@/store/i18nStore';
 import { useCartStore } from '@/store/cartStore';
-import { ctaTokens } from '@/lib/designTokens';
+import { ctaTokens, ctaGlowToken } from '@/lib/designTokens';
 import { useTheme } from 'next-themes';
 import { getProductPrice } from './sharedResultsData';
 import type { RealProduct, RoutineStep } from '@/engine/routineEngine';
@@ -173,7 +173,7 @@ const StickyCartBar = memo(function StickyCartBar({
           whiteSpace: 'nowrap',
           flexShrink: 0,
           minHeight: 'auto',
-          boxShadow: ctaTok.boxShadow,
+          boxShadow: `${ctaTok.boxShadow}, ${ctaGlowToken(isDark)}`,
           transition: 'all 0.15s cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       >

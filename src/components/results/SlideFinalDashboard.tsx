@@ -17,7 +17,7 @@ import { useAnalysisStore } from '@/store/analysisStore';
 import { buildRoutineV5 } from '@/engine/routineEngineV5';
 import type { AnalysisResult } from '@/engine/types';
 import type { RoutineStep, RealProduct } from '@/engine/routineEngine';
-import { tokens, ctaTokens } from '@/lib/designTokens';
+import { tokens, ctaTokens, ctaGlowToken, glassTokens } from '@/lib/designTokens';
 import {
   getProductPrice, AGE_CYCLE_MAP, ROLE_EMOJI,
 } from './sharedResultsData';
@@ -82,6 +82,7 @@ export default function SlideFinalDashboard({ result, cartItemIds }: Props) {
 
   const tok = tokens(isDark);
   const ctaTok = ctaTokens(isDark);
+  const glassTok = glassTokens(isDark);
 
   // ── Store reads ─────────────────────────────────────────────────────────────
   const implicitFlags = useAnalysisStore((s) => s.implicitFlags);
@@ -315,6 +316,7 @@ function Section1MyCollection({
   resultWeek,
   onGoToSlide1,
 }: Section1Props) {
+  const glassTok = glassTokens(isDark);
   const barrierPhases = BARRIER_RECOVERY_PHASES;
   const barrierIdx = isBarrierEmergency ? 3 : 0; // stagger offset for price/cycle cards
 
@@ -349,10 +351,11 @@ function Section1MyCollection({
           }
         </p>
 
-        {/* Title */}
+        {/* Title — 2025 Fraunces serif */}
         <h2 style={{
           fontSize: 'clamp(1.125rem, 2vw + 0.5rem, 1.625rem)',
           fontWeight: 300,
+          fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
           color: isDark ? '#F5F5F7' : '#1B2838',
           margin: '0 0 4px',
           wordBreak: lang === 'ko' ? 'keep-all' : undefined,
@@ -543,10 +546,12 @@ function Section1MyCollection({
               return (
                 <div key={step.product.id} style={{
                   display: 'flex', alignItems: 'center', gap: 6,
-                  padding: 'clamp(4px, 1vw, 8px) clamp(6px, 1.5vw, 10px)',
-                  borderRadius: 6, marginBottom: 2,
-                  background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-                  border: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}`,
+                  padding: 'clamp(6px, 1.2vw, 10px) clamp(8px, 1.5vw, 12px)',
+                  borderRadius: 10, marginBottom: 3,
+                  background: glassTok.card.background,
+                  backdropFilter: glassTok.card.backdropFilter,
+                  WebkitBackdropFilter: glassTok.card.backdropFilter,
+                  border: `1px solid ${glassTok.card.border.split('solid ')[1] ?? glassTok.card.border}`,
                 }}>
                   <div style={{
                     width: 20, height: 20,
@@ -651,9 +656,11 @@ function Section1MyCollection({
                 return (
                   <div key={zone} style={{
                     display: 'flex', alignItems: 'center', gap: 6,
-                    padding: 'clamp(4px, 1vw, 8px) clamp(6px, 1.5vw, 10px)',
-                    borderRadius: 6, marginBottom: 2,
+                    padding: 'clamp(6px, 1.2vw, 10px) clamp(8px, 1.5vw, 12px)',
+                    borderRadius: 10, marginBottom: 3,
                     background: 'rgba(226,75,74,0.02)',
+                    backdropFilter: glassTok.card.backdropFilter,
+                    WebkitBackdropFilter: glassTok.card.backdropFilter,
                     border: `1px solid ${isDark ? 'rgba(226,75,74,0.08)' : 'rgba(226,75,74,0.06)'}`,
                   }}>
                     <div style={{
@@ -820,10 +827,12 @@ function Section1MyCollection({
         animate="visible"
       >
         <div style={{
-          padding: 'clamp(10px, 2.5vw, 16px)',
-          borderRadius: 10,
-          background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
+          padding: 'clamp(12px, 2.5vw, 18px)',
+          borderRadius: 14,
+          background: glassTok.card.background,
+          backdropFilter: glassTok.card.backdropFilter,
+          WebkitBackdropFilter: glassTok.card.backdropFilter,
+          border: glassTok.card.border,
         }}>
           <div style={{
             fontSize: 9, fontWeight: 500,
@@ -935,6 +944,7 @@ function Section2HowToStart({
   ctaTok,
 }: Section2Props) {
   const navigate = useNavigate();
+  const glassTok = glassTokens(isDark);
   const prefersReducedMotion = typeof window !== 'undefined'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
 
@@ -1009,10 +1019,12 @@ function Section2HowToStart({
             : '0 0 0 4px rgba(94,139,104,0.08)',
         }}
         style={{
-          padding: 'clamp(10px, 2.5vw, 16px)',
-          borderRadius: 12,
+          padding: 'clamp(12px, 2.5vw, 18px)',
+          borderRadius: 16,
           border: `2px solid ${isDark ? 'rgba(74,158,104,0.3)' : 'rgba(94,139,104,0.25)'}`,
-          background: isDark ? 'rgba(74,158,104,0.03)' : 'rgba(94,139,104,0.03)',
+          background: glassTok.card.background,
+          backdropFilter: glassTok.card.backdropFilter,
+          WebkitBackdropFilter: glassTok.card.backdropFilter,
           transition: 'box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       >
@@ -1107,7 +1119,7 @@ function Section2HowToStart({
             border: 'none', cursor: 'pointer',
             background: ctaTok.background,
             color: '#F5F5F7',
-            boxShadow: ctaTok.boxShadow,
+            boxShadow: `${ctaTok.boxShadow}, ${ctaGlowToken(isDark)}`,
             fontSize: 'clamp(0.8125rem, 1.2vw, 0.9375rem)',
             fontWeight: 600, letterSpacing: '0.01em',
             transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
@@ -1137,10 +1149,12 @@ function Section2HowToStart({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
         style={{
-          padding: 'clamp(10px, 2.5vw, 16px)',
-          borderRadius: 12,
-          border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
-          background: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.02)',
+          padding: 'clamp(12px, 2.5vw, 18px)',
+          borderRadius: 16,
+          border: glassTok.card.border,
+          background: glassTok.card.background,
+          backdropFilter: glassTok.card.backdropFilter,
+          WebkitBackdropFilter: glassTok.card.backdropFilter,
         }}
       >
         {/* Title */}

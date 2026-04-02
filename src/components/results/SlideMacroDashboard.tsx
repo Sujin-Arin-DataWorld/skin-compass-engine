@@ -13,7 +13,7 @@ import { buildRoutineV5 } from '@/engine/routineEngineV5';
 import type { AnalysisResult, AxisKey } from '@/engine/types';
 import { AXIS_LABELS, AXIS_LABELS_DE, AXIS_KEYS } from '@/engine/types';
 import type { RoutineStep, RealProduct } from '@/engine/routineEngine';
-import { tokens, ctaTokens, glassTokens } from '@/lib/designTokens';
+import { tokens, ctaTokens, glassTokens, tierGradients } from '@/lib/designTokens';
 import { useTheme } from 'next-themes';
 import ProductImage from '@/components/product/ProductImage';
 import {
@@ -115,35 +115,43 @@ const AIX_CONTENT: Record<string, { en: string; de: string; ko: string }> = {
   device: { en: 'Professional EMS/LED device. Amplifies serum penetration by up to 3×.', de: 'Professionelles EMS/LED-Gerät.', ko: '전문가급 EMS/LED 기기.' },
 };
 
-// ── Circular Score Ring 점수링 디자인 ─────────────────────────────────────────────────────
+// ── 2025 Gradient Score Ring ─────────────────────────────────────────────────
 const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56, isDark = false }: {
   axis: AxisKey; score: number; lang: LangKey; size?: number; isDark?: boolean;
 }) {
   const r = (size - 7) / 2;
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - Math.min(100, Math.max(0, score)) / 100);
-  // Health Score color: low = red (bad), mid = amber, high = green (good)
-  const color = score < 30 ? '#E24B4A' : score < 70 ? '#BA7517' : '#4A9E68';
-  const textColor = isDark ? '#F5F5F7' : '#1B2838'; // tok.text
+  const tier = score < 30 ? 'critical' : score < 70 ? 'attention' : score < 80 ? 'good' : 'excellent';
+  const { gradient } = tierGradients[tier];
+  const gradId = `macro-grad-${axis}-${size}`;
+  const textColor = isDark ? '#F5F5F7' : '#1B2838';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', overflow: 'visible' }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3.5} opacity={0.15} />
-        <motion.circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round"
+        <defs>
+          <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor={gradient[0]} />
+            <stop offset="100%" stopColor={gradient[1]} />
+          </linearGradient>
+        </defs>
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={3.5} opacity={0.15} />
+        <motion.circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={`url(#${gradId})`} strokeWidth={3.5} strokeLinecap="round"
           strokeDasharray={circ}
           initial={{ strokeDashoffset: circ }}
           animate={{ strokeDashoffset: offset }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         />
         <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central"
-          fontSize={size * 0.32} fontWeight={600} fill={textColor}
+          fontSize={size * 0.32} fontWeight={700} fill={textColor}
+          fontFamily="'Fraunces', serif"
           transform={`rotate(90, ${size / 2}, ${size / 2})`}
         >{Math.round(score)}</text>
       </svg>
       <span style={{
         fontSize: 'clamp(0.625rem, 0.9vw, 0.75rem)', fontWeight: 800,
         textAlign: 'center',
-        color: isDark ? '#86868B' : '#6B7280', // tok.textSecondary
+        color: isDark ? '#86868B' : '#6B7280',
         whiteSpace: 'nowrap',
         maxWidth: 90,
         overflow: 'hidden',
@@ -371,31 +379,42 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
           </motion.div>
         </div>
 
-        {/* ════════ TAB BAR (sticky) ════════ */}
+        {/* ════════ TAB BAR (2025 segmented pill) ════════ */}
         <div style={{
           position: 'sticky', top: 0, zIndex: 40,
-          display: 'flex', borderBottom: `1px solid ${tok.border}`,
+          display: 'flex', justifyContent: 'center',
           marginBottom: 'clamp(8px, 1.5vw, 12px)',
           marginInline: 'calc(-1 * clamp(16px, 4vw, 40px))',
           paddingInline: 'clamp(16px, 4vw, 40px)',
+          padding: '6px clamp(16px, 4vw, 40px)',
           background: isDark ? 'rgba(10,10,10,0.88)' : 'rgba(250,250,248,0.88)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: `1px solid ${tok.border}`,
         }}>
-          {(['routine', 'insights'] as TabKey[]).map((tab) => {
-            const active = activeTab === tab;
-            const label = tab === 'routine' ? tx('tab_routine', lang) : tx('tab_insights', lang);
-            return (
-              <button key={tab} onClick={() => setActiveTab(tab)} style={{
-                flex: 1, padding: '8px 0', border: 'none', cursor: 'pointer',
-                background: 'transparent', minHeight: 40,
-                fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)', fontWeight: 500,
-                color: active ? tok.accent : tok.textTertiary,
-                borderBottom: active ? `2px solid ${tok.accent}` : '2px solid transparent',
-                transition: 'all 0.2s ease',
-              }}>{label}</button>
-            );
-          })}
+          <div style={{
+            display: 'flex',
+            background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+            borderRadius: 12,
+            padding: 3,
+            gap: 2,
+            border: `1px solid ${tok.border}`,
+          }}>
+            {(['routine', 'insights'] as TabKey[]).map((tab) => {
+              const active = activeTab === tab;
+              const label = tab === 'routine' ? tx('tab_routine', lang) : tx('tab_insights', lang);
+              return (
+                <button key={tab} onClick={() => setActiveTab(tab)} style={{
+                  flex: 1, padding: '8px 16px', border: active ? `1px solid ${tok.accent}25` : '1px solid transparent',
+                  cursor: 'pointer', borderRadius: 10, minHeight: 40,
+                  background: active ? (isDark ? 'rgba(74,158,104,0.12)' : 'rgba(94,139,104,0.10)') : 'transparent',
+                  fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)', fontWeight: active ? 600 : 500,
+                  color: active ? (isDark ? '#F5F5F7' : '#1B2838') : tok.textTertiary,
+                  transition: 'all 0.2s ease',
+                }}>{label}</button>
+              );
+            })}
+          </div>
         </div>
 
         {/* ════════ TAB CONTENT ════════ */}
@@ -415,25 +434,24 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                 />
               ) : (
                 <>
-                  {/* Tier selector */}
-                  <div style={{ display: 'flex', gap: 4, marginBottom: 8, borderRadius: 10, overflow: 'hidden' }}>
+                  {/* 2025 Tier selector (pill style) */}
+                  <div style={{ display: 'flex', gap: 4, marginBottom: 8, borderRadius: 12, overflow: 'hidden', padding: 3, background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', border: `1px solid ${tok.border}` }}>
                     {tierTabs.map((tab) => {
                       const isActive = activeTier === tab.key;
                       return (
                         <button key={tab.key} onClick={() => {
                           setActiveTier(tab.key);
                           setExpandedId(null);
-                          // Sync to global store so Slide 2 reads the correct tier
                           const tierMap: Record<TierKey, 'Entry' | 'Full' | 'Premium'> = { '3-step': 'Entry', '5-step': 'Full', 'advanced': 'Premium' };
                           setTier(tierMap[tab.key]);
                         }} style={{
-                          flex: 1, padding: '10px 4px', textAlign: 'center', border: 'none', cursor: 'pointer',
+                          flex: 1, padding: '10px 4px', textAlign: 'center', border: isActive ? `1px solid ${tok.accent}25` : '1px solid transparent', cursor: 'pointer',
                           borderRadius: 10, minHeight: 48,
-                          background: isActive ? (isDark ? 'rgba(74,158,104,0.08)' : 'rgba(94,139,104,0.08)') : (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'),
-                          outline: isActive ? `1px solid ${isDark ? 'rgba(74,158,104,0.15)' : 'rgba(94,139,104,0.15)'}` : 'none',
+                          background: isActive ? (isDark ? 'rgba(74,158,104,0.10)' : 'rgba(94,139,104,0.08)') : 'transparent',
+                          transition: 'all 0.2s ease',
                         }}>
-                          <div style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500, color: isActive ? tok.accent : tok.textSecondary }}>{tab.label}</div>
-                          <div style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: isActive ? (isDark ? 'rgba(74,158,104,0.7)' : 'rgba(61,107,74,0.7)') : tok.textTertiary }}>{tab.desc}</div>
+                          <div style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: isActive ? 600 : 500, color: isActive ? (isDark ? '#F5F5F7' : '#1B2838') : tok.textSecondary }}>{tab.label}</div>
+                          <div style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: isActive ? tok.accent : tok.textTertiary }}>{tab.desc}</div>
                         </button>
                       );
                     })}

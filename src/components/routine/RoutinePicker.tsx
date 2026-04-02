@@ -1,10 +1,13 @@
 // src/components/routine/RoutinePicker.tsx
-// Bottom sheet component for selecting routine tier (Essential / Complete / Pro)
+// Bottom sheet: selecting routine tier (Essential / Complete / Pro)
+// 2025 UI/UX Redesign — Glassmorphism + Dual Theme + Accessibility
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, X } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useI18nStore } from '@/store/i18nStore';
+import { tokens, ctaTokens, ctaGlowToken, bottomSheet } from '@/lib/designTokens';
 import { ROUTINE_TIERS } from '@/constants/routineTiers';
 import type { RoutineTierId, RoutineTier } from '@/types/routine';
 import RoutineStepIcon from './RoutineStepIcon';
@@ -51,6 +54,9 @@ const TX: Record<string, Record<Lang, string>> = {
     en: '{N} products total',
     de: '{N} Produkte gesamt',
   },
+  'price.essential': { ko: '~€45', en: '~€45', de: '~€45' },
+  'price.complete':  { ko: '~€89', en: '~€89', de: '~€89' },
+  'price.pro':       { ko: '~€145', en: '~€145', de: '~€145' },
 };
 
 function tx(key: string, lang: Lang): string {
@@ -89,82 +95,112 @@ const cardVariants = {
   },
 };
 
-// ── TierCard ─────────────────────────────────────────────────────────────────
+// ── Tier emoji mapping ───────────────────────────────────────────────────────
+const TIER_EMOJI: Record<RoutineTierId, string> = {
+  essential: '🌿',
+  complete: '✨',
+  pro: '💎',
+};
+
+// ── TierCard (2025 Glassmorphism Redesign) ───────────────────────────────────
 
 function TierCard({
   tier,
   isSelected,
   onSelect,
   lang,
+  isDark,
 }: {
   tier: RoutineTier;
   isSelected: boolean;
   onSelect: () => void;
   lang: Lang;
+  isDark: boolean;
 }) {
+  const tok = tokens(isDark);
+  const ctaTok = ctaTokens(isDark);
+
   return (
     <motion.button
       variants={cardVariants}
       onClick={onSelect}
       className="w-full text-left relative"
+      aria-pressed={isSelected}
+      aria-label={tx(`tier.${tier.id}`, lang)}
       style={{
-        background: '#242B3D',
-        borderRadius: 14,
-        padding: 16,
-        border: isSelected ? '1.5px solid #C9A96E' : '1.5px solid transparent',
-        transition: 'border-color 0.2s ease',
+        background: isSelected
+          ? `${tok.accent}10`
+          : isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+        borderRadius: 16,
+        padding: '1rem 1.25rem',
+        border: `${isSelected ? '2px' : '1px'} solid ${isSelected ? tok.accent : tok.border}`,
+        transition: 'all 0.2s ease',
         outline: 'none',
         cursor: 'pointer',
       }}
       whileTap={{ scale: 0.98 }}
     >
-      {/* Recommended badge — Essential only */}
+      {/* Recommended badge */}
       {tier.isDefault && (
         <span
           style={{
             position: 'absolute',
             top: -8,
             right: 16,
-            background: 'linear-gradient(135deg, #C9A96E, #E8D5A3)',
-            color: '#1A1F2E',
+            background: ctaTok.background,
+            color: '#F5F5F7',
             fontSize: 10,
-            fontWeight: 600,
-            padding: '3px 10px',
-            borderRadius: 10,
+            fontWeight: 700,
+            padding: '2px 10px',
+            borderRadius: 99,
             fontFamily: "var(--font-sans)",
-            letterSpacing: '0.03em',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase' as const,
           }}
         >
           {tx('recommended', lang)}
         </span>
       )}
 
-      {/* Header row: Tier name + Time */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-        <span style={{
-          fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-          fontSize: 16,
-          fontWeight: 600,
-          color: '#F0EDE8',
-        }}>
-          {tx(`tier.${tier.id}`, lang)}
-        </span>
+      {/* Header row: Emoji + Name + Price */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 20 }}>{TIER_EMOJI[tier.id]}</span>
+          <span style={{
+            fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
+            fontSize: 16,
+            fontWeight: 700,
+            color: tok.text,
+          }}>
+            {tx(`tier.${tier.id}`, lang)}
+          </span>
+        </div>
         <span style={{
           fontFamily: "'Plus Jakarta Sans', sans-serif",
-          fontSize: 12,
-          color: '#9CA3AF',
+          fontSize: 13, fontWeight: 600,
+          color: tok.accent,
         }}>
-          ~{tier.timeMinutes} min
+          {tx(`price.${tier.id}`, lang)}
         </span>
       </div>
+
+      {/* Steps + Time */}
+      <p style={{
+        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        fontSize: 12,
+        color: tok.textSecondary,
+        marginBottom: 4,
+      }}>
+        {tier.steps.length + 1 + (tier.includesDevice ? 1 : 0)} {lang === 'ko' ? '단계' : lang === 'de' ? 'Schritte' : 'steps'} · ~{tier.timeMinutes} min
+      </p>
 
       {/* Description */}
       <p style={{
         fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
-        fontSize: 13,
-        color: '#9CA3AF',
+        fontSize: 12,
+        color: tok.textTertiary,
         lineHeight: 1.5,
-        marginBottom: 14,
+        marginBottom: 12,
       }}>
         {tx(`desc.${tier.id}`, lang)}
       </p>
@@ -174,38 +210,24 @@ function TierCard({
         {tier.steps.map((step) => (
           <RoutineStepIcon key={step.key} stepKey={step.key} size={36} />
         ))}
-
-        {/* Plus separator */}
-        <span style={{ color: '#6B7280', fontSize: 14, fontWeight: 500, marginInline: 2 }}>+</span>
-
-        {/* SPF Shield (always) */}
+        <span style={{ color: tok.textTertiary, fontSize: 14, fontWeight: 500, marginInline: 2 }}>+</span>
         <RoutineStepIcon stepKey="spf" size={36} />
-
-        {/* Device (Pro only) */}
         {tier.includesDevice && (
-          <>
-            <RoutineStepIcon stepKey="device" size={36} />
-          </>
+          <RoutineStepIcon stepKey="device" size={36} />
         )}
       </div>
 
-      {/* SPF notice + total products */}
+      {/* SPF notice */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         marginTop: 10, paddingTop: 8,
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderTop: `1px solid ${tok.border}`,
       }}>
         <span style={{
-          fontSize: 11, color: '#7C9CBF',
+          fontSize: 11, color: tok.textSecondary,
           fontFamily: "'Plus Jakarta Sans', sans-serif",
         }}>
           {tx('spfNote', lang)}
-        </span>
-        <span style={{
-          fontSize: 11, fontWeight: 600, color: '#9CA3AF',
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-        }}>
-          {tx('totalProducts', lang).replace('{N}', String(tier.steps.length + 1 + (tier.includesDevice ? 1 : 0)))}
         </span>
       </div>
     </motion.button>
@@ -224,6 +246,11 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
   const { language } = useI18nStore();
   const lang = (['ko', 'de'].includes(language) ? language : 'en') as Lang;
   const [selected, setSelected] = useState<RoutineTierId>('essential');
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tok = tokens(isDark);
+  const ctaTok = ctaTokens(isDark);
+  const sheetTok = isDark ? bottomSheet.dark : bottomSheet.light;
 
   // Reset to default when reopened
   useEffect(() => {
@@ -261,142 +288,169 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
           {/* Bottom sheet */}
           <motion.div
             key="routine-picker-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label={tx('title', lang)}
             variants={sheetVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            dragElastic={{ top: 0, bottom: 0.6 }}
-            onDragEnd={(_e, info) => {
-              if (info.offset.y > 100 || info.velocity.y > 300) {
-                onClose();
-              }
-            }}
             style={{
               position: 'fixed',
               bottom: 0,
               left: 0,
               right: 0,
               maxHeight: '85vh',
-              overflowY: 'auto',
-              overscrollBehavior: 'contain',
-              background: '#1A1F2E',
-              borderRadius: '20px 20px 0 0',
+              display: 'flex',
+              flexDirection: 'column',
+              background: sheetTok.background,
+              borderRadius: sheetTok.borderRadius,
+              boxShadow: sheetTok.boxShadow,
               zIndex: 9999,
               paddingBottom: 'env(safe-area-inset-bottom, 16px)',
-              touchAction: 'pan-x',
             }}
           >
-            {/* Handle bar */}
-            <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12, paddingBottom: 8 }}>
+            {/* Handle bar — drag-to-dismiss zone */}
+            <motion.div
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={{ top: 0, bottom: 0.6 }}
+              onDragEnd={(_e, info) => {
+                if (info.offset.y > 100 || info.velocity.y > 300) {
+                  onClose();
+                }
+              }}
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                paddingTop: 12,
+                paddingBottom: 8,
+                cursor: 'grab',
+                touchAction: 'none',
+                flexShrink: 0,
+              }}
+            >
               <div style={{
-                width: 40,
+                width: 36,
                 height: 4,
                 borderRadius: 99,
-                background: '#333A4D',
+                background: sheetTok.handleColor,
               }} />
-            </div>
-
-            {/* Header */}
-            <div style={{ textAlign: 'center', paddingInline: 24, marginBottom: 20, position: 'relative' }}>
-              <button
-                onClick={onClose}
-                style={{
-                  position: 'absolute',
-                  top: -12,
-                  right: 12,
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#9CA3AF',
-                  padding: '8px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%',
-                }}
-              >
-                <X size={20} />
-              </button>
-              <h2 style={{
-                fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-                fontSize: 18,
-                fontWeight: 500,
-                color: '#F0EDE8',
-                marginBottom: 6,
-              }}>
-                {tx('title', lang)}
-              </h2>
-              <p style={{
-                fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
-                fontSize: 13,
-                color: '#9CA3AF',
-              }}>
-                {tx('subtitle', lang)}
-              </p>
-            </div>
-
-            {/* Tier cards */}
-            <motion.div
-              variants={cardContainerVariants}
-              initial="hidden"
-              animate="visible"
-              style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingInline: 20 }}
-            >
-              {ROUTINE_TIERS.map((tier) => (
-                <TierCard
-                  key={tier.id}
-                  tier={tier}
-                  isSelected={selected === tier.id}
-                  onSelect={() => setSelected(tier.id)}
-                  lang={lang}
-                />
-              ))}
             </motion.div>
 
-            {/* Help text */}
+            {/* Scrollable content area */}
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-              marginTop: 16,
-              paddingInline: 24,
+              flex: 1,
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y',
+              minHeight: 0,
             }}>
-              <HelpCircle size={14} color="#7C9CBF" />
-              <span style={{
-                fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
-                fontSize: 12,
-                color: '#7C9CBF',
-                fontStyle: 'italic',
-              }}>
-                {tx('helpText', lang)}
-              </span>
-            </div>
-
-            {/* CTA button */}
-            <div style={{ padding: '16px 20px 20px' }}>
-              <motion.button
-                onClick={() => onConfirm(selected)}
-                whileHover={{ opacity: 0.9 }}
-                whileTap={{ scale: 0.98 }}
-                style={{
-                  width: '100%',
-                  padding: '14px 0',
-                  borderRadius: 12,
-                  border: 'none',
-                  background: 'linear-gradient(135deg, #C9A96E, #E8D5A3)',
-                  color: '#1A1F2E',
+              {/* Header */}
+              <div style={{ textAlign: 'center', paddingInline: 24, marginBottom: 20, position: 'relative' }}>
+                <button
+                  onClick={onClose}
+                  aria-label="Close"
+                  style={{
+                    position: 'absolute',
+                    top: -12,
+                    right: 12,
+                    background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
+                    border: 'none',
+                    color: tok.textSecondary,
+                    padding: '8px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: '50%',
+                    transition: 'background 0.15s ease',
+                  }}
+                >
+                  <X size={20} />
+                </button>
+                <h2 style={{
+                  fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: tok.text,
+                  marginBottom: 4,
+                }}>
+                  {tx('title', lang)}
+                </h2>
+                <p style={{
                   fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
-                  fontSize: 15,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  letterSpacing: '0.02em',
-                }}
+                  fontSize: 13,
+                  color: tok.textSecondary,
+                }}>
+                  {tx('subtitle', lang)}
+                </p>
+              </div>
+
+              {/* Tier cards */}
+              <motion.div
+                variants={cardContainerVariants}
+                initial="hidden"
+                animate="visible"
+                style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingInline: 20 }}
               >
-                {tx('cta', lang)}
-              </motion.button>
+                {ROUTINE_TIERS.map((tier) => (
+                  <TierCard
+                    key={tier.id}
+                    tier={tier}
+                    isSelected={selected === tier.id}
+                    onSelect={() => setSelected(tier.id)}
+                    lang={lang}
+                    isDark={isDark}
+                  />
+                ))}
+              </motion.div>
+
+              {/* Help text */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                marginTop: 16,
+                paddingInline: 24,
+              }}>
+                <HelpCircle size={14} color={tok.textSecondary} />
+                <span style={{
+                  fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
+                  fontSize: 12,
+                  color: tok.textSecondary,
+                  fontStyle: 'italic',
+                }}>
+                  {tx('helpText', lang)}
+                </span>
+              </div>
+
+              {/* CTA button */}
+              <div style={{ padding: '20px 20px 20px' }}>
+                <motion.button
+                  onClick={() => onConfirm(selected)}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{
+                    width: '100%',
+                    padding: '16px 0',
+                    borderRadius: 16,
+                    border: 'none',
+                    background: ctaTok.background,
+                    color: '#F5F5F7',
+                    fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
+                    fontSize: 15,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    letterSpacing: '0.02em',
+                    boxShadow: ctaGlowToken(isDark),
+                  }}
+                >
+                  {tx('cta', lang)} →
+                </motion.button>
+              </div>
             </div>
           </motion.div>
         </>

@@ -56,14 +56,12 @@ const SlideNav = ({ current, total, labels, onPrev, onNext, onGoTo }: SlideNavPr
                 onClick={() => onGoTo(i)}
                 style={{
                   fontSize: 'clamp(0.75rem, 1vw, 0.875rem)',
-                  fontWeight: isActive ? 600 : 500,
-                  color: isActive ? (isDark ? '#F5F5F7' : '#1B2838') : tok.textTertiary,
-                  background: isActive
-                    ? (isDark ? 'rgba(74,158,104,0.12)' : 'rgba(94,139,104,0.10)')
-                    : 'transparent',
+                  fontWeight: isActive ? 600 : 400,
+                  color: isActive ? tok.accent : tok.textSecondary,
+                  background: isActive ? (isDark ? 'rgba(74,158,104,0.12)' : 'rgba(94,139,104,0.1)') : 'transparent',
                   padding: '6px 16px',
-                  borderRadius: 10,
-                  border: isActive ? `1px solid ${tok.accent}25` : '1px solid transparent',
+                  borderRadius: 9,
+                  border: isActive ? `1px solid ${tok.accent}30` : '1px solid transparent',
                   cursor: 'pointer',
                   transition: 'all 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
                   whiteSpace: 'nowrap',

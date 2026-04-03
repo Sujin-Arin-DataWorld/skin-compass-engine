@@ -11,7 +11,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useI18nStore } from '@/store/i18nStore';
 import { useCartStore } from '@/store/cartStore';
-import { ctaTokens, ctaGlowToken } from '@/lib/designTokens';
+import { tokens, ctaTokens, ctaGlowToken } from '@/lib/designTokens';
 import { useTheme } from 'next-themes';
 import { getProductPrice } from './sharedResultsData';
 import type { RealProduct, RoutineStep } from '@/engine/routineEngine';
@@ -67,7 +67,7 @@ const StickyCartBar = memo(function StickyCartBar({
   const lang = (language === 'de' || language === 'ko') ? language : 'en' as LangKey;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
-
+  const tok = tokens(isDark);
   const ctaTok = ctaTokens(isDark);
 
   // ── Zombie cart prevention: validate on mount ─────────────────────────────
@@ -133,7 +133,7 @@ const StickyCartBar = memo(function StickyCartBar({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0 }}>
         <span style={{
           fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)',
-          color: isDark ? '#86868B' : '#9CA3AF',
+          color: tok.textSecondary,
           whiteSpace: 'nowrap',
           lineHeight: 1.2,
         }}>
@@ -143,14 +143,14 @@ const StickyCartBar = memo(function StickyCartBar({
           {pricing.totalOriginal > pricing.totalDiscounted && (
             <span style={{
               fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)',
-              color: isDark ? '#48484A' : '#D1D5DB',
+              color: tok.textTertiary,
               textDecoration: 'line-through',
             }}>€{pricing.totalOriginal}</span>
           )}
           <span style={{
             fontSize: 'clamp(1rem, 1.4vw, 1.125rem)',
             fontWeight: 600,
-            color: isDark ? '#F5F5F7' : '#1B2838',
+            color: tok.text,
           }}>€{pricing.totalDiscounted}</span>
         </div>
       </div>
@@ -166,7 +166,7 @@ const StickyCartBar = memo(function StickyCartBar({
           border: 'none',
           cursor: 'pointer',
           background: ctaTok.background,
-          color: '#F5F5F7',
+          color: isDark ? '#F5F5F7' : '#FFFFFF',
           fontSize: 'clamp(0.8125rem, 1vw, 0.875rem)',
           fontWeight: 600,
           letterSpacing: '0.01em',

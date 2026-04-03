@@ -15,7 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAnalysisStore } from '@/store/analysisStore';
 import { useTheme } from 'next-themes';
-import { tokens, tierGradients } from '@/lib/designTokens';
+import { tokens, tierGradients, glassTokens } from '@/lib/designTokens';
 import DuelCard from '@/features/lab-selection/components/DuelCard';
 import type { FaceZone, ZoneAssessment, Product, PriceTier, RequiredIngredient } from '@/features/lab-selection/types';
 import type { AnalysisResult, AxisKey } from '@/engine/types';
@@ -99,10 +99,10 @@ function tx(key: keyof typeof C, lang: LangKey, vars?: Record<string, string | n
 
 // ── Severity helpers ───────────────────────────────────────────────────────────
 
-function severityColor(score: number): string {
+function severityColor(score: number, isDark: boolean = true): string {
   if (score >= 70) return '#E24B4A';
   if (score >= 30) return '#BA7517';
-  return '#86868B';
+  return tokens(isDark).textSecondary;
 }
 
 // ── Bridge: analysisResult → ZoneAssessment[] (same as original) ───────────────
@@ -391,7 +391,7 @@ const ZoneCard = memo(function ZoneCard({
                         fontSize: 'clamp(0.625rem, 0.8vw, 0.6875rem)',
                         padding: '4px 10px', borderRadius: 99,
                         background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-                        color: isDark ? '#86868B' : '#6B7280',
+                        color: tok.textSecondary,
                       }}>
                         {ing.name_en}
                       </span>
@@ -459,6 +459,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
+  const glassTok = glassTokens(isDark);
 
   const selectedZones = useAnalysisStore(s => s.selectedZones);
   const storePicks = useAnalysisStore(s => s.specialCarePicks);
@@ -559,7 +560,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
       label: tx('zone_sufficient', lang),
       bg: isDark ? 'rgba(134,134,139,0.04)' : 'rgba(134,134,139,0.04)',
       border: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
-      color: '#86868B',
+      color: tok.textSecondary,
     },
   ];
 
@@ -580,9 +581,11 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
           style={{
             maxWidth: 420, width: '100%', textAlign: 'center',
             padding: 'clamp(32px, 5vw, 40px) 24px', borderRadius: 24,
-            background: isDark ? 'rgba(255,255,255,0.03)' : tok.bgCard,
+            background: glassTok.card.background,
+            backdropFilter: glassTok.card.backdropFilter,
+            WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
             border: `1px solid ${tok.border}`,
-            boxShadow: isDark ? 'none' : '0 8px 32px rgba(0,0,0,0.04)',
+            boxShadow: glassTok.card.boxShadow,
             position: 'relative', overflow: 'hidden',
           }}
         >
@@ -790,7 +793,7 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
                   background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
                   border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}`,
                 }}>
-                  <span style={{ fontSize: 10, color: '#86868B' }}>{Math.round(100 - zd.severity)}</span>
+                  <span style={{ fontSize: 10, color: tok.textSecondary }}>{Math.round(100 - zd.severity)}</span>
                   <span style={{ fontSize: 'clamp(0.6875rem, 0.9vw, 0.75rem)', color: tok.textSecondary }}>
                     {ZONE_LABELS[zd.faceZone]?.[lang] ?? zd.faceZone}
                   </span>
@@ -824,7 +827,11 @@ const SlideLabSpecialCare = memo(function SlideLabSpecialCare({
           transition={{ duration: 0.4, delay: 0.25 }}
           style={{
             padding: 'clamp(14px, 2.5vw, 18px)', borderRadius: 12,
-            background: tok.bgCard, border: `1px solid ${tok.border}`,
+            background: glassTok.card.background,
+            backdropFilter: glassTok.card.backdropFilter,
+            WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
+            border: `1px solid ${tok.border}`,
+            boxShadow: glassTok.card.boxShadow,
           }}
         >
           <p style={{

@@ -11,7 +11,7 @@
 
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { tokens } from '@/lib/designTokens';
+import { tokens, glassTokens } from '@/lib/designTokens';
 import { BARRIER_RECOVERY_PHASES } from './BarrierRecoveryProducts';
 
 type LangKey = 'ko' | 'en' | 'de';
@@ -47,6 +47,7 @@ interface BarrierRecoveryModeProps {
 }
 
 export default function BarrierRecoveryMode({ lang, isDark, tok, cartItemIds, onAddToCart, onRemoveFromCart }: BarrierRecoveryModeProps) {
+  const glassTok = glassTokens(isDark);
   const [activePhase, setActivePhase] = useState<number>(0);
 
   // Derive added state from parent cart — single source of truth
@@ -165,8 +166,11 @@ export default function BarrierRecoveryMode({ lang, isDark, tok, cartItemIds, on
             marginTop: 8,
             padding: '14px',
             borderRadius: 12,
-            background: isDark ? 'rgba(255,255,255,0.03)' : tok.bgCard,
+            background: glassTok.card.background,
+            backdropFilter: glassTok.card.backdropFilter,
+            WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
             border: `1px solid ${tok.border}`,
+            boxShadow: glassTok.card.boxShadow,
           }}
         >
           {/* Panel header */}

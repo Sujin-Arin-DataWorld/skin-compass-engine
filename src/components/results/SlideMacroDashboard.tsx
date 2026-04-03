@@ -125,7 +125,7 @@ const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56
   const tier = score < 30 ? 'critical' : score < 70 ? 'attention' : score < 80 ? 'good' : 'excellent';
   const { gradient } = tierGradients[tier];
   const gradId = `macro-grad-${axis}-${size}`;
-  const textColor = isDark ? '#F5F5F7' : '#1B2838';
+  const tok = tokens(!!isDark);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: 'rotate(-90deg)', overflow: 'visible' }}>
@@ -143,7 +143,7 @@ const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56
           transition={{ duration: 0.6, ease: 'easeOut' }}
         />
         <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central"
-          fontSize={size * 0.32} fontWeight={700} fill={textColor}
+          fontSize={size * 0.32} fontWeight={700} fill={tok.text}
           fontFamily="'Fraunces', serif"
           transform={`rotate(90, ${size / 2}, ${size / 2})`}
         >{Math.round(score)}</text>
@@ -151,7 +151,7 @@ const CircularScore = memo(function CircularScore({ axis, score, lang, size = 56
       <span style={{
         fontSize: 'clamp(0.625rem, 0.9vw, 0.75rem)', fontWeight: 800,
         textAlign: 'center',
-        color: isDark ? '#86868B' : '#6B7280',
+        color: tok.textSecondary,
         whiteSpace: 'nowrap',
         maxWidth: 90,
         overflow: 'hidden',
@@ -360,7 +360,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   ? (isDark ? '#E24B4A' : '#A32D2D')
                   : score < 70
                     ? (isDark ? '#BA7517' : '#854F0B')
-                    : (isDark ? '#86868B' : '#9CA3AF');
+                    : tok.textSecondary;
                 const pillBg = score < 30
                   ? (isDark ? 'rgba(226,75,74,0.10)' : 'rgba(226,75,74,0.08)')
                   : score < 70
@@ -409,7 +409,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   cursor: 'pointer', borderRadius: 10, minHeight: 40,
                   background: active ? (isDark ? 'rgba(74,158,104,0.12)' : 'rgba(94,139,104,0.10)') : 'transparent',
                   fontSize: 'clamp(0.75rem, 1.1vw, 0.875rem)', fontWeight: active ? 600 : 500,
-                  color: active ? (isDark ? '#F5F5F7' : '#1B2838') : tok.textTertiary,
+                  color: active ? tok.text : tok.textTertiary,
                   transition: 'all 0.2s ease',
                 }}>{label}</button>
               );
@@ -450,7 +450,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                           background: isActive ? (isDark ? 'rgba(74,158,104,0.10)' : 'rgba(94,139,104,0.08)') : 'transparent',
                           transition: 'all 0.2s ease',
                         }}>
-                          <div style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: isActive ? 600 : 500, color: isActive ? (isDark ? '#F5F5F7' : '#1B2838') : tok.textSecondary }}>{tab.label}</div>
+                          <div style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: isActive ? 600 : 500, color: isActive ? tok.text : tok.textSecondary }}>{tab.label}</div>
                           <div style={{ fontSize: 'clamp(0.625rem, 0.8vw, 0.75rem)', color: isActive ? tok.accent : tok.textTertiary }}>{tab.desc}</div>
                         </button>
                       );
@@ -469,7 +469,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                           <span style={{ fontSize: 14 }}>{t === 'am' ? '☀️' : '🌙'}</span>
                           <span style={{
                             fontSize: 'clamp(0.5625rem, 0.8vw, 0.625rem)', fontWeight: 600,
-                            color: timing === t ? (t === 'am' ? '#BA7517' : (isDark ? '#86868B' : '#6B7280')) : tok.textTertiary,
+                            color: timing === t ? (t === 'am' ? '#BA7517' : tok.textSecondary) : tok.textTertiary,
                           }}>{t.toUpperCase()}</span>
                         </button>
                       ))}
@@ -513,8 +513,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                           transition={{ duration: 0.4, delay: i * 0.05 }}
                           style={{
                             borderRadius: 12, overflow: 'hidden',
-                            background: isKeyStep ? 'rgba(226,75,74,0.03)' : tok.bgCard,
+                            background: isKeyStep ? 'rgba(226,75,74,0.03)' : glassTok.card.background,
+                            backdropFilter: glassTok.card.backdropFilter,
+                            WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
                             border: `1px solid ${isKeyStep ? 'rgba(226,75,74,0.1)' : tok.border}`,
+                            boxShadow: glassTok.card.boxShadow,
                           }}
                         >
                           <button onClick={() => setExpandedId(isExpanded ? null : step.product.id)}
@@ -660,7 +663,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   {/* Routine total */}
                   <div style={{
                     marginTop: 'clamp(8px, 1.5vw, 12px)', padding: 'clamp(10px, 1.5vw, 14px)', borderRadius: 12,
-                    background: tok.bgCard, border: `1px solid ${tok.border}`,
+                    background: glassTok.card.background,
+                    backdropFilter: glassTok.card.backdropFilter,
+                    WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
+                    border: `1px solid ${tok.border}`,
+                    boxShadow: glassTok.card.boxShadow,
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   }}>
                     <span style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', color: tok.textSecondary }}>
@@ -790,8 +797,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                         transition={{ delay: i * 0.1, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                         style={{
                           padding: 24, borderRadius: 20,
-                          background: isDark ? 'rgba(255,255,255,0.02)' : tok.bgCard,
+                          background: glassTok.card.background,
+                          backdropFilter: glassTok.card.backdropFilter,
+                          WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
                           border: `1px solid ${tok.border}`,
+                          boxShadow: glassTok.card.boxShadow,
                           position: 'relative', overflow: 'hidden',
                           display: 'flex', flexDirection: 'column',
                         }}
@@ -873,7 +883,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                         style={{ overflow: 'hidden', marginBottom: 12 }}>
                         <div style={{
                           padding: 10, borderRadius: 10,
-                          background: tok.bgCard, border: `1px solid ${tok.border}`,
+                          background: glassTok.card.background,
+                          backdropFilter: glassTok.card.backdropFilter,
+                          WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
+                          border: `1px solid ${tok.border}`,
+                          boxShadow: glassTok.card.boxShadow,
                         }}>
                           <p style={{ fontSize: 'clamp(0.75rem, 1vw, 0.875rem)', fontWeight: 500, color: tok.text, margin: '0 0 4px' }}>
                             {axisLabel(expandedAxis, lang)} ({Math.round(toHealthScore(expandedAxis, result.axis_scores[expandedAxis] ?? 0))}/100)
@@ -889,7 +903,11 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                   {/* Skin Cell Turnover Cycle Card */}
                   <div style={{
                     padding: 14, borderRadius: 12,
-                    background: tok.bgCard, border: `1px solid ${tok.border}`,
+                    background: glassTok.card.background,
+                    backdropFilter: glassTok.card.backdropFilter,
+                    WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
+                    border: `1px solid ${tok.border}`,
+                    boxShadow: glassTok.card.boxShadow,
                   }}>
                     <p style={{
                       fontSize: 'clamp(0.625rem, 1vw, 0.75rem)', fontWeight: 600,
@@ -919,7 +937,7 @@ export default function SlideMacroDashboard({ result, onGoToLab, onTierChange, o
                       <div style={{
                         position: 'absolute', top: -4, left: '50%', transform: 'translateX(-50%)',
                         width: 2, height: 16, borderRadius: 1,
-                        background: isDark ? '#F5F5F7' : '#1B2838',
+                        background: tok.text,
                       }} />
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>

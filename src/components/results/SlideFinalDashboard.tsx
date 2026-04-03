@@ -316,6 +316,7 @@ function Section1MyCollection({
   resultWeek,
   onGoToSlide1,
 }: Section1Props) {
+  const tok = tokens(isDark);
   const glassTok = glassTokens(isDark);
   const barrierPhases = BARRIER_RECOVERY_PHASES;
   const barrierIdx = isBarrierEmergency ? 3 : 0; // stagger offset for price/cycle cards
@@ -356,7 +357,7 @@ function Section1MyCollection({
           fontSize: 'clamp(1.125rem, 2vw + 0.5rem, 1.625rem)',
           fontWeight: 300,
           fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-          color: isDark ? '#F5F5F7' : '#1B2838',
+          color: tok.text,
           margin: '0 0 4px',
           wordBreak: lang === 'ko' ? 'keep-all' : undefined,
           overflowWrap: 'break-word',
@@ -370,7 +371,7 @@ function Section1MyCollection({
         {/* Subtitle */}
         <p style={{
           fontSize: 'clamp(0.5625rem, 0.8vw, 0.6875rem)',
-          color: isDark ? '#86868B' : '#6B7280',
+          color: tok.textSecondary,
           margin: 0,
           overflowWrap: 'break-word',
           wordBreak: lang === 'ko' ? 'keep-all' : undefined,
@@ -479,7 +480,7 @@ function Section1MyCollection({
                 </div>
                 <div style={{
                   fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
-                  color: isDark ? '#F5F5F7' : '#1B2838',
+                  color: tok.text,
                   flex: 1,
                   wordBreak: lang === 'ko' ? 'keep-all' : undefined,
                   overflow: 'hidden',
@@ -503,7 +504,7 @@ function Section1MyCollection({
                 <div style={{
                   fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
                   fontWeight: 500,
-                  color: isDark ? '#86868B' : '#6B7280',
+                  color: tok.textSecondary,
                   flexShrink: 0,
                 }}>
                   €{product.price.toFixed(2)}
@@ -550,7 +551,7 @@ function Section1MyCollection({
                   borderRadius: 10, marginBottom: 3,
                   background: glassTok.card.background,
                   backdropFilter: glassTok.card.backdropFilter,
-                  WebkitBackdropFilter: glassTok.card.backdropFilter,
+                  WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
                   border: `1px solid ${glassTok.card.border.split('solid ')[1] ?? glassTok.card.border}`,
                 }}>
                   <div style={{
@@ -562,7 +563,7 @@ function Section1MyCollection({
                   </div>
                   <div style={{
                     fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
-                    color: isDark ? '#F5F5F7' : '#1B2838',
+                    color: tok.text,
                     flex: 1,
                     wordBreak: lang === 'ko' ? 'keep-all' : undefined,
                     overflow: 'hidden',
@@ -576,7 +577,7 @@ function Section1MyCollection({
                     <div style={{
                       fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
                       fontWeight: 500,
-                      color: isDark ? '#86868B' : '#6B7280',
+                      color: tok.textSecondary,
                       flexShrink: 0,
                     }}>
                       €{price.toFixed(price % 1 === 0 ? 0 : 2)}
@@ -618,7 +619,7 @@ function Section1MyCollection({
               }}>
                 <span style={{
                   fontSize: 'clamp(0.5625rem, 0.8vw, 0.6875rem)',
-                  color: isDark ? '#86868B' : '#6B7280',
+                  color: tok.textSecondary,
                   wordBreak: lang === 'ko' ? 'keep-all' : undefined,
                 }}>
                   {tx(
@@ -660,7 +661,7 @@ function Section1MyCollection({
                     borderRadius: 10, marginBottom: 3,
                     background: 'rgba(226,75,74,0.02)',
                     backdropFilter: glassTok.card.backdropFilter,
-                    WebkitBackdropFilter: glassTok.card.backdropFilter,
+                    WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
                     border: `1px solid ${isDark ? 'rgba(226,75,74,0.08)' : 'rgba(226,75,74,0.06)'}`,
                   }}>
                     <div style={{
@@ -672,7 +673,7 @@ function Section1MyCollection({
                     </div>
                     <div style={{
                       fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
-                      color: isDark ? '#F5F5F7' : '#1B2838',
+                      color: tok.text,
                       flex: 1,
                       wordBreak: lang === 'ko' ? 'keep-all' : undefined,
                       overflow: 'hidden',
@@ -694,7 +695,7 @@ function Section1MyCollection({
                       <div style={{
                         fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
                         fontWeight: 500,
-                        color: isDark ? '#86868B' : '#6B7280',
+                        color: tok.textSecondary,
                         flexShrink: 0,
                       }}>
                         €{price.toFixed(price % 1 === 0 ? 0 : 2)}
@@ -725,7 +726,7 @@ function Section1MyCollection({
             <div style={{
               fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
               fontWeight: 600,
-              color: isDark ? '#F5F5F7' : '#1B2838',
+              color: tok.text,
               marginBottom: 6,
               wordBreak: lang === 'ko' ? 'keep-all' : undefined,
             }}>
@@ -738,7 +739,7 @@ function Section1MyCollection({
             </div>
             <p style={{
               fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
-              color: isDark ? '#86868B' : '#6B7280',
+              color: tok.textSecondary,
               margin: 0, lineHeight: 1.6,
               wordBreak: lang === 'ko' ? 'keep-all' : undefined,
               overflowWrap: 'break-word',
@@ -771,7 +772,7 @@ function Section1MyCollection({
         {/* Count + duration */}
         <div style={{
           fontSize: 10,
-          color: isDark ? '#86868B' : '#6B7280',
+          color: tok.textSecondary,
           marginBottom: 6,
           wordBreak: lang === 'ko' ? 'keep-all' : undefined,
         }}>
@@ -801,7 +802,7 @@ function Section1MyCollection({
           <span style={{
             fontSize: 'clamp(1.125rem, 1.8vw, 1.375rem)',
             fontWeight: 500,
-            color: isDark ? '#F5F5F7' : '#1B2838',
+            color: tok.text,
           }}>
             €{effectiveDiscounted}
           </span>
@@ -831,12 +832,12 @@ function Section1MyCollection({
           borderRadius: 14,
           background: glassTok.card.background,
           backdropFilter: glassTok.card.backdropFilter,
-          WebkitBackdropFilter: glassTok.card.backdropFilter,
+          WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
           border: glassTok.card.border,
         }}>
           <div style={{
             fontSize: 9, fontWeight: 500,
-            color: isDark ? '#F5F5F7' : '#1B2838',
+            color: tok.text,
             marginBottom: 8,
           }}>
             {tx('피부 주기: {N}일', 'Hautzyklus: {N} Tage', 'Skin cycle: {N} days', lang, { N: cycleDays })}
@@ -872,13 +873,13 @@ function Section1MyCollection({
               }}>
                 <div style={{
                   fontSize: 11, fontWeight: 600,
-                  color: isDark ? '#F5F5F7' : '#1B2838',
+                  color: tok.text,
                 }}>
                   {tx('{W}주', '{W} Wo.', '{W}wk', lang, { W: m.week })}
                 </div>
                 <div style={{
                   fontSize: 'clamp(0.5625rem, 0.8vw, 0.625rem)',
-                  color: isDark ? '#86868B' : '#6B7280',
+                  color: tok.textSecondary,
                   wordBreak: lang === 'ko' ? 'keep-all' : undefined,
                 }}>
                   {m.label}
@@ -889,7 +890,7 @@ function Section1MyCollection({
 
           <p style={{
             fontSize: 'clamp(0.5rem, 0.7vw, 0.5625rem)',
-            color: isDark ? '#86868B' : '#6B7280',
+            color: tok.textSecondary,
             margin: '6px 0 0',
             wordBreak: lang === 'ko' ? 'keep-all' : undefined,
             overflowWrap: 'break-word',
@@ -943,6 +944,7 @@ function Section2HowToStart({
   isDark,
   ctaTok,
 }: Section2Props) {
+  const tok = tokens(isDark);
   const navigate = useNavigate();
   const glassTok = glassTokens(isDark);
   const prefersReducedMotion = typeof window !== 'undefined'
@@ -1024,7 +1026,7 @@ function Section2HowToStart({
           border: `2px solid ${isDark ? 'rgba(74,158,104,0.3)' : 'rgba(94,139,104,0.25)'}`,
           background: glassTok.card.background,
           backdropFilter: glassTok.card.backdropFilter,
-          WebkitBackdropFilter: glassTok.card.backdropFilter,
+          WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
           transition: 'box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1)',
         }}
       >
@@ -1036,7 +1038,7 @@ function Section2HowToStart({
           <span style={{
             fontSize: 'clamp(0.8125rem, 1.3vw, 1rem)',
             fontWeight: 500,
-            color: isDark ? '#F5F5F7' : '#1B2838',
+            color: tok.text,
             wordBreak: lang === 'ko' ? 'keep-all' : undefined,
           }}>
             {isBarrierEmergency
@@ -1060,7 +1062,7 @@ function Section2HowToStart({
           <div style={{
             fontSize: 'clamp(1.125rem, 2vw, 1.5rem)',
             fontWeight: 500,
-            color: isDark ? '#F5F5F7' : '#1B2838',
+            color: tok.text,
           }}>
             €{effectiveDiscounted}
           </div>
@@ -1083,7 +1085,7 @@ function Section2HowToStart({
         {/* Description */}
         <p style={{
           fontSize: 'clamp(0.6875rem, 1vw, 0.8125rem)',
-          color: isDark ? '#86868B' : '#6B7280',
+          color: tok.textSecondary,
           margin: '0 0 10px',
           wordBreak: lang === 'ko' ? 'keep-all' : undefined,
           overflowWrap: 'break-word',
@@ -1154,14 +1156,14 @@ function Section2HowToStart({
           border: glassTok.card.border,
           background: glassTok.card.background,
           backdropFilter: glassTok.card.backdropFilter,
-          WebkitBackdropFilter: glassTok.card.backdropFilter,
+          WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
         }}
       >
         {/* Title */}
         <div style={{
           fontSize: 'clamp(0.8125rem, 1.3vw, 1rem)',
           fontWeight: 500,
-          color: isDark ? '#F5F5F7' : '#1B2838',
+          color: tok.text,
           marginBottom: 8,
         }}>
           {tx('스마트 리필 플랜', 'Smart-Nachfüll-Plan', 'Smart Refill Plan', lang)}
@@ -1340,6 +1342,7 @@ interface Section3Props {
 }
 
 function Section3TrustFooter({ isBarrierEmergency, lang, isDark, onRestart }: Section3Props) {
+  const tok = tokens(isDark);
   const prefersReducedMotion = typeof window !== 'undefined'
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
 

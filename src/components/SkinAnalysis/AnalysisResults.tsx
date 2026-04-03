@@ -191,7 +191,7 @@ function AxisAccordion({ healthScore, label, badge, badgeColor, reason, isDark =
       style={{
         background: glassTok.card.background,
         backdropFilter: glassTok.card.backdropFilter,
-        WebkitBackdropFilter: glassTok.card.backdropFilter,
+        WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
         border: glassTok.card.border,
         boxShadow: glassTok.card.boxShadow,
         transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
@@ -469,13 +469,13 @@ export default function AnalysisResults({
       const saveMsg = lang === 'ko' ? '분석 결과가 안전하게 저장되었어요' : 'Analysis safely saved';
       toast.success(saveMsg, {
         style: {
-          background: 'rgba(36, 43, 61, 0.95)',
+          background: isDark ? 'rgba(28,28,30,0.95)' : 'rgba(255,255,255,0.95)',
           backdropFilter: 'blur(8px)',
-          border: '1px solid #333A4D',
-          color: '#F0EDE8',
+          border: `1px solid ${tok.border}`,
+          color: tok.text,
           borderRadius: '12px',
           padding: '16px 20px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.08)',
           fontFamily: "'SUIT', sans-serif"
         },
         icon: <CheckCircle2 size={18} color="#C9A96E" fill="#1A1F2E" />,
@@ -598,7 +598,7 @@ export default function AnalysisResults({
               padding: '2rem 1.5rem',
               background: glassTok.card.background,
               backdropFilter: glassTok.card.backdropFilter,
-              WebkitBackdropFilter: glassTok.card.backdropFilter,
+              WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
               border: glassTok.card.border,
               boxShadow: isDark ? '0 8px 40px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)',
             }}
@@ -671,7 +671,7 @@ export default function AnalysisResults({
                     padding: '1rem 1.25rem',
                     background: glassTok.card.background,
                     backdropFilter: glassTok.card.backdropFilter,
-                    WebkitBackdropFilter: glassTok.card.backdropFilter,
+                    WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
                     border: glassTok.card.border,
                     boxShadow: glassTok.card.boxShadow,
                     transition: 'all 0.3s cubic-bezier(0.22,1,0.36,1)',
@@ -839,9 +839,9 @@ export default function AnalysisResults({
                   saveStatus === 'error' ? '1px solid rgba(232,168,124,0.35)' :
                     'none',
               color:
-                saveStatus === 'saved' ? '#F5F5F7' :
+                saveStatus === 'saved' ? (isDark ? '#F5F5F7' : '#FFFFFF') :
                   saveStatus === 'error' ? '#E8A87C' :
-                    '#F5F5F7',
+                    (isDark ? '#F5F5F7' : '#FFFFFF'),
               fontFamily: 'var(--font-sans)', fontSize: '14px',
               fontWeight: 600,
               opacity: saveStatus === 'saving' ? 0.6 : 1,

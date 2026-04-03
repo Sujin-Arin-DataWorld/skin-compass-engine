@@ -27,6 +27,8 @@ import { useRoutineStore } from '@/store/useRoutineStore';
 import { useAnalysisStore } from '@/store/analysisStore';
 import { useSkinAnalysisStore } from '@/store/skinAnalysisStore';
 import { supabase } from '@/integrations/supabase/client';
+import { useTheme } from 'next-themes';
+import { tokens, tierGradients, ctaGlowToken, glassTokens } from '@/lib/designTokens';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import RoutinePicker from '@/components/routine/RoutinePicker';
@@ -58,8 +60,8 @@ function getScoreTier(h: number): 'excellent' | 'good' | 'attention' | 'critical
 const TIER_ACCENT: Record<string, string> = {
   excellent: '#4ECDC4',
   good: '#5E8B68',
-  attention: '#FFAB4C',
-  critical: '#FF6B6B',
+  attention: '#C9A96E',
+  critical: '#E8A87C',
 };
 
 const TIER_LABELS: Record<string, Record<Lang, string>> = {
@@ -110,21 +112,21 @@ function formatDateShort(dateStr: string, lang: Lang): string {
 // SECTION ① — COMPACT SCORE HUB (SVG Ring)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
+function ScoreRing({ score, size = 120, isDark = false }: { score: number; size?: number; isDark?: boolean }) {
   const tier = getScoreTier(score);
   const color = TIER_ACCENT[tier];
   const radius = (size - 12) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
-  const trackColor = 'rgba(0,0,0,0.05)';
+  const trackColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
 
   // Gradient colors based on tier
   const gradientId = `ring-gradient-${tier}`;
   const gradients: Record<string, [string, string]> = {
     excellent: ['#4ECDC4', '#2BAE66'],
     good: ['#5E8B68', '#8FC49F'],
-    attention: ['#FFAB4C', '#FF8F1F'],
-    critical: ['#FF6B6B', '#FF4444'],
+    attention: ['#C9A96E', '#B08A4A'],
+    critical: ['#E8A87C', '#D4845A'],
   };
   const [g1, g2] = gradients[tier];
 
@@ -160,7 +162,7 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
           fontFamily: "'Fraunces', serif",
           fontSize: size * 0.3,
           fontWeight: 700,
-          fill: '#1B2838',
+          fill: isDark ? '#F5F5F7' : '#1B2838',
         }}
       >
         {score}
@@ -172,7 +174,7 @@ function ScoreRing({ score, size = 120 }: { score: number; size?: number }) {
           fontFamily: "'Plus Jakarta Sans', sans-serif",
           fontSize: size * 0.09,
           fontWeight: 500,
-          fill: color,
+          fill: isDark ? '#86868B' : '#9CA3AF',
         }}
       >
         / 100
@@ -186,11 +188,15 @@ function CompactScoreHub({
   userName,
   lang,
   onReanalyze,
+  isDark,
+  tok,
 }: {
   activeProfile: UserSkinProfile | null;
   userName: string;
   lang: Lang;
   onReanalyze: () => void;
+  isDark: boolean;
+  tok: ReturnType<typeof tokens>;
 }) {
   const overall = activeProfile ? calculateOverallHealth(activeProfile) : null;
   const tier = overall !== null ? getScoreTier(overall) : null;
@@ -219,7 +225,7 @@ function CompactScoreHub({
         >
           <span style={{
             fontFamily: "'Fraunces', serif",
-            fontSize: 18, fontWeight: 600, color: '#5E8B68',
+            fontSize: 18, fontWeight: 600, color: tok.accent,
           }}>
             {userName?.charAt(0)?.toUpperCase() || 'S'}
           </span>
@@ -227,12 +233,12 @@ function CompactScoreHub({
         <div style={{ flex: 1 }}>
           <h1 style={{
             fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-            fontSize: 20, fontWeight: 600, color: '#1B2838', margin: 0, lineHeight: 1.3,
+            fontSize: 20, fontWeight: 600, color: tok.text, margin: 0, lineHeight: 1.3,
           }}>
             {userName || 'Guest'}
           </h1>
           {activeProfile && (
-            <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, marginTop: 2 }}>
+            <p style={{ fontSize: 12, color: tok.textSecondary, margin: 0, marginTop: 2 }}>
               {lang === 'ko'
                 ? `마지막 분석 · ${formatDateShort(activeProfile.createdAt, lang)}`
                 : lang === 'de'
@@ -251,7 +257,7 @@ function CompactScoreHub({
         >
           {/* Ring + Tier label */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
-            <ScoreRing score={overall} size={140} />
+            <ScoreRing score={overall} size={140} isDark={isDark} />
             <div style={{
               marginTop: 12,
               display: 'flex', alignItems: 'center', gap: 8,
@@ -263,9 +269,9 @@ function CompactScoreHub({
               }}>
                 {TIER_LABELS[tier][lang]}
               </span>
-              <span style={{ fontSize: 11, color: '#9CA3AF' }}>·</span>
+              <span style={{ fontSize: 11, color: tok.textSecondary }}>·</span>
               <span style={{
-                fontSize: 11, color: '#9CA3AF',
+                fontSize: 11, color: tok.textSecondary,
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}>
                 {lang === 'ko' ? '종합 피부 건강도' : lang === 'de' ? 'Gesamt-Hautgesundheit' : 'Overall Skin Health'}
@@ -308,7 +314,7 @@ function CompactScoreHub({
                 padding: '8px 20px', borderRadius: 99,
                 border: '1px solid rgba(94,139,104,0.2)',
                 background: 'transparent',
-                color: '#5E8B68',
+                color: tok.accent,
                 fontSize: 13, fontWeight: 500, cursor: 'pointer',
                 fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
               }}
@@ -319,25 +325,25 @@ function CompactScoreHub({
           </div>
         </motion.div>
       ) : (
-        <NoAnalysisCTA lang={lang} />
+        <NoAnalysisCTA lang={lang} isDark={isDark} tok={tok} />
       )}
     </section>
   );
 }
 
-function NoAnalysisCTA({ lang }: { lang: Lang }) {
+function NoAnalysisCTA({ lang, isDark, tok }: { lang: Lang; isDark: boolean; tok: ReturnType<typeof tokens> }) {
   const navigate = useNavigate();
   return (
     <div style={{
       borderRadius: 16, padding: 24, textAlign: 'center',
-      border: '1px dashed rgba(94,139,104,0.25)',
+      border: `1px dashed ${tok.accent}40`,
     }}>
-      <p style={{ fontSize: 14, fontWeight: 500, color: '#1B2838', marginBottom: 4 }}>
+      <p style={{ fontSize: 14, fontWeight: 500, color: tok.text, marginBottom: 4 }}>
         {lang === 'ko' ? '아직 피부 분석을 하지 않았어요'
           : lang === 'de' ? 'Noch keine Hautanalyse durchgeführt'
             : "You haven't done a skin analysis yet"}
       </p>
-      <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 16 }}>
+      <p style={{ fontSize: 12, color: tok.textSecondary, marginBottom: 16 }}>
         {lang === 'ko' ? 'AI가 30초 안에 피부 상태를 분석해드려요'
           : lang === 'de' ? 'KI analysiert Ihren Hautzustand in 30 Sekunden'
             : 'AI analyzes your skin in 30 seconds'}
@@ -347,7 +353,7 @@ function NoAnalysisCTA({ lang }: { lang: Lang }) {
         style={{
           display: 'inline-block',
           padding: '10px 24px', borderRadius: 12,
-          background: 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
+          background: isDark ? 'linear-gradient(135deg, #4A9E68, #2D7A48)' : 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
           color: '#fff', fontSize: 14, fontWeight: 600,
           textDecoration: 'none', border: 'none', cursor: 'pointer',
         }}
@@ -368,13 +374,18 @@ function ActiveRoutineCard({
   lang,
   hasAnalysis,
   onOpenPicker,
+  isDark,
+  tok,
 }: {
   lang: Lang;
   hasAnalysis: boolean;
   onOpenPicker: () => void;
+  isDark: boolean;
+  tok: ReturnType<typeof tokens>;
 }) {
   const selectedTier = useRoutineStore((s) => s.selectedTier);
   const hasRoutine = selectedTier !== null;
+  const G = glassTokens(isDark).card;
 
   const tierConfig: Record<string, { label: Record<Lang, string>; steps: string[]; total: number }> = {
     essential: {
@@ -404,8 +415,10 @@ function ActiveRoutineCard({
         style={{
           width: '100%', textAlign: 'left',
           borderRadius: 16, padding: 20,
-          border: hasRoutine ? '1px solid rgba(94,139,104,0.15)' : '1px dashed rgba(94,139,104,0.25)',
-          background: '#FFFFFF',
+          border: hasRoutine ? `1px solid ${tok.accent}25` : `1px dashed ${tok.accent}40`,
+          background: G.background,
+          backdropFilter: G.backdropFilter,
+          WebkitBackdropFilter: G.WebkitBackdropFilter,
           cursor: 'pointer',
           boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
         }}
@@ -418,13 +431,13 @@ function ActiveRoutineCard({
                 <Sparkles size={16} color="#5E8B68" />
                 <span style={{
                   fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-                  fontSize: 15, fontWeight: 600, color: '#1B2838',
+                  fontSize: 15, fontWeight: 600, color: tok.text,
                 }}>
                   {config.label[lang]}
                 </span>
               </div>
               <span style={{
-                fontSize: 11, color: '#9CA3AF',
+                fontSize: 11, color: tok.textSecondary,
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}>
                 {lang === 'ko' ? `총 ${config.total}제품` : `${config.total} products`}
@@ -436,14 +449,14 @@ function ActiveRoutineCard({
               {config.steps.map((step) => (
                 <RoutineStepIcon key={step} stepKey={step} size={32} />
               ))}
-              <span style={{ color: '#9CA3AF', fontSize: 12, marginInline: 2 }}>+</span>
+              <span style={{ color: tok.textSecondary, fontSize: 12, marginInline: 2 }}>+</span>
               <RoutineStepIcon stepKey="spf" size={32} />
               {selectedTier === 'pro' && <RoutineStepIcon stepKey="device" size={32} />}
             </div>
 
             <div style={{
               display: 'flex', alignItems: 'center', gap: 4,
-              color: '#5E8B68', fontSize: 13, fontWeight: 500,
+              color: tok.accent, fontSize: 13, fontWeight: 500,
             }}>
               <span>
                 {lang === 'ko' ? 'Lab에서 루틴 관리하기'
@@ -460,21 +473,21 @@ function ActiveRoutineCard({
               <Sparkles size={18} color="#5E8B68" />
               <span style={{
                 fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-                fontSize: 15, fontWeight: 600, color: '#1B2838',
+                fontSize: 15, fontWeight: 600, color: tok.text,
               }}>
                 {lang === 'ko' ? '맞춤 루틴 만들기'
                   : lang === 'de' ? 'Routine zusammenstellen'
                     : 'Build your routine'}
               </span>
             </div>
-            <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 12, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: tok.textSecondary, marginBottom: 12, lineHeight: 1.5 }}>
               {lang === 'ko' ? '분석 결과 기반으로 3가지 루틴 중 선택하세요'
                 : lang === 'de' ? 'Wählen Sie aus 3 Routinen basierend auf Ihrer Analyse'
                   : 'Choose from 3 routines based on your analysis'}
             </p>
             <div style={{
               display: 'flex', alignItems: 'center', gap: 4,
-              color: '#5E8B68', fontSize: 13, fontWeight: 500,
+              color: tok.accent, fontSize: 13, fontWeight: 500,
             }}>
               <span>
                 {lang === 'ko' ? '3가지 루틴 살펴보기'
@@ -522,7 +535,7 @@ function overallFromRecord(r: HistoryRecord): number {
   return Math.round(total / AXES.length);
 }
 
-function SparklineSVG({ points, width = 280, height = 60 }: { points: number[]; width?: number; height?: number }) {
+function SparklineSVG({ points, width = 280, height = 60, isDark = false }: { points: number[]; width?: number; height?: number; isDark?: boolean }) {
   if (points.length === 0) return null;
 
   const padding = 8;
@@ -581,7 +594,7 @@ function SparklineSVG({ points, width = 280, height = 60 }: { points: number[]; 
         <motion.circle
           key={i}
           cx={c.x} cy={c.y} r={4}
-          fill="#FAFAF8" stroke="#5E8B68" strokeWidth={2}
+          fill={isDark ? '#1A1A1C' : '#FAFAF8'} stroke="#5E8B68" strokeWidth={2}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.3 + i * 0.1 }}
@@ -603,13 +616,18 @@ function SkinTrends({
   activeProfile,
   lang,
   onOpenPicker,
+  isDark,
+  tok,
 }: {
   userId: string;
   activeProfile: UserSkinProfile | null;
   lang: Lang;
   onOpenPicker: () => void;
+  isDark: boolean;
+  tok: ReturnType<typeof tokens>;
 }) {
   const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const G = glassTokens(isDark).card;
 
   useEffect(() => {
     if (!userId) return;
@@ -642,7 +660,7 @@ function SkinTrends({
     <section style={{ padding: '0 20px 16px' }}>
       <h2 style={{
         fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-        fontSize: 16, fontWeight: 600, color: '#1B2838',
+        fontSize: 16, fontWeight: 600, color: tok.text,
         marginBottom: 12,
       }}>
         {lang === 'ko' ? '피부 변화 추이' : lang === 'de' ? 'Hauttrends' : 'Skin Trends'}
@@ -650,8 +668,10 @@ function SkinTrends({
 
       <div style={{
         borderRadius: 16, padding: 20,
-        background: '#FFFFFF',
-        border: '1px solid rgba(0,0,0,0.05)',
+        background: G.background,
+        backdropFilter: G.backdropFilter,
+        WebkitBackdropFilter: G.WebkitBackdropFilter,
+        border: G.border,
         boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
       }}>
         {/* Sparkline chart */}
@@ -682,7 +702,7 @@ function SkinTrends({
           /* Single data point — Target Trajectory message */
           <div style={{ textAlign: 'center' }}>
             <p style={{
-              fontSize: 12, color: '#9CA3AF', lineHeight: 1.6, marginBottom: 10,
+              fontSize: 12, color: tok.textSecondary, lineHeight: 1.6, marginBottom: 10,
             }}>
               {lang === 'ko'
                 ? 'Skin Strategy Lab의 맞춤 루틴을 꾸준히 진행했을 때\n기대되는 4주 뒤의 변화입니다'
@@ -696,7 +716,7 @@ function SkinTrends({
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '8px 20px', borderRadius: 99,
-                background: 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
+                background: isDark ? 'linear-gradient(135deg, #4A9E68, #2D7A48)' : 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
                 color: '#fff', fontSize: 13, fontWeight: 600,
                 border: 'none', cursor: 'pointer',
               }}
@@ -721,12 +741,16 @@ function AxisAccordionItem({
   lang,
   isOpen,
   onToggle,
+  isDark,
+  tok,
 }: {
   axis: SkinAxis;
   health: number;
   lang: Lang;
   isOpen: boolean;
   onToggle: () => void;
+  isDark: boolean;
+  tok: ReturnType<typeof tokens>;
 }) {
   const tier = getScoreTier(health);
   const color = TIER_ACCENT[tier];
@@ -734,7 +758,7 @@ function AxisAccordionItem({
 
   return (
     <div style={{
-      borderBottom: '1px solid rgba(0,0,0,0.04)',
+      borderBottom: `1px solid ${tok.border}`,
     }}>
       <button
         onClick={onToggle}
@@ -753,7 +777,7 @@ function AxisAccordionItem({
         {/* Axis name */}
         <span style={{
           flex: 1, textAlign: 'left',
-          fontSize: 14, fontWeight: 500, color: '#1B2838',
+          fontSize: 14, fontWeight: 500, color: tok.text,
           fontFamily: lang === 'ko' ? "'SUIT', sans-serif" : "'Plus Jakarta Sans', sans-serif",
         }}>
           {AXIS_LABELS[axis][lang]}
@@ -773,7 +797,7 @@ function AxisAccordionItem({
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <ChevronDown size={16} color="#9CA3AF" />
+          <ChevronDown size={16} color={tok.textSecondary} />
         </motion.div>
       </button>
 
@@ -788,7 +812,7 @@ function AxisAccordionItem({
           >
             <div style={{ paddingBottom: 14, paddingLeft: 20 }}>
               <p style={{
-                fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 10,
+                fontSize: 13, color: tok.textSecondary, lineHeight: 1.6, marginBottom: 10,
               }}>
                 {insight.text}
               </p>
@@ -815,7 +839,7 @@ function AxisAccordionItem({
   );
 }
 
-function FullBreakdown({ activeProfile, lang }: { activeProfile: UserSkinProfile; lang: Lang }) {
+function FullBreakdown({ activeProfile, lang, isDark, tok }: { activeProfile: UserSkinProfile; lang: Lang; isDark: boolean; tok: ReturnType<typeof tokens> }) {
   const [openAxis, setOpenAxis] = useState<SkinAxis | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -838,11 +862,11 @@ function FullBreakdown({ activeProfile, lang }: { activeProfile: UserSkinProfile
       >
         <h2 style={{
           fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-          fontSize: 16, fontWeight: 600, color: '#1B2838', margin: 0,
+          fontSize: 16, fontWeight: 600, color: tok.text, margin: 0,
         }}>
           {lang === 'ko' ? '전체 피부 분석' : lang === 'de' ? 'Vollständige Analyse' : 'Full Breakdown'}
         </h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#9CA3AF' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: tok.textSecondary }}>
           <span style={{ fontSize: 12 }}>
             {lang === 'ko' ? '10개 축' : '10 axes'}
           </span>
@@ -862,9 +886,9 @@ function FullBreakdown({ activeProfile, lang }: { activeProfile: UserSkinProfile
             style={{
               overflow: 'hidden',
               borderRadius: 16,
-              background: '#FFFFFF',
-              border: '1px solid rgba(0,0,0,0.05)',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
+              background: isDark ? 'rgba(28,28,30,0.7)' : '#FFFFFF',
+              border: `1px solid ${tok.border}`,
+              boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.2)' : '0 1px 3px rgba(0,0,0,0.03)',
               paddingInline: 16,
             }}
           >
@@ -875,6 +899,8 @@ function FullBreakdown({ activeProfile, lang }: { activeProfile: UserSkinProfile
                 health={health}
                 lang={lang}
                 isOpen={openAxis === axis}
+                isDark={isDark}
+                tok={tok}
                 onToggle={() => setOpenAxis(openAxis === axis ? null : axis)}
               />
             ))}
@@ -889,21 +915,23 @@ function FullBreakdown({ activeProfile, lang }: { activeProfile: UserSkinProfile
 // SECTION ⑤ — ACCOUNT (iOS Settings style)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function AccountSection({ email, lang, onLogout }: {
+function AccountSection({ email, lang, onLogout, isDark, tok }: {
   email: string | undefined;
   lang: Lang;
   onLogout: () => void;
+  isDark: boolean;
+  tok: ReturnType<typeof tokens>;
 }) {
   const langDisplay: Record<Lang, string> = { ko: '한국어', de: 'Deutsch', en: 'English' };
 
   const items = [
     {
-      icon: <Mail size={16} color="#9CA3AF" />,
+      icon: <Mail size={16} color={tok.textSecondary} />,
       label: lang === 'ko' ? '이메일' : 'Email',
       value: email || '-',
     },
     {
-      icon: <Globe size={16} color="#9CA3AF" />,
+      icon: <Globe size={16} color={tok.textSecondary} />,
       label: lang === 'ko' ? '언어' : lang === 'de' ? 'Sprache' : 'Language',
       value: langDisplay[lang],
     },
@@ -913,7 +941,7 @@ function AccountSection({ email, lang, onLogout }: {
     <section style={{ padding: '0 20px 32px' }}>
       <h2 style={{
         fontFamily: lang === 'ko' ? "'Hahmlet', serif" : "'Fraunces', serif",
-        fontSize: 14, fontWeight: 600, color: '#9CA3AF',
+        fontSize: 14, fontWeight: 600, color: tok.textSecondary,
         textTransform: 'uppercase', letterSpacing: '0.05em',
         marginBottom: 8,
       }}>
@@ -922,25 +950,25 @@ function AccountSection({ email, lang, onLogout }: {
 
       <div style={{
         borderRadius: 12,
-        background: '#FFFFFF',
-        border: '1px solid rgba(0,0,0,0.05)',
+        background: isDark ? 'rgba(255,255,255,0.03)' : '#FFFFFF',
+        border: `1px solid ${tok.border}`,
         overflow: 'hidden',
       }}>
         {items.map((item, i) => (
           <div key={i}>
-            {i > 0 && <div style={{ height: 1, background: 'rgba(0,0,0,0.04)', marginLeft: 44 }} />}
+            {i > 0 && <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', marginLeft: 44 }} />}
             <div style={{
               display: 'flex', alignItems: 'center',
               padding: '13px 16px', gap: 12,
             }}>
               {item.icon}
-              <span style={{ flex: 1, fontSize: 14, color: '#6B7280' }}>{item.label}</span>
-              <span style={{ fontSize: 14, color: '#1B2838' }}>{item.value}</span>
+              <span style={{ flex: 1, fontSize: 14, color: tok.textSecondary }}>{item.label}</span>
+              <span style={{ fontSize: 14, color: tok.text }}>{item.value}</span>
             </div>
           </div>
         ))}
 
-        <div style={{ height: 1, background: 'rgba(0,0,0,0.04)', marginLeft: 44 }} />
+        <div style={{ height: 1, background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)', marginLeft: 44 }} />
 
         <button
           onClick={onLogout}
@@ -959,10 +987,10 @@ function AccountSection({ email, lang, onLogout }: {
 
       {/* Legal links */}
       <div style={{ display: 'flex', gap: 16, marginTop: 16, justifyContent: 'center' }}>
-        <Link to="/impressum" style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'none' }}>
+        <Link to="/impressum" style={{ fontSize: 11, color: tok.textSecondary, textDecoration: 'none' }}>
           {lang === 'ko' ? '이용약관' : 'Impressum'}
         </Link>
-        <Link to="/datenschutz" style={{ fontSize: 11, color: '#9CA3AF', textDecoration: 'none' }}>
+        <Link to="/datenschutz" style={{ fontSize: 11, color: tok.textSecondary, textDecoration: 'none' }}>
           {lang === 'ko' ? '개인정보처리방침' : 'Datenschutz'}
         </Link>
       </div>
@@ -974,7 +1002,7 @@ function AccountSection({ email, lang, onLogout }: {
 // GUEST VIEW (not logged in)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-function GuestView({ lang }: { lang: Lang }) {
+function GuestView({ lang, isDark, tok }: { lang: Lang; isDark: boolean; tok: ReturnType<typeof tokens> }) {
   return (
     <div style={{
       display: 'flex', flexDirection: 'column',
@@ -984,16 +1012,16 @@ function GuestView({ lang }: { lang: Lang }) {
       <div style={{
         width: 64, height: 64, borderRadius: '50%',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(94,139,104,0.08)', marginBottom: 16,
+        background: `${tok.accent}14`, marginBottom: 16,
       }}>
-        <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: '#5E8B68' }}>S</span>
+        <span style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: tok.accent }}>S</span>
       </div>
-      <p style={{ fontSize: 16, fontWeight: 600, color: '#1B2838', marginBottom: 4 }}>
+      <p style={{ fontSize: 16, fontWeight: 600, color: tok.text, marginBottom: 4 }}>
         {lang === 'ko' ? '로그인 후 피부 분석 결과를 저장하세요'
           : lang === 'de' ? 'Melden Sie sich an, um Ihre Analyse zu speichern'
             : 'Sign in to save your skin analysis'}
       </p>
-      <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 24 }}>
+      <p style={{ fontSize: 13, color: tok.textSecondary, marginBottom: 24 }}>
         {lang === 'ko' ? '분석 기록, 루틴, 변화 추이를 한눈에 확인할 수 있어요'
           : lang === 'de' ? 'Verlauf, Routine und Veränderungen auf einen Blick'
             : 'View history, routine, and progress at a glance'}
@@ -1003,8 +1031,8 @@ function GuestView({ lang }: { lang: Lang }) {
           to="/login"
           style={{
             padding: '10px 24px', borderRadius: 12,
-            border: '1px solid rgba(94,139,104,0.3)',
-            color: '#5E8B68', fontSize: 14, fontWeight: 500,
+            border: `1px solid ${tok.accent}40`,
+            color: tok.accent, fontSize: 14, fontWeight: 500,
             textDecoration: 'none',
           }}
         >
@@ -1014,7 +1042,7 @@ function GuestView({ lang }: { lang: Lang }) {
           to="/signup"
           style={{
             padding: '10px 24px', borderRadius: 12,
-            background: 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
+            background: isDark ? 'linear-gradient(135deg, #4A9E68, #2D7A48)' : 'linear-gradient(135deg, #5E8B68, #3D6B4A)',
             color: '#fff', fontSize: 14, fontWeight: 500,
             textDecoration: 'none',
           }}
@@ -1037,6 +1065,10 @@ export default function Profile() {
   const { isPickerOpen, openPicker, closePicker, setSelectedTier } = useRoutineStore();
   const navigate = useNavigate();
   const lang = (['ko', 'de'].includes(language) ? language : 'en') as Lang;
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+  const tok = tokens(isDark);
+  const G = glassTokens(isDark).card;
 
   const userName = userProfile?.firstName
     ? `${userProfile.firstName} ${userProfile.lastName ?? ''}`.trim()
@@ -1051,12 +1083,12 @@ export default function Profile() {
   const sectionGap = <div style={{ height: 8 }} />;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF8' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: tok.bg, color: tok.text, transition: 'background-color 0.3s ease, color 0.3s ease' }}>
       <Navbar />
 
       <main style={{ paddingTop: 80, paddingBottom: 16, maxWidth: 480, marginInline: 'auto', position: 'relative', zIndex: 10 }}>
         {!isLoggedIn || !userProfile ? (
-          <GuestView lang={lang} />
+          <GuestView lang={lang} isDark={isDark} tok={tok} />
         ) : (
           <>
             {/* ① Compact Score Hub */}
@@ -1065,6 +1097,8 @@ export default function Profile() {
               userName={userName}
               lang={lang}
               onReanalyze={() => { useAnalysisStore.getState().reset(); useSkinAnalysisStore.getState().resetAnalysis(); navigate('/skin-analysis'); }}
+              isDark={isDark}
+              tok={tok}
             />
 
             {activeProfile && (
@@ -1076,6 +1110,8 @@ export default function Profile() {
                   lang={lang}
                   hasAnalysis={!!activeProfile}
                   onOpenPicker={openPicker}
+                  isDark={isDark}
+                  tok={tok}
                 />
 
                 {sectionGap}
@@ -1087,13 +1123,15 @@ export default function Profile() {
                     activeProfile={activeProfile}
                     lang={lang}
                     onOpenPicker={openPicker}
+                    isDark={isDark}
+                    tok={tok}
                   />
                 )}
 
                 {sectionGap}
 
                 {/* ④ Full Breakdown */}
-                <FullBreakdown activeProfile={activeProfile} lang={lang} />
+                <FullBreakdown activeProfile={activeProfile} lang={lang} isDark={isDark} tok={tok} />
               </>
             )}
 
@@ -1105,6 +1143,8 @@ export default function Profile() {
               email={userProfile.email}
               lang={lang}
               onLogout={handleLogout}
+              isDark={isDark}
+              tok={tok}
             />
           </>
         )}

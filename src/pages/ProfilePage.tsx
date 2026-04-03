@@ -12,7 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthStore } from "@/store/authStore";
 import { useProfile } from "@/hooks/useProfile";
 import { useSkinAnalysisStore } from "@/store/skinAnalysisStore";
-import { useAnalysisStore } from "@/store/analysisStore";
+import { useSkinProfileStore } from "@/store/useSkinProfileStore";
+import type { SkinAxis } from "@/types/skinProfile";
 import { useRoutineStore } from "@/store/useRoutineStore";
 import { useI18nStore } from "@/store/i18nStore";
 import { useTheme } from "next-themes";
@@ -196,8 +197,9 @@ function GlassSection({ children, style, isDark }: {
       borderRadius: 16, padding: "1.25rem",
       background: glassTok.card.background,
       backdropFilter: glassTok.card.backdropFilter,
-      WebkitBackdropFilter: glassTok.card.backdropFilter,
+      WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
       border: glassTok.card.border,
+      boxShadow: glassTok.card.boxShadow,
       ...style,
     }}>
       {children}
@@ -227,7 +229,9 @@ function DeleteModal({
       <motion.div
         initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.92 }}
         style={{
-          background: isDark ? '#111' : '#fff',
+          background: isDark ? 'rgba(20,20,20,0.97)' : 'rgba(255,255,255,0.97)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
           border: "1px solid rgba(239,68,68,0.3)", borderRadius: 18, padding: "1.75rem",
           maxWidth: 420, width: "100%",
         }}
@@ -366,27 +370,26 @@ export default function ProfilePage({ de }: { de: boolean }) {
   const [bioDataPurgeOpen, setBioDataPurgeOpen] = useState(false);
   const [aiProfilingEnabled, setAiProfilingEnabled] = useState(true);
 
-  // ── Score data from analysis store ──────────────────────────────────────────
-  const analysisResult = useAnalysisStore(s => s.result);
+  // ── Score data from Supabase-persisted skin profile ─────────────────────────
+  const { activeProfile } = useSkinProfileStore();
   const selectedTier = useRoutineStore(s => s.selectedTier);
 
   const overallScore = useMemo(() => {
-    if (!analysisResult?.axis_scores) return null;
-    const entries = Object.entries(analysisResult.axis_scores) as [string, number][];
-    const scores = entries.map(([, v]) => v).filter(s => s > 0);
-    if (scores.length === 0) return null;
-    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+    if (!activeProfile?.scores) return null;
+    const values = Object.values(activeProfile.scores).filter(s => s > 0);
+    if (values.length === 0) return null;
+    const avg = values.reduce((a, b) => a + b, 0) / values.length;
     return Math.round(100 - avg); // Convert severity to health
-  }, [analysisResult]);
+  }, [activeProfile]);
 
   const topConcerns = useMemo(() => {
-    if (!analysisResult?.axis_scores) return [];
-    return (Object.entries(analysisResult.axis_scores) as [string, number][])
+    if (!activeProfile?.scores) return [];
+    return (Object.entries(activeProfile.scores) as [SkinAxis, number][])
       .filter(([k, v]) => v > 0 && k !== 'makeup_stability')
-      .map(([k, v]) => ({ axis: k, score: Math.round(100 - v) }))
+      .map(([k, v]) => ({ axis: k as string, score: Math.round(100 - v) }))
       .sort((a, b) => a.score - b.score)
       .slice(0, 3);
-  }, [analysisResult]);
+  }, [activeProfile]);
 
   const tierLabel = useMemo(() => {
     const tierMap = { essential: tx('tier_essential', lang), complete: tx('tier_complete', lang), pro: tx('tier_pro', lang) };
@@ -502,7 +505,7 @@ export default function ProfilePage({ de }: { de: boolean }) {
             width: 52, height: 52, borderRadius: 99,
             background: ctaTok.background,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 20, fontWeight: 700, color: '#F5F5F7',
+            fontSize: 20, fontWeight: 700, color: isDark ? '#F5F5F7' : '#FFFFFF',
           }}>
             {initials}
           </div>
@@ -561,7 +564,7 @@ export default function ProfilePage({ de }: { de: boolean }) {
                 onClick={() => window.location.href = '/analysis'}
                 style={{
                   padding: '10px 24px', borderRadius: 12, border: 'none', cursor: 'pointer',
-                  background: ctaTok.background, color: '#F5F5F7',
+                  background: ctaTok.background, color: isDark ? '#F5F5F7' : '#FFFFFF',
                   fontSize: 13, fontWeight: 600,
                   boxShadow: ctaGlowToken(isDark),
                 }}
@@ -753,7 +756,7 @@ export default function ProfilePage({ de }: { de: boolean }) {
                       style={{
                         padding: '0.625rem 1.25rem', borderRadius: 12, border: 'none', cursor: 'pointer',
                         background: profileSave === 'success' ? '#4ADE80' : ctaTok.background,
-                        color: '#F5F5F7', fontSize: '0.875rem', fontWeight: 600,
+                        color: isDark ? '#F5F5F7' : '#FFFFFF', fontSize: '0.875rem', fontWeight: 600,
                       }}>
                       {profileSave === 'saving' ? tx('saving', lang) : profileSave === 'success' ? tx('saved', lang) : tx('save', lang)}
                     </button>
@@ -808,7 +811,7 @@ export default function ProfilePage({ de }: { de: boolean }) {
                         style={{
                           padding: '0.625rem 1.25rem', borderRadius: 12, border: 'none', cursor: 'pointer',
                           background: pwdSave === 'success' ? '#4ADE80' : ctaTok.background,
-                          color: '#F5F5F7', fontSize: '0.875rem', fontWeight: 600,
+                          color: isDark ? '#F5F5F7' : '#FFFFFF', fontSize: '0.875rem', fontWeight: 600,
                         }}>
                         {pwdSave === 'saving' ? tx('saving', lang) : pwdSave === 'success' ? tx('saved', lang) : tx('save', lang)}
                       </button>

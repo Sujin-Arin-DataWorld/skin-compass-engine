@@ -48,10 +48,10 @@ export default function Widerrufsbelehrung() {
             </p>
             <p>
               {language === 'ko'
-                ? "청약철회권을 행사하려면 당사(SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, 이메일: info@skinstrategylab.com)에 명확한 의사표시(예: 하단 양식을 이용한 이메일)를 해야 합니다."
+                ? "청약철회권을 행사하려면 당사(SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, 이메일: info@skinstrategylab.de)에 명확한 의사표시(예: 하단 양식을 이용한 이메일)를 해야 합니다."
                 : language === 'de'
-                  ? "Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, E-Mail: info@skinstrategylab.com) mittels einer eindeutigen Erklärung über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist."
-                  : "To exercise the right of withdrawal, you must inform us (SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, Email: info@skinstrategylab.com) of your decision to withdraw from this contract by an unequivocal statement (e.g. an e-mail)."}
+                  ? "Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, E-Mail: info@skinstrategylab.de) mittels einer eindeutigen Erklärung über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist."
+                  : "To exercise the right of withdrawal, you must inform us (SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, Email: info@skinstrategylab.de) of your decision to withdraw from this contract by an unequivocal statement (e.g. an e-mail)."}
             </p>
           </section>
 
@@ -83,10 +83,10 @@ export default function Widerrufsbelehrung() {
             <div className="font-mono text-xs md:text-sm p-4 bg-background border border-border rounded-lg text-foreground/80 overflow-x-auto whitespace-pre">
               {language === 'de' ? (
                 `An:
-SkinStrategyLab GmbH
-123 Musterstraße
+SkinStrategyLab 
+Kurfürstenstraße 14
 60486 Frankfurt am Main
-E-Mail: info@skinstrategylab.com
+E-Mail: info@skinstrategylab.de
 
 Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden Waren (*) / die Erbringung der folgenden Dienstleistung (*):
 
@@ -110,10 +110,10 @@ Datum: _________________
 (*) Unzutreffendes streichen.`
               ) : language === 'ko' ? (
                 `수신:
-SkinStrategyLab GmbH
-123 Musterstraße
+SkinStrategyLab 
+Kurfürstenstraße 14
 60486 Frankfurt am Main
-이메일: info@skinstrategylab.com
+이메일: info@skinstrategylab.de
 
 본인/당사(*)는 다음 상품의 구매(*)/서비스 제공(*)에 대한 계약을 철회합니다:
 
@@ -137,10 +137,10 @@ _________________________
 (*) 해당하지 않는 내용 삭제`
               ) : (
                 `To:
-SkinStrategyLab GmbH
-123 Musterstraße
+SkinStrategyLab 
+Kurfürstenstraße 14
 60486 Frankfurt am Main
-Email: info@skinstrategylab.com
+Email: info@skinstrategylab.de
 
 I/We (*) hereby give notice that I/We (*) withdraw from my/our (*) contract of sale of the following goods (*) / for the provision of the following service (*):
 

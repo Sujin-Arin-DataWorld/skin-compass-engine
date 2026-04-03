@@ -27,65 +27,64 @@ function tx(obj: LT, lang: Lang): string {
 // ─── Copy ─────────────────────────────────────────────────────────────────────
 
 const L = {
-  eyebrow:    { en: "Lifestyle Profile",   de: "Lebensstil-Profil",     ko: "라이프스타일 프로필" } as LT,
-  title:      { en: "Your Daily Life & Skin", de: "Ihr Alltag & Ihre Haut", ko: "일상과 피부" } as LT,
-  sub:        { en: "Small daily habits powerfully shape your skin biology.", de: "Kleine tägliche Gewohnheiten prägen Ihre Haut stark.", ko: "작은 일상 습관들이 피부에 큰 영향을 줍니다." } as LT,
-  whyPrefix:  { en: "Why we ask:", de: "Warum wir fragen:", ko: "왜 물어보나요:" } as LT,
-  back:       { en: "← Back",       de: "← Zurück",   ko: "← 뒤로" } as LT,
-  cont:       { en: "Continue →",   de: "Weiter →",   ko: "계속 →" } as LT,
+  eyebrow:    { en: "Lifestyle Profile",      de: "Lebensstil-Profil",         ko: "라이프스타일 프로필" } as LT,
+  title:      { en: "Your Daily Life & Skin",  de: "Ihr Alltag & Ihre Haut",   ko: "일상과 피부" } as LT,
+  sub:        { en: "Small daily habits have a big impact on your skin.", de: "Kleine Alltagsgewohnheiten beeinflussen Ihre Haut stark.", ko: "작은 일상 습관이 피부에 큰 영향을 줍니다." } as LT,
+  whyPrefix:  { en: "Why we ask:",             de: "Warum wir fragen:",         ko: "왜 물어보나요:" } as LT,
+  back:       { en: "← Back",                  de: "← Zurück",                 ko: "← 뒤로" } as LT,
+  cont:       { en: "Continue →",              de: "Weiter →",                 ko: "계속 →" } as LT,
 
   // Q1 — Sleep
-  q1:    { en: "How many hours of restful sleep do you average per night?", de: "Wie viele Stunden erholsamen Schlaf bekommen Sie durchschnittlich pro Nacht?", ko: "하루 평균 몇 시간 숙면을 취하시나요?" } as LT,
-  q1why: { en: "Sleep is when your skin repairs itself. Chronic deprivation elevates cortisol, accelerating barrier breakdown and inflammation.", de: "Im Schlaf regeneriert sich Ihre Haut. Chronischer Mangel erhöht Cortisol und schwächt die Hautbarriere.", ko: "수면 중 피부가 회복됩니다. 만성 수면 부족은 코르티솔을 높여 피부 장벽을 약화시키고 염증을 유발합니다." } as LT,
+  q1:    { en: "How much sleep do you get on average?", de: "Wie viele Stunden schlafen Sie durchschnittlich?", ko: "평균 수면 시간이 얼마나 되세요?" } as LT,
+  q1why: { en: "Your skin repairs itself during sleep. Less rest means slower cell turnover and a weaker barrier.", de: "Ihre Haut regeneriert sich im Schlaf. Weniger Schlaf bedeutet langsamere Zellerneuerung und eine geschwächte Hautbarriere.", ko: "수면 중 피부가 스스로 회복해요. 수면이 부족하면 세포 재생이 느려지고 피부 장벽이 약해집니다." } as LT,
 
   // Q2 — Water
-  q2:    { en: "How much water do you drink daily?", de: "Wie viel Wasser trinken Sie täglich?", ko: "하루에 물을 얼마나 드시나요?" } as LT,
-  q2why: { en: "Systemic hydration supports your skin's ability to maintain its moisture barrier from within.", de: "Ausreichend Flüssigkeit unterstützt die Feuchtigkeitsbarriere Ihrer Haut von innen.", ko: "충분한 수분 섭취는 피부가 안에서부터 수분 장벽을 유지하는 데 도움을 줍니다." } as LT,
+  q2:    { en: "How much water do you drink per day?", de: "Wie viel Wasser trinken Sie am Tag?", ko: "하루에 물을 얼마나 마시세요?" } as LT,
+  q2why: { en: "Staying hydrated supports your skin barrier from within and helps maintain a healthy glow.", de: "Ausreichend trinken stärkt Ihre Hautbarriere von innen und sorgt für einen frischen Teint.", ko: "충분한 수분 섭취는 피부 장벽을 안에서부터 건강하게 유지해줘요." } as LT,
 
   // Q3 — Stress
-  q3:    { en: "How would you rate your current stress level?", de: "Wie würden Sie Ihr aktuelles Stressniveau einschätzen?", ko: "현재 스트레스 수준은 어떤가요?" } as LT,
-  q3why: { en: "Cortisol, your stress hormone, directly increases skin oil and triggers inflammatory cascades that worsen breakouts and accelerate aging.", de: "Cortisol erhöht die Hautöl-Produktion direkt und löst Entzündungskaskaden aus, die Unreinheiten verschlechtern.", ko: "스트레스 호르몬 코르티솔은 피지 분비를 증가시키고 염증 반응을 유발해 트러블과 노화를 악화시킵니다." } as LT,
+  q3:    { en: "How stressed are you right now?", de: "Wie gestresst fühlen Sie sich gerade?", ko: "요즘 스트레스가 어느 정도예요?" } as LT,
+  q3why: { en: "Stress raises cortisol, which increases oil production and can trigger breakouts and premature ageing.", de: "Stress erhöht Cortisol — das steigert die Talgproduktion und kann Unreinheiten und vorzeitige Hautalterung auslösen.", ko: "스트레스는 코르티솔을 높여 피지 분비를 늘리고 트러블과 조기 노화를 유발할 수 있어요." } as LT,
 
   // Q4 — Climate
-  q4:    { en: "What is the climate where you live?", de: "Welches Klima herrscht dort, wo Sie leben?", ko: "사시는 지역의 기후는 어떤가요?" } as LT,
-  q4why: { en: "Your climate determines your skin's daily challenges — cold strips the barrier, humidity promotes oil, UV-intense climates accelerate pigmentation.", de: "Kälte schadet der Hautbarriere, Feuchtigkeit begünstigt Hautöl, UV beschleunigt Pigmentierung.", ko: "기후는 피부의 일상적 과제를 결정합니다. 추위는 장벽을, 습도는 피지를, UV는 색소침착을 유발합니다." } as LT,
+  q4:    { en: "What is the climate where you live?", de: "Welches Klima herrscht an Ihrem Wohnort?", ko: "사시는 곳의 기후는 어떤가요?" } as LT,
+  q4why: { en: "Cold air strips moisture, humidity promotes oiliness, and UV accelerates pigmentation — your climate shapes your skin's daily challenges.", de: "Kälte entzieht Feuchtigkeit, Luftfeuchtigkeit fördert Talgproduktion und UV beschleunigt Pigmentierung — Ihr Klima bestimmt die täglichen Herausforderungen Ihrer Haut.", ko: "추위는 수분을 빼앗고, 습도는 피지를 늘리고, UV는 색소침착을 가속해요 — 기후가 피부의 일상 과제를 결정합니다." } as LT,
 
   // Q5 — Exercise
-  q5:    { en: "How often do you exercise outdoors?", de: "Wie oft bewegen Sie sich im Freien?", ko: "야외에서 얼마나 자주 운동하시나요?" } as LT,
-  q5why: { en: "Outdoor exercise increases UV exposure and sweat (both affect skin), but also boosts circulation, improving oxygenation and repair.", de: "Outdoor-Sport erhöht UV-Belastung und Schwitzen, verbessert aber auch die Durchblutung und Sauerstoffversorgung der Haut.", ko: "야외 운동은 자외선 노출과 땀을 증가시키지만 혈액순환을 개선해 피부 산소 공급과 회복에 도움을 줍니다." } as LT,
+  q5:    { en: "How often do you exercise outdoors?", de: "Wie oft bewegen Sie sich draußen?", ko: "야외 운동을 얼마나 자주 하세요?" } as LT,
+  q5why: { en: "Outdoor exercise boosts circulation and skin repair, but also increases UV and sweat exposure.", de: "Bewegung draußen fördert die Durchblutung und Hautregeneration — erhöht aber auch UV- und Schweißbelastung.", ko: "야외 운동은 혈액순환과 피부 재생에 좋지만 자외선과 땀 노출도 늘어요." } as LT,
 } as const;
 
 // ─── Sleep slider labels ──────────────────────────────────────────────────────
 
 const SLEEP_LABELS: LT[] = [
-  { en: "< 5h", de: "< 5 Std.", ko: "5시간 미만" },
-  { en: "5h",   de: "5 Std.",   ko: "5시간" },
-  { en: "6h",   de: "6 Std.",   ko: "6시간" },
-  { en: "7h",   de: "7 Std.",   ko: "7시간" },
-  { en: "8h+",  de: "8+ Std.",  ko: "8시간 이상" },
+  { en: "< 5h",  de: "< 5 Std.",  ko: "5시간 미만" },
+  { en: "5–6h",  de: "5–6 Std.",  ko: "5–6시간" },
+  { en: "7–8h",  de: "7–8 Std.",  ko: "7–8시간" },
+  { en: "8h+",   de: "8+ Std.",   ko: "8시간 이상" },
 ];
-const SLEEP_DEFAULT = 2; // 6h
+const SLEEP_DEFAULT = 1; // 5–6h
 
 // ─── Water options ────────────────────────────────────────────────────────────
 
 const WATER_OPTS = [
   {
     id: "water_low",
-    label:  { en: "1–2 glasses", de: "1–2 Gläser", ko: "1–2잔" } as LT,
+    label:    { en: "Under 1L", de: "Unter 1 Liter", ko: "1리터 미만" } as LT,
     sublabel: { en: "per day", de: "pro Tag", ko: "하루" } as LT,
     glasses: 1,
     fill: 0.28,
   },
   {
     id: "water_mid",
-    label:  { en: "3–5 glasses", de: "3–5 Gläser", ko: "3–5잔" } as LT,
+    label:    { en: "1–2L", de: "1–2 Liter", ko: "1–2리터" } as LT,
     sublabel: { en: "per day", de: "pro Tag", ko: "하루" } as LT,
     glasses: 3,
     fill: 0.62,
   },
   {
     id: "water_high",
-    label:  { en: "6+ glasses", de: "6+ Gläser", ko: "6잔 이상" } as LT,
+    label:    { en: "Over 2L", de: "Über 2 Liter", ko: "2리터 이상" } as LT,
     sublabel: { en: "per day", de: "pro Tag", ko: "하루" } as LT,
     glasses: 5,
     fill: 0.88,
@@ -95,7 +94,7 @@ const WATER_OPTS = [
 // ─── Stress options ───────────────────────────────────────────────────────────
 
 const STRESS_OPTS = [
-  { id: "stress_low",  emoji: "😌", label: { en: "Low",      de: "Niedrig", ko: "낮음" } as LT, accent: "emerald" },
+  { id: "stress_low",  emoji: "😌", label: { en: "Low",      de: "Gering", ko: "낮음" } as LT, accent: "emerald" },
   { id: "stress_mod",  emoji: "😐", label: { en: "Moderate", de: "Mittel",  ko: "보통" } as LT, accent: "amber"   },
   { id: "stress_high", emoji: "😰", label: { en: "High",     de: "Hoch",   ko: "높음" } as LT, accent: "rose"    },
 ] as const;

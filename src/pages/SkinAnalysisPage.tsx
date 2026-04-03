@@ -65,15 +65,15 @@ const CAMERA_PROMPT = {
 const SKIN_ANALYSIS_META = {
   ko: {
     title: 'AI 피부 분석 | SkinStrategyLab',
-    description: '60초 AI 피부 분석으로 10가지 축의 피부 상태를 분석하고 맞춤 스킨케어를 추천받으세요.',
+    description: '60초 안에 AI가 당신의 피부를 10가지 지표로 분석하고, 당신에게 꼭 맞는 스킨케어를 추천해드려요.',
   },
   en: {
     title: 'AI Skin Analysis | SkinStrategyLab',
-    description: 'Analyze your skin across 10 axes with a 60-second AI analysis and get personalized skincare recommendations.',
+    description: 'Stop guessing your skincare. Let AI find what your skin really needs.',
   },
   de: {
     title: 'KI-Hautanalyse | SkinStrategyLab',
-    description: 'Analysieren Sie Ihre Haut in 10 Dimensionen mit einer 60-Sekunden-KI-Analyse und erhalten Sie personalisierte Hautpflege-Empfehlungen.',
+    description: 'Schluss mit falscher Pflege. In 60 Sekunden zur Pflege, die wirklich passt.',
   },
 } as const;
 

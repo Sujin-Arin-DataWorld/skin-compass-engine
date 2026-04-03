@@ -69,7 +69,7 @@ export const translations = {
 
         // Hero Data
         heroTitle: "Precision Skincare.",
-        heroSlogan: "Advanced skin intelligence. 10-Axis professionaln profiling.",
+        heroSlogan: "Advanced skin intelligence. 10-axis precision profiling.",
         targetPrecision: "Targeted Precision Scan",
         steps: {
             step1: "Algorithm Engine",
@@ -82,8 +82,8 @@ export const translations = {
         index: {
             journey: [
                 { title: "Context Setup", subtitle: "Age, environment & lifestyle baseline", desc: "We begin by establishing your environmental and lifestyle parameters. Every algorithmic decision accounts for your local climate and daily routine.", accent: "30 sec" },
-                { title: "Biometric Symptom Check", subtitle: "120 professionalc markers assessed", desc: "Our analysis engine evaluates your skin across multiple dimensions based on IGA, TEWL, and MASI—the exactprofessionalional scales used in cosmetic research.", accent: "3-5 min" },
-                { title: "Data-Driven Analysis", subtitle: "10-axis scoring computed", desc: "Your responses generate a unique biometric skin vector. We don't sort you into a generic \"skin type.\" Your professionalc metrics drive the entire recommendation engine.", accent: "< 3 sec" },
+                { title: "Biometric Symptom Check", subtitle: "120 precision markers assessed", desc: "Our analysis engine evaluates your skin across multiple dimensions based on IGA, TEWL, and MASI — the exact scales used in cosmetic research.", accent: "3-5 min" },
+                { title: "Data-Driven Analysis", subtitle: "10-axis scoring computed", desc: "Your responses generate a unique biometric skin vector. We don't sort you into a generic \"skin type.\" Your precision metrics drive the entire recommendation engine.", accent: "< 3 sec" },
                 { title: "Your Targeted Protocol", subtitle: "5-phase K-beauty routine", desc: "Every product recommendation passes a dual filter: cosmetic efficacy for your specific data vector, and EU-compliant safety standards. No guesswork.", accent: "Personalized" }
             ],
             expertSealTitle: "Biometric Skin Analysis",
@@ -106,12 +106,12 @@ export const translations = {
                 markers: "Validated Markers",
                 phase: "Phase Protocol",
                 realResults: "Real Results. Visible Progress.",
-                realResultsSub: "See how a professionaln-matched K-Beauty protocol transforms your skin over time."
+                realResultsSub: "See how a precision-matched K-Beauty protocol transforms your skin over time."
             },
             analysisMeets: "Analysis Meets Beauty.",
             analysisMeetsSub: "End the cycle of skincare speculation. We curate exactly what your unique skin vector demands.",
             kitTitle: "The Complete<br/>Strategy Lab Kit.",
-            kitSub: "5 formulas perfectly curated to shift your exact professionalc vector toward harmony. Delivered monthly.",
+            kitSub: "5 formulas perfectly curated — designed to bring your skin into balance. Delivered monthly.",
             exploreKit: "Explore Kit",
             initializing: "Initializing...",
             scanningSebum: "Scanning Skin Oil...",
@@ -131,9 +131,9 @@ export const translations = {
                 routine: "K-beauty routine"
             },
             journeyTitle: "The Skin Strategy Journey",
-            journeySub: "A biometrically precise timeline — from intelligent professionaln analysis to a vibrant, personalized European-Korean protocol.",
+            journeySub: "A biometrically precise timeline — from intelligent precision analysis to a vibrant, personalized European-Korean protocol.",
             readyTitle: "Ready to decode your skin?",
-            readySub: "No registration · Results in under 6 min · Backed by professionalonal scales",
+            readySub: "No registration · Results in under 6 min · Backed by professional-grade scales",
             startFree: "Start Free Assessment"
         },
         navbar: {
@@ -176,7 +176,7 @@ export const translations = {
         loginPage: {
             title: "Secure Access",
             titleSignup: "Create Account",
-            subtitle: "Your 10-Axis Skin Strategy is a professionalasset. Sign in to secure your precision data and unlock your personalized formula. Unsaved data will be lost.",
+            subtitle: "Your 10-Axis Skin Strategy is a valuable asset. Sign in to secure your precision data and unlock your personalized formula. Unsaved data will be lost.",
             subtitleSignup: "Create your Skin Strategy Lab account.",
             tabLogin: "Sign In",
             tabSignup: "Register",
@@ -232,12 +232,12 @@ export const translations = {
             coreAssessment: "Core Assessment",
             previous: "Previous",
             next: "Next",
-            processing: "Analyzing dermal vectors...",
-            completing: "Synthesizing 10-Axis Strategy...",
+            processing: "Analysing your skin data...",
+            completing: "Building your personalised profile...",
 
             // Analysis.tsx additions
-            contextTitle: "First, tell us about your skin context",
-            contextSub: "Select all that apply — this personalises your assessment",
+            contextTitle: "First, tell us about your skin",
+            contextSub: "Select everything that applies — this helps personalise your results",
             skinTypeTitle: "What's your baseline skin type?",
             skinTypeSub: "Choose the option that best describes your skin on an average day",
             metaTitle: "Additional Precision Questions",
@@ -271,9 +271,9 @@ export const translations = {
                 high_stress: "I experience high stress or lack of sleep",
             },
             loading: [
-                "Mapping your symptom profile...",
+                "Mapping your skin profile...",
                 "Scoring 10 professional axes...",
-                "Detecting high-risk patterns...",
+                "Identifying key patterns...",
                 "Building your protocol...",
             ],
             ui: {
@@ -414,7 +414,7 @@ export const translations = {
             pageDescription: "Analyze your skin across 10 axes with a 60-second AI analysis and get personalized skincare recommendations.",
             badge: "AI Skin Analysis",
             heading: "60-Second AI Skin Analysis",
-            subheading: "Take a photo and our AI will analyze 10 skin axes\nand suggest personalized solutions.",
+            subheading: "One photo is all it takes — our AI analyses 10 skin areas\nand creates personalised recommendations.",
             startCamera: "Start Analysis →",
             privacyNote: "Photos are never stored on our servers. They are instantly and permanently deleted after AI analysis to ensure complete privacy.",
             axisLabels: ["Sebum", "Hydration", "Barrier", "Sensitivity", "Acne", "Pigment", "Texture", "Aging", "Oxidation", "Makeup Hold"],
@@ -454,7 +454,7 @@ export const translations = {
 
         // Hero Data
         heroTitle: "Wissenschaftliche Präzision.",
-        heroSlogan: "Erweiterte Hautintelligenz. 10-Dimensionen-Vektorprofilierung.",
+        heroSlogan: "Intelligente Hautanalyse. Präzise 10-Achsen-Profilierung.",
         targetPrecision: "Gezielter Präzisionsscan",
         steps: {
             step1: "Algorithmus-Engine",
@@ -468,11 +468,11 @@ export const translations = {
             journey: [
                 { title: "Kontext-Setup", subtitle: "Alter, Umwelt & Lebensstil als Basis", desc: "Wir beginnen mit der Erfassung Ihrer Umwelt- und Lebensstilparameter. Jede algorithmische Entscheidung berücksichtigt Ihr lokales Klima und Ihren Alltag.", accent: "30 Sek" },
                 { title: "Biometrischer Hautbedürfnis-Check", subtitle: "120 biometrische Marker analysiert", desc: "Unsere Analyse-Engine bewertet Ihre Haut in mehreren Dimensionen basierend auf IGA, TEWL und MASI — exakt den professionellen Skalen, die in der kosmetischen Forschung verwendet werden.", accent: "3-5 Min" },
-                { title: "Datengetriebene Analyse", subtitle: "Berechnung auf 10 Dimensionen", desc: "Ihre Antworten erzeugen einen einzigartigen biometrischen Hautvektor. Wir ordnen Sie nicht in einen generischen \"Hauttyp\" ein. Ihre biometrischen Metriken steuern die gesamte Empfehlungs-Engine.", accent: "< 3 Sek" },
+                { title: "Datengetriebene Analyse", subtitle: "Berechnung auf 10 Dimensionen", desc: "Ihre Antworten erzeugen ein einzigartiges biometrisches Profil. Wir ordnen Sie nicht in einen generischen \"Hauttyp\" ein. Ihre biometrischen Metriken steuern die gesamte Empfehlungs-Engine.", accent: "< 3 Sek" },
                 { title: "Ihr gezieltes Protokoll", subtitle: "5-Phasen K-Beauty-Pflege", desc: "Jede Produktempfehlung durchläuft einen doppelten Filter: kosmetische Wirksamkeit für Ihren spezifischen Datenvektor und EU-konforme Sicherheitsstandards. Kein Raten.", accent: "Personalisiert" }
             ],
             expertSealTitle: "Biometrische Hautanalyse",
-            expertSealSub: "ANGETRIEBEN DURCH KOREANISCHE BIOMETRISCHE DATENVERARBEITUNG — DEUTSCHLAND",
+            expertSealSub: "KOREANISCHE BIOMETRISCHE SCIENCE — FÜR DEUTSCHLAND",
             radarBrand: "Skin Strategy",
             scanInProgress: "SCAN LÄUFT",
             matchAccuracy: "Pflege-Fit: 98.4% Genauigkeit",
@@ -494,9 +494,9 @@ export const translations = {
                 realResultsSub: "Sehen Sie, wie ein präzise abgestimmtes K-Beauty-Protokoll Ihre Haut im Laufe der Zeit transformiert."
             },
             analysisMeets: "Analyse trifft Schönheit.",
-            analysisMeetsSub: "Beenden Sie den Kreislauf der Hautpflegespekulationen. Wir kuratieren genau das, was Ihr einzigartiger Hautvektor erfordert.",
+            analysisMeetsSub: "Schluss mit Rätselraten bei der Hautpflege. Wir kuratieren genau das, was Ihre Haut wirklich braucht.",
             kitTitle: "Das komplette<br/>Strategy Lab Kit.",
-            kitSub: "5 Formeln, perfekt kuratiert, um Ihren exakten Hautvektor in Richtung Harmonie zu verschieben. Monatlich geliefert.",
+            kitSub: "5 Formeln, perfekt kuratiert — für eine ausgewogene, gesündere Haut. Monatlich geliefert.",
             exploreKit: "Kit entdecken",
             initializing: "Initialisieren...",
             scanningSebum: "Scanne Hautöl...",
@@ -508,7 +508,7 @@ export const translations = {
             assessingAging: "Beurteile Alterung...",
             analysisComplete: "Analyse abgeschlossen",
             targeting: "Zielerfassung",
-            tenAxisAnalysis: "10-Dimensionen Hautvektoranalyse",
+            tenAxisAnalysis: "10-Achsen-Hautanalyse",
             clinicallyMatched: "Präzise abgestimmte Formeln",
             flow: {
                 analysis: "Analyse",
@@ -617,11 +617,11 @@ export const translations = {
             coreAssessment: "Kernbewertung",
             previous: "Zurück",
             next: "Weiter",
-            processing: "Hautvektoren werden analysiert...",
-            completing: "10-Dimensionen-Strategie wird synchronisiert...",
+            processing: "Ihre Hautdaten werden analysiert...",
+            completing: "Ihr persönliches Profil wird erstellt...",
 
             // Analysis.tsx additions
-            contextTitle: "Erzählen Sie uns zunächst von Ihrem Hautkontext",
+            contextTitle: "Erzählen Sie uns zuerst etwas über Ihre Haut",
             contextSub: "Wählen Sie alle zutreffenden Aussagen — dies personalisiert Ihre Analyse",
             skinTypeTitle: "Was ist Ihr grundlegender Hauttyp?",
             skinTypeSub: "Wählen Sie die Option, die Ihre Haut an einem normalen Tag am besten beschreibt",
@@ -652,7 +652,7 @@ export const translations = {
                 skincare_beginner: "Ich bin neu in der Hautpflege",
                 recent_procedure: "Ich hatte kürzlich einen kosmetischen Eingriff",
                 low_water_intake: "Ich trinke nicht viel Wasser",
-                reactive_skin: "Meine Haut ist leicht irritiert/reaktiv (Empfindlich)",
+                reactive_skin: "Meine Haut reagiert schnell gereizt",
                 high_stress: "Ich habe viel Stress oder Schlafmangel",
             },
             loading: [
@@ -736,7 +736,7 @@ export const translations = {
             progress: {
                 enc1: "Scan wird initialisiert... Wir analysieren Ihren Hautkontext.",
                 enc2: "Analyse läuft. Weiter so — bleiben Sie konzentriert!",
-                enc3: "Fast geschafft! Wir kartieren jetzt Ihren einzigartigen Hautvektor.",
+                enc3: "Fast geschafft! Wir erstellen jetzt Ihr persönliches Hautprofil.",
                 enc4: "Ergebnisse werden finalisiert. Machen Sie sich bereit für Ihren Bericht.",
                 encFinal: "Analyse abgeschlossen! Hochpräziser Bericht wird geladen...",
                 processing: "DATEN WERDEN VERARBEITET",
@@ -797,7 +797,7 @@ export const translations = {
             pageDescription: "Analysieren Sie Ihre Haut in 10 Dimensionen mit einer 60-Sekunden-KI-Analyse und erhalten Sie personalisierte Hautpflege-Empfehlungen.",
             badge: "KI-Hautanalyse",
             heading: "60-Sekunden KI-Hautanalyse",
-            subheading: "Machen Sie ein Foto und unsere KI analysiert 10 Hautdimensionen\nund schlägt personalisierte Lösungen vor.",
+            subheading: "Ein Foto genügt — unsere KI analysiert Ihre Haut in 10 Bereichen\nund erstellt persönliche Empfehlungen.",
             startCamera: "Analyse starten →",
             privacyNote: "Fotos werden niemals auf unseren Servern gespeichert. Sie werden nach der KI-Analyse sofort dauerhaft gelöscht, um Ihre Privatsphäre zu schützen.",
             axisLabels: ["Hautöl", "Feuchtigkeit", "Barriere", "Empfindlichkeit", "Akne", "Pigment", "Textur", "Alterung", "Oxidation", "Make-up-Halt"],
@@ -1047,7 +1047,7 @@ export const phase1T = {
         loginPage: {
             title: "안전한 접근",
             titleSignup: "계정 만들기",
-            subtitle: "10축 피부 전략은 전문적인적 자산입니다. 로그인하여 정밀 데이터를 보호하고 맞춤 포뮬러를 확인하세요. 저장되지 않은 데이터는 사라집니다.",
+            subtitle: "10축 피부 전략은 소중한 자산입니다. 로그인하여 정밀 데이터를 보호하고 맞춤 포뮬러를 확인하세요. 저장되지 않은 데이터는 사라집니다.",
             subtitleSignup: "Skin Strategy Lab 계정을 만드세요.",
             tabLogin: "로그인",
             tabSignup: "회원가입",
@@ -1090,11 +1090,11 @@ export const phase1T = {
             concernSub: "고민을 선택하면 맞춤 제품을 확인할 수 있습니다.",
             noProducts: "이 카테고리에 해당하는 제품이 없습니다.",
             routineTitle: "우리의 루틴",
-            routineSub: "전문적인적으로 선별된 스킨케어 세트 — 피부 데이터에 맞춤.",
+            routineSub: "전문가가 선별한 스킨케어 세트 — 피부 데이터에 맞춤.",
             routines: [
                 { badge: "3단계", title: "입문", desc: "클렌징 · 보습 · 보호", cta: "루틴 시작" },
                 { badge: "5단계", title: "풀 프로토콜", desc: "클렌징 · 토너 · 세럼 · 아이크림 · 보습", cta: "루틴 시작" },
-                { badge: "5단계 + 디바이스", title: "프리미엄 전략", desc: "풀 프로토콜 +\n전문적인 RF/LED 홈 디바이스", cta: "루틴 시작" },
+                { badge: "5단계 + 디바이스", title: "프리미엄 전략", desc: "풀 프로토콜 +\n프로페셔널 RF/LED 홈 디바이스", cta: "루틴 시작" },
             ],
             bannerHeadline: "나의 피부 타입 알아보기",
             bannerSub: "모든 피부는 고유합니다.\n알고리즘이 당신만의 프로토콜을 찾아드립니다.",
@@ -1110,7 +1110,7 @@ export const phase1T = {
             headingLine1: "피부가 머금은 고유의 결,",
             headingLine2: "데이터",
             headingLine3: "로<br />마주하는 첫 순간",
-            description: "10가지 정밀 지표와 7개 부위의 입체적 매핑으로<br />당신만을 위한 솔루션을 제안합니다",
+            description: "10가지 정밀 지표 × 7개 부위 분석으로<br />나만의 솔루션을 제안합니다",
             btnPrimary: "AI로 분석받기",
             btnSecondary: "질문으로 분석하기",
             feature1: "⚡ 30초 분석",

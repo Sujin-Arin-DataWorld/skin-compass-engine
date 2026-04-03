@@ -28,8 +28,8 @@ export default function Widerrufsbelehrung() {
             {language === 'ko'
               ? '유럽 연합 및 독일 법률(BGB)에 따른 소비자 청약철회 권리 안내입니다.'
               : language === 'de'
-              ? 'Verbraucher-Widerrufsrecht nach dem Bürgerlichen Gesetzbuch (BGB).'
-              : 'Consumer right of withdrawal under EU and German law (BGB).'}
+                ? 'Verbraucher-Widerrufsrecht nach dem Bürgerlichen Gesetzbuch (BGB).'
+                : 'Consumer right of withdrawal under EU and German law (BGB).'}
           </p>
         </div>
 
@@ -43,15 +43,15 @@ export default function Widerrufsbelehrung() {
               {language === 'ko'
                 ? "고객님은 사유를 불문하고 14일 이내에 본 계약을 철회할 권리가 있습니다. 청약철회 기한은 고객님 또는 고객님이 지정한 제3자(운송인 제외)가 상품을 수령한 날로부터 14일입니다."
                 : language === 'de'
-                ? "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag, an dem Sie oder ein von Ihnen benannter Dritter, der nicht der Beförderer ist, die Waren in Besitz genommen haben bzw. hat."
-                : "You have the right to withdraw from this contract within 14 days without giving any reason. The withdrawal period will expire after 14 days from the day on which you acquire, or a third party other than the carrier and indicated by you acquires, physical possession of the goods."}
+                  ? "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag, an dem Sie oder ein von Ihnen benannter Dritter, der nicht der Beförderer ist, die Waren in Besitz genommen haben bzw. hat."
+                  : "You have the right to withdraw from this contract within 14 days without giving any reason. The withdrawal period will expire after 14 days from the day on which you acquire, or a third party other than the carrier and indicated by you acquires, physical possession of the goods."}
             </p>
             <p>
               {language === 'ko'
-                ? "청약철회권을 행사하려면 당사(SkinStrategyLab GmbH, 123 Musterstraße, 10115 Berlin, 이메일: support@skinstrategylab.com)에 명확한 의사표시(예: 하단 양식을 이용한 이메일)를 해야 합니다."
+                ? "청약철회권을 행사하려면 당사(SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, 이메일: info@skinstrategylab.com)에 명확한 의사표시(예: 하단 양식을 이용한 이메일)를 해야 합니다."
                 : language === 'de'
-                ? "Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (SkinStrategyLab GmbH, 123 Musterstraße, 10115 Berlin, E-Mail: support@skinstrategylab.com) mittels einer eindeutigen Erklärung über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist."
-                : "To exercise the right of withdrawal, you must inform us (SkinStrategyLab GmbH, 123 Musterstraße, 10115 Berlin, Email: support@skinstrategylab.com) of your decision to withdraw from this contract by an unequivocal statement (e.g. an e-mail)."}
+                  ? "Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, E-Mail: info@skinstrategylab.com) mittels einer eindeutigen Erklärung über Ihren Entschluss, diesen Vertrag zu widerrufen, informieren. Sie können dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist."
+                  : "To exercise the right of withdrawal, you must inform us (SkinStrategyLab, Kurfürstenstraße 14 60486 Frankfurt am Main, Email: info@skinstrategylab.com) of your decision to withdraw from this contract by an unequivocal statement (e.g. an e-mail)."}
             </p>
           </section>
 
@@ -63,8 +63,8 @@ export default function Widerrufsbelehrung() {
               {language === 'ko'
                 ? "당사는 귀하로부터 수령한 모든 결제 대금(표준 배송비를 초과하는 추가 배송비 제외)을 계약 철회 통지를 받은 날로부터 14일 이내에 환불합니다. 훼손된 제품(특히 개봉된 화장품)은 위생 및 건강 보호를 이유로 반품이 불가할 수 있습니다."
                 : language === 'de'
-                ? "Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass Sie eine andere Art der Lieferung als die von uns angebotene, günstigste Standardlieferung gewählt haben), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Kosmetikprodukte, deren Versiegelung nach der Lieferung entfernt wurde, sind aus Gründen des Gesundheitsschutzes oder der Hygiene von der Rückgabe ausgeschlossen."
-                : "If you withdraw from this contract, we shall reimburse to you all payments received from you, including the costs of delivery, without undue delay and in any event not later than 14 days from the day on which we are informed about your decision to withdraw from this contract. Cosmetic products that have been unsealed after delivery are exempt from return for reasons of health protection or hygiene."}
+                  ? "Wenn Sie diesen Vertrag widerrufen, haben wir Ihnen alle Zahlungen, die wir von Ihnen erhalten haben, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass Sie eine andere Art der Lieferung als die von uns angebotene, günstigste Standardlieferung gewählt haben), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über Ihren Widerruf dieses Vertrags bei uns eingegangen ist. Kosmetikprodukte, deren Versiegelung nach der Lieferung entfernt wurde, sind aus Gründen des Gesundheitsschutzes oder der Hygiene von der Rückgabe ausgeschlossen."
+                  : "If you withdraw from this contract, we shall reimburse to you all payments received from you, including the costs of delivery, without undue delay and in any event not later than 14 days from the day on which we are informed about your decision to withdraw from this contract. Cosmetic products that have been unsealed after delivery are exempt from return for reasons of health protection or hygiene."}
             </p>
           </section>
 
@@ -76,17 +76,17 @@ export default function Widerrufsbelehrung() {
               {language === 'ko'
                 ? "본 양식을 복사하여 이메일로 보내주시면 됩니다."
                 : language === 'de'
-                ? "Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück."
-                : "Complete and return this form only if you wish to withdraw from the contract."}
+                  ? "Wenn Sie den Vertrag widerrufen wollen, dann füllen Sie bitte dieses Formular aus und senden Sie es zurück."
+                  : "Complete and return this form only if you wish to withdraw from the contract."}
             </p>
 
             <div className="font-mono text-xs md:text-sm p-4 bg-background border border-border rounded-lg text-foreground/80 overflow-x-auto whitespace-pre">
               {language === 'de' ? (
-`An:
+                `An:
 SkinStrategyLab GmbH
 123 Musterstraße
-10115 Berlin
-E-Mail: support@skinstrategylab.com
+60486 Frankfurt am Main
+E-Mail: info@skinstrategylab.com
 
 Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden Waren (*) / die Erbringung der folgenden Dienstleistung (*):
 
@@ -109,11 +109,11 @@ Datum: _________________
 
 (*) Unzutreffendes streichen.`
               ) : language === 'ko' ? (
-`수신:
+                `수신:
 SkinStrategyLab GmbH
 123 Musterstraße
-10115 Berlin
-이메일: support@skinstrategylab.com
+60486 Frankfurt am Main
+이메일: info@skinstrategylab.com
 
 본인/당사(*)는 다음 상품의 구매(*)/서비스 제공(*)에 대한 계약을 철회합니다:
 
@@ -136,11 +136,11 @@ _________________________
 
 (*) 해당하지 않는 내용 삭제`
               ) : (
-`To:
+                `To:
 SkinStrategyLab GmbH
 123 Musterstraße
-10115 Berlin
-Email: support@skinstrategylab.com
+60486 Frankfurt am Main
+Email: info@skinstrategylab.com
 
 I/We (*) hereby give notice that I/We (*) withdraw from my/our (*) contract of sale of the following goods (*) / for the provision of the following service (*):
 

@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { HelpCircle, X } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useI18nStore } from '@/store/i18nStore';
-import { tokens, ctaTokens, ctaGlowToken, bottomSheet } from '@/lib/designTokens';
+import { tokens, ctaTokens, ctaGlowToken } from '@/lib/designTokens';
 import { ROUTINE_TIERS } from '@/constants/routineTiers';
 import type { RoutineTierId, RoutineTier } from '@/types/routine';
 import RoutineStepIcon from './RoutineStepIcon';
@@ -130,7 +130,9 @@ function TierCard({
       style={{
         background: isSelected
           ? `${tok.accent}10`
-          : isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+          : isDark ? 'rgba(28,28,30,0.55)' : 'rgba(255,255,255,0.65)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         borderRadius: 16,
         padding: '1rem 1.25rem',
         border: `${isSelected ? '2px' : '1px'} solid ${isSelected ? tok.accent : tok.border}`,
@@ -250,7 +252,6 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
   const isDark = resolvedTheme === 'dark';
   const tok = tokens(isDark);
   const ctaTok = ctaTokens(isDark);
-  const sheetTok = isDark ? bottomSheet.dark : bottomSheet.light;
 
   // Reset to default when reopened
   useEffect(() => {
@@ -303,9 +304,13 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
               maxHeight: '85vh',
               display: 'flex',
               flexDirection: 'column',
-              background: sheetTok.background,
-              borderRadius: sheetTok.borderRadius,
-              boxShadow: sheetTok.boxShadow,
+              background: isDark ? 'rgba(28,28,30,0.97)' : 'rgba(255,255,255,0.97)',
+              backdropFilter: 'blur(24px)',
+              WebkitBackdropFilter: 'blur(24px)',
+              borderRadius: '20px 20px 0 0',
+              boxShadow: isDark
+                ? '0 -8px 40px rgba(0,0,0,0.5), 0 -1px 0 rgba(255,255,255,0.06)'
+                : '0 -8px 40px rgba(0,0,0,0.1), 0 -1px 0 rgba(0,0,0,0.06)',
               zIndex: 9999,
               paddingBottom: 'env(safe-area-inset-bottom, 16px)',
             }}
@@ -334,7 +339,7 @@ export default function RoutinePicker({ isOpen, onClose, onConfirm }: RoutinePic
                 width: 36,
                 height: 4,
                 borderRadius: 99,
-                background: sheetTok.handleColor,
+                background: tok.textTertiary,
               }} />
             </motion.div>
 

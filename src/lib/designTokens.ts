@@ -489,8 +489,8 @@ export const tierGradients: Record<ScoreTier, { color: string; gradient: [string
 // ── CTA GLOW (2025 Redesign — Premium Button Glow Shadows) ──────────────────
 
 export const ctaGlow = {
-  light: '0 8px 24px rgba(94,139,104,0.3)',
-  dark: '0 8px 24px rgba(74,158,104,0.25)',
+  light: '0 8px 24px rgba(94,139,104,0.3), 0 2px 8px rgba(94,139,104,0.15)',
+  dark: '0 8px 24px rgba(74,158,104,0.25), 0 2px 8px rgba(74,158,104,0.15)',
 } as const;
 
 export function ctaGlowToken(isDark: boolean) {

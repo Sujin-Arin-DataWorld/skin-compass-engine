@@ -120,15 +120,9 @@ function ScoreRing({ score, size = 120, isDark = false }: { score: number; size?
   const progress = (score / 100) * circumference;
   const trackColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
 
-  // Gradient colors based on tier
+  // Gradient colors from shared designTokens — single source of truth
   const gradientId = `ring-gradient-${tier}`;
-  const gradients: Record<string, [string, string]> = {
-    excellent: ['#4ECDC4', '#2BAE66'],
-    good: ['#5E8B68', '#8FC49F'],
-    attention: ['#C9A96E', '#B08A4A'],
-    critical: ['#E8A87C', '#D4845A'],
-  };
-  const [g1, g2] = gradients[tier];
+  const [g1, g2] = tierGradients[tier].gradient;
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>

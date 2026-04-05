@@ -600,7 +600,7 @@ export default function AnalysisResults({
               backdropFilter: glassTok.card.backdropFilter,
               WebkitBackdropFilter: glassTok.card.WebkitBackdropFilter,
               border: glassTok.card.border,
-              boxShadow: isDark ? '0 8px 40px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)',
+              boxShadow: glassTok.card.boxShadow,
             }}
           >
             <p style={{ fontSize: '11px', fontFamily: 'var(--font-sans)', color: tok.textSecondary, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '16px', fontWeight: 600 }}>
@@ -769,7 +769,7 @@ export default function AnalysisResults({
                 ? 'linear-gradient(135deg, rgba(74,158,104,0.12) 0%, rgba(45,107,74,0.08) 100%)'
                 : 'linear-gradient(135deg, rgba(94,139,104,0.08) 0%, rgba(61,107,74,0.05) 100%)',
               border: `1px solid ${tok.accent}30`,
-              boxShadow: `0 0 40px ${tok.accent}08, inset 0 1px 0 rgba(255,255,255,0.04)`,
+              boxShadow: `${ctaGlowToken(isDark)}, inset 0 1px 0 rgba(255,255,255,0.04)`,
               backdropFilter: 'blur(12px)',
             }}
           >

@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Activity, Package, Heart, MapPin, LogOut } from "lucide-react";
+import { useTheme } from "next-themes";
+import { tokens } from "@/lib/designTokens";
 import { useAuthStore } from "@/store/authStore";
 import { useI18nStore } from "@/store/i18nStore";
 
@@ -29,6 +31,9 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
     const { language } = useI18nStore();
     const navigate = useNavigate();
     const de = language === "de";
+    const { resolvedTheme } = useTheme();
+    const isDark = resolvedTheme === 'dark';
+    const tok = tokens(isDark);
 
     const initials = [userProfile?.firstName?.[0], userProfile?.lastName?.[0]]
         .filter(Boolean)
@@ -41,7 +46,7 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
     };
 
     return (
-        <div className="min-h-screen" style={{ background: "#F5F5F7", color: "#e8e8e8" }}>
+        <div className="min-h-screen" style={{ background: tok.bg, color: tok.text, transition: 'background-color 0.3s ease, color 0.3s ease' }}>
 
             {/* ── Desktop sidebar ─────────────────────────────────── */}
             <aside
@@ -53,7 +58,7 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
                     <p style={{ fontSize: "0.55rem", letterSpacing: "0.3em", color: BRONZE, textTransform: "uppercase" }}>
                         Skin Strategy Lab
                     </p>
-                    <p style={{ fontFamily: "'Georgia', serif", fontSize: "1.05rem", color: GOLD, marginTop: "0.25rem" }}>
+                    <p style={{ fontFamily: de ? "'Hahmlet', serif" : "'Fraunces', serif", fontSize: "1.05rem", color: GOLD, marginTop: "0.25rem" }}>
                         {de ? "Mein Konto" : "My Account"}
                     </p>
                 </div>
@@ -157,9 +162,9 @@ export default function AccountLayout({ activeTab, onTabChange, children }: Prop
                         </p>
                         <h1
                             style={{
-                                fontFamily: "'Georgia', serif",
+                                fontFamily: de ? "'Hahmlet', serif" : "'Fraunces', serif",
                                 fontSize: "1.6rem",
-                                color: "#f0f0f0",
+                                color: tok.text,
                                 lineHeight: 1.2,
                                 letterSpacing: "-0.01em",
                             }}

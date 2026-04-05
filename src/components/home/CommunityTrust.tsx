@@ -96,7 +96,7 @@ interface CommunityTrustProps {
   lang: 'ko' | 'en' | 'de';
 }
 
-const FALLBACK_COUNT = 12847;
+const FALLBACK_COUNT = 0;
 
 export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
   const counterRef = useRef(null);

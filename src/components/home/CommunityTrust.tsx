@@ -1,10 +1,17 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Star } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
+// ── Trustpilot config ─────────────────────────────────────────────────────────
+const TRUSTPILOT_BUSINESS_UNIT_ID = '69d2bef918012ef123c81d18';
+const TRUSTPILOT_TEMPLATE_ID      = '56278e9abfbbba0bdcd568bc'; // Review Collector
+const TRUSTPILOT_TOKEN            = '537cd804-2b36-42b0-ac08-229972e505ce';
+
+// ── Behold config ─────────────────────────────────────────────────────────────
 const BEHOLD_FEED_ID = '1936871740071623';
 
-// Inline SVG — lucide-react deprecated brand icons in v0.417+
+// ── Inline SVG — lucide-react deprecated brand icons in v0.417+ ───────────────
 function InstagramIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -15,7 +22,49 @@ function InstagramIcon({ className }: { className?: string }) {
   );
 }
 
-// Loads the Behold script once and renders the feed widget
+// ── Trustpilot TrustBox (Review Collector) ────────────────────────────────────
+// Requires bootstrap script in index.html:
+// <script src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>
+function TrustpilotWidget({ lang }: { lang: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const tp = (window as Window & { Trustpilot?: { loadFromElement: (el: Element) => void } }).Trustpilot;
+    if (tp && ref.current) {
+      tp.loadFromElement(ref.current);
+    }
+  }, []);
+
+  const locale =
+    lang === 'ko' ? 'ko-KR' :
+    lang === 'de' ? 'de-DE' :
+                    'en-GB';
+
+  return (
+    <div
+      ref={ref}
+      className="trustpilot-widget"
+      data-locale={locale}
+      data-template-id={TRUSTPILOT_TEMPLATE_ID}
+      data-businessunit-id={TRUSTPILOT_BUSINESS_UNIT_ID}
+      data-token={TRUSTPILOT_TOKEN}
+      data-style-height="52px"
+      data-style-width="100%"
+      data-theme="dark"
+    >
+      <a
+        href="https://www.trustpilot.com/review/skinstrategylab.de"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-white/40 text-xs hover:text-white/60 transition-colors"
+      >
+        Trustpilot
+      </a>
+    </div>
+  );
+}
+
+// ── Behold Instagram feed ─────────────────────────────────────────────────────
 function BeholdFeed() {
   const [loaded, setLoaded] = useState(false);
 
@@ -43,12 +92,8 @@ function BeholdFeed() {
     </motion.div>
   );
 }
-import { supabase } from '@/integrations/supabase/client';
 
-interface CommunityTrustProps {
-  lang: 'ko' | 'en' | 'de';
-}
-
+// ── Fake review cards (displayed until real Trustpilot reviews accumulate) ────
 const REVIEWS = [
   {
     name: "Sarah M.",
@@ -63,9 +108,9 @@ const REVIEWS = [
     name: "Elena K.",
     date: "04 Nov 2025",
     text: {
-      ko: "피부과 갈 돈 아꼈어요! 분석 결과가 너무 정확해서 소름 돋았습니다. 완전 추천해요.",
-      en: "Saved money on derm visits! The analysis was scarily accurate. Highly recommend.",
-      de: "Geld für den Hautarzt gespart! Die Analyse war erschreckend genau. Sehr zu empfehlen."
+      ko: "피부과 갈 돈 아꼈어요! 피부 스캔 결과가 너무 정확해서 소름 돋았습니다. 완전 추천해요.",
+      en: "Saved money on derm visits! The skin scan was scarily accurate. Highly recommend.",
+      de: "Geld für den Hautarzt gespart! Der Scan war erschreckend genau. Sehr zu empfehlen."
     }
   },
   {
@@ -79,6 +124,10 @@ const REVIEWS = [
   }
 ];
 
+interface CommunityTrustProps {
+  lang: 'ko' | 'en' | 'de';
+}
+
 const FALLBACK_COUNT = 12847;
 
 export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
@@ -87,7 +136,7 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
   const [count, setCount] = useState(0);
   const [target, setTarget] = useState(FALLBACK_COUNT);
 
-  // Fetch real analysis count from Supabase on mount
+  // Fetch real scan count (AI camera + questionnaire) from Supabase on mount
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (supabase.rpc as any)('get_public_scan_count')
@@ -98,7 +147,7 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
       });
   }, []);
 
-  // Animate from 0 to target over 2 seconds when in view
+  // Animate counter 0 → target over 2s when scrolled into view
   useEffect(() => {
     if (!isInView) return;
     let startTime: number;
@@ -118,8 +167,8 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
   return (
     <section className="bg-[#0A0D12] py-24 md:py-32 border-t border-white/5 overflow-hidden">
       <div className="mx-auto max-w-6xl px-5 md:px-10">
-        
-        {/* ── 1. Live Counter ── */}
+
+        {/* ── 1. Live scan counter ── */}
         <div ref={counterRef} className="text-center mb-24 md:mb-32">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -136,25 +185,30 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
           </motion.div>
         </div>
 
-        {/* ── 2. Trustpilot Reviews ── */}
+        {/* ── 2. Trustpilot ── */}
         <div className="mb-24 md:mb-32">
           <div className="flex flex-col items-center mb-12">
             <h4 className="text-2xl md:text-3xl font-light text-white mb-6" style={{ fontFamily: "var(--font-display)" }}>
               {lang === 'ko' ? '고객들이 증명합니다' : lang === 'de' ? 'Von echten Kunden geliebt' : 'Loved by real customers'}
             </h4>
-            {/* Fake Trustpilot styling */}
-            <div className="flex items-center gap-3">
-              <span className="text-white font-bold text-xl tracking-tight">Trustpilot</span>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="bg-[#00B67A] p-1.5 rounded-sm">
-                    <Star className="w-3.5 h-3.5 text-white fill-white" />
-                  </div>
-                ))}
-              </div>
+
+            {/* Real Trustpilot TrustBox widget */}
+            <div className="w-full max-w-sm mb-6">
+              <TrustpilotWidget lang={lang} />
             </div>
+
+            <a
+              href="https://www.trustpilot.com/review/skinstrategylab.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/30 text-xs tracking-wider hover:text-white/50 transition-colors"
+              style={{ fontFamily: 'var(--font-sans)' }}
+            >
+              {lang === 'ko' ? 'Trustpilot에서 리뷰 남기기 →' : lang === 'de' ? 'Bewertung auf Trustpilot hinterlassen →' : 'Leave a review on Trustpilot →'}
+            </a>
           </div>
 
+          {/* Review cards — displayed until real Trustpilot reviews accumulate */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
             {REVIEWS.map((review, i) => (
               <motion.div
@@ -182,25 +236,23 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
           </div>
         </div>
 
-        {/* ── 3. UGC Masonry Grid ── */}
+        {/* ── 3. Instagram feed (Behold) ── */}
         <div>
           <div className="flex items-center justify-between mb-8">
             <h4 className="text-2xl font-light text-white" style={{ fontFamily: "var(--font-display)" }}>
               #SkinStrategyLab
             </h4>
-            <div className="flex gap-3">
-              <a
-                href="https://www.instagram.com/skinstrategylab.de"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
-                aria-label="Instagram"
-              >
-                <InstagramIcon className="w-4 h-4 text-white" />
-              </a>
-            </div>
+            <a
+              href="https://www.instagram.com/skinstrategylab.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+              aria-label="Instagram"
+            >
+              <InstagramIcon className="w-4 h-4 text-white" />
+            </a>
           </div>
-          
+
           <BeholdFeed />
         </div>
 

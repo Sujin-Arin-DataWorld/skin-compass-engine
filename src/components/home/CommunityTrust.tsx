@@ -1,6 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Star } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 // ── Trustpilot config ─────────────────────────────────────────────────────────
@@ -9,7 +8,7 @@ const TRUSTPILOT_TEMPLATE_ID      = '56278e9abfbbba0bdcd568bc'; // Review Collec
 const TRUSTPILOT_TOKEN            = '537cd804-2b36-42b0-ac08-229972e505ce';
 
 // ── Behold config ─────────────────────────────────────────────────────────────
-const BEHOLD_FEED_ID = '1936871740071623';
+const BEHOLD_FEED_ID = 'J08oNpv7aSHY73AZmvaT';
 
 // ── Inline SVG — lucide-react deprecated brand icons in v0.417+ ───────────────
 function InstagramIcon({ className }: { className?: string }) {
@@ -87,42 +86,11 @@ function BeholdFeed() {
       transition={{ duration: 0.6 }}
       style={{ opacity: loaded ? 1 : 0, transition: 'opacity 0.4s ease' }}
     >
-      {/* @ts-expect-error — behold-widget is a custom element registered by Behold's script */}
-      <behold-widget feed-id={BEHOLD_FEED_ID} />
+      <div data-behold-id={BEHOLD_FEED_ID} />
     </motion.div>
   );
 }
 
-// ── Fake review cards (displayed until real Trustpilot reviews accumulate) ────
-const REVIEWS = [
-  {
-    name: "Sarah M.",
-    date: "12 Oct 2025",
-    text: {
-      ko: "내 피부가 진짜 필요한게 뭔지 이제야 알았어요. 추천해준 앰플 3주째 쓰는데 붉은기가 완전히 사라졌습니다.",
-      en: "Finally know what my skin actually needs. Using the recommended ampoule for 3 weeks and redness is gone.",
-      de: "Endlich weiß ich, was meine Haut wirklich braucht. Nutze die Ampulle seit 3 Wochen und Rötungen sind weg."
-    }
-  },
-  {
-    name: "Elena K.",
-    date: "04 Nov 2025",
-    text: {
-      ko: "피부과 갈 돈 아꼈어요! 피부 스캔 결과가 너무 정확해서 소름 돋았습니다. 완전 추천해요.",
-      en: "Saved money on derm visits! The skin scan was scarily accurate. Highly recommend.",
-      de: "Geld für den Hautarzt gespart! Der Scan war erschreckend genau. Sehr zu empfehlen."
-    }
-  },
-  {
-    name: "Julia W.",
-    date: "18 Nov 2025",
-    text: {
-      ko: "지금까지 산 화장품 중에 제일 피부가 편안해요. 60초 스캔 한번으로 인생템 찾았습니다.",
-      en: "Most comfortable my skin has ever felt. Found my holy grail products in 60 seconds.",
-      de: "Meine Haut hat sich noch nie so gut angefühlt. Holy Grail Produkte in 60 Sekunden gefunden."
-    }
-  }
-];
 
 interface CommunityTrustProps {
   lang: 'ko' | 'en' | 'de';
@@ -208,32 +176,6 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
             </a>
           </div>
 
-          {/* Review cards — displayed until real Trustpilot reviews accumulate */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-            {REVIEWS.map((review, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                className="bg-white/[0.03] border border-white/5 rounded-[24px] p-8 flex flex-col justify-between"
-              >
-                <div className="flex gap-1 mb-5">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className="w-4 h-4 text-[#00B67A] fill-[#00B67A]" />
-                  ))}
-                </div>
-                <p className="text-white/80 text-[15px] leading-relaxed mb-8 flex-grow">
-                  "{review.text[lang]}"
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-white font-medium text-sm">{review.name}</span>
-                  <span className="text-white/40 text-xs">{review.date}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
 
         {/* ── 3. Instagram feed (Behold) ── */}

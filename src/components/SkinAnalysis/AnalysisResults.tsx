@@ -6,7 +6,7 @@ import { useMemo, useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { RotateCcw, Save, ChevronRight, ChevronDown, CheckCircle2 } from 'lucide-react';
+import { RotateCcw, Save, ChevronRight, ChevronDown, CheckCircle2, Share2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useI18nStore } from '@/store/i18nStore';
 import { useAuthStore } from '@/store/authStore';
@@ -22,6 +22,7 @@ import AuthModal from '@/components/ui/AuthModal';
 import AiGeneratedBadge from '@/components/legal/AiGeneratedBadge';
 import MedicalDisclaimer from '@/components/legal/MedicalDisclaimer';
 import { compressImageBase64 } from '@/utils/imageCompression';
+import { generateShareCard } from '@/utils/generateShareCard';
 import { AXIS_KO_SHORT } from '@/data/productRules';
 import { buildProductBundleV5 } from '@/engine/routineEngineV5';
 import type { SkinAxisScores } from '@/types/skinAnalysis';
@@ -110,8 +111,11 @@ const TX = {
   topConcerns: { ko: '관리가 시급한 항목', en: 'Priority Concerns', de: 'Prioritäre Anliegen' },
   allAxes: { ko: '전체 상세 분석', en: 'Full Analysis', de: 'Vollständige Analyse' },
   masterplan: { ko: '🧪 AI가 설계한 내 맞춤 스킨케어 마스터플랜 보기', en: '🧪 View AI Custom Skincare Masterplan', de: '🧪 KI-Hautpflege-Masterplan ansehen' },
-  retake: { ko: '다시 분석', en: 'Retake', de: 'Wiederholen' },
+  retake: { ko: '다시 스캔', en: 'Retake', de: 'Wiederholen' },
   save: { ko: '저장', en: 'Save', de: 'Speichern' },
+  share: { ko: '공유', en: 'Share', de: 'Teilen' },
+  shareGenerating: { ko: '카드 생성 중…', en: 'Creating card…', de: 'Karte wird erstellt…' },
+  shareDownload: { ko: '이미지 저장됨 — Instagram Stories에서 공유하세요', en: 'Image saved — share to Instagram Stories from your gallery', de: 'Bild gespeichert — teile es in Instagram Stories' },
   saveLogin: { ko: '로그인 후 저장', en: 'Save after login', de: 'Nach Login speichern' },
   saved: { ko: '저장됨 ✓', en: 'Saved ✓', de: 'Gespeichert ✓' },
   saveFail: { ko: '저장 실패 — 재시도', en: 'Save failed — retry', de: 'Fehler — erneut versuchen' },
@@ -305,6 +309,7 @@ export default function AnalysisResults({
 
   const [pendingAction, setPendingAction] = useState<'save' | 'masterplan' | 'routine' | null>(null);
   const [pendingTierId, setPendingTierId] = useState<string | null>(null);
+  const [shareStatus, setShareStatus] = useState<'idle' | 'generating' | 'done'>('idle');
   const apiReasons = useSkinAnalysisStore((s) => s.reasons);
   const hasLifestyle = lifestyleAnswers !== null;
   const setResult = useAnalysisStore((s) => s.setResult);
@@ -545,6 +550,52 @@ export default function AnalysisResults({
     resetAnalysisStore();
     onRetake();
   }, [resetAnalysis, resetAnalysisStore, onRetake]);
+
+  // ── handleShare: generate card → Web Share API → download fallback ──────────
+  const handleShare = useCallback(async () => {
+    if (shareStatus === 'generating') return;
+    setShareStatus('generating');
+
+    try {
+      const blob = await generateShareCard({
+        overallScore,
+        tier,
+        top3: top3.map((a) => ({ key: a.key, healthScore: a.healthScore })),
+        lang,
+      });
+
+      const file = new File([blob], 'skin-score.jpg', { type: 'image/jpeg' });
+
+      // 1. Web Share API with file (works on mobile Chrome/Safari → user can pick Instagram Stories)
+      if (
+        typeof navigator.share === 'function' &&
+        typeof navigator.canShare === 'function' &&
+        navigator.canShare({ files: [file] })
+      ) {
+        await navigator.share({ files: [file], title: 'My Skin Score — Skin Strategy Lab' });
+        setShareStatus('idle');
+        return;
+      }
+
+      // 2. Fallback: trigger download + hint toast
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'skin-score.jpg';
+      a.click();
+      URL.revokeObjectURL(url);
+      toast(TX.shareDownload[lang], { duration: 5000 });
+    } catch (err) {
+      // User cancelled Web Share — treat as silent cancel
+      if (err instanceof Error && err.name === 'AbortError') {
+        /* silent */
+      } else {
+        console.error('[handleShare]', err);
+      }
+    } finally {
+      setShareStatus('idle');
+    }
+  }, [shareStatus, overallScore, tier, top3, lang]);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -853,6 +904,29 @@ export default function AnalysisResults({
               saveStatus === 'error' ? TX.saveFail[lang] :
                 saveStatus === 'saving' ? '...' :
                   isLoggedIn ? TX.save[lang] : TX.saveLogin[lang]}
+          </button>
+        </motion.div>
+
+        {/* ── Share card button ──────────────────────────────────────────────── */}
+        <motion.div custom={8.5} variants={fadeUp} initial="hidden" animate="visible" className="mt-3">
+          <button
+            onClick={handleShare}
+            disabled={shareStatus === 'generating'}
+            className="w-full rounded-2xl py-3 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            aria-label={TX.share[lang]}
+            style={{
+              background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+              border: `1px solid ${tok.border}`,
+              backdropFilter: 'blur(12px)',
+              color: tok.textSecondary,
+              fontFamily: 'var(--font-sans)',
+              fontSize: '13px',
+              fontWeight: 500,
+              opacity: shareStatus === 'generating' ? 0.55 : 1,
+            }}
+          >
+            <Share2 size={13} />
+            {shareStatus === 'generating' ? TX.shareGenerating[lang] : TX.share[lang]}
           </button>
         </motion.div>
 

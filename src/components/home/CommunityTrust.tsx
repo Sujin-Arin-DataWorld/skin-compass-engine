@@ -1,6 +1,49 @@
 import { useRef, useEffect, useState } from 'react';
-import { motion, useInView, useAnimation } from 'framer-motion';
-import { Star, Instagram } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+import { Star } from 'lucide-react';
+
+const BEHOLD_FEED_ID = '1936871740071623';
+
+// Inline SVG — lucide-react deprecated brand icons in v0.417+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+// Loads the Behold script once and renders the feed widget
+function BeholdFeed() {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const existing = document.querySelector('script[data-behold]');
+    if (existing) { setLoaded(true); return; }
+    const script = document.createElement('script');
+    script.src = 'https://w.behold.so/widget.js';
+    script.type = 'module';
+    script.dataset.behold = 'true';
+    script.onload = () => setLoaded(true);
+    document.head.appendChild(script);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      style={{ opacity: loaded ? 1 : 0, transition: 'opacity 0.4s ease' }}
+    >
+      {/* @ts-expect-error — behold-widget is a custom element registered by Behold's script */}
+      <behold-widget feed-id={BEHOLD_FEED_ID} />
+    </motion.div>
+  );
+}
+import { supabase } from '@/integrations/supabase/client';
 
 interface CommunityTrustProps {
   lang: 'ko' | 'en' | 'de';
@@ -36,35 +79,41 @@ const REVIEWS = [
   }
 ];
 
+const FALLBACK_COUNT = 12847;
+
 export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
   const counterRef = useRef(null);
   const isInView = useInView(counterRef, { once: true, margin: "-100px" });
   const [count, setCount] = useState(0);
+  const [target, setTarget] = useState(FALLBACK_COUNT);
 
-  // Animate from 0 to 12847 over 2 seconds when in view
+  // Fetch real analysis count from Supabase on mount
   useEffect(() => {
-    if (isInView) {
-      let startTime: number;
-      const target = 12847;
-      const duration = 2000;
-      
-      const step = (timestamp: number) => {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / duration, 1);
-        
-        // Easing function (easeOutExpo)
-        const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-        
-        setCount(Math.floor(easeOut * target));
-        
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase.rpc as any)('get_public_scan_count')
+      .then(({ data, error }: { data: unknown; error: unknown }) => {
+        if (!error && typeof data === 'number' && data > 0) {
+          setTarget(data);
         }
-      };
-      
-      window.requestAnimationFrame(step);
-    }
-  }, [isInView]);
+      });
+  }, []);
+
+  // Animate from 0 to target over 2 seconds when in view
+  useEffect(() => {
+    if (!isInView) return;
+    let startTime: number;
+    const duration = 2000;
+
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCount(Math.floor(easeOut * target));
+      if (progress < 1) window.requestAnimationFrame(step);
+    };
+
+    window.requestAnimationFrame(step);
+  }, [isInView, target]);
 
   return (
     <section className="bg-[#0A0D12] py-24 md:py-32 border-t border-white/5 overflow-hidden">
@@ -82,7 +131,7 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
               <span className="text-[#5E8B68]">+</span>
             </h3>
             <p className="text-[15px] md:text-[18px] text-white/50 tracking-widest uppercase mt-4" style={{ fontFamily: "var(--font-sans)" }}>
-              {lang === 'ko' ? '누적 AI 피부 분석 완료' : lang === 'de' ? 'Analysen durchgeführt' : 'Analyses Conducted'}
+              {lang === 'ko' ? '누적 AI 피부 스캔 완료' : lang === 'de' ? 'Hautscans abgeschlossen' : 'Skin Scans Completed'}
             </p>
           </motion.div>
         </div>
@@ -140,41 +189,19 @@ export const CommunityTrust = ({ lang }: CommunityTrustProps) => {
               #SkinStrategyLab
             </h4>
             <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                <Instagram className="w-4 h-4 text-white" />
-              </div>
+              <a
+                href="https://www.instagram.com/skinstrategylab.de"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+                aria-label="Instagram"
+              >
+                <InstagramIcon className="w-4 h-4 text-white" />
+              </a>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            {/* Placeholder images. Replace with real UGC later. */}
-            {[
-              "beginner-mood.jpg",
-              "full-mood2.jpg",
-              "premium-mood.jpg",
-              "routine-placeholder.jpg"
-            ].map((img, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="group relative aspect-square rounded-[20px] overflow-hidden bg-white/5"
-              >
-                <img
-                  src={`/assets/routines/${img}`}
-                  alt="UGC"
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                  onError={(e) => { e.currentTarget.style.opacity = '0'; }}
-                />
-                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <Instagram className="w-6 h-6 text-white drop-shadow-lg" />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <BeholdFeed />
         </div>
 
       </div>
